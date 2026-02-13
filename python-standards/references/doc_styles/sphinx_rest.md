@@ -6,7 +6,7 @@ Prioritizes tooling and rich linking. The native format for Python's official do
 ## Format Rules
 * **Directives**: Uses `:field name:` syntax.
 * **Types**: Can be separate (`:type param:`) or inline.
-* **Formatting**: Supports bold, italics, and code blocks using reST syntax (`**bold**`, ` ``code`` `).
+* **Formatting**: Supports bold, italics, and code blocks using reST syntax (`**bold**`, ``` ``code`` ```).
 
 ## Example
 ```python

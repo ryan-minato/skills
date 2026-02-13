@@ -21,6 +21,6 @@ project_root/
 
 ## Import Mechanics
 
-* Code in `tests/` cannot simple `import my_package` via relative path.
+* Code in `tests/` cannot simply `import my_package` via relative path.
 * You must install the package in editable mode (`pip install -e .`) to run tests.
 * **Benefit**: Guarantees that you are testing the code that will actually be built and distributed.
