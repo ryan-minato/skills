@@ -69,7 +69,6 @@ Store templates, images, or static data files.
 - Create `./skills/<skill-name>/SKILL.md`.
 - Create subdirectories (`scripts`, `references`) if the skill requires code or heavy context.
 
-
 5. **Review**: Confirm the file structure is correct.
 
 # Constraints
