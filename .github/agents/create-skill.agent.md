@@ -37,7 +37,7 @@ Must start with YAML frontmatter:
 name: skill-name-here
 description: specific description of when to use this skill (max 1024 chars)
 ---
-
+Skill usage instructions go here.
 ```
 
 Followed by Markdown instructions. Keep the body under 500 lines.
