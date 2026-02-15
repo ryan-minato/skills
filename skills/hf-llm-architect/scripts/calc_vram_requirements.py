@@ -103,7 +103,7 @@ if __name__ == "__main__":
     parser.add_argument("--size", type=float, required=True, help="Model size in Billions")
     parser.add_argument("--context", type=int, default=4096)
     parser.add_argument("--batch", type=int, default=1)
-    parser.add_argument("--precision", type=str, default="bf16", choices=["fp32", "bf16", "fp16", "int8", "int4"])
+    parser.add_argument("--precision", type=str, default="bf16", choices=["fp32", "bf16", "int8", "int4"])
     parser.add_argument("--mode", type=str, default="training", choices=["training", "inference", "lora"])
     parser.add_argument("--optim", type=str, default="adamw", choices=["adamw", "adamw_8bit", "sgd"])
 

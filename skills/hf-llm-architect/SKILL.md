@@ -45,27 +45,27 @@ Estimate memory usage for Training (Full/LoRA) and Inference based on model size
 
 * **Theory**: Understand **Step Law** (Hyperparameters) and **Farseer** (Loss Prediction) to optimize compute.
 * **Practice**: Data mixing recipes for continual pre-training.
-* 🔗 [Scaling Laws & Recipes](references/01_pretraining/scaling_laws_step_farseer.md)
-* 🔗 [Continual Pre-training Guide](references/01_pretraining/continual_pretraining_recipes.md)
+* 🔗 [Scaling Laws & Recipes](https://www.google.com/search?q=references/01_pretraining/scaling_laws_step_farseer.md)
+* 🔗 [Continual Pre-training Guide](https://www.google.com/search?q=references/01_pretraining/continual_pretraining_recipes.md)
 
 ### Phase 2: Supervised Fine-Tuning (SFT)
 
 * **Core**: Chat Templates, Sequence Packing (`packing=True`), and Loss Masking.
 * **Efficiency**: LoRA/QLoRA configuration (`target_modules="all-linear"`).
-* 🔗 [SFT Best Practices](references/02_fine_tuning/sft_best_practices.md)
-* 🔗 [PEFT & LoRA Config](references/02_fine_tuning/peft_lora_config.md)
+* 🔗 [SFT Best Practices](https://www.google.com/search?q=references/02_fine_tuning/sft_best_practices.md)
+* 🔗 [PEFT & LoRA Config](https://www.google.com/search?q=references/02_fine_tuning/peft_lora_config.md)
 
 ### Phase 3: Alignment & Reasoning
 
 * **General**: DPO vs ORPO for chat preferences.
 * **Reasoning**: **GRPO** (DeepSeek-R1 style) for math/code tasks without a value model.
-* 🔗 [Preference Optimization (DPO/ORPO)](references/03_alignment/dpo_orpo_preference.md)
-* 🔗 [Reasoning with GRPO](references/03_alignment/grpo_reasoning.md)
+* 🔗 [Preference Optimization (DPO/ORPO)](https://www.google.com/search?q=references/03_alignment/dpo_orpo_preference.md)
+* 🔗 [Reasoning with GRPO](https://www.google.com/search?q=references/03_alignment/grpo_reasoning.md)
 
 ### Phase 4: Infrastructure
 
 * **Distributed**: Choosing between DDP, DeepSpeed ZeRO-1/2/3, and FSDP.
 * **Inference**: Flash Attention 2, KV Cache Quantization, and vLLM serving.
-* 🔗 [Distributed Strategy Matrix](references/04_distributed/strategy_matrix.md)
-* 🔗 [DeepSpeed & FSDP Config](references/04_distributed/deepspeed_fsdp_config.md)
-* 🔗 [Inference Optimization](references/05_inference/production_optimization.md)
+* 🔗 [Distributed Strategy Matrix](https://www.google.com/search?q=references/04_distributed/strategy_matrix.md)
+* 🔗 [DeepSpeed & FSDP Config](https://www.google.com/search?q=references/04_distributed/deepspeed_fsdp_config.md)
+* 🔗 [Inference Optimization](https://www.google.com/search?q=references/05_inference/production_optimization.md)
