@@ -33,11 +33,17 @@ Use [references/scope_selection.md](references/scope_selection.md).
 Default behavior when user gives no explicit scope:
 
 1. Scan staged diffs first.
-2. Then scan the diff between current branch local `HEAD` and the latest commit of its remote tracking branch.
-3. If no staged files exist, scan all changed files in the working tree.
+2. Then scan unstaged working tree changes against local `HEAD`.
+3. If no staged files exist, scan all changed files in the working tree (`staged + unstaged + untracked` where relevant).
+
+If user explicitly asks to scan all commits in a PR, expand scope to:
+
+- Current staged diff (if any).
+- Current unstaged/untracked working tree changes (if any).
+- Every commit in the PR range, scanned commit-by-commit for leak content in diffs and commit messages.
 
 If user explicitly asks to scan all files, ignore diff-only logic and scan the entire requested range.
-After scope is determined, build the concrete target file list. Do not report "full scan complete" unless all in-scope files meet the full-scan completion criteria defined in [references/scenario_full_scan.md](references/scenario_full_scan.md) (for example, each file has been both read and checked at least once).
+After scope is determined, build the concrete target file list. Do not report "full scan complete" unless all in-scope files satisfy both conditions.
 
 If any files are excluded, list them explicitly with reason.
 
@@ -60,7 +66,8 @@ Load only relevant references:
 - Full-repo/range behavior: [references/scenario_full_scan.md](references/scenario_full_scan.md)
 - Commit message review: [references/scenario_commit_messages.md](references/scenario_commit_messages.md)
 
-If the user does not explicitly disable it, also check commit messages between local commits and the latest remote tracking commit.
+If the user does not explicitly disable it, also check commit messages in the active scan range.
+If user explicitly asks to scan all commits in a PR, commit message checks must cover each commit in that PR range.
 
 ### Step 4: Validate Git Identity Privacy (Conditional)
 
@@ -85,7 +92,7 @@ For each finding include:
 
 ## Response Template
 
-> **Scan Scope**: [staged diff / local-vs-remote diff / changed files / full scan]
+> **Scan Scope**: [staged diff / working-tree-vs-HEAD / changed files / full scan / pr-all-commits]
 >
 > **Context Checks**:
 > - Open-source scenario: [yes/no]
@@ -101,7 +108,7 @@ For each finding include:
 > - [severity] [category] [location] — [risk] — [recommended fix]
 >
 > **Commit Message Review**:
-> - [result for local commits vs latest remote commit]
+> - [result for checked commit range]
 >
 > **Git Identity Privacy Check**:
 > - [result and recommendation]

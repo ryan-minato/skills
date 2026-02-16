@@ -4,7 +4,7 @@ Use this structure for final scan output.
 
 ## 1) Scope and assumptions
 
-- Scan mode: `staged diff` / `local-vs-remote diff` / `changed files` / `full scan`
+- Scan mode: `staged diff` / `working-tree-vs-HEAD` / `changed files` / `full scan` / `pr-all-commits`
 - Target range: directories/files/commit range
 - Assumptions: open-source context, privacy requirement, exclusions
 - File coverage:
@@ -33,7 +33,7 @@ For each finding:
 
 ## 4) Commit message check
 
-- Range checked: local commits not in latest remote commit
+- Range checked: explicit commit range (default: current scan scope; PR mode: all commits in PR range)
 - Result: pass/fail
 - Findings: hashes and remediation actions if any
 

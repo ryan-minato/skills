@@ -6,11 +6,11 @@ Review commit messages for leakage risk.
 
 If user does not explicitly disable commit message checking:
 
-1. Identify latest commit of remote tracking branch.
-2. Inspect local commits between that remote commit and local `HEAD`.
+1. Inspect pending commit messages that are in current explicit scan range.
+2. By default, do not infer and scan the full PR commit range.
 3. Scan commit subject and body for secrets/privacy leakage.
 
-Do not limit this to only the immediate previous commit.
+If user explicitly asks to scan all commits in a PR, scan commit messages for every commit in that PR range.
 
 ## What to detect in commit messages
 

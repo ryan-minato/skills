@@ -5,13 +5,23 @@ Use this reference when scan scope is based on changes, not full repository.
 ## Objectives
 
 1. Catch newly introduced secret/privacy leaks quickly.
-2. Prioritize review on content likely to be committed or recently diverged from remote.
+2. Prioritize review on content likely to be committed relative to local latest commit (`HEAD`).
 
 ## Checklist
 
 1. Inspect staged diff first.
-2. Inspect local-vs-latest-remote diff for current branch.
+2. Inspect unstaged diff against local `HEAD`.
 3. If no staged files exist, inspect all changed files in working tree.
+
+## Explicit PR all-commits mode
+
+Run this mode only when user explicitly asks to scan all commits in a PR.
+
+1. Keep normal working tree checks (staged + unstaged/untracked when relevant).
+2. Identify PR commit range.
+3. Scan each commit in that range one by one:
+  - commit diff content,
+  - commit message leakage risk.
 
 ## Detection focus in diffs
 
@@ -34,6 +44,6 @@ Also inspect context lines when:
 
 For each finding in this scenario include:
 
-- Diff scope (`staged` / `local-vs-remote` / `working-tree-change`)
+- Diff scope (`staged` / `working-tree-vs-HEAD` / `working-tree-change` / `pr-commit`)
 - File path and nearby marker (line/diff hunk)
 - Whether value appears newly added or pre-existing
