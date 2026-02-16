@@ -8,10 +8,10 @@ Use this structure for final scan output.
 - Target range: directories/files/commit range
 - Assumptions: open-source context, privacy requirement, exclusions
 - File coverage:
-	- in-scope files: `N`
-	- read at least once: `N`
-	- checked at least once: `N`
-	- excluded/unscannable files: `N` (with reasons)
+  - in-scope files: `N`
+  - read at least once: `N`
+  - checked at least once: `N`
+  - excluded/unscannable files: `N` (with reasons)
 
 ## 2) Findings summary
 
