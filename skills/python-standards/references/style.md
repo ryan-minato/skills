@@ -65,7 +65,7 @@
     * **FIXME**: For code that has a known bug and requires a fix.
     * **HACK**: For suboptimal code that works but requires refactoring.
     * **XXX**: For dangerous code or logic that is unclear despite working.
-    * **NOTE**: To document the background or specific reasoning behind a implementation decision.
+    * **NOTE**: To document the background or specific reasoning behind an implementation decision.
 
 ## 8. Type Annotations
 
