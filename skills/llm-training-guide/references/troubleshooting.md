@@ -18,7 +18,7 @@ Training proceeds, but model metrics degrade or fail to improve.
 
 | Issue | Symptoms | Root Causes | Solutions |
 | :--- | :--- | :--- | :--- |
-| **Loss Spikes & Gradient Explosion** | Sudden loss increase, NaNs, oscillating metrics. | High gradient norms (dirty data, numerical instability); Excessive LR/insufficient warmup. | 1. Monitor Gradient Norm & Gradient Spike Score (GSS > 50 is critical).<br>2. Apply Adaptive Gradient Clipping (AdaGC).<br>3. Implement automated checkpoint rollback & batch skipping. |
+| **Loss Spikes & Gradient Explosion** | Sudden loss increase, NaNs, oscillating metrics. | High gradient norms (dirty data, numerical instability); Excessive LR/insufficient warmup. | 1. Monitor Gradient Norm & Gradient Spike Score (GSS; values ≫ 10 are concerning, and GSS > 50 indicates severe spikes; see `gradient_spike_score.md`).<br>2. Apply Adaptive Gradient Clipping (AdaGC).<br>3. Implement automated checkpoint rollback & batch skipping. |
 | **Non-Convergence / "Fake Learning"** | Loss plateaus near random chance (e.g., $Loss \approx -\log(1/C)$). | Bad weight initialization (vanishing/exploding gradients); Silent data drops (e.g., HF Trainer dropping un-tokenized inputs). | 1. **Overfit One Batch:** Ensure loss hits 0 on 2-10 samples.<br>2. **Zero-Input Baseline:** Train on zeroed inputs; if loss drops, the model is learning statistical bugs, not features. |
 | **Representation Collapse** *(Added)* | All outputs converge to the same token/vector; Dead ReLUs. | High learning rates with ReLU architectures; Normalization layers failing. | 1. Switch to SwiGLU or GeLU.<br>2. Check LayerNorm/RMSNorm implementations for numerical underflow. |
 
