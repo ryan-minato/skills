@@ -11,7 +11,7 @@ from accelerate import Accelerator
 from accelerate.utils import AORecipeKwargs, MSAMPRecipeKwargs, TERecipeKwargs
 
 
-def pick_handler(backend: str):
+def pick_handler(backend: str) -> MSAMPRecipeKwargs | TERecipeKwargs | AORecipeKwargs | None:
     if backend == "msamp":
         return MSAMPRecipeKwargs(optimization_level="O1")
     if backend == "te":
