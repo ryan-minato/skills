@@ -175,7 +175,7 @@ notebook_launcher(training_loop, args, num_processes=2)
 ### Reference Guides
 *   **Accelerators**: See [the reference guide](references/accelerators.md) for details on supported hardware accelerators.
 *   **Best Practices**: See [the reference guide](references/best_practices.md) for additional best practices and optimization tips.
-*   **Big Model Loading**: See [the reference guide](references/big_mode_loadling.md) for details on loading models that exceed single-device memory.
+*   **Big Model Loading**: See [the reference guide](references/big_model_loading.md) for details on loading models that exceed single-device memory.
 *   **Compilation**: See [the reference guide](references/compilation.md) for details on graph compilation (e.g., `torch.compile`).
 *   **DeepSpeed**: See [the reference guide](references/deepspeed.md) for details on integrating DeepSpeed.
 *   **Distributed Architecture**: See [the reference guide](references/distributed_architecture.md) for details on the underlying distributed architecture.
