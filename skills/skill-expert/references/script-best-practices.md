@@ -16,7 +16,7 @@ The top of every Python script must contain a metadata block similar to this:
 
 ```python
 # /// script
-# requires-python = ">=3.12"
+# requires-python = ">=3.9"
 # dependencies = [
 #     "requests",
 #     "pandas",
