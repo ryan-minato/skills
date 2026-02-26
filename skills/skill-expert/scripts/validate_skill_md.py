@@ -41,7 +41,7 @@ def validate(skill_dir: str):
         sys.exit(1)
 
     # 2. Name Validation (Mandatory constraints)
-    name = str(metadata.get("name", ""))
+    name = str(metadata.get("name") or "")
     if not name:
         log("ERROR", "Frontmatter", "Missing required field: 'name'.")
         errors += 1
@@ -62,7 +62,7 @@ def validate(skill_dir: str):
             errors += 1
 
     # 3. Description Validation
-    desc = str(metadata.get("description", ""))
+    desc = str(metadata.get("description") or "")
     if not desc:
         log("ERROR", "Frontmatter", "Missing required field: 'description'.")
         errors += 1
