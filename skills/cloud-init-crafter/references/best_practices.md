@@ -13,8 +13,8 @@ Adopting consistent practices for `cloud-init` configurations helps improve the 
 Idempotency ensures that running a script multiple times yields the same result as running it once. Since `cloud-init` modules or scripts may be re-executed during reboots or manual calls, configurations should be designed to handle repeated execution gracefully.
 
 * **Pre-execution Checks**: It is recommended to verify the system state before performing an action.
-    * *Sub-optimal*: `runcmd: ["echo 'export PATH=$PATH:/opt/bin' >> /etc/profile"]` (Appends the line on every execution).
-    * *Recommended*: `runcmd: ["grep -q '/opt/bin' /etc/profile || echo 'export PATH=$PATH:/opt/bin' >> /etc/profile"]`
+  * *Sub-optimal*: `runcmd: ["echo 'export PATH=$PATH:/opt/bin' >> /etc/profile"]` (Appends the line on every execution).
+  * *Recommended*: `runcmd: ["grep -q '/opt/bin' /etc/profile || echo 'export PATH=$PATH:/opt/bin' >> /etc/profile"]`
 * **Semaphore Files**: For complex initializations, consider using `cloud-init-per` or creating a "flag" file (e.g., `/var/lib/myapp/init_done`) to prevent redundant operations.
 
 ## 3. Security Hardening
@@ -31,8 +31,6 @@ Idempotency ensures that running a script multiple times yields the same result 
 * **Documentation**: Including comments within the YAML to explain the rationale behind specific system tunings can aid future maintenance.
 
 ## 5. Testing and Validation Workflow
-
-
 
 1. **Static Analysis**: Use `cloud-init schema -c <file> --annotate` to catch logical errors or schema mismatches.
 2. **Local Simulation**: Testing configurations in local environments such as LXD, QEMU, or Multipass can verify execution logic before cloud deployment.
