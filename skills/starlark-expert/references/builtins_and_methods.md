@@ -294,7 +294,7 @@ x.setdefault("three", 3)                # 3
 
 ```python
 x = {}
-x.update([("a", 1), ("b", 2)], c=3)     # x becomes {"a": 1, "b": "2", "c": 3}
+x.update([("a", 1), ("b", 2)], c=3)     # x becomes {"a": 1, "b": 2, "c": 3}
 ```
 
 #### dict·values
