@@ -20,7 +20,7 @@ regexes = [
   # GitLab anonymous (noreply.gitlab.com and users.noreply.gitlab.com)
   '''(?i).+@(users\.)?noreply\.gitlab\.com''',
   # RFC 2606 reserved documentation domains
-  '''(?i).+@example\.(com|org|net)''',
+  '''(?i)^[A-Za-z0-9._%+-]+@example\.(com|org|net)$''',
 ]
 
 # ---------------------------------------------------------------------------
