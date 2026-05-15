@@ -68,3 +68,18 @@ runtime (`uv` or `deno`).
 Target: 50–100 lines. Hard limit: 120 lines. Exceeding the limit means content should
 move to `docs/` with a pointer added to AGENTS.md. Enforced by
 `scripts/validate_harness.py` (structural validator).
+
+## Deployment Boundary
+
+`skills/<name>/` is the deployable unit. When a skill is installed in another project,
+only the contents of that directory are available — no `docs/`, `scripts/`, `AGENTS.md`,
+`WORKFLOW.md`, `QUALITY.md`, or any other file from this repository.
+
+**Consequence for skill authors:** `SKILL.md` body and any skill-local files must be
+fully self-contained. Never instruct an agent to read or reference files outside
+`skills/<name>/`.
+
+Prohibited in `SKILL.md` body:
+- Paths to `docs/`, `scripts/`, or any repo-level file
+- References to `docs/specs/<name>.md`, `WORKFLOW.md`, `QUALITY.md`, or `SECURITY.md`
+- Instructions to run repo-level scripts (`validate_harness.py`, `check_skill.py`)
