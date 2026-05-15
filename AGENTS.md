@@ -21,6 +21,9 @@ ARCHITECTURE.md      ← structural rules and ownership map
 SECURITY.md          ← secrets, PII, and content safety rules
 ```
 
+Skills in `skills/` are deployed standalone — end users see only `skills/<name>/`.
+`SKILL.md` body must reference only files within its own skill directory.
+
 ## Core Conventions
 
 - **Language:** All docs, code, templates, and comments are English-first.

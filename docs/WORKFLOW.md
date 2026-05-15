@@ -1,5 +1,11 @@
 # WORKFLOW.md — Skill Authoring Process
 
+> **Contributor scope:** This document describes the authoring process for this
+> repository. These steps are **not** skill content — do not embed references to
+> `docs/specs/`, `validate_harness.py`, or any other repo-internal file in a
+> `SKILL.md` body. See [ARCHITECTURE.md](../ARCHITECTURE.md#deployment-boundary)
+> for the deployment boundary rule.
+
 ## Authoring a New Skill
 
 ### 1. Define Intent
@@ -91,9 +97,11 @@ ci: add harness validator to pre-commit
 
 ## Modifying an Existing Skill
 
-1. Re-read `docs/specs/<name>.md` to confirm intent before editing.
+1. Re-read `docs/specs/<name>.md` to confirm intent before editing. *(Contributor
+   step — not skill content.)*
 2. Make the smallest change that addresses the issue.
-3. Update `docs/specs/<name>.md` if the skill's scope changed.
+3. Update `docs/specs/<name>.md` if the skill's scope changed. *(Contributor
+   step — not skill content.)*
 4. Add a new Gotcha if the change corrects an agent behavior error.
 5. Run the validator.
 

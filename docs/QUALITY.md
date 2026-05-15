@@ -35,8 +35,9 @@ explicitly in `docs/specs/<name>.md`.
 
 **Document external dependencies in the spec, not the skill body.**
 If a skill depends on an external API, library, component, or service, record its name,
-version constraints, and access requirements in `docs/specs/<name>.md`. The SKILL.md
-body should reference the spec rather than embedding raw API details inline.
+version constraints, and access requirements in `docs/specs/<name>.md` at authoring
+time. The SKILL.md body must remain self-contained — it must not reference the spec
+file or any other file outside `skills/<name>/`.
 
 ## SKILL.md Structural Constraints
 
@@ -84,17 +85,28 @@ purpose and target trigger conditions before the skill is considered complete.
 
 ## Review Checklist
 
+### Repo structure checks
+
+*(Verified by contributors and CI — not applicable to deployed skills.)*
+
+- [ ] `docs/specs/<name>.md` exists and matches skill intent
 - [ ] `name` in frontmatter matches directory name exactly
+- [ ] All referenced external APIs, libraries, or services are documented in
+      `docs/specs/<name>.md`
+- [ ] `uv run scripts/check_skill.py skills/<name>/` passes without errors
+
+### Skill content checks
+
+*(Verified by reviewers — these constraints must hold in the deployed skill.)*
+
 - [ ] `description` uses imperative phrasing and covers indirect triggers
 - [ ] `Gotchas` contains only non-obvious, domain-specific facts
 - [ ] Every reference file load instruction specifies a precise condition
 - [ ] All scripts implement `--help` and accept input via flags only
 - [ ] Skill makes no assumption about framework, runtime, or platform (unless
       `docs/specs/<name>.md` explicitly restricts scope)
-- [ ] All referenced external APIs, libraries, or services are documented in
-      `docs/specs/<name>.md`
+- [ ] `SKILL.md` body references no files outside `skills/<name>/` — no `docs/`,
+      `scripts/`, `WORKFLOW.md`, `QUALITY.md`, spec files, or any repo-level path
 - [ ] No internal business logic, proprietary specs, or confidential runbooks
       (see SECURITY.md — External Content)
-- [ ] `docs/specs/<name>.md` exists and matches skill intent
-- [ ] `uv run scripts/check_skill.py skills/<name>/` passes without errors
 - [ ] No credentials, PII, or verbatim proprietary content
