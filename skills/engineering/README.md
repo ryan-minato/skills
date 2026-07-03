@@ -14,4 +14,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | Description |
 |---|---|
-| _(none yet)_ | |
+| [gitmoji](gitmoji/) | Draft gitmoji commit messages: resolve the project variant (standalone vs CC-combined grammar, unicode vs text codes), pick the one emoji for the dominant intent via a first-match decision list, and validate against a pre-handover checklist. |
