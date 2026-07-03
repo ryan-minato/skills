@@ -1,0 +1,27 @@
+# <type>[(<scope>)][!]: <description>   (title <= 50 chars, imperative,
+#                                        lowercase start, no trailing period)
+#
+# type — first match wins:
+#   revert   revert a prior commit
+#   fix      correct wrong user-visible behavior      -> PATCH
+#   feat     new user-visible behavior                -> MINOR
+#   perf     measured performance improvement         -> PATCH
+#   refactor restructure code, behavior unchanged
+#   style    cosmetic only (whitespace, formatting)
+#   test     tests only
+#   docs     documentation only
+#   build    build system or dependency changes
+#   ci       CI pipeline configuration
+#   chore    remaining maintenance
+#
+# scope — optional noun for the changed area: (auth), (parser)
+# !     — before the colon marks a breaking change    -> MAJOR
+#
+# ------------------ blank line between title and body ------------------
+# Body: wrap at 72 characters. Explain WHY, not HOW - the diff shows how.
+# ------------------------------------------------------------------------
+#
+# Footers (each on its own line, after a blank line):
+#   BREAKING CHANGE: <what breaks and how to migrate>
+#   Closes #<issue>
+#   Co-authored-by: Name <name@example.com>
