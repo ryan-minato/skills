@@ -15,4 +15,5 @@ npx skills add ryan-minato/skills --skill <skill-name> -g
 |---|---|
 | [great-skill-writer](great-skill-writer/) | Write and improve Agent Skills that behave predictably: spec-compliant frontmatter, trigger-accurate descriptions, checkable completion criteria, progressive disclosure, and a bundled linter. |
 | [meta-harness](meta-harness/) | Design, audit, and improve agent harnesses: inspect project and team facts, choose a maturity level (L0–L4), calibrate nine harness layers, and make every rule discoverable to future agents from AGENTS.md. |
+| [programming-guidelines](programming-guidelines/) | Apply universal coding standards for programming work: think before coding, prefer simple solutions, make surgical changes, and verify against clear success criteria. |
 | [sensitivity-check](sensitivity-check/) | Detect PII and leaked secrets in text or files and produce a structured report. Preferred engines (Presidio, detect-secrets via uv) with stdlib-only fallback scripts covering generic + US/GB/CN/JP entities. |
