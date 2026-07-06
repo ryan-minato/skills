@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -41,6 +42,10 @@ from pathlib import Path
 DEFAULT_REPO = "https://github.com/ryan-minato/skills.git"
 DEFAULT_REF = "main"
 DEFAULT_AGENT_DIR = ".claude"
+
+# A skill directory name is interpolated into a glob pattern, so restrict it to
+# a safe character set: letters, digits, dot, underscore, hyphen.
+SAFE_SKILL_NAME = re.compile(r"[A-Za-z0-9._-]+")
 
 
 def eprint(*args: object) -> None:
@@ -134,6 +139,14 @@ def discover_skills(clone: Path) -> list[dict[str, str]]:
 
 def find_skill_dir(clone: Path, name: str) -> Path:
     """Locate skills/<catalog>/<name>/; error if missing or ambiguous."""
+    # Restrict to a bare, safe directory name. This rejects path separators,
+    # ``..``, and glob metacharacters (``*``, ``?``, ``[]``) that would
+    # otherwise steer the match outside — or across — the skills/*/<name> shape.
+    if not SAFE_SKILL_NAME.fullmatch(name) or name in (".", ".."):
+        raise RuntimeError(
+            f"invalid skill name '{name}': use a bare skill directory name "
+            f"(letters, digits, '.', '_', '-'). Run with --list to see names."
+        )
     matches = [p for p in clone.glob(f"skills/*/{name}") if (p / "SKILL.md").is_file()]
     if not matches:
         raise RuntimeError(
@@ -149,6 +162,14 @@ def find_skill_dir(clone: Path, name: str) -> Path:
 
 
 def dest_root(agent_dir: str, is_global: bool) -> Path:
+    # --agent-dir joins onto the home/cwd base for filesystem writes; keep it a
+    # relative, traversal-free path so it cannot escape that base.
+    parts = Path(agent_dir)
+    if parts.is_absolute() or ".." in parts.parts:
+        raise RuntimeError(
+            f"invalid --agent-dir '{agent_dir}': must be a relative path "
+            f"without '..' components (e.g. .claude or .codex)."
+        )
     base = Path.home() if is_global else Path.cwd()
     return base / agent_dir / "skills"
 
@@ -196,7 +217,9 @@ def cmd_install(args: argparse.Namespace) -> int:
         root.mkdir(parents=True, exist_ok=True)
         for name, src in resolved.items():
             dest = root / name
-            if dest.exists():
+            # exists() follows symlinks, so a dangling symlink reads as absent;
+            # test is_symlink() too so --force can still clear it.
+            if dest.exists() or dest.is_symlink():
                 if not args.force:
                     skipped.append(
                         {
@@ -206,7 +229,12 @@ def cmd_install(args: argparse.Namespace) -> int:
                         }
                     )
                     continue
-                shutil.rmtree(dest)
+                # A prior CLI install may have left a symlink (or a file) here;
+                # only a real directory can be rmtree'd — unlink anything else.
+                if dest.is_symlink() or dest.is_file():
+                    dest.unlink()
+                else:
+                    shutil.rmtree(dest)
             shutil.copytree(src, dest)
             installed.append(
                 {"name": name, "catalog": src.parent.name, "dest": str(dest)}

@@ -126,3 +126,9 @@ Done when: the script's JSON output reports each skill's copied destination.
   (`--force` for the fallback).
 - A non–Claude Code client uses a different agent dir — pass `--agent-dir`
   (fallback) or the CLI's `--agent` (e.g. `.codex`); default is `.claude`.
+- Run the fallback script **from the project root**, not from inside the skill
+  directory: a project-scope install copies into the current directory's agent
+  dir (`./.claude`), while the script's own file lives inside the installed
+  skill (e.g. `.claude/skills/ryan-minato-skills-installing/scripts/install_skill.py`).
+  `cd`-ing into that directory first would land a project install in the wrong
+  place.
