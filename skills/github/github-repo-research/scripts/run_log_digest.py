@@ -7,7 +7,7 @@ and keeps the last N lines per job, so multi-megabyte logs stay out of
 agent context.
 
 Usage:
-    python3 run_log_digest.py --repo OWNER/REPO --run-id ID [--tail N]
+    python3 scripts/run_log_digest.py --repo OWNER/REPO --run-id ID [--tail N]
 
     --repo    Repository as OWNER/REPO (e.g. octocat/hello-world).
     --run-id  Numeric workflow run id (databaseId from `gh run list`).

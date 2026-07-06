@@ -50,7 +50,7 @@ parameters).
 
 | Task | MCP tool | gh |
 |---|---|---|
-| List discussions | `list_discussions` (orderBy `updatedAt`) | see [references/discussions-gh.md](references/discussions-gh.md) |
+| List discussions | `list_discussions` (`orderBy: UPDATED_AT`, `direction: DESC` — direction is required whenever orderBy is given) | see [references/discussions-gh.md](references/discussions-gh.md) |
 | Read one discussion | `get_discussion` (`discussionNumber`) | see references/discussions-gh.md |
 | Read its comments | `get_discussion_comments` | see references/discussions-gh.md |
 | List categories | `list_discussion_categories` | see references/discussions-gh.md |
@@ -68,7 +68,7 @@ queries for every row above, plus pagination and search.
 | List workflow runs | `actions_list` method=`list_workflow_runs` | `gh run list -R O/R --limit 20 --json databaseId,displayTitle,workflowName,headBranch,status,conclusion,createdAt` |
 | Inspect one run | `actions_get` method=`get_workflow_run` | `gh run view RUN_ID -R O/R` |
 | List a run's jobs | `actions_list` method=`list_workflow_jobs` | `gh run view RUN_ID -R O/R --json jobs` |
-| Failed-log excerpt | `get_job_logs` (`failed_only: true`, `tail_lines: 100`, `return_content: true`) | [scripts/run_log_digest.py](scripts/run_log_digest.py): `python3 scripts/run_log_digest.py --repo O/R --run-id RUN_ID [--tail 50]` |
+| Failed-log excerpt | `get_job_logs` (`run_id: RUN_ID`, `failed_only: true`, `tail_lines: 100`, `return_content: true`) | [scripts/run_log_digest.py](scripts/run_log_digest.py): `python3 scripts/run_log_digest.py --repo O/R --run-id RUN_ID [--tail 50]` |
 
 NEVER run bare `gh run view --log` or fetch full logs: run logs can be
 megabytes and will flood the context. Always request failed-only output

@@ -23,7 +23,7 @@ artifacts can be large.
 
 | Task | MCP tool | gh |
 |---|---|---|
-| Filtered run listing | `actions_list` method=`list_workflow_runs` (with `workflow_id`, `branch`, `status` parameters) | `gh run list -R O/R --workflow NAME --branch BR --status failure --limit 20 --json databaseId,displayTitle,headBranch,status,conclusion,createdAt` |
+| Filtered run listing | `actions_list` method=`list_workflow_runs` — the workflow id or file name goes in `resource_id`; branch/status/event/actor filters go inside the `workflow_runs_filter` object (there are no bare `workflow_id`/`branch`/`status` parameters) | `gh run list -R O/R --workflow NAME --branch BR --status failure --limit 20 --json databaseId,displayTitle,headBranch,status,conclusion,createdAt` |
 | List workflows | `actions_list` method=`list_workflows` | `gh workflow list -R O/R` |
 
 `--workflow` accepts the workflow name, its file name (`ci.yml`), or its
