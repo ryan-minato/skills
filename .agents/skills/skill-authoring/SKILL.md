@@ -28,8 +28,8 @@ worth building and where it belongs:
    disclosure, script rules).
 2. Decide where the skill lives:
    - **Public skill** (distributable): `skills/<catalog>/<skill-name>/`.
-     Pick the catalog from the list in `AGENTS.md` and read that catalog's
-     `CONTEXT.md` for catalog-specific requirements.
+     Pick the catalog from the list in `ARCHITECTURE.md` (Catalogs section)
+     and read that catalog's `CONTEXT.md` for catalog-specific requirements.
    - **Project-only workflow skill** (serves this repo itself):
      `.agents/skills/<skill-name>/` as a real directory.
 

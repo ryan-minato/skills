@@ -12,7 +12,7 @@ the repository and adds the repo-level checks:
   3. plugin.json skill paths exist.
   4. Every catalog has README.md, README.zh.md, and CONTEXT.md; the root
      README.zh.md exists.
-  5. Catalog directories match the catalog list in AGENTS.md.
+  5. Catalog directories match the catalog list in ARCHITECTURE.md.
 
 Errors exit 1; warnings from check_skill.py are reported but never fail.
 Messages explain what failed, why it matters, and how to fix it.
@@ -31,7 +31,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILLS_DIR = REPO_ROOT / "skills"
 AGENT_SKILLS_DIR = REPO_ROOT / ".agents" / "skills"
 PLUGIN_MANIFEST = REPO_ROOT / ".claude-plugin" / "plugin.json"
-AGENTS_MD = REPO_ROOT / "AGENTS.md"
+ARCHITECTURE_MD = REPO_ROOT / "ARCHITECTURE.md"
 
 ESCAPING_LINK = re.compile(r"\]\((?:\.\./|/)[^)]*\)")
 
@@ -97,20 +97,20 @@ def check_catalogs() -> None:
                 )
 
 
-def check_agents_md_catalog_list() -> None:
-    if not AGENTS_MD.is_file():
+def check_architecture_md_catalog_list() -> None:
+    if not ARCHITECTURE_MD.is_file():
         fail(
-            "AGENTS.md: missing. It is the harness entrypoint for all "
-            "agents. Fix: restore it from git history."
+            "ARCHITECTURE.md: missing. It documents the repo mechanisms "
+            "and holds the catalog list. Fix: restore it from git history."
         )
         return
-    text = AGENTS_MD.read_text(encoding="utf-8")
+    text = ARCHITECTURE_MD.read_text(encoding="utf-8")
     section = re.search(r"^## Catalogs$(.*?)(?=^## |\Z)", text, re.M | re.S)
     if not section:
         fail(
-            "AGENTS.md: no `## Catalogs` section found. The validator (and "
-            "agents) read the catalog list from that section. Fix: add a "
-            "`## Catalogs` heading listing each catalog as `- `name` — ...`."
+            "ARCHITECTURE.md: no `## Catalogs` section found. The validator "
+            "(and agents) read the catalog list from that section. Fix: add "
+            "a `## Catalogs` heading listing each catalog as `- `name` — ...`."
         )
         return
     listed = set(re.findall(r"^- `([\w-]+)`", section.group(1), re.M))
@@ -121,16 +121,16 @@ def check_agents_md_catalog_list() -> None:
     )
     for missing in sorted(actual - listed):
         fail(
-            f"AGENTS.md: catalog `{missing}` exists in skills/ but is not "
-            f"listed in the Catalogs section. Agents rely on AGENTS.md to "
-            f"know the catalogs. Fix: add `- \\`{missing}\\`` with a short "
-            f"description to AGENTS.md."
+            f"ARCHITECTURE.md: catalog `{missing}` exists in skills/ but is "
+            f"not listed in the Catalogs section. Agents rely on "
+            f"ARCHITECTURE.md to know the catalogs. Fix: add `- "
+            f"\\`{missing}\\`` with a short description to ARCHITECTURE.md."
         )
     for stale in sorted(listed - actual):
         fail(
-            f"AGENTS.md: catalog `{stale}` is listed but skills/{stale}/ "
-            f"does not exist. Stale harness misleads agents. Fix: remove "
-            f"the entry or create the catalog."
+            f"ARCHITECTURE.md: catalog `{stale}` is listed but "
+            f"skills/{stale}/ does not exist. Stale harness misleads "
+            f"agents. Fix: remove the entry or create the catalog."
         )
 
 
@@ -209,7 +209,7 @@ def main() -> int:
     check_all_skills()
     check_self_containment()
     check_catalogs()
-    check_agents_md_catalog_list()
+    check_architecture_md_catalog_list()
     check_symlinks()
     check_plugin_manifest()
     check_root_files()
@@ -222,7 +222,8 @@ def main() -> int:
         for error in errors:
             print(f"  * {error}\n", file=sys.stderr)
         print(
-            "Source of truth: AGENTS.md and .agents/knowledge/skill-quality.md. "
+            "Source of truth: AGENTS.md, ARCHITECTURE.md, and "
+            ".agents/knowledge/skill-quality.md. "
             "Re-run with `just validate` after fixing.",
             file=sys.stderr,
         )
