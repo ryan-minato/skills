@@ -12,14 +12,9 @@ maintained.
 
 ## Catalogs
 
-- `core` — skills recommended for global (user-level) installation.
-- `engineering` — general programming methodology skills; not tied to a
-  specific language or framework.
-- `ops` — general workflow operations, not invoked directly by users.
-
-Adding a catalog requires: the catalog scaffold (`README.md`, `README.zh.md`,
-`CONTEXT.md`), an entry in this list, and a path entry in
-`.claude-plugin/plugin.json`.
+Public skills are grouped into catalogs under `skills/`. The catalog list,
+each catalog's contract, and the procedure for adding one live in the
+Catalogs section of `ARCHITECTURE.md`.
 
 ## Repository Map
 
@@ -83,7 +78,7 @@ Adding a catalog requires: the catalog scaffold (`README.md`, `README.zh.md`,
 | When this changes | Update |
 |---|---|
 | Public skill added/removed | Symlink in `.agents/skills/`, `.claude-plugin/plugin.json`, catalog `README.md` + `README.zh.md` |
-| Catalog added/removed | Catalog scaffold, the Catalogs section above, `.claude-plugin/plugin.json` |
+| Catalog added/removed | Catalog scaffold, the Catalogs section in `ARCHITECTURE.md`, `.claude-plugin/plugin.json` |
 | Any `README.md` | The matching `README.zh.md` (and vice versa) |
 | `.agents/knowledge/` documents | Run the `knowledge-sync` project skill after merge |
 | Repo structure or check commands | This file and `ARCHITECTURE.md` |

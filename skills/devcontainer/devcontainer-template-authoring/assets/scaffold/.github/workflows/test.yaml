@@ -1,0 +1,39 @@
+# On every push/PR, smoke-test only the templates whose src/ or test/
+# trees changed. Failures fail the check — no continue-on-error masking.
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      templates: ${{ steps.detect.outputs.templates }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/detect-changed-templates
+        id: detect
+
+  smoke:
+    needs: changes
+    if: ${{ needs.changes.outputs.templates != '[]' && needs.changes.outputs.templates != '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template: ${{ fromJson(needs.changes.outputs.templates) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/smoke-test
+        with:
+          template: ${{ matrix.template }}

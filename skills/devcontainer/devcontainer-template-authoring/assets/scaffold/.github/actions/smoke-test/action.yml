@@ -1,0 +1,29 @@
+name: "Smoke test template"
+description: >
+  Install a pinned Dev Container CLI, substitute a template's default
+  option values into a temp copy (the same replacement `templates apply`
+  performs), start the dev container, and run the template's test script
+  inside it. Every test workflow calls this action.
+inputs:
+  template:
+    description: "Template id (directory name under src/)"
+    required: true
+  cli-version:
+    description: "Pinned @devcontainers/cli version"
+    required: false
+    default: "0.87.0"
+runs:
+  using: composite
+  steps:
+    - name: Install Dev Container CLI
+      shell: bash
+      env:
+        CLI_VERSION: ${{ inputs.cli-version }}
+      run: npm install -g "@devcontainers/cli@${CLI_VERSION}"
+
+    - name: Run smoke test
+      shell: bash
+      env:
+        TEMPLATE: ${{ inputs.template }}
+      run: |
+        "${{ github.action_path }}/smoke.sh" "$TEMPLATE"

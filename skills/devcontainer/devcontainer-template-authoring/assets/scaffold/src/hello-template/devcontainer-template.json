@@ -1,0 +1,18 @@
+{
+    "id": "hello-template",
+    "version": "1.0.0",
+    "name": "Hello Template (example)",
+    "description": "Minimal example template: a base image with git, parameterized by image variant. Replace with a real starting point.",
+    "documentationURL": "https://github.com/OWNER/REPO/tree/main/src/hello-template",
+    "publisher": "OWNER",
+    "platforms": ["Any"],
+    "options": {
+        "imageVariant": {
+            "type": "string",
+            "proposals": ["bookworm", "ubuntu", "alpine"],
+            "default": "bookworm",
+            "description": "Base image variant for mcr.microsoft.com/devcontainers/base."
+        }
+    },
+    "optionalPaths": [".github/*"]
+}

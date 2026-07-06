@@ -1,0 +1,24 @@
+# Local mirror of the CI workflows. Keep the CLI version in sync with
+# .github/actions/smoke-test/action.yml.
+
+cli_version := "0.87.0"
+
+# Install the pinned Dev Container CLI.
+setup:
+    npm install -g "@devcontainers/cli@{{cli_version}}"
+
+# Substitute default options, start the container, run test/<id>/test.sh.
+smoke template:
+    .github/actions/smoke-test/smoke.sh {{template}}
+
+# Syntax-check every template manifest.
+validate:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for f in src/*/devcontainer-template.json; do
+      jq empty "$f" && echo "ok: $f"
+    done
+
+# Shell lint over smoke and test scripts.
+lint:
+    shellcheck -S error .github/actions/smoke-test/*.sh test/*/*.sh
