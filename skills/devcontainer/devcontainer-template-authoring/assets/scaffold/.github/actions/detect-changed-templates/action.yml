@@ -1,0 +1,33 @@
+name: "Detect changed templates"
+description: >
+  Scan src/ for template directories, generate a dorny/paths-filter config
+  covering each template's src/ and test/ trees, and output the JSON array
+  of templates changed by this push/PR. New templates are picked up with
+  no workflow edits. Caller must run actions/checkout first.
+outputs:
+  templates:
+    description: "JSON array of changed template ids"
+    value: ${{ steps.filter.outputs.changes }}
+runs:
+  using: composite
+  steps:
+    - name: Generate path filters
+      id: gen-filters
+      shell: bash
+      run: |
+        set -euo pipefail
+        shopt -s nullglob
+        filters_file="$RUNNER_TEMP/filters.yml"
+        for dir in src/*/; do
+          name=$(basename "$dir")
+          printf '%s:\n  - "src/%s/**"\n  - "test/%s/**"\n' \
+            "$name" "$name" "$name"
+        done > "$filters_file"
+        echo "path=${filters_file}" >> "$GITHUB_OUTPUT"
+
+    # Adaptation point: pin to a commit SHA if your supply-chain policy
+    # requires immutable third-party actions.
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: ${{ steps.gen-filters.outputs.path }}
