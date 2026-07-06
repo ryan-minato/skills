@@ -28,7 +28,11 @@ for option in $(jq -r '.options // {} | keys[]' "$manifest"); do
         echo "template '${TEMPLATE_ID}': option '${option}' has no default" >&2
         exit 1
     fi
-    escaped=$(sed -e 's/[]\/$*.^[]/\\&/g' <<<"$value")
+    # Escape for the sed REPLACEMENT context: backslash first, then the
+    # special replacement characters & and the / delimiter.
+    escaped=${value//\\/\\\\}
+    escaped=${escaped//&/\\&}
+    escaped=${escaped//\//\\/}
     find "${SRC_DIR}" -type f -print0 \
         | xargs -0 sed -i "s/\${templateOption:${option}}/${escaped}/g"
 done

@@ -25,4 +25,5 @@ runs:
       shell: bash
       env:
         TEMPLATE: ${{ inputs.template }}
-      run: '"${{ github.action_path }}/smoke.sh" "$TEMPLATE"'
+      run: |
+        "${{ github.action_path }}/smoke.sh" "$TEMPLATE"
