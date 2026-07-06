@@ -17,8 +17,9 @@ license: Apache-2.0
 Operate GitHub issues in any repository: create, comment, close or reopen,
 edit labels and assignees, read details and comments, list issues and
 labels. This skill covers issue operations only: pull request work belongs
-to `github-pull-requests`, read-only research across Discussions and
-Actions to `github-repo-research`, authoring issue templates or a label
+to `github-pull-requests`, read-only research across a repository
+(issues, PRs, Actions, Discussions) to `github-repo-research`, authoring
+issue templates or a label
 taxonomy to `github-issue-conventions`, and setting up missing GitHub
 tooling to `github-tooling-setup`.
 

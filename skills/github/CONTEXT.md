@@ -68,6 +68,20 @@ skills/github/` finds them).
 4. Use one column for the whole task. Never mix MCP and gh in one operation.
 ```
 
+#### Read-only variant (github-repo-research only)
+
+`github-repo-research` inserts a REST-fallback step between steps 2 and 3
+and renumbers accordingly; its closing step reads "Use one path for the
+whole task. Never mix MCP, gh, and REST in one operation." The inserted
+step is:
+
+```markdown
+3. Otherwise, if the target repository is public, or a token is set in
+   `GH_TOKEN`/`GITHUB_TOKEN` even though gh is missing, use the REST
+   fallback: read [references/rest-fallback.md](references/rest-fallback.md)
+   and run [scripts/rest_read.py](scripts/rest_read.py). Reads only.
+```
+
 ### Pre-publish gate
 
 The sentence in square brackets appears only in `github-pull-requests` and
@@ -108,8 +122,9 @@ of the same procedure.
 ## Disambiguation
 
 Set up MCP/gh → `github-tooling-setup` · issue operations → `github-issues`
-· PR operations → `github-pull-requests` · read-only Discussions/Actions
-research → `github-repo-research` · authoring templates, labels, automation
+· PR operations → `github-pull-requests` · read-only repository research
+(issues, PRs, Actions, Discussions — including repos without write access)
+→ `github-repo-research` · authoring templates, labels, automation
 → `github-issue-conventions` / `github-pr-conventions`.
 
 ## Tool inventory
@@ -124,10 +139,10 @@ or command reference, update this inventory in the same commit.
 | Tool | Methods used | Meaning | Used in |
 |---|---|---|---|
 | `get_me` | — | Verify auth / current login | github-tooling-setup |
-| `issue_read` | `get`, `get_comments`, `get_labels` | Read one issue, its comments, its labels | github-issues |
+| `issue_read` | `get`, `get_comments`, `get_labels` | Read one issue, its comments, its labels | github-issues, github-repo-research |
 | `issue_write` | `create`, `update` | Create/edit issue incl. state, labels, assignees | github-issues |
-| `list_issues` | — | List issues in a repo | github-issues |
-| `search_issues` | — | Search issues | github-issues (references/issue-recipes.md) |
+| `list_issues` | — | List issues in a repo | github-issues, github-repo-research |
+| `search_issues` | — | Search issues | github-issues (references/issue-recipes.md), github-repo-research |
 | `add_issue_comment` | — | Comment on an issue or PR | github-issues, github-pull-requests |
 | `sub_issue_write` | `add`, `remove`, `reprioritize` | Manage sub-issues | github-issues (references/issue-recipes.md) |
 | `list_label` | — | List repo labels | github-issues, github-issue-conventions |
@@ -136,7 +151,9 @@ or command reference, update this inventory in the same commit.
 | `update_pull_request` | — | Edit PR incl. state, draft, reviewers | github-pull-requests |
 | `update_pull_request_branch` | — | Update PR branch with base | github-pull-requests (references/pr-recipes.md) |
 | `merge_pull_request` | — | Merge a PR (`merge_method`) | github-pull-requests |
-| `pull_request_read` | `get`, `get_diff`, `get_status`, `get_check_runs`, `get_reviews`, `get_review_comments` | Read PR details, diff, checks, reviews | github-pull-requests |
+| `pull_request_read` | `get`, `get_diff`, `get_status`, `get_check_runs`, `get_reviews`, `get_review_comments` | Read PR details, diff, checks, reviews | github-pull-requests, github-repo-research |
+| `list_pull_requests` | — | List PRs in a repo | github-repo-research |
+| `search_pull_requests` | — | Search PRs | github-repo-research |
 | `pull_request_review_write` | `create`, `submit_pending` | Author a PR review | github-pull-requests (references/reviews-and-copilot.md) |
 | `add_comment_to_pending_review` | — | Inline comment on a pending review | github-pull-requests (references/reviews-and-copilot.md) |
 | `add_reply_to_pull_request_comment` | — | Reply in a review thread | github-pull-requests (references/reviews-and-copilot.md) |
@@ -168,6 +185,20 @@ or command reference, update this inventory in the same commit.
 | `gh repo view --json` | Read default branch and merge settings | github-pr-conventions |
 | `gh api graphql` | Discussions (no first-class gh command) | github-repo-research (references/discussions-gh.md) |
 | `gh api --paginate` | Cursor pagination | github-repo-research |
+
+### REST/GraphQL/Atom endpoints (scripts/rest_read.py)
+
+All consumed only by github-repo-research's REST fallback tier.
+
+| Endpoint | Meaning |
+|---|---|
+| `GET /repos/{o}/{r}/issues`, `/issues/{n}`, `/issues/{n}/comments`, `/labels` | Issues (list mixes PRs; the script filters by the `pull_request` key) |
+| `GET /repos/{o}/{r}/pulls`, `/pulls/{n}` (+`Accept: application/vnd.github.diff`), `/pulls/{n}/files`, `/pulls/{n}/reviews`, `/pulls/{n}/comments` | Pull requests, diff, files, reviews, review comments |
+| `GET /repos/{o}/{r}/commits/{sha}/check-runs` | Check results for a PR head sha |
+| `GET /repos/{o}/{r}/actions/runs`, `/actions/runs/{id}`, `/actions/runs/{id}/jobs`, `/actions/jobs/{id}/logs` | Actions runs, jobs, log text (logs require a token even on public repos) |
+| `GET /search/issues` | Issue/PR search (10/min unauthenticated) |
+| `POST /graphql` | Discussions with a token |
+| `GET github.com/{o}/{r}/discussions.atom` and `/discussions/{n}` (HTML) | Tokenless Discussions: Atom list (~25), best-effort page extraction |
 
 ## References
 

@@ -17,8 +17,9 @@ license: Apache-2.0
 
 This skill operates pull requests: create, comment, read state and diff,
 read check results, manage draft state, merge, and work with review
-threads. For issue work use `github-issues`; for Actions investigation
-beyond a PR's own checks use `github-repo-research`; for authoring PR
+threads. For issue work use `github-issues`; for read-only research
+across a repository (issues, PRs, Actions, Discussions — including repos
+without write access) use `github-repo-research`; for authoring PR
 templates and automation use `github-pr-conventions`; if GitHub tooling
 is missing entirely, set it up with `github-tooling-setup`.
 
