@@ -57,15 +57,20 @@ SUBPROCESS_TIMEOUT = 30
 NETWORK_TIMEOUT = 5
 
 
+def _bare_host(value: str) -> str:
+    """Strip a scheme prefix and trailing slashes so the host can be
+    interpolated into an endpoint URL."""
+    return value.removeprefix("https://").removeprefix("http://").strip("/")
+
+
 def resolve_host(flag_value: str | None) -> dict:
     """Resolve the host to probe: flag > GITLAB_HOST > GL_HOST > default."""
     if flag_value:
-        return {"host": flag_value, "source": "--hostname"}
+        return {"host": _bare_host(flag_value), "source": "--hostname"}
     for name in HOST_ENV_VARS:
         value = os.environ.get(name)
         if value:
-            host = value.removeprefix("https://").removeprefix("http://")
-            return {"host": host.strip("/"), "source": name}
+            return {"host": _bare_host(value), "source": name}
     return {"host": DEFAULT_HOST, "source": "default"}
 
 
