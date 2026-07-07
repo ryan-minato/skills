@@ -4,27 +4,30 @@ description: >
   Operates GitLab planning structures through the authenticated glab CLI
   and REST API, with each operation's tier floor marked: milestone
   lifecycle (create, edit, close, delete, list at project or group
-  level), iteration lookup, issue-board and board-list management, and
-  epic lifecycle on Premium/Ultimate. Use when managing planning
-  structures on gitlab.com or a self-managed instance — "create a
-  milestone", "close the milestone", "set up the next release
-  milestone", "list group milestones", "what iteration are we in",
-  "create an issue board", "add a Doing column to the board", "reorder
-  the board lists", "create an epic", "make this epic a child of that
-  one", "close the epic", or "delete this board". Assigning a single
-  issue to a milestone, iteration, or epic belongs to gitlab-issues.
+  level), label lifecycle (create, rename, recolor, delete), iteration
+  lookup, issue-board and board-list management, and epic lifecycle on
+  Premium/Ultimate. Use when managing planning structures on gitlab.com
+  or a self-managed instance — "create a milestone", "close the
+  milestone", "set up the next release milestone", "list group
+  milestones", "rename this label", "what iteration are we in", "create
+  an issue board", "add a Doing column to the board", "reorder the board
+  lists", "create an epic", "make this epic a child of that one", "close
+  the epic", or "delete this board". Assigning a single issue to a
+  milestone, iteration, or epic belongs to gitlab-issues.
 license: Apache-2.0
 ---
 
 # GitLab Planning
 
-Manage the planning structures themselves: milestones, iterations, issue
-boards, and epics. Putting one issue into a milestone/iteration/epic
-belongs to `gitlab-issues`; setting a milestone on an MR to
-`gitlab-merge-requests`; read-only project research to
-`gitlab-repo-research`; tooling setup to `gitlab-tooling-setup`. The
-GitLab Duo MCP server has no tools for milestones, iterations, boards,
-or epics — glab is the only path, so the tables below have one column.
+Manage the planning structures themselves: milestones, labels,
+iterations, issue boards, and epics. Putting one issue into a milestone/
+iteration/epic — or moving it between label-backed board lists, which is
+relabeling — belongs to `gitlab-issues`; setting a milestone on an MR to
+`gitlab-merge-requests`; attaching a milestone to a release to
+`gitlab-releases`; read-only project research to `gitlab-repo-research`;
+designing a label taxonomy to `gitlab-issue-conventions`. The GitLab Duo
+MCP server has no tools for these structures — glab (with `glab api` for
+gaps) is the only path, so the tables below have one column.
 
 ## Choose your path (do this first, once per session)
 
@@ -45,11 +48,11 @@ Run `git remote get-url origin`. The host is the part right after
 trailing `.git` stripped; GitLab paths can nest (`group/subgroup/project`
 is one project — keep the full path). The group path is the project path
 minus its last segment; group-level structures (group milestones,
-iterations, epics, group boards) live there. If there is no origin
-remote, or the user named a different project or group, use that instead.
-Substitute the full path wherever the tables show `G/P` or `GROUP`
-(URL-encode `/` as `%2F` inside `glab api` endpoint paths; inside a
-checkout the `:fullpath` and `:group` placeholders do it for you).
+iterations, epics, group boards, group labels) live there. If there is no
+origin remote, or the user named a different project or group, use that
+instead. Substitute the full path wherever the tables show `G/P` or
+`GROUP` (URL-encode `/` as `%2F` inside `glab api` endpoint paths; inside
+a checkout the `:fullpath` and `:group` placeholders do it for you).
 Outside a checkout, pass `--hostname HOST` to `glab api` and
 `GITLAB_HOST=HOST` for other command groups.
 
@@ -61,14 +64,39 @@ for a Premium row, report the tier requirement instead of retrying.
 Probe the instance version with `glab api version` when a feature might
 be too new for a self-managed host.
 
+## Match the project's conventions (before any create)
+
+Before creating anything, discover what the project already defines and
+use it — never invent parallel structure:
+
+| Artifact | How to check |
+|---|---|
+| Existing milestones (all states) | `glab milestone list -R G/P --state closed -F json` plus the active list — never create a near-duplicate |
+| Existing labels, colors, scopes | `glab label list -R G/P -F json` — respect scoped-label prefixes (`type::`) and the palette in use |
+| Existing boards and lists | `glab api projects/:fullpath/boards` — reuse list structure and naming |
+
+If a project-level convention skill or an AGENTS.md conventions section
+covers this task, follow it over this skill's defaults.
+Done when: each artifact was checked and the draft uses the project's
+existing structures (or the user approved new ones).
+
+## Authoring defaults
+
+Write all published text — titles, bodies, comments, notes — as
+professional, concise prose. Default to English unless the user or the
+project's own conventions call for another language. State facts and
+requests directly; no filler, and no emojis unless the project's existing
+content uses them. The project's templates and conventions win over these
+defaults.
+
 ## Pre-publish gate (mandatory)
 
 Everything you send becomes visible the moment the call succeeds — to the
 whole internet on public projects, and to every member just as instantly
 on private or internal ones: title, body, every comment, labels, commit
 messages, the full diff, attachment contents, and the branch name.
-Milestone, epic, and board titles and descriptions are visible to
-everyone who can view the project or group. A line starting with `/` in
+Milestone, board, list, epic, and label names and descriptions are
+visible to everyone who can see the project. A line starting with `/` in
 any body or comment can execute as a GitLab quick action (for example
 `/close`). Before ANY call that creates or edits such content:
 
@@ -87,9 +115,9 @@ explicitly; record the skip in your summary.
 Done when: a `SAFE TO PUBLISH: YES` verdict exists for the exact content
 being sent.
 
-The gate applies to milestone/epic create and edit and to board or list
-create and rename; close, reopen, delete, reorder, and reads carry no new
-text.
+The gate applies to milestone/epic/label create and edit and to board or
+list create and rename; close, reopen, delete, reorder, and reads carry
+no new text.
 
 ## Milestones (all tiers)
 
@@ -109,6 +137,26 @@ first. `--group GROUP` switches any row to group level (`--project` and
 
 Report the milestone's `web_url` from the JSON response.
 Done when: the URL is reported.
+
+## Labels (all tiers)
+
+glab has `label list` and `label create` only; rename, recolor, and
+delete go through the REST endpoints. `LABEL_ID` is the numeric `id` in
+the list output. Group labels use `groups/GROUP/labels` endpoints and are
+inherited by every project below the group — edit them at group level
+only with the user's explicit confirmation.
+
+| Task | Command |
+|---|---|
+| List (with ids) | `glab label list -R G/P -F json` |
+| Create | `glab label create -R G/P --name "NAME" --color "#5843AD" --description "D"` |
+| Rename / recolor / redescribe | `glab api --method PUT projects/:fullpath/labels/LABEL_ID [-f new_name="N"] [-f color="#HEX"] [-f description="D"]` |
+| Delete | `glab api --method DELETE projects/:fullpath/labels/LABEL_ID` — removed from every issue and MR carrying it; confirm with the user first |
+
+Renaming a label updates it everywhere it is applied — rename beats
+delete-and-recreate. Scoped labels (`scope::value`) are plain labels with
+`::` in the name; their mutual exclusion is enforced by GitLab on
+assignment (enforcement is Premium, the naming works everywhere).
 
 ## Iterations (Premium; read-only)
 
@@ -139,8 +187,9 @@ Multiple boards per **project** are Free.
 | Reorder a list | `glab api --method PUT projects/:fullpath/boards/BID/lists/LID -F position=N` |
 | Delete a list | `glab api --method DELETE projects/:fullpath/boards/BID/lists/LID` |
 
-A label list takes the numeric `label_id` — look it up with
-`glab api projects/:fullpath/labels`. Read
+A label list takes the numeric `label_id` from the Labels section's list
+row. Moving an issue between label-backed lists is relabeling the issue —
+that belongs to `gitlab-issues`. Read
 [references/boards-premium.md](references/boards-premium.md) when
 scoping a board (milestone/assignee/weight/labels), creating an
 assignee, milestone, or iteration list, creating or deleting a **group**
@@ -178,6 +227,9 @@ objectives, or key results.
   the user actually wants; confirm before deleting.
 - Only the fields you pass to `glab milestone edit` change; omitted
   fields keep their values.
+- Group-inherited labels cannot be edited through the project endpoints —
+  a 404 on `projects/.../labels/ID` for a label you can see usually means
+  it lives at group level.
 - On a board update, the scope parameters (`labels`, `assignee_id`,
   `milestone_id`, `weight`) are mutually exclusive — one per request.
 - 404 ≠ wrong path: for iterations, epics, and board scoping it usually
