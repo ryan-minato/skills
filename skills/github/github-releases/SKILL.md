@@ -94,9 +94,8 @@ every asset, and notifies watchers — the draft step exists so this gate
 always runs before the release goes live. Before ANY call that creates or
 edits public content:
 
-1. Write the exact outgoing content to files in a scratch directory (title,
-   body, each comment; for PRs also `git log BASE..HEAD --format=full >
-   commits.txt` and `git diff BASE...HEAD > diff.patch`; copy attachments in).
+1. Write the exact outgoing content to files in a scratch directory (the
+   tag name, release title, NOTES.md, and every asset file).
 2. Run the review procedure in references/publish-review.md over that
    directory. Read that file every time — do not review from memory.
 3. Publish only after the verdict is exactly `SAFE TO PUBLISH: YES`. On `NO`,

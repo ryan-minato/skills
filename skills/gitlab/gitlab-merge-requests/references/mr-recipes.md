@@ -18,18 +18,13 @@ glab mr rebase N -R G/P [--skip-ci]
 glab mr checkout N -R G/P
 ```
 
-## Change target branch, reviewers, milestone
+## Change target branch, reviewers
+
+Labels and milestone are main-table rows in SKILL.md.
 
 ```bash
 glab mr update N -R G/P --target-branch main
 glab mr update N -R G/P --reviewer +some-user      # + adds, !/- removes, bare replaces
-glab mr update N -R G/P -m "MILESTONE TITLE"       # -m "" unassigns
-```
-
-## Labels
-
-```bash
-glab mr update N -R G/P -l new-label -u old-label
 ```
 
 ## Linked issues and auto-close

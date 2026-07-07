@@ -12,8 +12,8 @@ glab mr view N -R G/P --unresolved      # only unresolved threads
 glab mr view N -R G/P --resolved        # only resolved threads
 ```
 
-Each thread's discussion id appears in the output; MCP:
-`get_merge_request_notes` (19.2).
+Each thread's discussion id appears in the output; MCP: the capability
+that reads MR comments and threads (19.2).
 
 ## Reply in a thread
 
@@ -29,7 +29,7 @@ in the installed glab, use the API directly:
 glab api --method POST "projects/:fullpath/merge_requests/N/discussions/DISCUSSION_ID/notes" -F "body=@REPLY.md"
 ```
 
-MCP: `create_merge_request_note` (19.2) with the discussion parameter.
+MCP: the MR-comment capability (19.2) with its discussion parameter.
 
 ## Comment on a diff line
 

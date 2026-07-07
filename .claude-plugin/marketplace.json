@@ -63,10 +63,11 @@
         "./skills/gitlab/gitlab-issues",
         "./skills/gitlab/gitlab-merge-requests",
         "./skills/gitlab/gitlab-planning",
+        "./skills/gitlab/gitlab-releases",
         "./skills/gitlab/gitlab-repo-research",
         "./skills/gitlab/gitlab-wiki"
       ],
-      "description": "GitLab collaboration workflows: issues, MRs, pipelines, planning, and wiki."
+      "description": "GitLab collaboration workflows: issues, MRs, pipelines, planning, releases, wiki, and repo research."
     },
     {
       "name": "meta-github",

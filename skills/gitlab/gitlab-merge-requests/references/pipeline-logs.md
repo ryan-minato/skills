@@ -7,7 +7,7 @@ megabytes and flood the context.
 
 | glab | MCP (min GitLab) |
 |---|---|
-| `glab ci get --merge-request N -R G/P -s failed -d -F json` | `get_merge_request_pipelines` (18.4), then `get_pipeline_jobs` (18.4) |
+| `glab ci get --merge-request N -R G/P -s failed -d -F json` | read the MR's pipelines (18.4), then a pipeline's jobs (18.4) |
 
 `-s failed` limits the listing to failed jobs; `-d` adds job details.
 Record each failing job's `id`, `name`, `stage`, and `failure_reason`.
@@ -27,9 +27,10 @@ first (step 1 shows its status). Equivalent without trace:
 glab api "projects/:fullpath/jobs/JOB_ID/trace" | tail -n 100
 ```
 
-MCP alternative: `get_job_log` (19.1) — it has **no tail parameter** and
-returns the whole trace; prefer the glab column for logs, and use the MCP
-tool only when glab is unavailable and the log is known to be small.
+MCP alternative: the job-log capability (19.1) — it has **no tail
+parameter** and returns the whole trace; prefer the glab column for logs,
+and use the MCP tool only when glab is unavailable and the log is known
+to be small.
 
 ## 3. Quote the error
 
