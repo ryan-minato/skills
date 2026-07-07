@@ -5,7 +5,8 @@
 # .gitlab/merge_request_templates/Default.md.
 #
 # Paste this job directly into .gitlab-ci.yml: merge-request-pipeline
-# rules that live only inside include:d files do not enable MR pipelines.
+# rules only enable MR pipelines when written there directly, not when
+# they live in a file pulled in through the `include:` keyword.
 # If the project defines custom `stages:`, add a matching `stage:` key.
 # To make the check blocking, enable Settings > Merge requests >
 # "Pipelines must succeed".
