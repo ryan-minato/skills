@@ -97,8 +97,16 @@ Skills whose tables contain `—` MCP cells append this sentence to step 1:
 
 ```markdown
    The MCP column applies only to rows that name a capability; rows marked
-   `—` have no MCP tool — use the gh column for those rows even on the MCP
-   path.
+   `—` have no MCP tool — those rows use the gh column instead: check
+   `gh auth status` before running one, and if gh is not authenticated,
+   stop and tell the user that row needs gh.
+```
+
+and replace step 4 with:
+
+```markdown
+4. Use one column per row — rows marked `—` are the one sanctioned switch
+   to gh on the MCP path. Within a single operation, never mix MCP and gh.
 ```
 
 #### Read-only variant (github-repo-research only)
@@ -249,7 +257,7 @@ inventory in the same commit.
 | Author PR reviews; reply in review threads; request Copilot review | github-pull-requests (references) |
 | List/read Actions workflows, runs, jobs; job logs (failed-only, tail) | github-repo-research, github-pull-requests (references) |
 | Read Discussions and their comments/categories | github-repo-research |
-| Read releases (list, latest, by tag) | github-repo-research, github-releases (reads) |
+| Read releases (list, latest, by tag) and repository tags | github-repo-research, github-releases (reads) |
 
 ### gh commands
 
