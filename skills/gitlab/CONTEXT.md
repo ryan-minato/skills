@@ -248,10 +248,10 @@ update this inventory in the same commit.
 | `glab issue create/note/close/reopen/view/list/update` | Issue operations | gitlab-issues |
 | `glab label list` | List labels | gitlab-issues, gitlab-issue-conventions |
 | `glab mr create/note/view/diff/list/close/reopen/update/approve/revoke/merge` | MR operations | gitlab-merge-requests |
-| `glab mr rebase/checkout/issues/approvers` | Long-tail MR operations | gitlab-merge-requests (references/mr-recipes.md) |
+| `glab mr rebase/checkout/issues/approvers` | Long-tail MR operations, approval reads | gitlab-merge-requests (references/mr-recipes.md), gitlab-repo-research |
 | `glab ci list/get/trace` | Pipeline status and job logs | gitlab-merge-requests, gitlab-repo-research |
-| `glab ci retry/cancel/run/lint` | Explicit pipeline writes and config lint | gitlab-repo-research (references/pipeline-recipes.md) |
-| `glab milestone list/create/edit/delete` | Milestone lifecycle (`--group`) | gitlab-planning |
+| `glab ci retry/cancel/run/lint/artifact` | Explicit pipeline writes, config lint, artifact download | gitlab-repo-research (references/pipeline-recipes.md), gitlab-mr-conventions (lint) |
+| `glab milestone list/get/create/edit/delete` | Milestone lifecycle (`--group`) | gitlab-planning |
 | `glab iteration list` | List iterations (Premium) | gitlab-planning |
 | `glab work-items create/list/update` | Experimental work-item path for epics | gitlab-planning (references/epics-work-items.md) |
 
