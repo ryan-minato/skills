@@ -34,8 +34,8 @@ Public skills are grouped into catalogs under `skills/`:
   Discussions/Actions operations, planning (milestones, labels, Projects),
   and releases, with embedded pre-publish review.
 - `gitlab` — GitLab collaboration workflow skills: glab-first issue/MR/
-  pipeline operations, planning and wiki — on gitlab.com or self-managed
-  hosts, with embedded pre-publish review.
+  pipeline operations, planning, releases, and wiki — on gitlab.com or
+  self-managed hosts, with embedded pre-publish review.
 - `meta-github` — GitHub harness-authoring skills: agent tooling setup and
   repository conventions authoring (issue forms, labels, PR rules,
   automation) whose outputs — not the skills themselves — land in the
