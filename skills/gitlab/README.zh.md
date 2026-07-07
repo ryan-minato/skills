@@ -20,3 +20,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 | [gitlab-issues](gitlab-issues/) | 通过 glab 优先、附 MCP 注释的决策表执行 issue 操作——创建、评论、关闭/重开、读取、标签、指派——全部经过强制的发布前审查关卡。 |
 | [gitlab-merge-requests](gitlab-merge-requests/) | 通过 glab 优先的决策表执行 merge request 操作——创建、评论、批准、含 auto-merge/squash 语义的合并、流水线状态、失败任务日志尾部、讨论线程——全部经过强制的发布前审查关卡。 |
 | [gitlab-planning](gitlab-planning/) | GitLab 规划结构的生命周期管理并标注层级门槛——milestone（Free）、iteration（Premium，由 cadence 管理）、issue board 与列表、epic（Premium/Ultimate，走稳定 REST 路径，work items 为实验性后继）。 |
+| [gitlab-wiki](gitlab-wiki/) | 通过 wikis REST API 操作项目与群组 wiki 页面——读取、创建、更新、重命名、删除、附件——批量重构走 wiki 即 git 仓库路径，全部经过强制的发布前审查关卡。 |
