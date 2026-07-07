@@ -50,6 +50,7 @@
         "./skills/github/github-issues",
         "./skills/github/github-planning",
         "./skills/github/github-pull-requests",
+        "./skills/github/github-releases",
         "./skills/github/github-repo-research"
       ],
       "description": "GitHub collaboration workflows: issues, PRs, and repo research."
