@@ -77,6 +77,7 @@
         "./skills/meta-github/github-commit-conventions",
         "./skills/meta-github/github-issue-conventions",
         "./skills/meta-github/github-pr-conventions",
+        "./skills/meta-github/github-release-conventions",
         "./skills/meta-github/github-tooling-setup"
       ],
       "description": "GitHub harness authoring: agent tooling setup and repository conventions (issue forms, labels, PR rules, automation)."

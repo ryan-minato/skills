@@ -1,0 +1,42 @@
+# Validates pushed tags against the repository's versioning policy:
+# the name must match the release tag format, and the tagged commit must
+# be reachable from the default branch. First-party actions only.
+name: tag-check
+
+on:
+  push:
+    tags:
+      - "**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-tag:
+    runs-on: ubuntu-latest
+    steps:
+      # fetch-depth: 0 so the default branch's history is available for
+      # the reachability check.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag name matches the versioning policy
+        env:
+          TAG: ${{ github.ref_name }}
+          # Keep in sync with docs/versioning-policy.md.
+          TAG_REGEX: '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+\.[0-9]+)?$'
+        run: |
+          if ! printf '%s\n' "$TAG" | grep -Eq "$TAG_REGEX"; then
+            echo "::error::Tag '$TAG' does not match the policy regex $TAG_REGEX (see docs/versioning-policy.md)."
+            exit 1
+          fi
+      - name: Tagged commit is reachable from the default branch
+        env:
+          TAG: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git fetch origin "$DEFAULT_BRANCH" --quiet
+          if ! git merge-base --is-ancestor "$TAG^{commit}" "origin/$DEFAULT_BRANCH"; then
+            echo "::error::Tag '$TAG' points at a commit not reachable from $DEFAULT_BRANCH — release tags are cut from the default branch."
+            exit 1
+          fi

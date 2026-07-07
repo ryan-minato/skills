@@ -17,6 +17,7 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | 说明 |
 |---|---|
+| [github-release-conventions](github-release-conventions/) | 为仓库创作发布规范：映射到提交类型的 SemVer 政策、tag 格式 CI 检查、按标签体系分类的 release.yml、notes 模板，以及生成的项目级 release skill——并以 AGENTS.md 章节作为 fallback 交付物。 |
 | [github-tooling-setup](github-tooling-setup/) | 通过各框架官方安装指南安装并配置 GitHub MCP server（远程 HTTP 或本地 stdio），以及各操作系统下 gh CLI 的安装与认证（涵盖操作类技能所需的 token scope：repo、project），并附带报告可用性与认证状态的探测脚本。 |
 | [github-commit-conventions](github-commit-conventions/) | 为仓库创作提交规范：基于历史分析的约定式提交规则、提交进仓库的零依赖 Python 校验器、只用第一方 action 的 PR 范围 CI 校验工作流，以及生成的项目级 commit skill——并以 AGENTS.md 章节作为 fallback 交付物。 |
 | [github-issue-conventions](github-issue-conventions/) | 为仓库创作 issue 规范：issue 表单、由幂等同步脚本应用的标签体系、第一方 issue 自动化，以及生成的项目级 issue skill——并以 AGENTS.md 章节作为 fallback 交付物。 |
