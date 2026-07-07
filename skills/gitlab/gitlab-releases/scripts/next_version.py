@@ -20,8 +20,12 @@ Rules:
   toward its base version instead: the counter is incremented and --bump
   is ignored (pass --latest with the last final release to start a new
   series at a different version).
-- A prerelease latest (e.g. v1.3.0-rc.2) finalizes to its base version
-  when bumped with the part that produced it (patch keeps 1.3.0).
+- When the latest tag is a prerelease and --pre is absent, the bump
+  finalizes it: the base version is printed and --bump is ignored (pass
+  --latest with the last final release to bump past the base).
+- Among prereleases of the same base version, the latest is picked by
+  identifier (alphabetically — matching the common alpha < beta < rc)
+  and then by counter; a final release always outranks its prereleases.
 
 Exit codes: 0 = tag printed; 1 = no parseable version tag found (pass
 --latest explicitly); 2 = bad arguments or git unavailable.
@@ -73,10 +77,12 @@ def latest_from_git() -> str | None:
         parsed = parse(tag)
         if parsed is None:
             continue
-        # A final release outranks its own prereleases.
+        # A final release outranks its own prereleases; among prereleases,
+        # compare the identifier alphabetically, then the counter.
         key = (
             parsed["release"],
             parsed["counter"] is None,
+            parsed["ident"] or "",
             parsed["counter"] or 0,
         )
         if best_key is None or key > best_key:
