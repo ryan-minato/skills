@@ -1,0 +1,18 @@
+# gitlab
+
+[English](README.md)
+
+GitLab **协作工作流** skill——优先通过已认证的 `glab` CLI 操作 issue、merge
+request、流水线、规划结构与 wiki，并以 GitLab Duo MCP server 作为带注释的
+备选路径，另含项目规范创作类 skill。同等支持 gitlab.com 与自建实例，并
+标注层级与版本门槛。面向小型本地模型设计：每个操作只有一条推荐路径、
+决策表驱动，且所有发布内容的 skill 都内嵌强制的发布前安全审查。
+
+```bash
+npx skills add ryan-minato/skills --skill <skill-name>
+```
+
+## Skill 列表
+
+| Skill | 说明 |
+|---|---|
