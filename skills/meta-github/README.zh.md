@@ -4,8 +4,8 @@
 
 GitHub **harness 创作类** skill。它们为项目及其编码 agent 搭建围绕
 GitHub 的基础设施，而不是执行日常的 GitHub 操作：agent 工具链（GitHub
-MCP server、gh CLI）与仓库规范（issue 表单、标签体系、PR 规则、自动化、
-生成的项目级 skill）。meta skill 的价值在于它留下的产物——配置好的工具
+MCP server、gh CLI）与仓库规范（issue 表单、标签体系、PR 规则、提交信息
+规则、版本与发布政策、自动化、生成的项目级 skill）。meta skill 的价值在于它留下的产物——配置好的工具
 链和提交进仓库的文件——而不在于自身持续安装。日常的 issue、pull
 request、规划与发布操作属于 `github` catalog。
 

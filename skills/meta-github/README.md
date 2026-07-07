@@ -5,8 +5,9 @@
 GitHub **harness-authoring** skills. They set up what a project and its
 coding agents need *around* GitHub instead of operating GitHub day to day:
 agent tooling (the GitHub MCP server, the gh CLI) and a repository's
-conventions (issue forms, label taxonomy, PR rules, automation, generated
-project-level skills). A meta skill's value lands in what it leaves behind —
+conventions (issue forms, label taxonomy, PR rules, commit-message rules,
+versioning and release policy, automation, generated project-level
+skills). A meta skill's value lands in what it leaves behind —
 configured tooling and committed files — not in staying installed. Day-to-day
 issue, pull-request, planning, and release operations belong to the `github`
 catalog.
