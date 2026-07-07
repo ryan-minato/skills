@@ -102,7 +102,7 @@ first. `--group GROUP` switches any row to group level (`--project` and
 | List | `glab milestone list -R G/P [--state active\|closed] -F json` |
 | Find id by title | `glab milestone list -R G/P --title "TITLE" -F json` |
 | View one | `glab milestone get ID -R G/P` |
-| Create | `glab milestone create -R G/P --title "TITLE" [--description "$(cat DESC.md)"] [--start-date 2026-07-01T00:00:00Z] [--due-date 2026-09-30T00:00:00Z]` |
+| Create | `glab milestone create -R G/P --title "TITLE" [--description "$(cat DESC.md)"] [--start-date 2026-07-01] [--due-date 2026-09-30]` |
 | Edit | `glab milestone edit ID -R G/P [--title "T"] [--due-date ...]` |
 | Close / reactivate | `glab milestone edit ID -R G/P --state close` (or `--state activate`) |
 | Delete | `glab milestone delete ID -R G/P` |
@@ -178,6 +178,10 @@ objectives, or key results.
   the user actually wants; confirm before deleting.
 - Only the fields you pass to `glab milestone edit` change; omitted
   fields keep their values.
+- `--start-date`/`--due-date` take a plain `YYYY-MM-DD` date. glab's
+  `--help` flag text misleadingly shows a full timestamp
+  (`2025-04-15T08:00:00Z`), but its own usage examples and the
+  milestones API both use the date-only form — pass the date only.
 - On a board update, the scope parameters (`labels`, `assignee_id`,
   `milestone_id`, `weight`) are mutually exclusive — one per request.
 - 404 ≠ wrong path: for iterations, epics, and board scoping it usually
