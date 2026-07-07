@@ -1,0 +1,24 @@
+# Validates every commit message in a pull request against the
+# repository's commit conventions, using the committed dependency-free
+# validator. First-party actions only.
+name: commit-check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  commit-messages:
+    runs-on: ubuntu-latest
+    steps:
+      # fetch-depth: 0 is mandatory — a shallow clone has no base commit
+      # and the range below resolves to nothing.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate commit messages in the PR range
+        run: >
+          python3 scripts/check_commits.py
+          --range "${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }}"

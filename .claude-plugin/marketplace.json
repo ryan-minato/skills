@@ -74,6 +74,7 @@
       "source": "./",
       "strict": false,
       "skills": [
+        "./skills/meta-github/github-commit-conventions",
         "./skills/meta-github/github-issue-conventions",
         "./skills/meta-github/github-pr-conventions",
         "./skills/meta-github/github-tooling-setup"
