@@ -116,12 +116,16 @@ def check_message(message: str, label: str) -> list[str]:
 def messages_from_range(git_range: str) -> list[tuple[str, str]]:
     # %x01/%x00 are expanded by git itself — a literal NUL cannot be
     # passed inside a subprocess argument.
-    proc = subprocess.run(
-        ["git", "log", "--format=%h%x01%B%x00", git_range],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    try:
+        proc = subprocess.run(
+            ["git", "log", "--format=%h%x01%B%x00", git_range],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        print("git is not installed or not on PATH", file=sys.stderr)
+        sys.exit(2)
     if proc.returncode != 0:
         sys.stderr.write(proc.stderr)
         sys.exit(2)
@@ -145,9 +149,9 @@ def main() -> None:
     source.add_argument("--message", help="one commit message string")
     args = parser.parse_args()
 
-    if args.git_range:
+    if args.git_range is not None:
         targets = messages_from_range(args.git_range)
-    elif args.file:
+    elif args.file is not None:
         try:
             with open(args.file, encoding="utf-8") as handle:
                 targets = [("message", handle.read())]

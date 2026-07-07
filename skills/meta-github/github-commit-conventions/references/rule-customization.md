@@ -56,6 +56,13 @@ disappear. Two adjustments:
 2. Relax the branch-commit rules in the convention doc: branch commits
    may be informal when they are squashed away, and say which applies.
 
+## Cheaper checkout on huge repositories
+
+`fetch-depth: 0` is the reliable default. On repositories where a full
+clone is painful, `fetch-depth: ${{ github.event.pull_request.commits }}`
+plus one usually reaches `base.sha`; keep `0` if the check ever fails
+with "bad object" (the base moved during the PR).
+
 ## Commit template
 
 Ship a `.gitmessage` template so humans get the format as a scaffold:

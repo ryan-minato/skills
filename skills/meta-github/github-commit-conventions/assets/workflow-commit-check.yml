@@ -13,8 +13,8 @@ jobs:
   commit-messages:
     runs-on: ubuntu-latest
     steps:
-      # fetch-depth: 0 is mandatory — a shallow clone has no base commit
-      # and the range below resolves to nothing.
+      # fetch-depth: 0 is required — a shallow clone has no base commit,
+      # so the range below cannot resolve and git fails the check.
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0

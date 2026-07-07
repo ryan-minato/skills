@@ -43,11 +43,11 @@ lengths, and the trailer keys in use. Also check: an existing
 stated in `CONTRIBUTING.md` / `AGENTS.md` / `CLAUDE.md`, existing
 workflows in `.github/workflows/` (name collisions), whether the repo
 squash-merges (`gh repo view -R O/R --json squashMergeAllowed,
-mergeCommitAllowed`), and where project skills live — `.claude/skills/`
-if it exists, else `.agents/skills/`, else plan to create
-`.agents/skills/`. Never invent structure parallel to what the project
-already defines: build on what exists, or get the user's explicit
-approval to replace it.
+mergeCommitAllowed`), and where project skills live — use
+`.claude/skills/` if it exists, else `.agents/skills/` if it exists, else
+plan to create `.agents/skills/`. Never invent structure parallel to what
+the project already defines: build on what exists, or get the user's
+explicit approval to replace it.
 Done when: the inventory is written down and each deliverable below is
 marked "new", "extends existing", or "replaces (approved)".
 
@@ -85,7 +85,6 @@ any CI runner and any contributor machine with no installation.
 Smoke-test it against the repo's own recent history:
 
 ```bash
-git log --format=%H -n 20 | head -1   # confirm git works here
 python3 scripts/check_commits.py --range HEAD~20..HEAD || true
 ```
 
@@ -116,11 +115,21 @@ was actually installed at.
 For the default deliverable, copy
 [assets/project-skill-commits.md](assets/project-skill-commits.md) to
 `<skills-dir>/<repo-name>-commits/SKILL.md` and fill every
-`{{PLACEHOLDER}}` (`{{REPO_NAME}}`, `{{TYPES_TABLE}}` and
-`{{SCOPE_RULE}}` from the convention doc, `{{SUBJECT_MAX}}`). For the
-AGENTS.md fallback, copy
+`{{PLACEHOLDER}}`:
+
+| Placeholder | Fill with |
+|---|---|
+| `{{REPO_NAME}}` | Repository name, lowercase, hyphens only |
+| `{{CONVENTION_DOC_PATH}}` | Where the convention doc was installed |
+| `{{TYPES_TABLE}}` | The convention doc's type → use-for table |
+| `{{TYPES_LIST}}` | The same types as one comma-separated line |
+| `{{SCOPE_RULE}}` | The scope rule sentence from the convention doc |
+| `{{SUBJECT_MAX}}` / `{{BODY_LINE_MAX}}` | The limits set in CONFIG |
+
+For the AGENTS.md fallback, copy
 [assets/agents-md-commits-section.md](assets/agents-md-commits-section.md)
-into the project's `AGENTS.md` and fill the same placeholders.
+into the project's `AGENTS.md` and fill the same placeholders (it uses
+the list form, not the table).
 Refinement beyond the template pairs with `great-skill-writer`
 (`npx skills add ryan-minato/skills --skill great-skill-writer`).
 
@@ -139,8 +148,9 @@ workflow on, branch protection to require the check).
 ## Gotchas
 
 - `fetch-depth: 0` on the checkout is load-bearing: the default shallow
-  clone has no base commit, the range resolves to nothing, and the check
-  silently passes on everything.
+  clone has no base commit, so the range cannot resolve and git fails
+  the check on every PR with "bad object" (see
+  references/rule-customization.md for a cheaper depth on huge repos).
 - Merge, revert, and `fixup!`/`squash!` commits are exempted by pattern
   in the validator — hand-tightening the regexes to catch them again
   breaks normal GitHub merge flows.

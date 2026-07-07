@@ -23,7 +23,7 @@ import subprocess
 import sys
 
 CC_RE = re.compile(r"^(?P<type>[a-z]+)(?:\((?P<scope>[^)]*)\))?(?P<bang>!)?: \S")
-GITMOJI_RE = re.compile(r"^(:\w+:|[\U0001F000-\U0001FAFF☀-➿])")
+GITMOJI_RE = re.compile(r"^(:\w+:|[\U0001F000-\U0001FAFF←-⯿])")
 EXEMPT_RE = re.compile(r"^(Merge |Revert |fixup!|squash!)")
 TRAILER_RE = re.compile(r"^([A-Za-z][A-Za-z-]*): \S")
 
