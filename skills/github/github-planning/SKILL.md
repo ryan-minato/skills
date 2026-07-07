@@ -36,8 +36,9 @@ designing a label taxonomy to `github-issue-conventions`.
    the **MCP** column of every table below, picking the tool whose
    description matches the row's capability.
    The MCP column applies only to rows that name a capability; rows marked
-   `—` have no MCP tool — use the gh column for those rows even on the MCP
-   path.
+   `—` have no MCP tool — those rows use the gh column instead: check
+   `gh auth status` before running one, and if gh is not authenticated,
+   stop and tell the user that row needs gh.
 2. Otherwise run `gh auth status`. If it exits 0, use the **gh** column.
 3. Otherwise stop and tell the user GitHub tooling is not set up. This skill
    pairs with `github-tooling-setup`. If it is not installed, install it from
@@ -45,7 +46,8 @@ designing a label taxonomy to `github-issue-conventions`.
 
        npx skills add ryan-minato/skills --skill github-tooling-setup
 
-4. Use one column for the whole task. Never mix MCP and gh in one operation.
+4. Use one column per row — rows marked `—` are the one sanctioned switch
+   to gh on the MCP path. Within a single operation, never mix MCP and gh.
 
 ## Identify the repository
 

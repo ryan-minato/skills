@@ -127,7 +127,7 @@ beyond the table above.
 |---|---|---|
 | List releases | list releases | `gh release list -R O/R --limit 20` |
 | Read one release | read a release by tag, or the latest release | `gh release view TAG -R O/R` (omit `TAG` for the latest) |
-| List tags | — | `gh api repos/O/R/tags --jq '.[].name'` |
+| List tags | list a repository's tags | `gh api repos/O/R/tags --jq '.[].name'` |
 
 On the REST tier: `python3 scripts/rest_read.py releases --repo O/R`
 (`--tag TAG` or `--latest` for one), and `python3 scripts/rest_read.py

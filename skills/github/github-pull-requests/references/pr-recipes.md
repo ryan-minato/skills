@@ -1,8 +1,9 @@
 # PR recipes
 
 Operations not covered by the main table in SKILL.md. Use the column (MCP
-or gh) chosen in "Choose your path"; `O/R` and `N` come from "Identify
-the repository".
+or gh) chosen in "Choose your path", except where an entry is marked gh
+only — then use gh regardless of the session's default. `O/R` and `N`
+come from "Identify the repository".
 
 ## Update the PR branch with its base
 
