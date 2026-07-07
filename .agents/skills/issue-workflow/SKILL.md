@@ -1,6 +1,8 @@
 ---
 name: issue-workflow
 description: Issue-driven development workflow for this repository — create the Linear issue before any proactive change, work on the issue's branch, comment at milestones, keep every commit atomic and hook-clean, and hand off a copy-pastable PR after pushing. Use when starting any proactive creation or modification of tracked files, when picking up an existing Linear issue, when creating a work branch, or when preparing a push or pull request in this repo.
+metadata:
+  internal: true
 ---
 
 # Issue Workflow

@@ -1,6 +1,8 @@
 ---
 name: skill-authoring
 description: End-to-end workflow for creating or modifying a skill in this repository — scaffolding, symlinks, marketplace manifest, catalog READMEs, validation, and commit. Use when asked to "create a skill", "add a skill to a catalog", "move a skill", "remove a skill", or when modifying any skill under skills/ or .agents/skills/.
+metadata:
+  internal: true
 ---
 
 # Skill Authoring

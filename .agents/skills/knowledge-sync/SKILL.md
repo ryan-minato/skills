@@ -1,6 +1,8 @@
 ---
 name: knowledge-sync
 description: Syncs this repository's local knowledge base (.agents/knowledge/*.md) to Linear Documents in the "Skills" project. Use after knowledge base files change on the default branch, when Linear documents may be stale, or when asked to "sync the knowledge base", "update Linear docs", or "push knowledge to Linear".
+metadata:
+  internal: true
 ---
 
 # Knowledge Sync
