@@ -22,7 +22,12 @@ conventions below.
    every table below, picking the tool whose description matches the
    row's capability.
 2. Otherwise run `gh auth status`. If it exits 0, use the **gh** column.
-3. Otherwise stop and tell the user GitHub tooling is not set up.
+3. Otherwise stop and tell the user GitHub tooling is not set up; the
+   `github-tooling-setup` skill installs it, from
+   https://github.com/ryan-minato/skills.git:
+
+       npx skills add ryan-minato/skills --skill github-tooling-setup
+
 4. Use one column for the whole task. Never mix MCP and gh in one
    operation.
 
@@ -51,9 +56,10 @@ PR: title, body, `git log {{DEFAULT_BRANCH}}..HEAD --format=full`, and
 4. Professional, concise wording; English unless the project's conventions
    say otherwise.
 
-If any check fails, fix the draft (or the branch) and re-check. Publish
-only after everything passes. Only the user may skip this gate,
-explicitly; note the skip in your summary.
+If any check fails, fix the draft — or the branch, when the finding is
+in the diff — and re-check. Publish only after the full text passes.
+Only the user may skip this gate, explicitly; note the skip in your
+summary.
 
 ## Create a pull request
 

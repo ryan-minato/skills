@@ -113,6 +113,9 @@ Read [references/automation-recipes.md](references/automation-recipes.md)
 when adding automation beyond the shipped labeler (stale handling,
 auto-assign, form-completeness checks).
 
+Done when: the workflow and its config file still parse as YAML after
+the placeholder edits.
+
 ## Generate the project-level skill
 
 For the default deliverable, copy

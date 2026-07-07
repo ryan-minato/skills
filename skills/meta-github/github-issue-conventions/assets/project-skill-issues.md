@@ -21,7 +21,12 @@ conventions.
    every table below, picking the tool whose description matches the
    row's capability.
 2. Otherwise run `gh auth status`. If it exits 0, use the **gh** column.
-3. Otherwise stop and tell the user GitHub tooling is not set up.
+3. Otherwise stop and tell the user GitHub tooling is not set up; the
+   `github-tooling-setup` skill installs it, from
+   https://github.com/ryan-minato/skills.git:
+
+       npx skills add ryan-minato/skills --skill github-tooling-setup
+
 4. Use one column for the whole task. Never mix MCP and gh in one
    operation.
 

@@ -101,6 +101,9 @@ merge the two files. Read
 customizing the labeler config syntax or adding more automation (title
 validation, linked-issue enforcement, stale-PR handling).
 
+Done when: all three files still parse as YAML after the placeholder
+edits.
+
 ## Generate the project-level skill
 
 For the default deliverable, copy
@@ -149,5 +152,6 @@ branch protection to enable, the first PR to watch the workflows on).
   minimal — it runs with repository permissions.
 - labeler v6 keeps the v5 config syntax (`any-glob-to-any-file` and
   friends); older v4-era configs with bare glob lists do not work.
-- Renaming a heading in the PR template silently breaks the checklist
-  workflow until its heading list is updated to match.
+- Renaming a heading in the PR template makes the checklist workflow
+  fail every PR until its heading list is updated to match (the same
+  rule the PR-template section states — one heading list, two files).
