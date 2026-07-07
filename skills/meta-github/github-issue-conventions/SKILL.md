@@ -5,10 +5,12 @@ description: >
   config.yml, a baseline label taxonomy applied by an idempotent sync
   script, first-party-only Actions automation for issue labeling, and a
   generated project-level agent skill for filing and triaging issues in
-  that repository. Use when standardizing how a repo's issues are filed
-  and triaged — "add issue templates", "set up issue forms", "define our
-  labels", "standardize issues", "automate issue triage", or "create a
-  skill for filing issues in this repo".
+  that repository — with an AGENTS.md section as the fallback deliverable
+  when the project's harness does not support skills. Use when
+  standardizing how a repo's issues are filed and triaged — "add issue
+  templates", "set up issue forms", "define our labels", "standardize
+  issues", "automate issue triage", or "create a skill for filing issues
+  in this repo".
 license: Apache-2.0
 compatibility: >
   scripts/sync_labels.py requires Python 3.9+ (stdlib only) and an
@@ -19,28 +21,37 @@ compatibility: >
 
 Author the files that define how a repository's issues are filed, labeled,
 and triaged: issue forms, a label taxonomy, labeling automation, and a
-project-level skill that teaches agents in that repository to follow all
-of it. This skill writes local files; day-to-day issue operations belong
-to `github-issues`, PR conventions to `github-pr-conventions`, and MCP/gh
-setup to `github-tooling-setup`.
+project-level skill (or AGENTS.md section) that teaches agents in that
+repository to follow all of it. This skill writes local files — only its
+outputs land in the repository. Day-to-day issue operations belong to
+`github-issues`; PR conventions to `github-pr-conventions`; commit and
+release policy to `github-commit-conventions` /
+`github-release-conventions`.
 
-## Assess the repository first
+## Assess the project first
 
-Inventory what already exists before writing anything:
+Before authoring anything, inventory what the repository already has:
+`.github/ISSUE_TEMPLATE/` (existing forms, legacy `.md` templates,
+`config.yml`), existing labels (derive `O/R` from `git remote get-url
+origin`, then `gh label list -R O/R --json name,color,description` — or
+the MCP tool that lists repository labels), existing issue automation in
+`.github/workflows/`, `AGENTS.md` / `CLAUDE.md` for recorded conventions,
+and where project skills live — use `.claude/skills/` if it exists, else
+`.agents/skills/` if it exists, else plan to create `.agents/skills/`.
+Never invent structure parallel to what the project already defines:
+build on what exists, or get the user's explicit approval to replace it.
+Done when: the inventory is written down and each deliverable below is
+marked "new", "extends existing", or "replaces (approved)".
 
-1. `.github/ISSUE_TEMPLATE/` — existing issue forms, legacy `.md`
-   templates, and `config.yml`.
-2. Existing labels: derive `O/R` from `git remote get-url origin` (the
-   part after `github.com/` or `github.com:`, minus a trailing `.git`),
-   then `gh label list -R O/R --json name,color,description`. If only the
-   GitHub MCP server is available, use its `list_label` tool instead.
-3. `.github/workflows/` — existing issue automation.
-4. The project's agent-skills directory: use `.claude/skills/` if it
-   exists, else `.agents/skills/` if it exists, else create
-   `.agents/skills/`.
+## Choose the deliverable
 
-Done when: an inventory of existing templates, labels, workflows, and the
-chosen skills directory is written down.
+The default deliverable for workflow guidance is a **project-level agent
+skill** in the skills directory found during assessment. When the project's
+harness does not support skills, or the user prefers documentation, deliver
+an `AGENTS.md` section (create the file if missing) or a standalone doc
+instead. Ask the user once, before generating, and record the choice. All
+other artifacts (templates, configs, workflows, validators) ship regardless
+of this choice.
 
 ## Issue forms
 
@@ -83,26 +94,8 @@ that carries it. The script is idempotent; re-running after apply yields
 all-skip.
 
 If only MCP is available (no gh), apply the printed plan one label at a
-time with the `label_write` tool (method `create` or `update`), or hand
-the plan to the user.
-
-## Generate the project-level skill
-
-Copy [assets/project-skill-issues.md](assets/project-skill-issues.md) to
-`<skills-dir>/<repo-name>-issues/SKILL.md` (the skills directory chosen
-during assessment) and fill every `{{PLACEHOLDER}}`: `{{REPO_NAME}}` and
-`{{OWNER_REPO}}` from the origin remote, `{{FORMS}}` with the form files
-and their display names, `{{LABEL_AXES}}` with the axes actually synced.
-The template pre-wires the repository's issue forms, its label taxonomy,
-the choose-your-path block, the embedded pre-publish gate with inline
-review procedure, and a triage table. For refinement beyond the template
-this pairs with `great-skill-writer`. If it is not installed, install it
-from https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill great-skill-writer
-
-Done when: the generated SKILL.md contains no `{{...}}` placeholder and
-its frontmatter `name` matches its directory name.
+time with the MCP tool that creates or updates a label, or hand the plan
+to the user.
 
 ## Automation
 
@@ -120,15 +113,42 @@ Read [references/automation-recipes.md](references/automation-recipes.md)
 when adding automation beyond the shipped labeler (stale handling,
 auto-assign, form-completeness checks).
 
+Done when: the workflow and its config file still parse as YAML after
+the placeholder edits.
+
+## Generate the project-level skill
+
+For the default deliverable, copy
+[assets/project-skill-issues.md](assets/project-skill-issues.md) to
+`<skills-dir>/<repo-name>-issues/SKILL.md` and fill every
+`{{PLACEHOLDER}}`: `{{REPO_NAME}}` and `{{OWNER_REPO}}` from the origin
+remote, `{{FORMS}}` with the form files and their display names,
+`{{LABEL_AXES}}` with the axes actually synced. The template pre-wires
+the repository's issue forms, its label taxonomy, capability-described
+MCP alternatives, and the condensed pre-publish gate.
+
+For the AGENTS.md fallback, copy
+[assets/agents-md-issues-section.md](assets/agents-md-issues-section.md)
+into the project's `AGENTS.md` (create the file if missing) and fill the
+same placeholders.
+
+For refinement beyond the template this pairs with `great-skill-writer`.
+If it is not installed, install it from
+https://github.com/ryan-minato/skills.git:
+
+    npx skills add ryan-minato/skills --skill great-skill-writer
+
+Done when: the generated deliverable contains no `{{...}}` placeholder
+and (for a skill) its frontmatter `name` matches its directory name.
+
 ## Deliver
 
-The new files are local until committed and pushed through the project's
-normal git/PR flow — pushing is what publishes them, and that flow
-carries its own review gates.
-
-Done when: forms + config.yml + label plan (applied or handed to the
-user) + generated project skill + labeler workflow and config all exist
-locally and parse.
+Everything this skill wrote is local files — nothing is published yet. Hand
+the changes to the project's normal git flow (branch, commit, review); that
+flow, not this skill, publishes them and carries its own review gates.
+Done when: the user has the list of every file created or changed, one line
+each on what it does, and any follow-up steps (secrets to set, first sync
+run, branch protection to enable).
 
 ## Gotchas
 
@@ -141,6 +161,6 @@ locally and parse.
 - Label colors are 6-digit hex WITHOUT `#` in gh and API contexts
   (`--color d73a4a`); the leading `#` shown in GitHub's web UI is not
   accepted there.
-- MCP tool names have changed across github-mcp-server versions. If a tool
-  named in a table is absent, list the github server's available tools and
-  pick the same-purpose name; if none matches, fall back to the gh column.
+- The label taxonomy feeds more than issues: `.github/release.yml`
+  (release-notes categories) keys on the same labels — when both this
+  skill and `github-release-conventions` run, run this one first.

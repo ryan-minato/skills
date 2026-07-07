@@ -1,0 +1,27 @@
+# .github/release.yml — categories for generated release notes.
+# Categories match by PR label; every label listed here must exist in
+# the repository (unknown labels silently match nothing). Section order
+# below is the render order; the "*" catch-all stays last.
+changelog:
+  exclude:
+    labels:
+      - status/duplicate
+      - status/wontfix
+  categories:
+    - title: Breaking changes
+      labels:
+        # Not part of the github-issue-conventions taxonomy — create it
+        # (gh label create breaking --color b60205) or delete this category.
+        - breaking
+    - title: Features
+      labels:
+        - type/feature
+    - title: Bug fixes
+      labels:
+        - type/bug
+    - title: Documentation
+      labels:
+        - type/docs
+    - title: Other changes
+      labels:
+        - "*"

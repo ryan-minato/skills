@@ -5,46 +5,54 @@ description: >
   CONTRIBUTING pull-request rules section, path-based auto-labeling and
   checklist-validation workflows built from first-party actions only, and
   a generated project-level agent skill for opening and reviewing PRs in
-  that repository. Use when standardizing how a repository handles pull
-  requests — "add a PR template", "enforce a PR checklist", "auto-label
-  PRs", "document our review process", "standardize pull requests", or
-  "create a skill for opening PRs in this repo".
+  that repository — with an AGENTS.md section as the fallback deliverable
+  when the project's harness does not support skills. Use when
+  standardizing how a repository handles pull requests — "add a PR
+  template", "enforce a PR checklist", "auto-label PRs", "document our
+  review process", "standardize pull requests", or "create a skill for
+  opening PRs in this repo".
 license: Apache-2.0
 ---
 
 # GitHub PR Conventions
 
 Author a repository's pull-request conventions: template, contributing
-rules, automation workflows, and a project-level skill that teaches agents
-to open and review PRs the way this repository expects. This skill authors
-local files only: day-to-day PR operations belong to
-`github-pull-requests`, issue templates and label taxonomy to
-`github-issue-conventions`, and setting up missing GitHub tooling to
-`github-tooling-setup`.
+rules, automation workflows, and a project-level skill (or AGENTS.md
+section) that teaches agents to open and review PRs the way this
+repository expects. This skill writes local files — only its outputs land
+in the repository. Day-to-day PR operations belong to
+`github-pull-requests`; issue templates and label taxonomy to
+`github-issue-conventions`; commit-message rules to
+`github-commit-conventions`.
 
-## Assess the repository first
+## Assess the project first
 
-Before writing anything, record what already exists:
+Before authoring anything, inventory what the repository already has:
+the existing PR template (`.github/pull_request_template.md`, a root or
+`docs/` copy, or a `.github/PULL_REQUEST_TEMPLATE/` directory — adapt,
+never replace wholesale without asking), `CONTRIBUTING.md` (root or
+`.github/`), existing workflows in `.github/workflows/` (avoid file-name
+collisions), the base branch and allowed merge methods
+(`gh repo view -R O/R --json
+defaultBranchRef,mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed`
+with `O/R` from `git remote get-url origin`), `AGENTS.md` / `CLAUDE.md`
+for recorded conventions, and where project skills live — use
+`.claude/skills/` if it exists, else `.agents/skills/` if it exists, else
+plan to create `.agents/skills/`. Never invent structure parallel to what
+the project already defines: build on what exists, or get the user's
+explicit approval to replace it.
+Done when: the inventory is written down and each deliverable below is
+marked "new", "extends existing", or "replaces (approved)".
 
-1. Existing PR template: check `.github/pull_request_template.md`, a root
-   `pull_request_template.md`, `docs/pull_request_template.md`, and a
-   `.github/PULL_REQUEST_TEMPLATE/` directory. If one exists, adapt it —
-   do not replace it wholesale without asking.
-2. `CONTRIBUTING.md` (root or `.github/`), and existing workflows in
-   `.github/workflows/` (avoid file-name collisions with the workflows
-   added below).
-3. Base branch and allowed merge methods. Derive `O/R` from
-   `git remote get-url origin` (the part after `github.com/` or
-   `github.com:`, minus a trailing `.git`), then run:
+## Choose the deliverable
 
-       gh repo view --json defaultBranchRef,mergeCommitAllowed,squashMergeAllowed,rebaseMergeAllowed -R O/R
-
-4. The agent-skills directory for the generated skill: use
-   `.claude/skills/` if it exists, else `.agents/skills/`, else create
-   `.agents/skills/`.
-
-Done when: existing conventions and the chosen skills directory are
-written down.
+The default deliverable for workflow guidance is a **project-level agent
+skill** in the skills directory found during assessment. When the project's
+harness does not support skills, or the user prefers documentation, deliver
+an `AGENTS.md` section (create the file if missing) or a standalone doc
+instead. Ask the user once, before generating, and record the choice. All
+other artifacts (templates, configs, workflows, validators) ship regardless
+of this choice.
 
 ## PR template
 
@@ -71,25 +79,6 @@ assessment above. Read
 the user wants full contributing guidance (branch naming, merge strategy,
 review expectations) beyond the shipped section.
 
-## Generate the project-level skill
-
-Copy [assets/project-skill-prs.md](assets/project-skill-prs.md) to
-`<skills-dir>/<repo-name>-prs/SKILL.md` and fill every `{{PLACEHOLDER}}`:
-
-| Placeholder | Fill with |
-|---|---|
-| `{{REPO_NAME}}` | Repository name, lowercase, hyphens only |
-| `{{OWNER_REPO}}` | `O/R` from the assessment |
-| `{{DEFAULT_BRANCH}}` | Default branch from `gh repo view` |
-| `{{MERGE_METHOD}}` | The repository's merge method (for example squash) |
-| `{{TEMPLATE_HEADINGS}}` | The exact headings shipped in the PR template |
-| `{{LABEL_PREFIXES}}` | Label prefixes in use (for example `area/`) |
-
-Verify no `{{` remains in the generated file. Refinement beyond the
-template pairs with `great-skill-writer` — if it is not installed, install
-it from https://github.com/ryan-minato/skills.git:
-`npx skills add ryan-minato/skills --skill great-skill-writer`.
-
 ## Automation
 
 Copy three files:
@@ -112,16 +101,44 @@ merge the two files. Read
 customizing the labeler config syntax or adding more automation (title
 validation, linked-issue enforcement, stale-PR handling).
 
+Done when: all three files still parse as YAML after the placeholder
+edits.
+
+## Generate the project-level skill
+
+For the default deliverable, copy
+[assets/project-skill-prs.md](assets/project-skill-prs.md) to
+`<skills-dir>/<repo-name>-prs/SKILL.md` and fill every `{{PLACEHOLDER}}`:
+
+| Placeholder | Fill with |
+|---|---|
+| `{{REPO_NAME}}` | Repository name, lowercase, hyphens only |
+| `{{OWNER_REPO}}` | `O/R` from the assessment |
+| `{{DEFAULT_BRANCH}}` | Default branch from `gh repo view` |
+| `{{MERGE_METHOD}}` | The repository's merge method (for example squash) |
+| `{{TEMPLATE_HEADINGS}}` | The exact headings shipped in the PR template |
+| `{{LABEL_PREFIXES}}` | Label prefixes in use (for example `area/`) |
+
+For the AGENTS.md fallback, copy
+[assets/agents-md-prs-section.md](assets/agents-md-prs-section.md) into
+the project's `AGENTS.md` (create the file if missing) and fill the same
+placeholders.
+
+Refinement beyond the template pairs with `great-skill-writer` — if it is
+not installed, install it from https://github.com/ryan-minato/skills.git:
+`npx skills add ryan-minato/skills --skill great-skill-writer`.
+
+Done when: the generated deliverable contains no `{{...}}` placeholder
+and (for a skill) its frontmatter `name` matches its directory name.
+
 ## Deliver
 
-Everything this skill writes stays local until it is committed and pushed
-through the repository's normal git/PR flow, which carries its own review
-gates — this skill publishes nothing itself.
-
-Done when: the PR template, the CONTRIBUTING section, the generated
-project skill, `.github/labeler.yml`, and both workflow files exist
-locally, the YAML files parse, and no `{{PLACEHOLDER}}` remains in
-generated output.
+Everything this skill wrote is local files — nothing is published yet. Hand
+the changes to the project's normal git flow (branch, commit, review); that
+flow, not this skill, publishes them and carries its own review gates.
+Done when: the user has the list of every file created or changed, one line
+each on what it does, and any follow-up steps (missing labels to create,
+branch protection to enable, the first PR to watch the workflows on).
 
 ## Gotchas
 
@@ -135,5 +152,6 @@ generated output.
   minimal — it runs with repository permissions.
 - labeler v6 keeps the v5 config syntax (`any-glob-to-any-file` and
   friends); older v4-era configs with bare glob lists do not work.
-- Renaming a heading in the PR template silently breaks the checklist
-  workflow until its heading list is updated to match.
+- Renaming a heading in the PR template makes the checklist workflow
+  fail every PR until its heading list is updated to match (the same
+  rule the PR-template section states — one heading list, two files).

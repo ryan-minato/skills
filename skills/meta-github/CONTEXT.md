@@ -113,10 +113,16 @@ run, branch protection to enable).
 
 ### Condensed pre-publish gate
 
-Embedded verbatim in every generated project skill that publishes content
-(issues, PRs, comments). The full-procedure gate stays in the `github`
-catalog's operational skills; this condensed form exists because generated
-skills must be self-contained.
+Embedded in every generated project skill that publishes content
+(issues, PRs, releases, comments). The four numbered checks and the
+closing paragraph are fixed; two slots are tailorable per template —
+the opening sentence(s) before "review the exact final text" (the PR
+template adds the commit-log/diff exposure, the release template the
+draft-first framing) and a parenthetical after it naming the artifacts
+under review. The AGENTS.md fallback sections carry the same checks as
+prose, not verbatim. The full-procedure gate stays in the `github`
+catalog's operational skills; this condensed form exists because
+generated skills must be self-contained.
 
 ```markdown
 ## Pre-publish gate (mandatory)
@@ -140,13 +146,19 @@ your summary.
 Set up MCP/gh for an agent → `github-tooling-setup` · issue forms, label
 taxonomy, issue automation → `github-issue-conventions` · PR template,
 CONTRIBUTING PR rules, PR automation → `github-pr-conventions` ·
-**using** the conventions day to day (filing issues, opening PRs, applying
-labels) → the `github` catalog's operational skills or the generated
-project skill.
+commit-message rules, the committed validator, commit CI →
+`github-commit-conventions` · versioning and tag policy, release.yml,
+tag CI → `github-release-conventions` · **using** the conventions day to
+day (filing issues, opening PRs, committing, cutting releases) → the
+`github` catalog's operational skills or the generated project skill.
 
 Boundary rule: this catalog authors *policy and structure* (what labels
-exist, what the template says); the `github` catalog *operates within* that
-structure (applies labels, files issues against templates).
+exist, what the template says); the `github` catalog *operates within*
+that structure (applies labels, files issues against templates).
+Ordering: when several conventions skills run, `github-issue-conventions`
+goes before `github-release-conventions` (release.yml keys on the label
+taxonomy), and `github-commit-conventions` before it when the bump rule
+is type-mapped.
 
 ## Tool inventory
 
@@ -163,8 +175,12 @@ reference, update this inventory in the same commit.
 | `gh label list` | Inventory existing labels | github-issue-conventions |
 | `gh label create/edit/delete` | Apply the label taxonomy | github-issue-conventions (scripts/sync_labels.py) |
 | `gh api repos/{o}/{r}/labels` | Label sync fallback fields | github-issue-conventions (scripts/sync_labels.py) |
-| `gh repo view --json` | Read default branch and merge settings | github-pr-conventions |
+| `gh repo view --json` | Read default branch and merge settings | github-pr-conventions, github-commit-conventions, github-release-conventions (assess) |
 | `gh workflow list` | Inventory existing automation | conventions assess steps |
+| `gh release list` / `gh release view` | Inventory existing releases and notes style | github-release-conventions (assess) |
+| `gh api repos/{o}/{r}/releases/generate-notes` | Preview generated notes while editing release.yml | github-release-conventions (references) |
+| `git tag --sort=-v:refname` | Inventory the existing tag scheme | github-release-conventions (assess) |
+| `git log` (via scripts) | History analysis and range validation | github-commit-conventions (scripts/analyze_history.py, assets/check_commits.py) |
 
 ## References
 
