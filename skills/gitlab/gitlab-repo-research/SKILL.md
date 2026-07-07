@@ -121,7 +121,7 @@ user-initiated).
 |---|---|---|
 | List releases | `glab release list -R G/P` | — |
 | Read one release | `glab release view TAG -R G/P` (omit `TAG` for the latest) | — |
-| List tags | `glab api "projects/:fullpath/repository/tags"` | — |
+| List tags | `glab api "projects/:fullpath/repository/tags?per_page=20"` — tag objects embed full release notes; never fetch unbounded | — |
 
 On the REST tier: `python3 scripts/rest_read.py releases --project G/P`
 (`--tag TAG` or `--latest` for one), and `python3 scripts/rest_read.py

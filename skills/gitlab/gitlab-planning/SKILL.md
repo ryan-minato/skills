@@ -135,7 +135,8 @@ first. `--group GROUP` switches any row to group level (`--project` and
 | Close / reactivate | `glab milestone edit ID -R G/P --state close` (or `--state activate`) |
 | Delete | `glab milestone delete ID -R G/P` |
 
-Report the milestone's `web_url` from the JSON response.
+Edits are partial: only the fields you pass change; omitted fields keep
+their values. Report the milestone's `web_url` from the JSON response.
 Done when: the URL is reported.
 
 ## Labels (all tiers)
