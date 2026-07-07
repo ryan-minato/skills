@@ -22,3 +22,5 @@ npx skills add ryan-minato/skills --skill <skill-name>
 | [gitlab-repo-research](gitlab-repo-research/) | 对任意 GitLab 项目的只读调查——issue、MR、流水线与失败任务日志摘要、搜索——可经 glab、MCP 或内置 REST 脚本（公开项目无需认证），并附带避免大日志涌入上下文的工具。 |
 | [gitlab-planning](gitlab-planning/) | GitLab 规划结构的生命周期管理并标注层级门槛——milestone（Free）、iteration（Premium，由 cadence 管理）、issue board 与列表、epic（Premium/Ultimate，走稳定 REST 路径，work items 为实验性后继）。 |
 | [gitlab-wiki](gitlab-wiki/) | 通过 wikis REST API 操作项目与群组 wiki 页面——读取、创建、更新、重命名、删除、附件——批量重构走 wiki 即 git 仓库路径，全部经过强制的发布前审查关卡。 |
+| [gitlab-issue-conventions](gitlab-issue-conventions/) | 为项目创作 issue 规范：内嵌 quick actions 的描述模板、由幂等同步脚本应用的 scoped 标签体系、定时清扫自动化配方，以及生成的项目级 issue skill。 |
+| [gitlab-mr-conventions](gitlab-mr-conventions/) | 为项目创作 merge request 规范：Default.md MR 模板、贡献规则、在 merge request 流水线中运行的免 token CI 清单校验任务，以及生成的项目级 MR skill。 |
