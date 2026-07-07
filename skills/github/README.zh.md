@@ -3,10 +3,10 @@
 [English](README.md)
 
 GitHub **协作工作流** skill——优先通过 GitHub MCP server 操作 issue、pull
-request、Discussions 与 Actions，并提供精确的 `gh` CLI 回退命令。面向小型
-本地模型设计：每个操作只有一条推荐路径、决策表驱动，且所有发布内容的
-skill 都内嵌强制的发布前安全审查。工具链配置与仓库规范创作类 skill 位于
-`meta-github` catalog。
+request、Discussions、Actions、规划结构（milestone、label、Projects）与
+release，并提供精确的 `gh` CLI 回退命令。面向小型本地模型设计：每个操作
+只有一条推荐路径、决策表驱动，且所有发布内容的 skill 都内嵌强制的发布前
+安全审查。工具链配置与仓库规范创作类 skill 位于 `meta-github` catalog。
 
 ```bash
 npx skills add ryan-minato/skills --skill <skill-name>

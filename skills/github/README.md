@@ -3,8 +3,9 @@
 [中文](README.zh.md)
 
 GitHub **collaboration workflow** skills — operating issues, pull requests,
-Discussions, and Actions through the GitHub MCP server first, with exact
-`gh` CLI fallbacks. Designed so small local models can execute them: one
+Discussions, Actions, planning structures (milestones, labels, Projects),
+and releases through the GitHub MCP server first, with exact `gh` CLI
+fallbacks. Designed so small local models can execute them: one
 recommended path per operation, decision tables, and a mandatory
 pre-publish security review embedded in every skill that publishes content.
 Tooling setup and repository conventions authoring live in the

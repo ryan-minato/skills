@@ -53,7 +53,7 @@
         "./skills/github/github-releases",
         "./skills/github/github-repo-research"
       ],
-      "description": "GitHub collaboration workflows: issues, PRs, and repo research."
+      "description": "GitHub collaboration workflows: issues, PRs, planning (milestones, labels, Projects), releases, and repo research."
     },
     {
       "name": "gitlab",
