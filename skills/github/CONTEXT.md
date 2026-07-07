@@ -137,8 +137,10 @@ owner and repo parameters).
 
 ### Match the project's conventions
 
-Only the table rows are tailorable per skill; the surrounding text is
-fixed. Embedded by every skill that creates content.
+Only the table rows and the wording of the `Done when:` line are
+tailorable per skill (`github-releases` tailors the latter to the
+version/notes outcome); the surrounding text is fixed. Embedded by every
+skill that creates content.
 
 ```markdown
 ## Match the project's conventions (before any create)
@@ -182,6 +184,9 @@ project names, and label names are visible to everyone who can see the
 repository."; `github-releases` uses "Publishing a release publishes the
 notes, the tag, and every asset, and notifies watchers — the draft step
 exists so this gate always runs before the release goes live."
+The parenthetical artifact list in step 1 is a second per-skill slot:
+`github-releases` replaces it with its own artifact list; every other
+line of the steps is fixed.
 
 ```markdown
 ## Pre-publish gate (mandatory)

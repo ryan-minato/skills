@@ -95,9 +95,8 @@ with `/` in any body or comment can execute as a GitLab quick action (for
 example `/close`). Before ANY call that creates or edits such content:
 
 1. Write the exact outgoing content to files in a scratch directory
-   (title, body, each comment; for MRs also `git log TARGET..SOURCE
-   --format=full > commits.txt` and `git diff TARGET...SOURCE >
-   diff.patch`; copy attachments in).
+   (the tag name, release name, NOTES.md, and every asset file or
+   link).
 2. Run the review procedure in references/publish-review.md over that
    directory. Read that file every time — do not review from memory.
 3. Publish only after the verdict is exactly `SAFE TO PUBLISH: YES`. On

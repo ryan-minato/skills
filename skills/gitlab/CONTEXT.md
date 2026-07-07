@@ -178,8 +178,10 @@ groups.
 
 ### Match the project's conventions
 
-Only the table rows are tailorable per skill; the surrounding text is
-fixed. Embedded by every skill that creates content.
+Only the table rows and the wording of the `Done when:` line are
+tailorable per skill (`gitlab-releases` tailors the latter to the
+version/notes outcome); the surrounding text is fixed. Embedded by every
+skill that creates content.
 
 ```markdown
 ## Match the project's conventions (before any create)
@@ -226,6 +228,9 @@ not just the page you edited."; `gitlab-releases` uses "GitLab has no
 draft releases — creating a release publishes the tag, name, notes, and
 asset links the moment the call succeeds, so this gate runs on the
 complete assembled release before create."
+The parenthetical artifact list in step 1 is a second per-skill slot:
+`gitlab-wiki` and `gitlab-releases` replace it with their own artifact
+lists; every other line of the steps is fixed.
 
 ```markdown
 ## Pre-publish gate (mandatory)
