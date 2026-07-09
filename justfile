@@ -28,6 +28,10 @@ lint:
     ruff check scripts/
     ruff format --check scripts/
 
+# Pre-commit safety gate for staged changes
+commit-gate:
+    python3 scripts/check_commit_safety.py
+
 # Run every check (validator, lint, pre-commit hooks)
 check: validate lint
     pre-commit run --all-files

@@ -47,10 +47,10 @@ Catalogs section of `ARCHITECTURE.md`.
   changes. Template: `.gitmessage` (installed by `just setup`).
 - **Task management**: Linear, team "Aoi", project "Skills" (via the Linear
   MCP server configured in `.mcp.json`).
-- **Workflow**: every change to tracked files is issue-driven — proactive
-  work starts by creating the Linear issue(s) (parent + sub-issues for
-  related groups), work happens on the issue's branch, and one PR covers
-  one parent issue. Full procedure: the `issue-workflow` project skill.
+- **Workflow**: every change to tracked files is issue-driven and uses
+  atomic commits, per-commit safety gates, best-effort sensitivity checks,
+  Linear status updates, and a draft PR before review. Full procedure: the
+  `issue-workflow` project skill.
 
 ## When To Read What
 
@@ -73,6 +73,7 @@ Catalogs section of `ARCHITECTURE.md`.
 - `just validate` — skill layout and harness consistency only.
 - `just check-skill <dir>...` — lint specific skill directories while drafting.
 - `just lint` — ruff over `scripts/`.
+- `just commit-gate` — pre-commit safety gate over staged changes.
 - `just gen-marketplace` — regenerate `marketplace.json` skills[] after
   adding or removing a public skill.
 
