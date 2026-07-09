@@ -26,6 +26,8 @@ ANONYMOUS_EMAILS = (
 )
 
 EMAIL_RE = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
+ENV_VAR_RE = re.compile(r"^\$[A-Za-z_][A-Za-z0-9_]*$")
+BRACED_ENV_VAR_RE = re.compile(r"^\$\{[A-Za-z_][A-Za-z0-9_]*(?:\})?$")
 PRIVATE_KEY_RE = re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----")
 CREDENTIAL_RE = re.compile(
     r"(?i)\b(api[_-]?key|apikey|secret|token|passw(?:or)?d|passwd|credential)"  # pragma: allowlist secret
@@ -64,6 +66,24 @@ def staged_files() -> list[Path]:
     return [Path(item) for item in output.split("\0") if item]
 
 
+def git_user_email() -> str:
+    result = subprocess.run(
+        ["git", "config", "--get", "user.email"],
+        check=False,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if result.returncode == 0:
+        return result.stdout.strip()
+    if result.returncode == 1:
+        return ""
+    print(
+        result.stderr.strip() or "git config --get user.email failed", file=sys.stderr
+    )
+    sys.exit(2)
+
+
 def classify(path: Path) -> str:
     parts = path.parts
     if parts[:1] == (".devcontainer",) or path.name in {".mcp.json"}:
@@ -91,7 +111,7 @@ def is_anonymous_email(email: str) -> bool:
 
 
 def check_author_email(allow_private_email: bool) -> list[str]:
-    email = git("config", "user.email").strip()
+    email = git_user_email()
     if not email:
         return ["git config user.email is empty. Configure an anonymous email."]
     if is_anonymous_email(email):
@@ -111,8 +131,8 @@ def looks_like_placeholder(value: str) -> bool:
     value = value.strip().strip("\"'")
     return (
         not value
-        or value.startswith("${")
-        or value.startswith("$")
+        or ENV_VAR_RE.fullmatch(value) is not None
+        or BRACED_ENV_VAR_RE.fullmatch(value) is not None
         or value.startswith("<")
         or value in {"...", "REDACTED", "redacted", "changeme", "example"}
     )
