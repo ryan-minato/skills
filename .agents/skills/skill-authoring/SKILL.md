@@ -49,14 +49,9 @@ subagent capability is recorded.
 
 The gate passes when the invoking agent can dispatch clean-context subagents;
 this is the only required capability. Do not maintain a framework allowlist or
-denylist. When it passes, try disposable candidate worktrees and snapshots for
-each test run; if either is unavailable, use the best available environment and
-record the isolation degradation. Prefer framework-native conversation history
-or skill-load telemetry to observe invocation. If neither is available, the
-testing reference supplies neutral self-report instrumentation. If subagents
-are unavailable, do not load the reference or use the authoring agent as a
-solver or grader; record the skipped tests and missing capability in the Linear
-milestone comment and handoff.
+denylist. If subagents are unavailable, do not load the reference or use the
+authoring agent as a solver or grader; record the skipped tests and missing
+capability in the Linear milestone comment and handoff.
 
 ## Creating a public skill
 
@@ -100,35 +95,27 @@ README.zh.md entries, and run `just gen-marketplace` to resync
 `.claude-plugin/marketplace.json` (remove a plugin entry by hand only if its
 catalog became empty). The validator catches anything missed.
 
-## Test bundled scripts without subagents
-
-For every added or changed bundled script, first try a detached disposable
-candidate worktree and complete temporary snapshot immediately before testing.
-If either is unavailable, generate the untracked test harness outside version
-control in the best available environment and record the isolation degradation.
-Verify:
-
-- `--help` exits 0 and includes a usage example;
-- a representative invocation exits 0 with expected output;
-- repeating it proves idempotence;
-- bad arguments exit 2 with an actionable diagnostic.
-
-Record commands and results in the Linear milestone comment and handoff, then
-remove the worktree, harness, fixtures, and outputs. This test does not require
-subagents or loading the behavioral-testing reference.
-
 ## Finish
 
-1. If the subagent gate passed, run the candidate tests from
-   [references/testing.md](references/testing.md), applying the best available
-   isolation, then apply the smallest general fix for each failure in the
-   current worktree and rerun the complete affected evaluation. Otherwise
-   confirm the skipped tests and missing subagent capability are recorded.
-2. Walk the "Checklist before committing" in
+1. Walk the "Checklist before committing" in
    `.agents/knowledge/skill-quality.md`.
-3. Run `just check` (repo-wide validation, including symlinks, the
+2. Run `just check` (repo-wide validation, including symlinks, the
    marketplace manifest, and catalog consistency) and fix everything it
    reports; warnings deserve a look even though they don't fail.
+3. **Test.** If the subagent gate passed, run the candidate tests from
+   [references/testing.md](references/testing.md). First try disposable
+   candidate worktrees and snapshots; if either is unavailable, use the best
+   available environment and record the isolation degradation. Prefer
+   framework-native conversation history or skill-load telemetry to observe
+   invocation; if neither is available, use the reference's neutral
+   self-report instrumentation. For every added or changed bundled script,
+   generate an untracked harness outside version control in the same
+   best-available isolated environment and verify `--help` plus its usage
+   example, a representative success, an identical repeated run proving
+   idempotence, and bad arguments exiting 2 with an actionable diagnostic.
+   Remove worktrees, harnesses, fixtures, and outputs after recording results.
+   On a test failure, fix the skill, then repeat steps 1–3. Otherwise confirm
+   skipped behavioral tests and their missing capability are recorded.
 4. Commit using the repository convention (`.gitmessage`): Conventional
    Commits, scope = the skill name. Classify a distributable skill change by
    its effect across SKILL.md, references, assets, and scripts. First ask
