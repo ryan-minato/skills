@@ -3,13 +3,13 @@ name: great-skill-writer
 description: >
   Write and improve Agent Skills that behave predictably — spec-compliant
   frontmatter, trigger-accurate descriptions, purposeful completion criteria,
-  references split by branching condition, and non-interactive
-  scripts. Use when creating a skill (even from a bare "make a skill for X"),
-  when reviewing, pruning, or refactoring an existing skill, or when diagnosing
-  a skill that misfires — wrong triggers, premature completion, or never-loaded
-  references.
+  references split by branching condition, framework-gated behavioral tests,
+  and non-interactive scripts. Use when creating a skill (even from a bare
+  "make a skill for X"), when reviewing, pruning, or refactoring an existing
+  skill, or when diagnosing a skill that misfires — wrong triggers, premature
+  completion, or never-loaded references.
 license: Apache-2.0
-compatibility: Validation step requires uv (runs scripts/lint_skill.py).
+compatibility: Validation requires uv; isolated tests require git worktree support.
 ---
 
 # Great Skill Writer
@@ -23,11 +23,36 @@ lever on one or the other.
 
 ## Route by task
 
-- Creating a new skill → run the workflow below.
+- Creating a new skill → define it in step 1, apply the behavioral-test gate
+  below, then run the remaining workflow.
 - Improving, reviewing, or pruning an existing skill, or diagnosing one that
-  misbehaved → read [references/failure-modes.md](references/failure-modes.md) when you start, then finish with steps 6–7 below.
+  misbehaved → read [references/failure-modes.md](references/failure-modes.md)
+  when you start. Apply the gate before editing; read-only work skips it.
 - Read [references/spec.md](references/spec.md) when a spec constraint is uncertain or a lint finding is unclear.
 - Read [references/glossary.md](references/glossary.md) when a term used here needs its full definition.
+
+## Gate behavioral tests by invoking framework
+
+Identify the agent framework and surface or mode that invoked this skill, then
+use its row below. A model provider is not the invoking framework. A row passes
+only when the current mode supplies every named mechanism.
+
+| Invoking framework | The current mode passes when |
+|---|---|
+| [Claude Code](https://code.claude.com/docs/en/sub-agents) | Independent subagents are enabled; candidate and baseline runs can expose different skills; Skill calls are visible in a transcript or hook. |
+| [Codex](https://openai.com/codex/) | The surface provides subagents, per-solver skill exposure, and evidence that a solver loaded the skill. Multi-agent execution or worktrees alone are insufficient. |
+| [OpenCode](https://opencode.ai/docs/agents/) | Task subagents are enabled; [skill permissions](https://opencode.ai/docs/skills/) can allow or deny the target per solver; child sessions show the native `skill` call. |
+| [Gemini CLI](https://geminicli.com/docs/core/subagents/) | Subagents are enabled; separate runs can enable or disable the target skill; [skill activation](https://geminicli.com/docs/cli/using-agent-skills/) is observable. |
+| Another or unknown framework | Its native facilities provide equivalent independent solvers, per-run skill isolation, and load evidence; uncertainty fails the gate. |
+
+When a task will create or edit a skill and its row passes, read
+[references/testing.md](references/testing.md) after defining the intended
+change and before the first edit. Follow it through the candidate comparison.
+When the row fails, do not load that reference or substitute the authoring
+agent for independent solvers: skip behavioral tests and report the skipped
+trigger tests, outcome comparison, independent grading, and the missing
+framework mechanism in the final handoff. Review-only and diagnosis-only work
+does not load the reference.
 
 ## Rules that apply on every branch
 
@@ -195,7 +220,17 @@ Three passes over anything you wrote or touched:
    (a host may lack uv, Deno, or Bun — SKILL.md-only skills need no such
    line), and a relative markdown link in SKILL.md at first mention.
    Read [references/scripts-python.md](references/scripts-python.md) when writing Python, or [references/scripts-typescript.md](references/scripts-typescript.md) when writing for Deno or Bun.
-   Done when: each script meets every rule in this step's list.
+   For every added or changed script, create a disposable candidate git
+   worktree immediately before testing, generate an untracked temporary harness
+   there, and verify `--help` plus its usage example, a representative success,
+   an identical repeated run proving idempotence, and bad arguments exiting 2
+   with an actionable diagnostic. Remove the worktree and harness after
+   recording results. This script test does not require subagents or the
+   behavioral-testing reference. If a disposable worktree cannot be created,
+   skip the script test and report why; never run generated test material in
+   the authoring worktree.
+   Done when: each script meets every rule in this step's list and its test
+   result or explicit skip reason is recorded.
 6. **Prune.** Run the three passes on your draft — including the description.
    Done when: a further deletion would change behaviour on a model the skill
    is meant to support.
@@ -206,7 +241,9 @@ Three passes over anything you wrote or touched:
 
 ## Improve or diagnose an existing skill
 
-Locate the observed symptom in [references/failure-modes.md](references/failure-modes.md) when you begin — it maps
-symptoms (never triggers, fires wrongly, rushes steps, shallow work, ignored
-references, bloat) to causes and ordered fixes. Apply the fix, then run steps
-6–7 above on the result.
+Locate the observed symptom in [references/failure-modes.md](references/failure-modes.md)
+when you begin — it maps symptoms (never triggers, fires wrongly, rushes steps,
+shallow work, ignored references, bloat) to causes and ordered fixes. If the
+task will edit the skill, apply the behavioral-test gate before the first edit.
+Apply the fix, complete any eligible comparison, then run steps 6–7 above on
+the result.

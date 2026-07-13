@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-description: End-to-end workflow for creating or modifying a skill in this repository — isolated test-first evaluation, scaffolding, symlinks, marketplace manifest, catalog READMEs, validation, and commit. Use when asked to "create a skill", "add a skill to a catalog", "move a skill", "remove a skill", or when modifying any skill under skills/ or .agents/skills/.
+description: End-to-end workflow for creating or modifying a skill in this repository — framework-gated behavioral evaluation, isolated script tests, scaffolding, symlinks, marketplace manifest, catalog READMEs, validation, and commit. Use when asked to "create a skill", "add a skill to a catalog", "move a skill", "remove a skill", or when modifying any skill under skills/ or .agents/skills/.
 metadata:
   internal: true
 ---
@@ -34,13 +34,33 @@ worth building and where it belongs:
      and read that catalog's `CONTEXT.md` for catalog-specific requirements.
    - **Project-only workflow skill** (serves this repo itself):
      `.agents/skills/<skill-name>/` as a real directory.
-3. Read [references/testing.md](references/testing.md) and design its tests
-   before editing. The `issue-workflow` skill must already have placed the
-   current worktree on the issue branch; edit the skill there.
+3. Apply the invoking-framework gate below. If it passes, read
+   [references/testing.md](references/testing.md) and design its behavioral
+   tests before editing. If it fails, do not read the reference; record the
+   skipped trigger tests, outcome comparison, independent grading, and reason
+   for the Linear milestone comment and handoff. The `issue-workflow` skill
+   must already have placed the current worktree on the issue branch; edit the
+   skill there.
 
-Done when: the target location, trigger expectations, outcome rubric, and
-available baselines are recorded; every skipped behavioral test names the
-missing capability.
+Done when: the target location is recorded and either the behavioral cases,
+rubric, and baselines are defined or every skipped behavioral test names the
+missing framework mechanism.
+
+## Gate behavioral tests by invoking framework
+
+Identify the framework and surface or mode that invoked this skill. A row
+passes only when its current mode supplies every named mechanism:
+
+| Invoking framework | The current mode passes when |
+|---|---|
+| Claude Code | Independent subagents are enabled; candidate and baseline runs can expose different skills; Skill calls are visible in a transcript or hook. |
+| Codex | The surface provides subagents, per-solver skill exposure, and evidence that a solver loaded the skill. Multi-agent execution or worktrees alone are insufficient. |
+| OpenCode | Task subagents are enabled; skill permissions can allow or deny the target per solver; child sessions show the native `skill` call. |
+| Gemini CLI | Subagents are enabled; separate runs can enable or disable the target skill; skill activation is observable. |
+| Another or unknown framework | Native facilities provide equivalent independent solvers, per-run skill isolation, and load evidence; uncertainty fails the gate. |
+
+Only a passing row permits loading the behavioral-testing reference. Never use
+the authoring agent as a solver or grader when the row fails.
 
 ## Creating a public skill
 
@@ -84,11 +104,31 @@ README.zh.md entries, and run `just gen-marketplace` to resync
 `.claude-plugin/marketplace.json` (remove a plugin entry by hand only if its
 catalog became empty). The validator catches anything missed.
 
+## Test bundled scripts without subagents
+
+For every added or changed bundled script, create a detached disposable
+candidate worktree immediately before testing and transfer a complete temporary
+snapshot of the intended changes. Generate an untracked test harness there and
+verify:
+
+- `--help` exits 0 and includes a usage example;
+- a representative invocation exits 0 with expected output;
+- repeating it proves idempotence;
+- bad arguments exit 2 with an actionable diagnostic.
+
+Record commands and results in the Linear milestone comment and handoff, then
+remove the worktree, harness, fixtures, and outputs. This test does not require
+subagents or loading the behavioral-testing reference. If a disposable
+worktree or complete snapshot cannot be created, skip it and record why; never
+run generated test material in the issue worktree.
+
 ## Finish
 
-1. Run the candidate tests from [references/testing.md](references/testing.md)
-   in disposable test worktrees, apply the smallest general fix for each
-   failure in the current worktree, and rerun the complete affected comparison.
+1. If the invoking-framework gate passed, run the candidate tests from
+   [references/testing.md](references/testing.md) in disposable test
+   worktrees, apply the smallest general fix for each failure in the current
+   worktree, and rerun the complete affected comparison. Otherwise confirm the
+   skipped tests and missing mechanism are recorded.
 2. Walk the "Checklist before committing" in
    `.agents/knowledge/skill-quality.md`.
 3. Run `just check` (repo-wide validation, including symlinks, the
