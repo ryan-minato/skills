@@ -49,12 +49,24 @@ Work happens on the issue's branch, never directly on `main`:
 2. For a parent/sub-issue structure, use the **parent** issue's branch; all
    sub-issue work lands there (one PR per parent). Sub-issues never get
    their own branches. A standalone issue acts as its own parent.
-3. Create the branch from up-to-date `origin/main`:
+3. Create the branch from up-to-date `origin/main`. For a skill creation or
+   modification, check it out as a new worktree so testing and editing never
+   touch the primary working tree:
+
+   ```bash
+   git fetch origin
+   git worktree add -b <gitBranchName> <isolated-path> origin/main
+   ```
+
+   For other changes, switch in the current worktree:
 
    ```bash
    git fetch origin
    git switch -c <gitBranchName> origin/main
    ```
+
+   The `skill-authoring` project skill owns any additional baseline worktrees
+   needed for skill evaluations.
 
 ## 3. Work and milestone comments
 

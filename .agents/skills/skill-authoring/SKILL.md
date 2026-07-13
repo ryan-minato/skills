@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-description: End-to-end workflow for creating or modifying a skill in this repository — scaffolding, symlinks, marketplace manifest, catalog READMEs, validation, and commit. Use when asked to "create a skill", "add a skill to a catalog", "move a skill", "remove a skill", or when modifying any skill under skills/ or .agents/skills/.
+description: End-to-end workflow for creating or modifying a skill in this repository — isolated test-first evaluation, scaffolding, symlinks, marketplace manifest, catalog READMEs, validation, and commit. Use when asked to "create a skill", "add a skill to a catalog", "move a skill", "remove a skill", or when modifying any skill under skills/ or .agents/skills/.
 metadata:
   internal: true
 ---
@@ -34,6 +34,13 @@ worth building and where it belongs:
      and read that catalog's `CONTEXT.md` for catalog-specific requirements.
    - **Project-only workflow skill** (serves this repo itself):
      `.agents/skills/<skill-name>/` as a real directory.
+3. Read [references/testing.md](references/testing.md) and design its tests
+   before editing. The `issue-workflow` skill must already have placed the
+   issue branch in an isolated candidate worktree.
+
+Done when: the target location, trigger expectations, outcome rubric, and
+available baselines are recorded; every skipped behavioral test names the
+missing capability.
 
 ## Creating a public skill
 
@@ -79,12 +86,15 @@ catalog became empty). The validator catches anything missed.
 
 ## Finish
 
-1. Walk the "Checklist before committing" in
+1. Run the candidate tests from [references/testing.md](references/testing.md),
+   apply the smallest general fix for each failure, and rerun the complete
+   affected comparison.
+2. Walk the "Checklist before committing" in
    `.agents/knowledge/skill-quality.md`.
-2. Run `just check` (repo-wide validation, including symlinks, the
+3. Run `just check` (repo-wide validation, including symlinks, the
    marketplace manifest, and catalog consistency) and fix everything it
    reports; warnings deserve a look even though they don't fail.
-3. Commit using the repository convention (`.gitmessage`): Conventional
+4. Commit using the repository convention (`.gitmessage`): Conventional
    Commits, scope = the skill name. Classify a distributable skill change by
    its effect across SKILL.md, references, assets, and scripts. First ask
    whether it corrects wrong, misleading, overly restrictive, or overly

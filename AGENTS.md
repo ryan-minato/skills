@@ -62,9 +62,9 @@ Catalogs section of `ARCHITECTURE.md`.
 
 - Starting any proactive change, or preparing a branch, commit series, or
   PR handoff → use the `issue-workflow` project skill.
-- Creating or modifying any skill → `.agents/knowledge/skill-quality.md`
-  first, then the catalog's `CONTEXT.md`, then use the `skill-authoring`
-  project skill.
+- Creating or modifying any skill → use the `skill-authoring` project skill;
+  it routes to `.agents/knowledge/skill-quality.md`, the catalog's
+  `CONTEXT.md`, and the repository's isolated test-first workflow.
 - Catalog-specific rules and references → `skills/<catalog>/CONTEXT.md`
   (catalog-scoped material belongs there, not in the global references).
 - External documentation URLs → `.agents/knowledge/references.md`.
