@@ -36,7 +36,7 @@ worth building and where it belongs:
      `.agents/skills/<skill-name>/` as a real directory.
 3. Read [references/testing.md](references/testing.md) and design its tests
    before editing. The `issue-workflow` skill must already have placed the
-   issue branch in an isolated candidate worktree.
+   current worktree on the issue branch; edit the skill there.
 
 Done when: the target location, trigger expectations, outcome rubric, and
 available baselines are recorded; every skipped behavioral test names the
@@ -86,9 +86,9 @@ catalog became empty). The validator catches anything missed.
 
 ## Finish
 
-1. Run the candidate tests from [references/testing.md](references/testing.md),
-   apply the smallest general fix for each failure, and rerun the complete
-   affected comparison.
+1. Run the candidate tests from [references/testing.md](references/testing.md)
+   in disposable test worktrees, apply the smallest general fix for each
+   failure in the current worktree, and rerun the complete affected comparison.
 2. Walk the "Checklist before committing" in
    `.agents/knowledge/skill-quality.md`.
 3. Run `just check` (repo-wide validation, including symlinks, the

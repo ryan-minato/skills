@@ -20,18 +20,28 @@ missing, record the skipped test and reason in the Linear milestone comment and
 handoff. Never use the authoring agent as a substitute for an independent
 subagent. Script tests in step 5 do not require subagents.
 
-## 2. Isolate the baselines
+## 2. Create test worktrees only when testing
 
-The `issue-workflow` skill creates the candidate issue branch in its own
-worktree before this workflow begins. Record its base revision. For an existing
-skill, add a detached worktree at that revision for the previous-version
-baseline. Add another detached worktree at the same revision for the no-skill
-baseline, with the target skill unavailable to that run. A new skill needs only
-the no-skill baseline.
+Record the base revision before editing. The current issue worktree is the
+authoring worktree: design, edit, stage, and commit there. Do not create a
+test worktree until immediately before a test run.
 
-Give every writing subagent a separate worktree and output directory. Never run
-tests or skill edits in the primary working tree, and never let concurrent
-writers share a worktree. If the required isolation cannot be created, stop and
+At the start of each test run, create detached disposable worktrees and
+separate output directories:
+
+- **Candidate:** create it at the current `HEAD`, then transfer a complete
+  temporary snapshot of the intended current changes. Include tracked staged
+  and unstaged changes plus intended untracked files; keep the snapshot patch
+  and file copies outside version control.
+- **Previous version:** for an existing skill, create it at the recorded base
+  revision.
+- **No skill:** create it at the recorded base revision with the target skill
+  unavailable. A new skill needs only this baseline.
+
+Give every writing subagent its own test worktree and output directory. Never
+run tests, generated harnesses, or test-driven edits in the current issue
+worktree, and never let concurrent writers share a test worktree. If the
+required isolation or complete candidate snapshot cannot be created, stop and
 report the blocker.
 
 ## 3. Make the tests red
@@ -59,9 +69,9 @@ then test the candidate:
   the environment's load evidence. Rerun an unexpected result until it has
   three total attempts; it passes only when at least two attempts match the
   expectation.
-- **Outcome quality:** run candidate, previous-version, and no-skill solvers in
-  parallel where all three exist. For a new skill, omit only the previous
-  version. Retain every output, including failures.
+- **Outcome quality:** run candidate, previous-version, and no-skill solvers
+  in parallel in their test worktrees where all three exist. For a new skill,
+  omit only the previous version. Retain every output, including failures.
 - **Independent grading:** anonymize solver identities and give the outputs,
   rubric, and critical requirements to a clean-context subagent that produced
   none of the answers. Require a score and concrete evidence for every item.
@@ -74,8 +84,8 @@ than patching one test prompt, then rerun the complete affected comparison.
 ## 5. Test bundled scripts without subagents
 
 For every added or changed bundled script, generate an untracked temporary test
-harness inside the candidate worktree and run it with the declared runtime. It
-must verify:
+harness inside the candidate test worktree and run it with the declared runtime.
+It must verify:
 
 - `--help` exits 0 and shows a usage example;
 - a representative invocation exits 0 with the expected output;
@@ -88,6 +98,7 @@ fixtures, and evaluation outputs before staging.
 
 ## 6. Clean up
 
-Keep the candidate issue worktree for the remaining commit and PR workflow.
-After recording results, remove the detached baseline worktrees and confirm
-that `git status` shows only the intended repository changes.
+After recording results, remove every detached candidate and baseline test
+worktree, snapshot, harness, fixture, and evaluation output. Keep the current
+issue worktree for the remaining commit and PR workflow, and confirm its
+`git status` shows only the intended repository changes.
