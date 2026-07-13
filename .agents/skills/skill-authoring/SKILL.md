@@ -34,29 +34,29 @@ worth building and where it belongs:
      and read that catalog's `CONTEXT.md` for catalog-specific requirements.
    - **Project-only workflow skill** (serves this repo itself):
      `.agents/skills/<skill-name>/` as a real directory.
-3. Apply the isolated-subagent gate below. If it passes, read
+3. Apply the subagent gate below. If it passes, read
    [references/testing.md](references/testing.md) and design its behavioral
    tests before editing. If it fails, do not read the reference; record the
-   skipped trigger tests, outcome evaluation, independent grading, and reason
-   for the Linear milestone comment and handoff. The `issue-workflow` skill
-   must already have placed the current worktree on the issue branch; edit the
-   skill there.
+   skipped behavioral tests and missing capability for the Linear milestone
+   comment and handoff. The `issue-workflow` skill must already have placed the
+   current worktree on the issue branch; edit the skill there.
 
 Done when: the target location is recorded and either the behavioral cases,
-rubric, critical failures, and passing threshold are defined or every skipped
-behavioral test names the missing capability.
+rubric, critical failures, and passing threshold are defined or the missing
+subagent capability is recorded.
 
 ## Gate behavioral tests by subagent support
 
-The gate passes when the invoking agent can dispatch clean-context subagents,
-assign each one a separate disposable candidate worktree, and expose the
-target through normal skill discovery before each subagent starts. Naming a
-worktree or the target skill in the solver prompt does not prove discovery.
-Do not maintain a framework allowlist or denylist; the testing reference
-supplies a neutral self-report prompt. If any capability is unavailable, do
-not load the reference or use the authoring agent as a solver or grader.
-Record the skipped tests and missing capability in the Linear milestone
-comment and handoff.
+The gate passes when the invoking agent can dispatch clean-context subagents;
+this is the only required capability. Do not maintain a framework allowlist or
+denylist. When it passes, try disposable candidate worktrees and snapshots for
+each test run; if either is unavailable, use the best available environment and
+record the isolation degradation. Prefer framework-native conversation history
+or skill-load telemetry to observe invocation. If neither is available, the
+testing reference supplies neutral self-report instrumentation. If subagents
+are unavailable, do not load the reference or use the authoring agent as a
+solver or grader; record the skipped tests and missing capability in the Linear
+milestone comment and handoff.
 
 ## Creating a public skill
 
@@ -102,10 +102,11 @@ catalog became empty). The validator catches anything missed.
 
 ## Test bundled scripts without subagents
 
-For every added or changed bundled script, create a detached disposable
-candidate worktree immediately before testing and transfer a complete temporary
-snapshot of the intended changes. Generate an untracked test harness there and
-verify:
+For every added or changed bundled script, first try a detached disposable
+candidate worktree and complete temporary snapshot immediately before testing.
+If either is unavailable, generate the untracked test harness outside version
+control in the best available environment and record the isolation degradation.
+Verify:
 
 - `--help` exits 0 and includes a usage example;
 - a representative invocation exits 0 with expected output;
@@ -114,17 +115,15 @@ verify:
 
 Record commands and results in the Linear milestone comment and handoff, then
 remove the worktree, harness, fixtures, and outputs. This test does not require
-subagents or loading the behavioral-testing reference. If a disposable
-worktree or complete snapshot cannot be created, skip it and record why; never
-run generated test material in the issue worktree.
+subagents or loading the behavioral-testing reference.
 
 ## Finish
 
-1. If the isolated-subagent gate passed, run the candidate tests from
-   [references/testing.md](references/testing.md) in disposable test
-   worktrees, apply the smallest general fix for each failure in the current
-   worktree, and rerun the complete affected evaluation. Otherwise confirm the
-   skipped tests and missing mechanism are recorded.
+1. If the subagent gate passed, run the candidate tests from
+   [references/testing.md](references/testing.md), applying the best available
+   isolation, then apply the smallest general fix for each failure in the
+   current worktree and rerun the complete affected evaluation. Otherwise
+   confirm the skipped tests and missing subagent capability are recorded.
 2. Walk the "Checklist before committing" in
    `.agents/knowledge/skill-quality.md`.
 3. Run `just check` (repo-wide validation, including symlinks, the
