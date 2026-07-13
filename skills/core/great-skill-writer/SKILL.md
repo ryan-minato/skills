@@ -1,12 +1,11 @@
 ---
 name: great-skill-writer
 description: >
-  Write and improve Agent Skills that behave predictably — spec-compliant
-  frontmatter, trigger-accurate descriptions, purposeful completion criteria,
-  references split by branching condition, and non-interactive scripts. Use
-  when creating a skill (including a bare "make a skill for X"), reviewing,
-  pruning, or refactoring an existing skill, or diagnosing a skill that
-  misfires — wrong triggers, premature completion, or never-loaded references.
+  Skill authoring for predictable Agent Skills — spec-compliant frontmatter,
+  trigger-accurate descriptions, completion criteria, conditional references,
+  and non-interactive scripts. Use when a user asks to create, review, prune,
+  refactor, or troubleshoot an Agent Skill, its SKILL.md, or an agent
+  instruction package; not for application code or generic documentation.
 license: Apache-2.0
 compatibility: Validation requires uv.
 ---
