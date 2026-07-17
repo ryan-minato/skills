@@ -36,12 +36,13 @@ KNOWN_FIELDS = frozenset(
 REQUIRED_FIELDS = frozenset({"name", "description"})
 ALLOWED_ROOT = frozenset({"SKILL.md", "references", "assets", "scripts"})
 BUNDLE_DIRS = ("scripts", "references", "assets")
-ALLOWED_SCRIPT_EXTS = frozenset({".py", ".rb", ".ts"})
+ALLOWED_SCRIPT_EXTS = frozenset({".py", ".ts"})
 
 NAME_RE = re.compile(r"[a-z0-9]+(?:-[a-z0-9]+)*")
 MD_LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
 FENCE_RE = re.compile(r"^(```|~~~)", re.MULTILINE)
 CONDITION_WORDS = ("when", "if", "before", "after", "unless", "only")
+USE_WHEN_RE = re.compile(r"\buse\b(?:\s+\w+){0,2}\s+when\b")
 FILLER_OPENERS = ("this ", "a ", "an ", "helps ", "allows ", "provides ")
 INTERACTIVE_PY_RE = re.compile(r"(?<![\w.\"'])input\s*\(")
 INTERACTIVE_TS_RE = re.compile(r"(?<![\w.\"'])(?:prompt|confirm)\s*\(")
@@ -96,6 +97,32 @@ def strip_fenced_code(text: str) -> str:
         else:
             out.append(line if not in_fence else "\n")
     return "".join(out)
+
+
+LIST_ITEM_RE = re.compile(r"(?:[-*+]|\d+\.)\s")
+
+
+def split_prose_units(text: str) -> list[str]:
+    """Split into logical prose units: paragraphs, with each list item its own
+    unit, joining soft-wrapped lines so sentence-level checks see whole
+    sentences."""
+    units: list[str] = []
+    current: list[str] = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            if current:
+                units.append(" ".join(current))
+                current = []
+        elif LIST_ITEM_RE.match(stripped):
+            if current:
+                units.append(" ".join(current))
+            current = [stripped]
+        else:
+            current.append(stripped)
+    if current:
+        units.append(" ".join(current))
+    return units
 
 
 def check_frontmatter(base: str, skill_dir: Path, fm: dict) -> list[dict]:
@@ -215,7 +242,7 @@ def check_description(base: str, desc: object) -> list[dict]:
         ))
 
     lowered = desc.lower()
-    if "use when" not in lowered and "use this" not in lowered:
+    if not USE_WHEN_RE.search(lowered) and "use this" not in lowered:
         issues.append(issue(
             loc,
             "warning",
@@ -341,7 +368,7 @@ def check_structure(skill_dir: Path) -> list[dict]:
                     loc,
                     "warning",
                     f"Unexpected file type '{ext}' in scripts/.",
-                    "Use .py (uv), .ts (Deno/Bun), or .rb; remove or convert other files.",
+                    "Use .py (uv) or .ts (Deno/Bun); remove or convert other files.",
                 ))
     return issues
 
@@ -402,14 +429,15 @@ def check_reachability(skill_dir: Path, skill_body: str) -> list[dict]:
                     "markdown link at first mention, or delete it.",
                 ))
 
-    for line in body_no_code.splitlines():
-        if "references/" not in line or not MD_LINK_RE.search(line):
+    for unit in split_prose_units(body_no_code):
+        if "references/" not in unit or not MD_LINK_RE.search(unit):
             continue
-        if not any(word in line.lower() for word in CONDITION_WORDS):
+        if not any(word in unit.lower() for word in CONDITION_WORDS):
+            snippet = unit if len(unit) <= 100 else unit[:97] + "..."
             issues.append(issue(
                 f"{rel(skill_dir / 'SKILL.md')}:pointer",
                 "warning",
-                f"Reference pointer without a load condition: {line.strip()!r}.",
+                f"Reference pointer without a load condition: {snippet!r}.",
                 "Pointer wording decides reach. State the condition: "
                 "'Read references/<file>.md when <condition>.'",
             ))
@@ -486,7 +514,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    path = Path(args.skill)
+    path = Path(args.skill).resolve()
     if path.is_dir():
         skill_md = path / "SKILL.md"
     elif path.name == "SKILL.md":
