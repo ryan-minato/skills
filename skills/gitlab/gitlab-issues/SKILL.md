@@ -1,17 +1,15 @@
 ---
 name: gitlab-issues
 description: >
-  Operates GitLab issues through one recommended path — exact glab
-  commands, with the GitLab Duo MCP server's issue tools as the annotated
-  alternative where the capability exists: create, comment, close and
-  reopen, edit labels, assignees and milestone, read details and comments,
-  list issues and labels — always discovering the project's description
-  templates, labels, and milestones before creating anything, on
-  gitlab.com or any self-managed host, with a mandatory pre-publish review
-  gate. Use when working with GitLab issues — "file an issue", "open an
-  issue", "create an issue", "comment on issue #N", "close this issue",
-  "reopen the issue", "what does issue #N say", "list open bugs", "label
-  this issue", "assign this issue", or "add the issue to the milestone".
+  GitLab issue operations — create, comment, triage, close, read. Use when asked to
+  file, comment on, close, reopen, list, or edit issues on a GitLab project
+  (gitlab.com or self-managed); when a bug found mid-task needs filing on the
+  project's GitLab tracker; when labeling, assigning, or putting one issue into a
+  milestone, iteration, or epic; when asked what an issue says; or when a GitLab issue
+  URL or #N reference is the material at hand. Merge requests belong to
+  gitlab-merge-requests; milestone and label lifecycle to gitlab-planning;
+  issue-template or label-taxonomy authoring to gitlab-issue-conventions; GitHub
+  issues to github-issues.
 license: Apache-2.0
 ---
 

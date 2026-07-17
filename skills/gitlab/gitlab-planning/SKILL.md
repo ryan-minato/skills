@@ -1,19 +1,15 @@
 ---
 name: gitlab-planning
 description: >
-  Operates GitLab planning structures through the authenticated glab CLI
-  and REST API, with each operation's tier floor marked: milestone
-  lifecycle (create, edit, close, delete, list at project or group
-  level), label lifecycle (create, rename, recolor, delete), iteration
-  lookup, issue-board and board-list management, and epic lifecycle on
-  Premium/Ultimate. Use when managing planning structures on gitlab.com
-  or a self-managed instance — "create a milestone", "close the
-  milestone", "set up the next release milestone", "list group
-  milestones", "rename this label", "what iteration are we in", "create
-  an issue board", "add a Doing column to the board", "reorder the board
-  lists", "create an epic", "make this epic a child of that one", "close
-  the epic", or "delete this board". Assigning a single issue to a
-  milestone, iteration, or epic belongs to gitlab-issues.
+  GitLab planning structures — milestone, label, iteration, board, and epic lifecycle.
+  Use when creating, editing, closing, or deleting milestones at project or group
+  level; when renaming, recoloring, or deleting labels; when asked which iteration or
+  sprint is current; when creating boards or adding, reordering, or scoping board
+  lists; when managing epics and their parent-child links; or when setting up tracking
+  for a coming release or sprint cycle, on gitlab.com or self-managed. Assigning one
+  issue to a milestone, iteration, or epic belongs to gitlab-issues; an MR's milestone
+  to gitlab-merge-requests; a release's milestone to gitlab-releases; label-taxonomy
+  design to gitlab-issue-conventions.
 license: Apache-2.0
 ---
 

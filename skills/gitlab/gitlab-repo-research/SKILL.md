@@ -1,17 +1,15 @@
 ---
 name: gitlab-repo-research
 description: >
-  Read-only research over any GitLab project on gitlab.com or a
-  self-managed host, including projects you cannot write to: reads
-  issues, merge requests, pipelines, jobs and failed-job logs, releases,
-  tags, and project search through one recommended path — glab commands,
-  the GitLab Duo MCP server's tools, or a bundled REST script that works
-  unauthenticated on public projects and with a token on private ones.
-  Use when investigating a GitLab project — "what issues are open on
-  that project", "read the comments on that MR", "summarize issue #N of
-  group/project", "what did the reviewers say", "show recent pipelines",
-  "why did the nightly pipeline fail", "get the logs from that job", or
-  "what changed in the latest release of group/project".
+  Read-only research over any GitLab project — issues, MRs, pipelines and job logs,
+  releases, tags, search — even without write access or a token. Use when
+  investigating a project on gitlab.com or a self-managed host — "has upstream fixed
+  this bug"; when summarizing an issue, MR, or review discussion of group/project;
+  when diagnosing a failed pipeline and reading its job logs; when checking what
+  changed in a project's latest release; or when a GitLab issue, MR, or pipeline URL
+  is pasted for context. Posting or changing anything belongs to the operating skills
+  (gitlab-issues, gitlab-merge-requests, gitlab-releases); wiki reads to gitlab-wiki;
+  GitHub repositories to github-repo-research.
 license: Apache-2.0
 compatibility: >
   scripts/rest_read.py requires Python 3.9+ (stdlib only) and outbound

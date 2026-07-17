@@ -1,17 +1,15 @@
 ---
 name: gitlab-releases
 description: >
-  Operates GitLab releases and their tags through the glab CLI on
-  gitlab.com or any self-managed host: create a release with reviewed
-  notes in one shot (GitLab has no draft releases), generate notes from
-  Changelog commit trailers with glab changelog, create annotated tags,
-  associate milestones, upload and link assets, and list, view, edit, or
-  delete releases. Use when cutting or managing a release — "create a
-  release", "tag v1.2.0 and release it", "generate the changelog",
-  "attach the milestone to the release", "upload this binary to the
-  release", or "delete the release". Reading releases of a project you
-  are only researching belongs to gitlab-repo-research; versioning and
-  tag policy to gitlab-release-conventions.
+  GitLab release cutting — pick the version, tag, write notes, publish, manage. Use
+  when asked to create, edit, or delete a release, or tag a version and release it, on
+  gitlab.com or self-managed; when a finished version needs shipping — "get 1.4 out
+  the door"; when choosing the next version number to tag; when generating a changelog
+  or release notes from commits; or when uploading binaries or linking assets to a
+  release. Reading releases of a project only being researched belongs to
+  gitlab-repo-research; versioning and tag-naming policy to
+  gitlab-release-conventions; milestone lifecycle to gitlab-planning; GitHub releases
+  to github-releases.
 license: Apache-2.0
 compatibility: >
   scripts/next_version.py requires Python 3.9+ (stdlib only); reading

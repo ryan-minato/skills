@@ -1,19 +1,14 @@
 ---
 name: gitlab-merge-requests
 description: >
-  Operates GitLab merge requests through one recommended path — exact glab
-  commands, with the GitLab Duo MCP server's MR tools as the annotated
-  alternative where the capability exists: create, comment, close/reopen,
-  draft/ready, approve, merge with squash and auto-merge handling, edit
-  labels and milestone, read MR state and diff, read pipeline status and
-  failed-job logs, and read, reply to, and resolve discussion threads —
-  always discovering the project's MR template and contributing rules
-  before opening anything, on gitlab.com or any self-managed host, with a
-  mandatory pre-publish review gate. Use when operating on a merge request
-  — "open/create an MR", "create a merge request", "comment on the MR",
-  "did the pipeline pass", "why is the pipeline red on my MR", "approve MR
-  !N", "reply to the review comments", "merge MR !N", "resolve the
-  discussion", or "mark the MR ready".
+  GitLab merge request operations — create, review, discuss, merge. Use when asked to
+  open, comment on, approve, merge, close, or mark ready an MR on a GitLab project
+  (gitlab.com or self-managed); when a finished branch needs to go up for review; when
+  checking whether an MR's pipeline passed or why it is red; when replying to or
+  resolving review discussions; or when a GitLab MR URL or !N reference is the
+  material at hand. GitHub pull requests belong to github-pull-requests; issues to
+  gitlab-issues; MR-template or review-rule authoring to gitlab-mr-conventions;
+  read-only MR research on other projects to gitlab-repo-research.
 license: Apache-2.0
 ---
 
