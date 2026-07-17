@@ -64,6 +64,19 @@ skill's **context load**.
 
 _Avoid_: frontmatter, summary
 
+### Trigger
+
+Any signal in the conversation or workspace that should make the agent fire
+the **description** — not only a domain word. The signal types: direct naming
+and indirect phrasings, intent verbs, the scenario the user is in, observed
+agent behavior the skill corrects, the shape of the material at hand,
+lifecycle events, questions about the domain, and exclusions (adjacent
+signals that must _not_ fire it). The trigger clause is the description's
+payload: the capability lead-in exists to be recognized, the triggers to be
+matched.
+
+_Avoid_: keyword, activation phrase
+
 ### Context Pointer
 
 A reference held in the agent's context that names some out-of-context

@@ -1,11 +1,13 @@
 ---
 name: great-skill-writer
 description: >
-  Skill authoring for predictable Agent Skills — spec-compliant frontmatter,
-  trigger-accurate descriptions, completion criteria, conditional references,
-  and non-interactive scripts. Use when a user asks to create, review, prune,
-  refactor, or troubleshoot an Agent Skill, its SKILL.md, or an agent
-  instruction package; not for application code or generic documentation.
+  Skill authoring — create, review, and repair Agent Skills. Use when the
+  request names an Agent Skill, SKILL.md, or an agent instruction package,
+  or such a file appears in the material at hand; when drafting reusable
+  instructions or a prompt package for an agent; when a skill misbehaves —
+  never triggers, fires on the wrong task, or produces inconsistent output;
+  or when deciding what belongs in a skill versus baseline agent docs. Not
+  for application code or generic documentation.
 license: Apache-2.0
 compatibility: Validation requires uv.
 ---
@@ -74,15 +76,24 @@ The restriction toolkit — use each where it applies, none by obligation:
 ### Descriptions
 
 The description is the only text the agent reads before activating, so it
-does two jobs: state the capability (third person, action verbs, domain
-keywords) and list the triggers. Every character is permanent context load —
-prune it harder than the body:
+does two jobs: name the capability and list the triggers. The trigger clause
+is the payload — give it most of the space, and compress the capability into
+a short third-person lead-in (action verbs, domain keywords), never a
+feature list: features are identity, and identity lives in the body. Every
+character is permanent context load — prune it harder than the body:
 
 - Front-load the skill's leading word; never open with filler ("This skill
   helps…").
+- Mine triggers from every signal type, not only domain words. Walk the list
+  asking "should this signal fire the skill?": direct naming and indirect
+  phrasings (what a user says without naming the domain), intent verbs
+  (create, review, fix), the scenario the user is in, observed agent
+  behavior the skill corrects, the shape of the material at hand (a pasted
+  or open file of the skill's kind), lifecycle events (before release, after
+  a model or harness change), questions about the domain, and exclusions —
+  adjacent tasks that must not fire it.
 - One trigger per branch. Synonyms renaming the same branch are duplication;
-  collapse them. Do include indirect phrasings — what a user says without
-  naming the domain.
+  collapse them.
 - Cut identity that's already in the body; keep triggers.
 
 ### Invocation
@@ -176,8 +187,9 @@ Three passes over anything you wrote or touched:
    ≤64 chars, exactly equal to the directory name. Create `scripts/`,
    `references/`, `assets/` only when a file goes in.
 4. **Describe.** Write the frontmatter description per the rules above.
-   Done when: it is third person, opens on the leading word, has one trigger
-   per branch plus indirect phrasings, and restates nothing from the body.
+   Done when: it is third person, opens on the leading word, gives triggers
+   most of the space, covers every applicable signal type with one trigger
+   per branch, and restates nothing from the body.
 5. **Write the body.** Steps first; add `Done when: <criterion>` only where a
    checkable boundary improves execution reliability. Then add in-file
    reference, applying the instruction patterns above where they fit; then
