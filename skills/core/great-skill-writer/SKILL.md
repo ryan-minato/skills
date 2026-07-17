@@ -222,11 +222,9 @@ Three passes over anything you wrote or touched:
 9. **Test.** If step 2 defined behavioral tests, try a disposable candidate
    worktree and complete candidate snapshot immediately before each run. If
    either is unavailable, use the best available environment and record the
-   isolation degradation; neither blocks testing. Prefer framework-native
-   conversation history or skill-load telemetry to observe invocation. If
-   neither is available, use the neutral instrumentation in
-   `references/testing.md`. Run every added or changed script in the same
-   best-available isolated environment and verify `--help` plus its usage
+   isolation degradation; neither blocks testing. Run every added or changed
+   script in the same best-available isolated environment and verify
+   `--help` plus its usage
    example, a representative success, an identical repeated run proving
    idempotence, and bad arguments exiting 2 with an actionable diagnostic.
    Remove generated harnesses and outputs after recording results. On a test

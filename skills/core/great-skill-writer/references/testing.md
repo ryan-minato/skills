@@ -51,9 +51,9 @@ Never explicitly tell a trigger-test solver to use the target skill.
 With the intended change in place, test the candidate:
 
 - **Trigger accuracy:** use a fresh clean-context subagent for every attempt.
-  Observe target loading through framework-native history or telemetry; when
-  unavailable, read its final `SKILLS_LOADED` line. The target name present
-  means loaded; absent means not loaded. A missing observation or malformed
+  Determine loading with the observation mechanism selected in section 1; in
+  the fallback report, the target name present in `SKILLS_LOADED` means
+  loaded, absent means not loaded. A missing observation or malformed
   fallback report invalidates the attempt. Run each case at least twice, up
   to three attempts total: the case passes when two valid attempts match the
   expected load decision, fails when two valid attempts contradict it, and
