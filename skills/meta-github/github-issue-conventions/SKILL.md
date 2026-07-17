@@ -1,16 +1,14 @@
 ---
 name: github-issue-conventions
 description: >
-  Authors a repository's issue conventions: GitHub issue forms plus
-  config.yml, a baseline label taxonomy applied by an idempotent sync
-  script, first-party-only Actions automation for issue labeling, and a
-  generated project-level agent skill for filing and triaging issues in
-  that repository — with an AGENTS.md section as the fallback deliverable
-  when the project's harness does not support skills. Use when
-  standardizing how a repo's issues are filed and triaged — "add issue
-  templates", "set up issue forms", "define our labels", "standardize
-  issues", "automate issue triage", or "create a skill for filing issues
-  in this repo".
+  Issue conventions for a GitHub repository — author and automate how its issues are
+  filed, labeled, and triaged. Use when adding or overhauling issue templates or
+  forms; when defining or restructuring the repository's labels, or asked what labels
+  it needs; when automating issue triage or labeling; when incoming reports arrive
+  unstructured or missing key details; when a repo opens to outside contributors and
+  needs structured intake; or when creating a skill for filing issues in this repo.
+  Not for filing, commenting on, or closing an issue (github-issues), one-off label or
+  milestone edits (github-planning), or GitLab (gitlab-issue-conventions).
 license: Apache-2.0
 compatibility: >
   scripts/sync_labels.py requires Python 3.9+ (stdlib only) and an

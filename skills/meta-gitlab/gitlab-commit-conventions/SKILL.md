@@ -1,18 +1,14 @@
 ---
 name: gitlab-commit-conventions
 description: >
-  Authors a GitLab project's commit conventions: a Conventional-Commits
-  rule set tailored from the project's actual git history and including
-  the Changelog trailer that powers GitLab changelog generation, a
-  dependency-free Python validator committed into the repo, a tokenless
-  CI job that validates every commit in merge request pipelines, and a
-  generated project-level agent skill for writing compliant messages —
-  with an AGENTS.md section as the fallback deliverable. Works on
-  gitlab.com and self-managed instances; push-rule enforcement is marked
-  Premium. Use when standardizing commit messages on GitLab — "set up
-  conventional commits", "enforce commit format in CI", "add Changelog
-  trailers", "define our commit types", or "create a skill for writing
-  commits in this repo".
+  Commit-convention authoring for GitLab projects — defines and enforces how a
+  project's commit messages are written. Use when standardizing commit messages — "set
+  up conventional commits", "define our commit types", "enforce commit format in merge
+  request pipelines"; when commit history is inconsistent and needs a house style;
+  when adding Changelog trailers or when generated changelogs come out empty for lack
+  of them; before setting up changelog-driven releases; or when asked for a
+  project-level skill for writing commits in this repo. Not for drafting or executing
+  a single commit message, day-to-day MR operations, or GitHub repositories.
 license: Apache-2.0
 compatibility: >
   scripts/analyze_history.py and the shipped assets/check_commits.py

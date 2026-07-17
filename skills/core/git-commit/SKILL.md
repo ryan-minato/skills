@@ -1,12 +1,12 @@
 ---
 name: git-commit
 description: >
-  Executes the full git commit workflow as ordered gates: discovers project
-  conventions, verifies change atomicity, scans the staged diff for secrets and
-  PII, checks committer identity, runs hooks and local checks, then validates the
-  message with a bundled script before committing. Use when creating a git commit
-  or saving changes to version control — "commit", "commit this", "checkpoint",
-  "stage and commit", "save my code to git", or "create a commit message".
+  Executes the full git commit workflow as ordered safety gates before anything is
+  committed. Use when creating a git commit or saving work to version control —
+  "commit this", "checkpoint my work", "save this to git"; when finished work sits
+  uncommitted at the end of a task; or when staged changes need splitting into atomic
+  commits. Not for drafting a message in a specific convention without committing, for
+  standalone secret/PII scans, or for authoring a repository's commit rules.
 compatibility: >
   scripts/validate_message.py requires uv and Python 3.11+ (stdlib only).
 ---

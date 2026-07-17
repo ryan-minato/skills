@@ -1,15 +1,15 @@
 ---
 name: github-commit-conventions
 description: >
-  Authors a repository's commit conventions: a Conventional-Commits rule
-  set tailored from the repo's actual git history, a dependency-free
-  Python validator committed into the repo, a first-party-only CI
-  workflow that validates every commit in a pull request, and a generated
-  project-level agent skill for writing compliant messages — with an
-  AGENTS.md section as the fallback deliverable. Use when standardizing
-  commit messages — "set up conventional commits", "enforce commit
-  message format", "add commit message CI checks", "define our commit
-  types", or "create a skill for writing commits in this repo".
+  Commit conventions for a GitHub repository — author, enforce in CI, and teach the
+  repo's commit-message rules. Use when standardizing commit messages ("set up
+  conventional commits", "enforce commit format in CI", "define our commit types");
+  when commit history is inconsistent and should be fixed going forward; when a repo
+  gains contributors and needs written commit rules; when an existing commitlint or
+  .gitmessage setup needs enforcement built around it; when asked what commit types or
+  scopes a project should use; or when creating a skill for writing commits in this
+  repo. Not for drafting one commit message or committing changes
+  (conventional-commits, git-commit), nor for GitLab (gitlab-commit-conventions).
 license: Apache-2.0
 compatibility: >
   scripts/analyze_history.py and the shipped assets/check_commits.py

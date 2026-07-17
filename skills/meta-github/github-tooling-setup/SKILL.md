@@ -1,16 +1,15 @@
 ---
 name: github-tooling-setup
 description: >
-  Installs and configures GitHub tooling for a coding agent: the GitHub
-  MCP server (remote HTTP or local stdio) for whatever agent framework is
-  hosting the session, using the official per-host install guides fetched
-  at runtime, plus gh CLI installation and authentication per OS with the
-  token scopes the operational github skills need (repo, project for
-  Projects v2), then verifies both. Use when connecting an agent to
-  GitHub — "set up GitHub MCP", "install gh", "connect this agent to
-  GitHub", "gh auth failed", "missing project scope", "GitHub tools not
-  working" — or when another GitHub skill reports that tooling is not set
-  up.
+  GitHub tooling setup for a coding agent — install, authenticate, and verify the
+  GitHub MCP server and gh CLI. Use when connecting an agent or session to GitHub
+  ("set up GitHub MCP", "install gh"); when gh is missing, unauthenticated, or acting
+  as the wrong account ("gh auth failed"); when GitHub MCP tools are absent or failing
+  mid-task ("GitHub tools not working"); when a token scope blocks an operation or the
+  needed scopes are in question ("missing project scope"); when preparing a new
+  machine, devcontainer, or CI environment for GitHub work; or when another GitHub
+  skill reports tooling is not set up. Not for performing GitHub operations once
+  tooling works, nor for GitLab (gitlab-tooling-setup).
 license: Apache-2.0
 compatibility: >
   scripts/check_tooling.py requires Python 3.9+ (stdlib only). Network

@@ -1,12 +1,13 @@
 ---
 name: conventional-commits
 description: >
-  Drafts git commit messages that comply with the Conventional Commits 1.0.0
-  specification. Use when writing a commit message with a type prefix, when the
-  project uses conventional commits, commitlint, or semantic-release, when the user
-  says "use conventional commits", "CC format", "write a feat/fix commit", or "what
-  type should I use", or when git history shows type-prefixed titles like "feat:",
-  "fix:", "chore:".
+  Drafts git commit messages in the Conventional Commits 1.0.0 format. Use when
+  writing a commit message with a type prefix; when the project uses commitlint or
+  semantic-release, or its docs mandate conventional commits; when the user says "use
+  conventional commits" or "CC format"; when asked which type, scope, or
+  breaking-change marker a change needs; or when git history shows type-prefixed
+  titles like "feat:", "fix:", "chore:". Not for executing the commit workflow itself
+  or for emoji (gitmoji) message conventions.
 ---
 
 # Conventional Commits

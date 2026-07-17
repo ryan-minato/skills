@@ -1,17 +1,14 @@
 ---
 name: gitlab-wiki
 description: >
-  Operates GitLab project and group wikis through the authenticated glab
-  CLI and the wikis REST API: list, read, create, update, rename, and
-  delete pages, upload attachments, and clone the wiki's git repository
-  for bulk restructures — always discovering the wiki's existing page
-  structure before creating anything, with a mandatory pre-publish review
-  gate before any page content goes live. Use when working with a GitLab wiki — "add
-  a wiki page", "update the wiki", "document this in the wiki", "read
-  the wiki page on X", "what does the wiki say about X", "attach an
-  image to the wiki page", "rename this wiki page", "fix the wiki
-  sidebar", "export the wiki", "migrate these docs into the wiki", or
-  "delete the outdated wiki page".
+  GitLab wiki operations — create, read, update, rename, delete, and restructure pages
+  on project and group wikis. Use when asked to add, update, or read wiki pages —
+  "document this in the wiki", "what does the wiki say about X"; when team
+  documentation lives in the project's wiki rather than in-repo files; when attaching
+  images, fixing the sidebar, or renaming pages; when migrating docs into or out of
+  the wiki or exporting it; or when a /-/wikis/ URL is the material at hand. Editing
+  README or docs/ files in the repository is ordinary git work, not this skill; issue,
+  MR, and pipeline research belongs to gitlab-repo-research.
 license: Apache-2.0
 ---
 
