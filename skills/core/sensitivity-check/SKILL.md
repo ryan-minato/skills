@@ -1,13 +1,13 @@
 ---
 name: sensitivity-check
 description: >
-  Detects personally identifiable information (PII) and leaked secrets or
-  credentials in text or files, then produces a structured scan report. Use
-  when checking content for sensitive data before sharing, committing, or
-  publishing — including requests like "find secrets in this code", "is
-  there any PII here?", "check for leaked passwords or API keys", "run a
-  privacy or compliance review", or "make sure nothing sensitive is in this
-  file".
+  Detects PII and leaked secrets or credentials in text or files, ending in a report
+  with an explicit YES/NO conclusion. Use when checking content for sensitive data
+  before sharing, committing, or publishing; when asked "is there any PII here?" or to
+  find secrets, keys, or passwords; when running a privacy or compliance review; when
+  pasted or exported material (logs, dumps, datasets) needs clearing before leaving
+  the machine; or when a commit workflow calls for a deeper sensitivity scan. Scans
+  and reports only — never commits, redacts, or publishes.
 compatibility: >
   Scripts need Python 3.9+; the lite fallback engines and the router run
   with plain python3 (stdlib only). The preferred engines additionally need

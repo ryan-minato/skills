@@ -1,13 +1,13 @@
 ---
 name: programming-guidelines
 description: >
-  Applies universal coding standards for programming work: think before
-  coding, prefer simple solutions, make surgical changes, and verify against
-  clear success criteria. Use when writing, editing, reviewing, debugging, or
-  refactoring code in any language or framework; when the user asks to "keep
-  it simple", make "minimal changes", "don't over-engineer", or "only change
-  what's needed"; or when a coding task needs explicit assumptions, tradeoffs,
-  or success criteria before implementation.
+  Applies universal coding standards to all programming work. Use when writing,
+  editing, debugging, reviewing, or refactoring code in any language or framework;
+  when the user asks to keep it simple or not over-engineer; when they ask for minimal
+  changes that touch only what was requested; when requirements are ambiguous enough
+  to need explicit assumptions, tradeoffs, or success criteria before coding; or when
+  produced code drifts beyond the request — unrequested features, extra abstractions,
+  adjacent edits. Not for prose, documentation, or commit messages.
 license: MIT
 metadata:
   references: >

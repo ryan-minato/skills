@@ -1,15 +1,14 @@
 ---
 name: meta-harness
 description: >
-  Design, audit, and improve agent harnesses: the environment, constraints,
-  tools, and accessible knowledge that make coding agents match user
-  expectations in a project. Use when setting up agent instructions, creating
-  or restructuring AGENTS.md or CLAUDE.md, deciding how much structure (tests,
-  linting, CI, architecture docs) a project needs for agent-driven work,
-  making project knowledge discoverable to agents, adding project skills,
-  designing sync or maintenance mechanisms, calibrating agent autonomy and
-  approval boundaries, or diagnosing why agents keep missing project
-  conventions.
+  Agent harness design — set up, audit, and improve the environment, constraints,
+  tools, and knowledge that steer coding agents in a project. Use when creating or
+  restructuring AGENTS.md or CLAUDE.md, or one is the file at hand; when introducing
+  agent-driven work to a project or deciding how much structure (tests, linting, CI,
+  docs) it needs; when making project knowledge discoverable to agents or deciding a
+  procedure should become a project skill; when calibrating agent autonomy, approval
+  boundaries, or harness maintenance; or when agents keep missing project conventions.
+  Not for authoring an individual Agent Skill's content.
 license: Apache-2.0
 ---
 

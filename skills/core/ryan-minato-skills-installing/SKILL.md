@@ -2,15 +2,13 @@
 name: ryan-minato-skills-installing
 description: >
   Installs Agent Skills from the ryan-minato/skills library into a project or
-  globally, picking the best available method: the vercel-labs skills CLI run
-  through a modern package runner (pnpm/bun/yarn) or npx, falling back to a
-  bundled clone-and-copy script when no Node runtime exists — and can list
-  what the library offers. Use when the user wants to install, add, or set up
-  a skill from ryan-minato/skills: "install the git-commit skill", "add
-  sensitivity-check globally", "get devcontainer-setup into this project",
-  "what skills does ryan-minato/skills have?", "install a skill from this
-  library". Not for installing npm packages, project dependencies, or skills
-  from other libraries.
+  globally, and lists what the library offers. Use when installing or adding a skill
+  from ryan-minato/skills — "install the git-commit skill", "add sensitivity-check
+  globally"; when a skill or document instructs running "npx skills add
+  ryan-minato/skills"; when asked what skills the library contains; or when an
+  installed skill from this library needs updating to its latest upstream version. Not
+  for npm packages, project dependencies, or any other skill library — nothing in it
+  applies outside ryan-minato/skills.
 license: Apache-2.0
 compatibility: >
   Preferred path needs a Node package runner (pnpm, bun, yarn, or npx) with

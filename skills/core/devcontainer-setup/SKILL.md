@@ -1,18 +1,13 @@
 ---
 name: devcontainer-setup
 description: >
-  Creates and edits dev container configurations
-  (.devcontainer/devcontainer.json) under a trusted-sources policy: base
-  images only from mcr.microsoft.com/devcontainers/* or NVIDIA NGC
-  (nvcr.io), features only from ghcr.io/devcontainers/features and
-  ghcr.io/stacit-ai/devcontainer-features, templates only from
-  ghcr.io/devcontainers/templates — with a bundled script that lists what
-  each trusted source offers. Covers GPU-capable containers (NVIDIA/CUDA
-  via NGC images, AMD/ROCm via device passthrough). Use when creating or
-  modifying a devcontainer — "create a devcontainer", "set up a dev
-  container", "add .devcontainer to this project", "make this repo open in
-  a container", "configure Codespaces", "containerized dev environment",
-  "GPU dev environment", or "CUDA/PyTorch container for development".
+  Creates and edits dev container configurations (.devcontainer/devcontainer.json)
+  using trusted sources only. Use when creating or modifying a devcontainer — "set up
+  a dev container", "make this repo open in a container", "configure Codespaces"; when
+  a devcontainer.json is the file at hand; when a project needs a containerized or
+  GPU/CUDA/ROCm development environment; or when asked what base images or features
+  are available or why the dev container fails to build. Not for authoring or
+  publishing Features, Templates, or prebuilt images — it consumes them.
 license: Apache-2.0
 compatibility: >
   scripts/list_sources.py requires uv and Python 3.11+ (stdlib only) plus
