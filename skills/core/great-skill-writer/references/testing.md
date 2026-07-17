@@ -30,12 +30,10 @@ to report it.
 
 ## 2. Isolate every test run when possible
 
-Create worktrees only immediately before a test run, with outputs outside
-version control:
-
-- **Candidate:** detach at the current `HEAD`, then transfer a complete
-  temporary snapshot of intended tracked staged and unstaged changes plus
-  intended untracked files.
+Create the candidate worktree only immediately before a test run, with
+outputs outside version control: detach at the current `HEAD`, then transfer
+a complete temporary snapshot of intended tracked staged and unstaged
+changes plus intended untracked files.
 
 Make the candidate visible to each solver's normal skill discovery. When it
 cannot be exposed, record the degradation and note which version of the
@@ -50,8 +48,7 @@ Never explicitly tell a trigger-test solver to use the target skill.
 
 ## 3. Evaluate the candidate
 
-Apply the smallest general skill change that should close the observed gap,
-then test the candidate:
+With the intended change in place, test the candidate:
 
 - **Trigger accuracy:** use a fresh clean-context subagent for every prompt.
   Observe target loading through framework-native history or telemetry; when
