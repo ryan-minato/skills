@@ -1,18 +1,14 @@
 ---
 name: gitlab-issue-conventions
 description: >
-  Authors a GitLab project's issue conventions: description templates in
-  .gitlab/issue_templates/ with embedded quick actions, a Default.md
-  fallback template, a scoped-label taxonomy (type::, priority::,
-  status::) applied by an idempotent sync script, and a generated
-  project-level agent skill for filing and triaging issues in that
-  project — with an AGENTS.md section as the fallback deliverable. Works
-  on gitlab.com and self-managed instances alike, defaulting to Free-tier
-  mechanisms. Use when standardizing how a GitLab project's issues are
-  filed and triaged — "add issue templates", "set up description
-  templates", "define our labels", "set up scoped labels", "standardize
-  issues", "automate issue triage in GitLab", or "create a skill for
-  filing issues in this repo".
+  Issue-convention authoring for GitLab projects — standardizes how a project's issues
+  are filed, labeled, and triaged. Use when setting up issue templates or description
+  templates, defining a label taxonomy or scoped labels, or automating issue triage;
+  when incoming issues arrive unlabeled or missing key details and intake needs
+  structure; when files under .gitlab/issue_templates/ are being created or edited; or
+  when asked for a project-level skill for filing issues in this repo. Not for filing,
+  commenting on, or triaging an individual issue (gitlab-issues), for MR templates
+  (gitlab-mr-conventions), or for GitHub repositories.
 license: Apache-2.0
 compatibility: >
   scripts/sync_labels.py requires Python 3.9+ (stdlib only) and a glab

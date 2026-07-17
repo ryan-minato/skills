@@ -1,16 +1,15 @@
 ---
 name: gitlab-tooling-setup
 description: >
-  Installs and configures GitLab tooling for a coding agent: the glab CLI
-  installed per OS and authenticated against gitlab.com or any self-managed
-  host (--hostname, GITLAB_HOST/GL_HOST, token environment variables), and
-  optionally the GitLab Duo MCP server at https://<gitlab-host>/api/v4/mcp
-  (Premium/Ultimate, GitLab 18.6+) for whatever agent framework is hosting
-  the session, then verifies both. Use when connecting an agent to GitLab —
-  "set up glab", "install glab", "connect this agent to GitLab", "set up
-  GitLab MCP", "glab auth failed", "authenticate to our self-managed
-  GitLab", "GitLab tools not working" — or when another GitLab skill
-  reports that tooling is not set up.
+  GitLab tooling installation for a coding agent — glab CLI install and
+  authentication, plus the optional GitLab Duo MCP server, on gitlab.com or any
+  self-managed host. Use when connecting an agent to GitLab or asked to set up or
+  install glab or GitLab MCP; when glab is missing, unauthenticated, or acting as the
+  wrong account or against the wrong host; when GitLab commands fail with auth errors
+  on a self-managed instance; when configured GitLab MCP tools do not appear in the
+  session; or when another GitLab skill reports tooling is not set up. Not for
+  operating issues, MRs, or releases once tooling works, and not for GitHub tooling
+  (github-tooling-setup).
 license: Apache-2.0
 compatibility: >
   scripts/check_tooling.py requires Python 3.9+ (stdlib only). Network

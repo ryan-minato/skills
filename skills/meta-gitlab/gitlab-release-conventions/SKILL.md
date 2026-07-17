@@ -1,18 +1,16 @@
 ---
 name: gitlab-release-conventions
 description: >
-  Authors a GitLab project's release conventions: a SemVer versioning
-  policy (mapped to commit types when the project uses Conventional
-  Commits), a tag-naming rule enforced by a tokenless CI check in tag
-  pipelines, a .gitlab/changelog_config.yml that maps Changelog trailer
-  values to release-notes categories, a milestone-per-release policy
-  with the auto-close decision recorded, and a generated project-level
-  agent skill for cutting releases — with an AGENTS.md section as the
-  fallback deliverable. Defaults to Free-tier mechanisms on gitlab.com
-  or self-managed. Use when standardizing releases on GitLab — "define
-  our versioning policy", "set up changelog generation", "configure
-  changelog_config.yml", "standardize tag names", "link milestones to
-  releases", or "create a skill for cutting releases in this repo".
+  Release-convention authoring for GitLab projects — standardizes how a project
+  versions, tags, and announces releases. Use when defining a versioning policy or how
+  versions are numbered; when standardizing tag names or enforcing a tag format in tag
+  pipelines; when setting up changelog generation or editing
+  .gitlab/changelog_config.yml; when setting a milestone-per-release policy; when
+  generated release notes land in the wrong categories; when a project's tags are
+  inconsistent and need a rule; before a project's first release; or when asked for a
+  project-level skill for cutting releases in this repo. Not for cutting an actual
+  release (gitlab-releases), single-milestone operations (gitlab-planning), or GitHub
+  repositories.
 license: Apache-2.0
 ---
 

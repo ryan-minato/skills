@@ -1,19 +1,15 @@
 ---
 name: gitlab-mr-conventions
 description: >
-  Authors a GitLab project's merge-request conventions: a Default.md MR
-  description template, a CONTRIBUTING merge-request rules section, a
-  tokenless CI checklist-validation job that runs in merge request
-  pipelines, and a generated project-level agent skill for opening and
-  reviewing MRs in that project — with an AGENTS.md section as the
-  fallback deliverable. Defaults to Free-tier mechanisms and
-  works on gitlab.com and self-managed instances; Premium-only features
-  (CODEOWNERS enforcement, required approvals) are marked as such. Use
-  when standardizing how a GitLab project handles merge requests — "add
-  an MR template", "merge request template", "enforce an MR checklist",
-  "validate MR descriptions in CI", "document our review process",
-  "standardize merge requests", or "create a skill for opening MRs in
-  this repo".
+  Merge-request convention authoring for GitLab projects — standardizes how a
+  project's MRs are described, checked, and reviewed. Use when adding a merge request
+  template, enforcing an MR checklist, or validating MR descriptions in CI; when the
+  user says "PR template" but the repository is on GitLab; when reviewers keep
+  receiving MRs with empty or unstructured descriptions; when documenting the review
+  process in CONTRIBUTING; when editing files under .gitlab/merge_request_templates/;
+  or when asked for a project-level skill for opening MRs in this repo. Not for
+  opening, reviewing, or merging an actual MR (gitlab-merge-requests), or for GitHub
+  repositories (github-pr-conventions).
 license: Apache-2.0
 ---
 
