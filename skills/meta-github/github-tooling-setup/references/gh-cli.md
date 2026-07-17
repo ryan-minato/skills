@@ -54,4 +54,29 @@ the install survives rebuilds.
 - Exit code 0: authenticated. The output shows the active account and
   the token's scopes.
 - Non-zero exit: not authenticated — no token was found, or the token
-  was rejected. Set `GH_TOKEN`, or ask the user to run `gh auth login`.
+  was rejected. Set `GH_TOKEN`, bridge git's stored credential (below),
+  or ask the user to run `gh auth login`.
+
+## Bridge git's stored credential
+
+When `gh auth status` fails but `git push` or `git fetch` against a
+github.com HTTPS remote succeeds, git's credential helper already holds
+a token. Borrow it for gh without creating or storing anything new:
+
+```bash
+TOKEN=$(printf 'protocol=https\nhost=github.com\n' | git credential fill | grep '^password=' | cut -d= -f2)  # gitleaks:allow
+GH_TOKEN="$TOKEN" gh <command>
+```
+
+- Keep the token in a shell variable scoped to the command; never echo
+  it, write it to a file or config, or feed it to `gh auth login`.
+- The bridge grants exactly the credential the user already gave git —
+  no new scopes. Scope-gated calls (for example Projects v2 needing
+  `project`) may still fail; fall back to a real token setup when they
+  do.
+- After using the bridge, tell the user explicitly that git's stored
+  credential was reused to authenticate gh; never include the token
+  value. Only the user may waive this disclosure, explicitly.
+
+Done when: the gh call succeeded and the disclosure was delivered (or an
+explicit waiver recorded).
