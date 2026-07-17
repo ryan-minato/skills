@@ -486,7 +486,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    path = Path(args.skill)
+    path = Path(args.skill).resolve()
     if path.is_dir():
         skill_md = path / "SKILL.md"
     elif path.name == "SKILL.md":
