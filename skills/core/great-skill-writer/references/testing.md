@@ -37,6 +37,11 @@ version control:
   temporary snapshot of intended tracked staged and unstaged changes plus
   intended untracked files.
 
+Make the candidate visible to each solver's normal skill discovery. When it
+cannot be exposed, record the degradation and note which version of the
+target — installed or candidate — the observation actually reflects; the
+results apply only to that version.
+
 Give every writing solver its own worktree and output directory. Never let
 concurrent writers share a worktree. If a worktree or complete candidate
 snapshot is unavailable, use the best available environment, keep generated
