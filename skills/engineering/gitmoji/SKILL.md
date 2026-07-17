@@ -1,11 +1,14 @@
 ---
 name: gitmoji
 description: >
-  Drafts git commit messages following the gitmoji convention: picks the one emoji
-  that matches the change intent and composes a structured message. Use when writing
-  emoji-prefixed commit messages, when the project uses gitmoji, when the user says
-  "use gitmoji", "gitmoji format", or "what emoji for this commit", or when git
-  history shows titles beginning with an emoji or an emoji code like ":bug:".
+  Gitmoji commit messages — drafts git commit titles and bodies in the emoji-led
+  gitmoji convention. Use when writing an emoji-prefixed commit message; when the
+  project documents gitmoji as its convention; when the user says "use gitmoji" or
+  asks for gitmoji format; when asked which emoji fits a change or what an emoji or
+  code like ":bug:" means in a commit title; or when git history shows titles
+  beginning with an emoji or emoji code. Not for type-prefixed commit messages without
+  an emoji, for staging and executing the commit itself, or for authoring a
+  repository's commit-convention rules.
 ---
 
 # Gitmoji
