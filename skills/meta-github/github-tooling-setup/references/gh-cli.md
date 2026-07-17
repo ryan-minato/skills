@@ -65,8 +65,7 @@ a token. It can be borrowed for gh without creating or storing anything
 new:
 
 ```bash
-TOKEN=$(printf 'protocol=https\nhost=github.com\n' | git credential fill | grep '^password=' | cut -d= -f2)  # gitleaks:allow
-GH_TOKEN="$TOKEN" gh <command>
+GH_TOKEN="$(printf 'protocol=https\nhost=github.com\n' | git credential fill | sed -n 's/^password=//p')" gh <command>  # gitleaks:allow
 ```
 
 - Get the user's explicit consent before the first use, and do not run
@@ -75,8 +74,11 @@ GH_TOKEN="$TOKEN" gh <command>
   user-question tool if it has one, otherwise stop and wait for the
   user — never assume approval. One explicit yes covers the rest of the
   session unless the user narrows or withdraws it.
-- Keep the token in a shell variable scoped to the command; never echo
-  it, write it to a file or config, or feed it to `gh auth login`.
+- The command-scoped `GH_TOKEN=… gh` form above holds the token only for
+  that one call; never assign it to a persistent shell variable, export
+  it, echo it, write it to a file or config, or feed it to `gh auth
+  login`. (`sed` takes the whole password, including any `=`, where
+  `cut -d= -f2` would truncate it.)
 - The bridge grants exactly the credential the user already gave git —
   no new scopes. Scope-gated calls (for example Projects v2 needing
   `project`) may still fail; fall back to a real token setup when they
