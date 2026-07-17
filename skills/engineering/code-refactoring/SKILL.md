@@ -109,11 +109,19 @@ A missing safety net changes the plan, not the principle:
 
 ## Diagnosing and executing
 
-- Read [references/smells.md](references/smells.md) when deciding what is
-  structurally wrong with a piece of code or which technique applies to a
-  symptom.
-- Read [references/techniques.md](references/techniques.md) when a technique
-  has been chosen and its safe step sequence is not obvious.
+Both reference files open with an index table, so a lookup never requires
+reading the whole file: consult the index, pick the row, then read only the
+matching entry — every entry sits under its own heading.
+
+- When deciding what is structurally wrong or which technique fixes a
+  symptom, consult the index table at the top of
+  [references/smells.md](references/smells.md); open a smell's `## <Name>`
+  entry only when the index row leaves the match or the remedy unclear.
+- When a technique is chosen and its safe step sequence is not obvious,
+  locate its `### <Name>` heading in
+  [references/techniques.md](references/techniques.md) and read that entry
+  alone; consult the index at its top only when still choosing between
+  related techniques (a purpose group or an inverse pair).
 
 ## Special contexts
 

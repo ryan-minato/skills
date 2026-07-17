@@ -2,8 +2,39 @@
 
 A smell is a structure that suggests — not proves — a refactoring
 opportunity. Use this file symptom-first: match what you see in the code to
-a smell, then apply the listed techniques (step sequences in
-`techniques.md`). No metric replaces judgment; these are cues, not rules.
+a row of the index below and take its techniques (step sequences live under
+matching `###` headings in `techniques.md`); open a smell's own `## <Name>`
+entry only when the index row leaves the match or the remedy unclear. No
+metric replaces judgment; these are cues, not rules.
+
+## Index
+
+| Smell | Telltale sign | Apply |
+|---|---|---|
+| Mysterious Name | Name doesn't say what it's for | Change Function Declaration, Rename Variable, Rename Field |
+| Duplicated Code | Same structure in more than one place | Extract Function, Slide Statements, Pull Up Method |
+| Long Function | Must read line by line to understand | Extract Function, Replace Temp with Query, Decompose Conditional |
+| Long Parameter List | Call sites hard to write and read | Introduce Parameter Object, Preserve Whole Object, Remove Flag Argument |
+| Global Data | Writable from anywhere, changes untraceable | Encapsulate Variable |
+| Mutable Data | An update here breaks an assumption there | Encapsulate Variable, Split Variable, Separate Query from Modifier |
+| Divergent Change | One module changes for unrelated reasons | Split Phase, Move Function, Extract Class |
+| Shotgun Surgery | One change forces edits in many modules | Move Function, Move Field, Combine Functions into Class |
+| Feature Envy | Function lives off another module's data | Move Function, Extract Function |
+| Data Clumps | Same three or four items always travel together | Extract Class, Introduce Parameter Object |
+| Primitive Obsession | Domain concepts as bare numbers or strings | Replace Primitive with Object, Replace Type Code with Subclasses |
+| Repeated Switches | Same switch logic in several places | Replace Conditional with Polymorphism |
+| Loops | Loop obscures what is being computed | Replace Loop with Pipeline |
+| Lazy Element | Structure that no longer earns its keep | Inline Function, Inline Class, Collapse Hierarchy |
+| Speculative Generality | Machinery for a future that never came | Collapse Hierarchy, Inline Function, Remove Dead Code |
+| Temporary Field | Field valid only in certain situations | Extract Class, Introduce Special Case |
+| Message Chains | Clients navigate `a.b().c().d()` | Hide Delegate, Extract Function, Move Function |
+| Middle Man | Interface mostly forwards elsewhere | Remove Middle Man, Inline Function |
+| Insider Trading | Modules trade private data off the books | Move Function, Move Field, Hide Delegate |
+| Large Class | Too many fields and responsibilities | Extract Class, Extract Superclass |
+| Alternative Classes with Different Interfaces | Would-be substitutes with mismatched signatures | Change Function Declaration, Move Function |
+| Data Class | Getters and setters and nothing else | Encapsulate Record, Move Function, Remove Setting Method |
+| Refused Bequest | Subclass uses a fraction of its inheritance | Push Down Method, Replace Subclass with Delegate |
+| Comments (as deodorant) | Thick comment masking bad code | Extract Function, Change Function Declaration, Introduce Assertion |
 
 ## Mysterious Name
 
