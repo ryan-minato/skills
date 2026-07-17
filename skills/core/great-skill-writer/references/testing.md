@@ -50,14 +50,14 @@ Never explicitly tell a trigger-test solver to use the target skill.
 
 With the intended change in place, test the candidate:
 
-- **Trigger accuracy:** use a fresh clean-context subagent for every prompt.
+- **Trigger accuracy:** use a fresh clean-context subagent for every attempt.
   Observe target loading through framework-native history or telemetry; when
   unavailable, read its final `SKILLS_LOADED` line. The target name present
   means loaded; absent means not loaded. A missing observation or malformed
-  fallback report invalidates the attempt. Retry an invalid or unexpected
-  result up to three total attempts. A valid case passes only when at least two
-  attempts match the expectation; if three attempts yield no valid observation,
-  skip that case and report inadequate observability.
+  fallback report invalidates the attempt. Run each case at least twice, up
+  to three attempts total: the case passes when two valid attempts match the
+  expected load decision, fails when two valid attempts contradict it, and
+  is otherwise skipped and reported as inadequate observability.
 - **Outcome quality:** run a candidate solver for every representative task in
   its own test worktree. Retain every output, including failures. An output is
   valid only when the selected observation mechanism shows the target loaded.
