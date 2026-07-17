@@ -1,16 +1,15 @@
 ---
 name: github-release-conventions
 description: >
-  Authors a repository's release conventions: a SemVer versioning policy
-  (mapped to commit types when the repo uses Conventional Commits), a
-  tag-naming rule enforced by a first-party-only CI check, a
-  .github/release.yml that keys generated release notes to the label
-  taxonomy, a release-notes template, and a generated project-level agent
-  skill for cutting releases — with an AGENTS.md section as the fallback
-  deliverable. Use when standardizing releases — "define our versioning
-  policy", "set up release notes categories", "standardize tag names",
-  "create a release checklist", or "create a skill for cutting releases
-  in this repo".
+  Release conventions for a GitHub repository — author and enforce how it versions,
+  tags, and categorizes release notes. Use when standardizing releases ("define our
+  versioning policy", "standardize tag names", "set up release notes categories",
+  "create a release checklist"); when tags or release notes have grown inconsistent;
+  when a project prepares its first public or versioned release; when a
+  .github/release.yml needs creating or editing; when asked how the project should
+  version or tag; or when creating a skill for cutting releases in this repo. Not for
+  cutting or publishing a release (github-releases), the label taxonomy itself
+  (github-issue-conventions), or GitLab (gitlab-release-conventions).
 license: Apache-2.0
 ---
 

@@ -1,16 +1,15 @@
 ---
 name: github-pr-conventions
 description: >
-  Authors a repository's pull-request conventions: a PR template, a
-  CONTRIBUTING pull-request rules section, path-based auto-labeling and
-  checklist-validation workflows built from first-party actions only, and
-  a generated project-level agent skill for opening and reviewing PRs in
-  that repository — with an AGENTS.md section as the fallback deliverable
-  when the project's harness does not support skills. Use when
-  standardizing how a repository handles pull requests — "add a PR
-  template", "enforce a PR checklist", "auto-label PRs", "document our
-  review process", "standardize pull requests", or "create a skill for
-  opening PRs in this repo".
+  Pull-request conventions for a GitHub repository — author, enforce, and teach how
+  its PRs are opened and reviewed. Use when standardizing pull requests ("add a PR
+  template", "enforce a PR checklist", "auto-label PRs", "document our review
+  process"); when PRs arrive with empty or unstructured descriptions; when a repo
+  gains contributors and needs written review expectations; when asked what a
+  mergeable PR must include; or when creating a skill for opening PRs in this repo.
+  Not for opening, reviewing, or merging an actual PR (github-pull-requests),
+  commit-message rules (github-commit-conventions), or GitLab merge requests
+  (gitlab-mr-conventions).
 license: Apache-2.0
 ---
 
