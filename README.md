@@ -18,6 +18,7 @@ and other compatible clients) how to perform specific tasks well.
 | [`meta-github`](skills/meta-github/) | GitHub harness authoring: agent tooling setup and repository conventions (issue forms, labels, PR/commit/release rules, automation) | Per project, as needed |
 | [`meta-gitlab`](skills/meta-gitlab/) | GitLab harness authoring: agent tooling setup and project conventions (description templates, scoped labels, MR/commit/release rules, CI validation) | Per project, as needed |
 | [`ops`](skills/ops/) | General workflow operations, not invoked directly | Per project, as needed |
+| [`writing`](skills/writing/) | Human-audience writing: genre skills (academic, blog/opinion, copy) and medium skills (LaTeX, Typst, Markdown) | Per project, as needed |
 
 Each catalog's README lists its skills.
 

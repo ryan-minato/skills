@@ -15,6 +15,7 @@
         "./skills/core/devcontainer-setup",
         "./skills/core/git-commit",
         "./skills/core/great-skill-writer",
+        "./skills/core/human-writing",
         "./skills/core/meta-harness",
         "./skills/core/programming-guidelines",
         "./skills/core/ryan-minato-skills-installing",
@@ -95,6 +96,20 @@
         "./skills/meta-gitlab/gitlab-tooling-setup"
       ],
       "description": "GitLab harness authoring: agent tooling setup and project conventions (description templates, scoped labels, MR, commit, and release rules, CI validation)."
+    },
+    {
+      "name": "writing",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/writing/academic-writing",
+        "./skills/writing/blog-writing",
+        "./skills/writing/copywriting",
+        "./skills/writing/latex-authoring",
+        "./skills/writing/markdown-authoring",
+        "./skills/writing/typst-authoring"
+      ],
+      "description": "Human-audience writing: genre skills (academic, blog/opinion, promotional copy) and medium skills (LaTeX, Typst, Markdown source)."
     }
   ]
 }

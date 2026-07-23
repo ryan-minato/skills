@@ -18,6 +18,7 @@
 | [`meta-github`](skills/meta-github/) | GitHub harness 创作：agent 工具链配置与仓库规范（issue 表单、标签、PR/提交/发布规则、自动化） | 按需安装到项目 |
 | [`meta-gitlab`](skills/meta-gitlab/) | GitLab harness 创作：agent 工具链配置与项目规范（描述模板、scoped 标签、MR/提交/发布规则、CI 校验） | 按需安装到项目 |
 | [`ops`](skills/ops/) | 不直接调用的通用工作流操作 | 按需安装到项目 |
+| [`writing`](skills/writing/) | 面向人类读者的写作：体裁类（学术、博客/评论、文案）与载体类（LaTeX、Typst、Markdown） | 按需安装到项目 |
 
 每个 catalog 的 README 列出了其包含的 skill。
 
