@@ -21,8 +21,8 @@ organize evidence, or synthesize a field — its center is logic, not emotion, a
 its credibility dies with a single fabricated reference.
 
 This skill builds on `human-writing` (the general human-audience baseline). When
-`human-writing` is installed, load it alongside this skill before drafting or
-editing — do not work from this skill alone. This skill leads: its rules override
+`human-writing` is installed, load it alongside this skill before drafting,
+editing, or reviewing — do not work from this skill alone. This skill leads: its rules override
 the baseline where they conflict. If `human-writing` is not installed, install it
 from https://github.com/ryan-minato/skills.git:
 

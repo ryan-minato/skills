@@ -18,8 +18,8 @@ opinion and the narrative rhythm that carries the reader to it; being correct is
 a bonus, and being defensible is not the goal.
 
 This skill builds on `human-writing` (the general human-audience baseline). When
-`human-writing` is installed, load it alongside this skill before drafting or
-editing — do not work from this skill alone. This skill leads: its rules override
+`human-writing` is installed, load it alongside this skill before drafting,
+editing, or reviewing — do not work from this skill alone. This skill leads: its rules override
 the baseline where they conflict. If `human-writing` is not installed, install it
 from https://github.com/ryan-minato/skills.git:
 

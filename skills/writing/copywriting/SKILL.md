@@ -17,8 +17,8 @@ density and how easily a line travels outrank completeness, and sometimes
 outrank structure and grammar.
 
 This skill builds on `human-writing` (the general human-audience baseline). When
-`human-writing` is installed, load it alongside this skill before drafting or
-editing — do not work from this skill alone. This skill leads: its rules override
+`human-writing` is installed, load it alongside this skill before drafting,
+editing, or reviewing — do not work from this skill alone. This skill leads: its rules override
 the baseline where they conflict — in particular, well-formed prose gives way
 where a fragment, repetition, or a broken rhythm spreads better. If
 `human-writing` is not installed, install it from
