@@ -20,13 +20,13 @@ Author and reader are both professionals. The piece exists to argue a claim,
 organize evidence, or synthesize a field — its center is logic, not emotion, and
 its credibility dies with a single fabricated reference.
 
-This skill pairs with `human-writing` (the general human-audience baseline). If it
-is not installed, install it from https://github.com/ryan-minato/skills.git:
+This skill builds on `human-writing` (the general human-audience baseline). When
+`human-writing` is installed, load it alongside this skill before drafting or
+editing — do not work from this skill alone. This skill leads: its rules override
+the baseline where they conflict. If `human-writing` is not installed, install it
+from https://github.com/ryan-minato/skills.git:
 
     npx skills add ryan-minato/skills --skill human-writing -g
-
-When both are loaded, this skill leads: its rules override the baseline where they
-conflict.
 
 ## Roles
 
@@ -118,3 +118,8 @@ result through [assets/verification-prompt.md](assets/verification-prompt.md):
 were all changes necessary, and do any evident problems remain? Without such
 subagents, answer the same questions yourself in the peer-reviewer seat before
 handing over.
+
+This pass fills the reader-review seat in `human-writing`'s review loop — the
+peer reviewer is this genre's reader. It replaces only that seat: still run the
+loop's language-and-wording review and AI-writing detection pass from
+`human-writing`, in parallel with this one when the environment supports it.
