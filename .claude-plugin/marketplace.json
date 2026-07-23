@@ -103,7 +103,8 @@
       "strict": false,
       "skills": [
         "./skills/writing/academic-writing",
-        "./skills/writing/blog-writing"
+        "./skills/writing/blog-writing",
+        "./skills/writing/copywriting"
       ],
       "description": "Human-audience writing: genre skills (academic, blog/opinion, promotional copy) and medium skills (LaTeX, Typst, Markdown source)."
     }
