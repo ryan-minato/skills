@@ -18,3 +18,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 | Skill | Description |
 |---|---|
 | [academic-writing](academic-writing/) | Write and revise academic prose (papers, theses, reports) in English, Chinese, or Japanese: editor/researcher/reviewer role switching, argument-spine planning, a source-credibility hierarchy with script-verified citations, strict register rules, and restraint-first editing. |
+| [blog-writing](blog-writing/) | Write and improve stance-carrying blog posts, columns, and commentary in English, Chinese, or Japanese: confirm audience and persona first, plan on the reader's arc with unequal budgets, keep the stance sharp and the rhythm ahead of defensive narration, verify or drop citations. |
