@@ -39,9 +39,12 @@ to report it.
 
 Before editing the skill, write:
 
-1. At least three realistic prompts that should trigger the description and
-   three near-misses that share vocabulary but should not trigger it. Include
-   direct and indirect phrasing, with the expected load decision for each.
+1. Two or three realistic prompts that should trigger the description and one
+   to three near-misses that share vocabulary but should not trigger it. Scale
+   both counts within those ranges to the task: more cases where the skill
+   borders adjacent skills or relies on indirect phrasings, fewer for a narrow
+   trigger surface. Include direct and indirect phrasing, with the expected
+   load decision for each.
 2. Two or three representative outcome tasks and a rubric of observable
    requirements. Mark critical failures and declare the aggregate score needed
    to pass before seeing candidate output.
@@ -51,14 +54,15 @@ Before editing the skill, write:
 Apply the smallest general skill change that should close the observed gap,
 then test the candidate:
 
-- **Trigger accuracy:** use a fresh clean-context subagent for each prompt.
-  Observe target loading through framework-native history or telemetry; when
-  unavailable, read its final `SKILLS_LOADED` line. The target name present
-  means loaded; absent means not loaded. A missing observation or malformed
-  fallback report invalidates the attempt. Retry an invalid or unexpected
-  result up to three total attempts. A valid case passes only when at least two
-  attempts match the expectation; if three attempts yield no valid observation,
-  skip that case and record inadequate observability.
+- **Trigger accuracy:** use a fresh clean-context subagent for each prompt,
+  run once. Observe target loading through framework-native history or
+  telemetry; when unavailable, read its final `SKILLS_LOADED` line. The target
+  name present means loaded; absent means not loaded. A single valid
+  observation decides the case: matching the expectation passes it, and a
+  contradicting one fails it. A missing observation or malformed fallback
+  report invalidates the attempt and is retried, up to three total attempts;
+  if none yields a valid observation, skip that case and record inadequate
+  observability.
 - **Outcome quality:** run a candidate solver for every representative task in
   its own test worktree when possible. Retain every output, including failures.
   An output is valid only when the selected observation mechanism shows the
