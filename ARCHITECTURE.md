@@ -45,6 +45,9 @@ Public skills are grouped into catalogs under `skills/`:
   MR, commit, and release rules, CI validation) whose outputs — not the
   skills themselves — land in the target project.
 - `ops` — general workflow operations, not invoked directly by users.
+- `writing` — human-audience writing skills: genre skills (academic,
+  blog/opinion, promotional copy) and medium skills (LaTeX, Typst,
+  Markdown source); the general baseline `human-writing` lives in `core`.
 
 Adding a catalog requires: the catalog scaffold (`README.md`, `README.zh.md`,
 `CONTEXT.md`), an entry in this list, and — once it has a skill — a plugin
