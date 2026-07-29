@@ -58,8 +58,10 @@ The catalog holds two classes of skills:
   condition verbatim, opt-in automation and schema details are
   sub-branches of their domain file.
 - MCP tools, where mentioned, are described by capability, never by name.
-- Sibling skills (including the `ops` skills) are named with the
-  install-pointer pattern, never path-linked (self-containment).
+- Skills are fully independent of each other: sibling skills (including
+  the `ops` skills) are named at most for disambiguation — never
+  path-linked, never accompanied by install instructions, and never
+  depended on behaviorally (self-containment).
 - Exact CLI names, CI keywords, schema keys, and platform file
   conventions must be re-verified before publishing a skill revision —
   GitHub form schemas, actions, and `release.yml` against

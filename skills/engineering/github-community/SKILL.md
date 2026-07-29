@@ -29,12 +29,9 @@ commit-message conventions with CI enforcement, versioning and
 release-notes policy, community health files, and project-level skills
 that teach agents to follow all of it. This skill writes **local files
 only** — the project's normal git flow publishes them. Performing the
-operations (filing issues, opening PRs, cutting releases) belongs to
-`github-ops`; GitLab projects to `gitlab-community`. If either is needed
-and not installed, install it from
-https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill github-ops
+operations (filing issues, opening PRs, cutting releases) is out of
+scope (the `github-ops` skill's territory), as are GitLab projects
+(`gitlab-community`).
 
 ## Assess the project first
 
@@ -109,9 +106,7 @@ hands the PR and commit sections to their domains.
 - **Generated project skills are products**: same quality bar as a
   published skill — frontmatter `name` equals the directory name, and
   zero leftover `{{...}}` placeholders survive delivery. Placeholders in
-  shipped assets use `{{UPPER_SNAKE}}`. Refinement beyond the templates
-  pairs with `great-skill-writer`
-  (`npx skills add ryan-minato/skills --skill great-skill-writer`).
+  shipped assets use `{{UPPER_SNAKE}}`.
 - MCP tools, where mentioned, are described by capability, never by name.
 
 ## Deliver

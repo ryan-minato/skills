@@ -18,11 +18,9 @@ following this project's conventions.
 1. Run `glab auth status --hostname {{GITLAB_HOST}}`. If it exits 0, use
    the glab commands below (run them inside this project's checkout so
    glab targets the right host).
-2. Otherwise stop and tell the user GitLab tooling is not set up. This
-   skill pairs with `gitlab-ops`. If it is not installed,
-   install it from https://github.com/ryan-minato/skills.git:
-
-       npx skills add ryan-minato/skills --skill gitlab-ops
+2. Otherwise stop and tell the user GitLab tooling is not set up — glab
+   must be installed and authenticated for `{{GITLAB_HOST}}` before this
+   skill can act.
 
 ## This project's conventions
 

@@ -100,8 +100,10 @@ files) lives in the `engineering` catalog's `github-community` /
   invoked with plain `python3`, non-interactive, exit codes 0/1/2, data to
   stdout, diagnostics to stderr, idempotent. `rest_read.py` is the only
   script that opens sockets itself; it never prints token values.
-- Sibling skills (including the `engineering` community skills) are named
-  with the install-pointer pattern, never path-linked (self-containment).
+- Skills are fully independent of each other: sibling skills (including
+  the `engineering` community skills) are named at most for
+  disambiguation — never path-linked, never accompanied by install
+  instructions, and never depended on behaviorally (self-containment).
 - Exact CLI subcommand and flag names — and REST/GraphQL endpoint shapes —
   must be re-verified before publishing a skill revision, against
   <https://cli.github.com/manual/> and <https://docs.github.com/en/rest>

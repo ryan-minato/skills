@@ -28,11 +28,8 @@ One skill for day-to-day GitHub work: issues, pull requests, CI runs and
 checks, Discussions, planning structures, releases, read-only research on
 any repository, and setting up the tooling all of it uses. Authoring a
 repository's templates, label taxonomy, commit/release policy, or
-community health files belongs to `github-community`; GitLab work to
-`gitlab-ops`. If either is needed and not installed, install it from
-https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill github-community
+community health files is out of scope (the `github-community` skill's
+territory), as is GitLab work (`gitlab-ops`).
 
 ## Choose your path (do this first, once per session)
 

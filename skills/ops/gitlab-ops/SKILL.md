@@ -26,11 +26,8 @@ One skill for day-to-day GitLab work on gitlab.com or any self-managed
 host: issues, merge requests, pipelines, planning structures, releases,
 wikis, read-only research, and setting up the tooling all of it uses.
 Authoring a project's description templates, label taxonomy,
-commit/release policy, or community files belongs to `gitlab-community`;
-GitHub work to `github-ops`. If either is needed and not installed,
-install it from https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill gitlab-community
+commit/release policy, or community files is out of scope (the
+`gitlab-community` skill's territory), as is GitHub work (`github-ops`).
 
 ## Choose your path (do this first, once per session)
 

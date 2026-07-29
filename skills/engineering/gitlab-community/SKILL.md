@@ -31,11 +31,8 @@ agents to follow all of it — on gitlab.com or any self-managed host.
 This skill writes **local files only** — the project's normal git flow
 publishes them (the one server action is the label sync's explicit
 `--apply`). Performing the operations (filing issues, opening MRs,
-cutting releases) belongs to `gitlab-ops`; GitHub repositories to
-`github-community`. If either is needed and not installed, install it
-from https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill gitlab-ops
+cutting releases) is out of scope (the `gitlab-ops` skill's territory),
+as are GitHub repositories (`github-community`).
 
 ## Assess the project first
 
@@ -121,9 +118,7 @@ to their domains.
   summary.
 - **Generated project skills are products**: frontmatter `name` equals
   the directory name, and zero leftover `{{...}}` placeholders survive
-  delivery. Placeholders use `{{UPPER_SNAKE}}`. Refinement beyond the
-  templates pairs with `great-skill-writer`
-  (`npx skills add ryan-minato/skills --skill great-skill-writer`).
+  delivery. Placeholders use `{{UPPER_SNAKE}}`.
 - MCP tools, where mentioned, are described by capability, never by name.
 
 ## Deliver

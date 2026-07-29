@@ -31,8 +31,9 @@ GROUP_PATH = re.compile(r"^[^/\s]+(?:/[^/\s]+)*$")
 SCP_REMOTE = re.compile(r"^(?:[^@/\s]+@)?([^:/\s]+):")
 
 TOOLING_HINT = (
-    "install and authenticate glab for this host with the "
-    "gitlab-ops skill (npx skills add ryan-minato/skills)"
+    "install glab and authenticate it for this host "
+    "(glab auth login --hostname HOST, or set GITLAB_TOKEN "
+    "with GITLAB_HOST)"
 )
 
 
