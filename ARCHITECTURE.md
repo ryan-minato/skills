@@ -28,23 +28,12 @@ Public skills are grouped into catalogs under `skills/`:
 - `core` — skills recommended for global (user-level) installation.
 - `devcontainer` — Dev Container authoring skills: developing Features,
   creating Templates, and prebuilding images.
-- `engineering` — general programming methodology skills; not tied to a
-  specific language or framework.
-- `github` — GitHub collaboration workflow skills: MCP-first issue/PR/
-  Discussions/Actions operations, planning (milestones, labels, Projects),
-  and releases, with embedded pre-publish review.
-- `gitlab` — GitLab collaboration workflow skills: glab-first issue/MR/
-  pipeline operations, planning, releases, and wiki — on gitlab.com or
-  self-managed hosts, with embedded pre-publish review.
-- `meta-github` — GitHub harness-authoring skills: agent tooling setup and
-  repository conventions authoring (issue forms, labels, PR, commit, and
-  release rules, automation) whose outputs — not the skills themselves —
-  land in the target project.
-- `meta-gitlab` — GitLab harness-authoring skills: agent tooling setup and
-  project conventions authoring (description templates, scoped labels,
-  MR, commit, and release rules, CI validation) whose outputs — not the
-  skills themselves — land in the target project.
-- `ops` — general workflow operations, not invoked directly by users.
+- `engineering` — general programming methodology skills, plus platform
+  community authoring for GitHub and GitLab (templates, labels,
+  commit/release conventions, CI validation, community health files).
+- `ops` — platform operations: consolidated GitHub and GitLab day-to-day
+  workflow skills (issues, PRs/MRs, CI, planning, releases, research, wiki)
+  with embedded tooling setup and pre-publish review.
 - `writing` — human-audience writing skills: genre skills (academic,
   blog/opinion, promotional copy) and medium skills (LaTeX, Typst,
   Markdown source); the general baseline `human-writing` lives in `core`.
@@ -86,9 +75,8 @@ paths do double duty: Claude Code loads each as a single skill (and with a
 marketplace-root source the explicit list *replaces* the default scan, so a
 plugin loads only its own catalog), and the `npx skills add` picker groups
 skills under the catalog name by matching each path to a discovered skill.
-No skill files move. The empty `ops` catalog is omitted until it has a skill;
-project-only skills live in `.agents/skills/` (marked `metadata.internal:
-true`) and are excluded.
+No skill files move. Project-only skills live in `.agents/skills/` (marked
+`metadata.internal: true`) and are excluded.
 
 `scripts/gen_marketplace.py` (via `just gen-marketplace`) regenerates the
 `skills` arrays from the catalogs on disk, and the validator fails if any

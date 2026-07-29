@@ -40,62 +40,21 @@
       "strict": false,
       "skills": [
         "./skills/engineering/code-refactoring",
+        "./skills/engineering/github-community",
+        "./skills/engineering/gitlab-community",
         "./skills/engineering/gitmoji"
       ],
-      "description": "General programming methodology skills, not tied to a language or framework."
+      "description": "General programming methodology skills, plus GitHub/GitLab community and conventions authoring."
     },
     {
-      "name": "github",
+      "name": "ops",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/github/github-issues",
-        "./skills/github/github-planning",
-        "./skills/github/github-pull-requests",
-        "./skills/github/github-releases",
-        "./skills/github/github-repo-research"
+        "./skills/ops/github-ops",
+        "./skills/ops/gitlab-ops"
       ],
-      "description": "GitHub collaboration workflows: issues, PRs, planning (milestones, labels, Projects), releases, and repo research."
-    },
-    {
-      "name": "gitlab",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/gitlab/gitlab-issues",
-        "./skills/gitlab/gitlab-merge-requests",
-        "./skills/gitlab/gitlab-planning",
-        "./skills/gitlab/gitlab-releases",
-        "./skills/gitlab/gitlab-repo-research",
-        "./skills/gitlab/gitlab-wiki"
-      ],
-      "description": "GitLab collaboration workflows: issues, MRs, pipelines, planning, releases, wiki, and repo research."
-    },
-    {
-      "name": "meta-github",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/meta-github/github-commit-conventions",
-        "./skills/meta-github/github-issue-conventions",
-        "./skills/meta-github/github-pr-conventions",
-        "./skills/meta-github/github-release-conventions",
-        "./skills/meta-github/github-tooling-setup"
-      ],
-      "description": "GitHub harness authoring: agent tooling setup and repository conventions (issue forms, labels, PR, commit, and release rules, automation)."
-    },
-    {
-      "name": "meta-gitlab",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/meta-gitlab/gitlab-commit-conventions",
-        "./skills/meta-gitlab/gitlab-issue-conventions",
-        "./skills/meta-gitlab/gitlab-mr-conventions",
-        "./skills/meta-gitlab/gitlab-release-conventions",
-        "./skills/meta-gitlab/gitlab-tooling-setup"
-      ],
-      "description": "GitLab harness authoring: agent tooling setup and project conventions (description templates, scoped labels, MR, commit, and release rules, CI validation)."
+      "description": "Platform operations: consolidated GitHub and GitLab day-to-day workflows (issues, PRs/MRs, CI, planning, releases, research, wiki) with tooling setup and pre-publish review."
     },
     {
       "name": "writing",
