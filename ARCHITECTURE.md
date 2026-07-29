@@ -44,7 +44,9 @@ Public skills are grouped into catalogs under `skills/`:
   project conventions authoring (description templates, scoped labels,
   MR, commit, and release rules, CI validation) whose outputs — not the
   skills themselves — land in the target project.
-- `ops` — general workflow operations, not invoked directly by users.
+- `ops` — platform operations: consolidated GitHub and GitLab day-to-day
+  workflow skills (issues, PRs/MRs, CI, planning, releases, research, wiki)
+  with embedded tooling setup and pre-publish review.
 - `writing` — human-audience writing skills: genre skills (academic,
   blog/opinion, promotional copy) and medium skills (LaTeX, Typst,
   Markdown source); the general baseline `human-writing` lives in `core`.
