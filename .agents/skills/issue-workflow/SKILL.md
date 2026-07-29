@@ -1,6 +1,6 @@
 ---
 name: issue-workflow
-description: Issue-driven change workflow for this repository, tracked in Linear. Use when tracked files are about to be created, modified, or removed and no Linear issue covers the work yet; when picking up an existing Linear issue; when creating a work branch; when pushing, opening, or readying a pull request here; when ending a session with work still in flight; or when asked how work is tracked or handed off in this repo. Read-only analysis and scratchpad-only files need no issue; GitHub issues in other repositories belong to github-issues.
+description: Issue-driven change workflow for this repository, tracked in Linear. Use when tracked files are about to be created, modified, or removed and no Linear issue covers the work yet; when picking up an existing Linear issue; when creating a work branch; when pushing, opening, or readying a pull request here; when ending a session with work still in flight; or when asked how work is tracked or handed off in this repo. Read-only analysis and scratchpad-only files need no issue; GitHub issues in other repositories belong to github-ops.
 metadata:
   internal: true
 ---

@@ -13,7 +13,6 @@
 | [`core`](skills/core/) | 推荐在所有环境安装的 skill | 全局（用户级） |
 | [`devcontainer`](skills/devcontainer/) | Dev Container 创作类 skill：Feature、Template 与预构建镜像 | 按需安装到项目 |
 | [`engineering`](skills/engineering/) | 通用编程方法论类 skill,外加 GitHub/GitLab 社区文件创作(模板、标签、规范、健康文件) | 按需安装到项目 |
-| [`github`](skills/github/) | GitHub 协作工作流：MCP 优先的 issue/PR/Discussions/Actions 操作、规划与发布 | 按需安装到项目 |
 | [`gitlab`](skills/gitlab/) | GitLab 协作工作流：glab 优先的 issue/MR/流水线操作、规划、发布与 wiki | 按需安装到项目 |
 | [`meta-github`](skills/meta-github/) | GitHub harness 创作：agent 工具链配置与仓库规范（issue 表单、标签、PR/提交/发布规则、自动化） | 按需安装到项目 |
 | [`meta-gitlab`](skills/meta-gitlab/) | GitLab harness 创作：agent 工具链配置与项目规范（描述模板、scoped 标签、MR/提交/发布规则、CI 校验） | 按需安装到项目 |
@@ -50,7 +49,7 @@ npx skills add ryan-minato/skills --skill <skill-name> -g
 ```
 /plugin marketplace add ryan-minato/skills
 /plugin install core@ryan-minato-skills
-/plugin install github@ryan-minato-skills   # 或 gitlab@、meta-github@、meta-gitlab@ 等
+/plugin install ops@ryan-minato-skills      # 或 engineering@、writing@ 等
 ```
 
 ## 参与贡献

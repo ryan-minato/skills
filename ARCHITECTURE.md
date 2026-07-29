@@ -31,9 +31,6 @@ Public skills are grouped into catalogs under `skills/`:
 - `engineering` — general programming methodology skills, plus platform
   community authoring for GitHub and GitLab (templates, labels,
   commit/release conventions, CI validation, community health files).
-- `github` — GitHub collaboration workflow skills: MCP-first issue/PR/
-  Discussions/Actions operations, planning (milestones, labels, Projects),
-  and releases, with embedded pre-publish review.
 - `gitlab` — GitLab collaboration workflow skills: glab-first issue/MR/
   pipeline operations, planning, releases, and wiki — on gitlab.com or
   self-managed hosts, with embedded pre-publish review.
