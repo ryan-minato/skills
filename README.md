@@ -13,7 +13,6 @@ and other compatible clients) how to perform specific tasks well.
 | [`core`](skills/core/) | Skills recommended for every environment | Global (user-level) |
 | [`devcontainer`](skills/devcontainer/) | Dev Container authoring skills: Features, Templates, and prebuilt images | Per project, as needed |
 | [`engineering`](skills/engineering/) | General programming methodology skills, plus GitHub/GitLab community authoring (templates, labels, conventions, health files) | Per project, as needed |
-| [`gitlab`](skills/gitlab/) | GitLab collaboration workflows: glab-first issue/MR/pipeline operations, planning, releases, and wiki | Per project, as needed |
 | [`meta-gitlab`](skills/meta-gitlab/) | GitLab harness authoring: agent tooling setup and project conventions (description templates, scoped labels, MR/commit/release rules, CI validation) | Per project, as needed |
 | [`ops`](skills/ops/) | Platform operations: consolidated GitHub and GitLab day-to-day workflows with tooling setup | Per project, as needed |
 | [`writing`](skills/writing/) | Human-audience writing: genre skills (academic, blog/opinion, copy) and medium skills (LaTeX, Typst, Markdown) | Per project, as needed |

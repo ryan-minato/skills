@@ -31,9 +31,6 @@ Public skills are grouped into catalogs under `skills/`:
 - `engineering` — general programming methodology skills, plus platform
   community authoring for GitHub and GitLab (templates, labels,
   commit/release conventions, CI validation, community health files).
-- `gitlab` — GitLab collaboration workflow skills: glab-first issue/MR/
-  pipeline operations, planning, releases, and wiki — on gitlab.com or
-  self-managed hosts, with embedded pre-publish review.
 - `meta-gitlab` — GitLab harness-authoring skills: agent tooling setup and
   project conventions authoring (description templates, scoped labels,
   MR, commit, and release rules, CI validation) whose outputs — not the
