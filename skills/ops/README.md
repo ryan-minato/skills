@@ -23,4 +23,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | Description |
 |---|---|
-| _(none yet)_ | |
+| [github-ops](github-ops/) | Consolidated GitHub operations: issues, PRs, CI checks and Actions logs, Discussions, milestones/labels/Projects, releases, and read-only research on any repository — MCP-first with gh fallback, an anonymous REST read tier, template discovery before any create, and a mandatory pre-publish review; includes gh/MCP setup and five bundled scripts |

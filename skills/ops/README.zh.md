@@ -19,4 +19,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | 说明 |
 |---|---|
-| _（暂无）_ | |
+| [github-ops](github-ops/) | 整合的 GitHub 操作：issue、PR、CI check 与 Actions 日志、Discussions、milestone/label/Projects、发布，以及对任意仓库的只读调研——MCP 优先、gh 兜底、匿名 REST 只读层、创建前模板发现、发布前强制审查；含 gh/MCP 配置与五个内置脚本 |

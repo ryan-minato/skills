@@ -88,9 +88,8 @@ paths do double duty: Claude Code loads each as a single skill (and with a
 marketplace-root source the explicit list *replaces* the default scan, so a
 plugin loads only its own catalog), and the `npx skills add` picker groups
 skills under the catalog name by matching each path to a discovered skill.
-No skill files move. The empty `ops` catalog is omitted until it has a skill;
-project-only skills live in `.agents/skills/` (marked `metadata.internal:
-true`) and are excluded.
+No skill files move. Project-only skills live in `.agents/skills/` (marked
+`metadata.internal: true`) and are excluded.
 
 `scripts/gen_marketplace.py` (via `just gen-marketplace`) regenerates the
 `skills` arrays from the catalogs on disk, and the validator fails if any

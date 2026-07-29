@@ -98,6 +98,15 @@
       "description": "GitLab harness authoring: agent tooling setup and project conventions (description templates, scoped labels, MR, commit, and release rules, CI validation)."
     },
     {
+      "name": "ops",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/ops/github-ops"
+      ],
+      "description": "Platform operations: consolidated GitHub and GitLab day-to-day workflows (issues, PRs/MRs, CI, planning, releases, research, wiki) with tooling setup and pre-publish review."
+    },
+    {
       "name": "writing",
       "source": "./",
       "strict": false,
