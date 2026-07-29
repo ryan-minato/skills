@@ -61,19 +61,6 @@
       "description": "GitLab collaboration workflows: issues, MRs, pipelines, planning, releases, wiki, and repo research."
     },
     {
-      "name": "meta-github",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/meta-github/github-commit-conventions",
-        "./skills/meta-github/github-issue-conventions",
-        "./skills/meta-github/github-pr-conventions",
-        "./skills/meta-github/github-release-conventions",
-        "./skills/meta-github/github-tooling-setup"
-      ],
-      "description": "GitHub harness authoring: agent tooling setup and repository conventions (issue forms, labels, PR, commit, and release rules, automation)."
-    },
-    {
       "name": "meta-gitlab",
       "source": "./",
       "strict": false,
