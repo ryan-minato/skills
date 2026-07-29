@@ -41,6 +41,7 @@
       "skills": [
         "./skills/engineering/code-refactoring",
         "./skills/engineering/github-community",
+        "./skills/engineering/gitlab-community",
         "./skills/engineering/gitmoji"
       ],
       "description": "General programming methodology skills, plus GitHub/GitLab community and conventions authoring."
