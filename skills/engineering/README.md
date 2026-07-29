@@ -3,8 +3,13 @@
 [中文](README.zh.md)
 
 General programming **methodology** skills — approaches, workflows, and
-practices that apply across languages and frameworks. Skills tied to a
-specific language, framework, or tool do not belong here.
+practices that apply across languages and frameworks — plus platform
+**community authoring** skills that write the files defining how a
+repository's collaboration works: issue/PR templates, label taxonomies,
+commit and release conventions, CI validation, and community health files
+(CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, ...). Community skills author
+policy and structure; performing the day-to-day platform operations
+belongs to the `ops` catalog.
 
 ```bash
 npx skills add ryan-minato/skills --skill <skill-name>

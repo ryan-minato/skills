@@ -28,8 +28,9 @@ Public skills are grouped into catalogs under `skills/`:
 - `core` — skills recommended for global (user-level) installation.
 - `devcontainer` — Dev Container authoring skills: developing Features,
   creating Templates, and prebuilding images.
-- `engineering` — general programming methodology skills; not tied to a
-  specific language or framework.
+- `engineering` — general programming methodology skills, plus platform
+  community authoring for GitHub and GitLab (templates, labels,
+  commit/release conventions, CI validation, community health files).
 - `github` — GitHub collaboration workflow skills: MCP-first issue/PR/
   Discussions/Actions operations, planning (milestones, labels, Projects),
   and releases, with embedded pre-publish review.

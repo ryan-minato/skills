@@ -2,8 +2,11 @@
 
 [English](README.md)
 
-通用编程**方法论**类 skill——跨语言、跨框架适用的方法、工作流和实践。
-绑定特定语言、框架或工具的 skill 不属于这个 catalog。
+通用编程**方法论**类 skill——跨语言、跨框架适用的方法、工作流和实践——
+外加平台**社区文件创作**类 skill：编写定义仓库协作方式的文件,包括
+issue/PR 模板、标签体系、提交与发布规范、CI 校验,以及社区健康文件
+(CONTRIBUTING、CODE_OF_CONDUCT、SECURITY 等)。community 类 skill 负责
+制定政策与结构;日常的平台操作属于 `ops` catalog。
 
 ```bash
 npx skills add ryan-minato/skills --skill <skill-name>
