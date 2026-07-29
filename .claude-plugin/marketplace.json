@@ -40,9 +40,10 @@
       "strict": false,
       "skills": [
         "./skills/engineering/code-refactoring",
+        "./skills/engineering/github-community",
         "./skills/engineering/gitmoji"
       ],
-      "description": "General programming methodology skills, not tied to a language or framework."
+      "description": "General programming methodology skills, plus GitHub/GitLab community and conventions authoring."
     },
     {
       "name": "github",
