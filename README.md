@@ -11,8 +11,7 @@ and other compatible clients) how to perform specific tasks well.
 | Catalog | Contents | Install scope |
 |---|---|---|
 | [`core`](skills/core/) | Skills recommended for every environment | Global (user-level) |
-| [`devcontainer`](skills/devcontainer/) | Dev Container authoring skills: Features, Templates, and prebuilt images | Per project, as needed |
-| [`engineering`](skills/engineering/) | General programming methodology skills, not tied to a language or framework | Per project, as needed |
+| [`engineering`](skills/engineering/) | General programming methodology skills, plus narrow engineering artifact-authoring workflows (e.g. Dev Container artifacts) | Per project, as needed |
 | [`github`](skills/github/) | GitHub collaboration workflows: MCP-first issue/PR/Discussions/Actions operations, planning, and releases | Per project, as needed |
 | [`gitlab`](skills/gitlab/) | GitLab collaboration workflows: glab-first issue/MR/pipeline operations, planning, releases, and wiki | Per project, as needed |
 | [`meta-github`](skills/meta-github/) | GitHub harness authoring: agent tooling setup and repository conventions (issue forms, labels, PR/commit/release rules, automation) | Per project, as needed |

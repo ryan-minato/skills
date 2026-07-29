@@ -39,7 +39,7 @@ packages public.
 
 ## The scaffold's release pipeline
 
-`assets/scaffold/.github/workflows/release.yaml` (manual dispatch, main
+`assets/feature-scaffold/.github/workflows/release.yaml` (manual dispatch, main
 only) runs two jobs:
 
 1. `publish` — `devcontainers/action@v1` with `publish-features: "true"`

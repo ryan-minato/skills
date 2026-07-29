@@ -1,6 +1,6 @@
 # devcontainer-feature.json property reference
 
-Read this when you need a property not covered in SKILL.md, or when
+Read this when you need a property not covered in feature-authoring.md, or when
 reviewing an existing feature manifest. Authoritative source (fetch when
 exact semantics matter):
 <https://raw.githubusercontent.com/devcontainers/spec/main/docs/specs/devcontainer-features.md>
