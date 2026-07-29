@@ -24,3 +24,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 | Skill | Description |
 |---|---|
 | [github-ops](github-ops/) | Consolidated GitHub operations: issues, PRs, CI checks and Actions logs, Discussions, milestones/labels/Projects, releases, and read-only research on any repository — MCP-first with gh fallback, an anonymous REST read tier, template discovery before any create, and a mandatory pre-publish review; includes gh/MCP setup and five bundled scripts |
+| [gitlab-ops](gitlab-ops/) | Consolidated GitLab operations on gitlab.com or self-managed hosts: issues, MRs, pipelines and job-log digests, milestones/labels/boards/epics, releases, wikis, and search — glab-first with the Duo MCP server as annotated alternative, an anonymous REST read tier, template discovery before any create, and a mandatory pre-publish review; includes glab/MCP setup and four bundled scripts |

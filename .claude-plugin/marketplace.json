@@ -102,7 +102,8 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/ops/github-ops"
+        "./skills/ops/github-ops",
+        "./skills/ops/gitlab-ops"
       ],
       "description": "Platform operations: consolidated GitHub and GitLab day-to-day workflows (issues, PRs/MRs, CI, planning, releases, research, wiki) with tooling setup and pre-publish review."
     },
