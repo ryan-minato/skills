@@ -1,6 +1,7 @@
 # devcontainer-template.json field reference
 
-Read this when you need a field not covered in SKILL.md or are reviewing
+Read this when you need a field not covered in template-authoring.md or
+are reviewing
 an existing template manifest. Authoritative source:
 <https://raw.githubusercontent.com/devcontainers/spec/main/docs/specs/devcontainer-templates.md>
 

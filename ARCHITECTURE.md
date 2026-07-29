@@ -26,11 +26,12 @@ justfile                         Canonical check recipes
 Public skills are grouped into catalogs under `skills/`:
 
 - `core` — skills recommended for global (user-level) installation.
-- `devcontainer` — Dev Container authoring skills: developing Features,
-  creating Templates, and prebuilding images.
 - `engineering` — general programming methodology skills, plus platform
   community authoring for GitHub and GitLab (templates, labels,
-  commit/release conventions, CI validation, community health files).
+  commit/release conventions, CI validation, community health files),
+  plus narrowly scoped artifact-authoring workflows (e.g. Dev Container
+  Features, Templates, and image prebuilds) that do not warrant a
+  catalog of their own.
 - `ops` — platform operations: consolidated GitHub and GitLab day-to-day
   workflow skills (issues, PRs/MRs, CI, planning, releases, research, wiki)
   with embedded tooling setup and pre-publish review.

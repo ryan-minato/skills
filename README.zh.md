@@ -11,8 +11,7 @@
 | Catalog | 内容 | 安装范围 |
 |---|---|---|
 | [`core`](skills/core/) | 推荐在所有环境安装的 skill | 全局（用户级） |
-| [`devcontainer`](skills/devcontainer/) | Dev Container 创作类 skill：Feature、Template 与预构建镜像 | 按需安装到项目 |
-| [`engineering`](skills/engineering/) | 通用编程方法论类 skill,外加 GitHub/GitLab 社区文件创作(模板、标签、规范、健康文件) | 按需安装到项目 |
+| [`engineering`](skills/engineering/) | 通用编程方法论类 skill,外加 GitHub/GitLab 社区文件创作(模板、标签、规范、健康文件)与窄域工件创作工作流(如 Dev Container 工件) | 按需安装到项目 |
 | [`ops`](skills/ops/) | 平台操作：整合的 GitHub 与 GitLab 日常工作流，含工具链配置 | 按需安装到项目 |
 | [`writing`](skills/writing/) | 面向人类读者的写作：体裁类（学术、博客/评论、文案）与载体类（LaTeX、Typst、Markdown） | 按需安装到项目 |
 

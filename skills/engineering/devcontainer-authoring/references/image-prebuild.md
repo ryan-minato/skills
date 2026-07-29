@@ -1,46 +1,15 @@
----
-name: devcontainer-image-prebuild
-description: >
-  Dev container image prebuilding — build and publish shared dev images so containers
-  start fast and identically everywhere. Use when prebuilding or publishing a dev
-  container image; when a team wants one shared dev environment; when a devcontainer
-  or Codespaces is slow to start or rebuilds everything on every machine; when a
-  consumer config behaves differently than its text says — baked settings persist
-  after deletion or appear unbidden; when adding caching or a devcontainers/ci
-  workflow for the container build; or when deciding what to bake into the image
-  versus leave to consumer configs. Not for authoring a project's devcontainer.json
-  (devcontainer-setup), packaging install units (devcontainer-feature-authoring), or
-  application Docker images.
-license: Apache-2.0
-compatibility: >
-  Requires the Dev Container CLI (pinned via npx -y
-  @devcontainers/cli@0.87.0 or npm install -g) and a Docker-compatible
-  engine for local builds; publishing needs OCI registry push access. CI
-  guidance assumes GitHub Actions (devcontainers/ci); a raw-CLI
-  alternative is included for other systems.
----
+# Image prebuild
 
-# Devcontainer Image Prebuild
-
+Read this in full before prebuilding or publishing a shared dev image.
 `devcontainer build` executes a configuration's Dockerfile and Features
 **once** and bakes the merged result — including the config itself, as
 the `devcontainer.metadata` image label — into a pushable image.
 Consumers then reference that image and inherit the environment without
-rebuilding it. The three dev container artifacts divide cleanly: a
-**prebuilt image** bakes results ahead of time; a **Feature** is an
-install unit that runs on each build; a **Template** is an applied-once
-starting config.
-
-Prebuild when a config is shared by a team, when Feature installs make
-container creation slow (Codespaces startup included), or when
-bit-identical environments matter. Skip it for single-user projects that
-rarely rebuild — a registry image to maintain is not free.
+rebuilding it.
 
 ## Build and push
 
 ```bash
-npm install -g @devcontainers/cli@0.87.0   # or npx -y @devcontainers/cli@0.87.0
-
 # Verify locally first (loads into the local docker daemon):
 devcontainer build --workspace-folder .
 
@@ -76,7 +45,7 @@ thumb fall out:
   packages); leave project- and person-specific setup (dependency
   install, dotfiles) to consumer lifecycle commands.
 
-Read [references/metadata-merge.md](references/metadata-merge.md) when a
+Read [image-metadata-merge.md](image-metadata-merge.md) when a
 consumer config behaves differently than its text suggests, or when
 deciding what to bake versus leave to consumers.
 
@@ -105,7 +74,7 @@ triggered on changes to `.devcontainer/**`, pushing the mutable + SHA
 tags with `cacheFrom` pointing at the previous image. Also set
 `"build": { "cacheFrom": "<image>" }` in the source devcontainer.json so
 local rebuilds reuse published layers. Read
-[references/ci-workflow.md](references/ci-workflow.md) when creating or
+[image-ci.md](image-ci.md) when creating or
 modifying the pipeline (full annotated workflow, multi-arch, non-GitHub
 CI via the raw CLI, post-publish verification).
 
@@ -122,8 +91,6 @@ CI via the raw CLI, post-publish verification).
   the immutable tag avoids the ambiguity.
 - Without an arm64 build (or manifest list), Apple Silicon consumers
   silently fall back to emulation or local rebuilds.
-- GHCR packages default to private — flip visibility after the first
-  push, or consumers get auth errors.
 - The publishing registry ref is outside the `devcontainer-setup`
   trusted-source defaults consumers may be operating under; teams should
   add their own image registry to their trust policy explicitly.
@@ -133,7 +100,3 @@ CI via the raw CLI, post-publish verification).
 - Image metadata spec: <https://raw.githubusercontent.com/devcontainers/spec/main/docs/specs/image-metadata.md>
 - Merge-logic table: <https://raw.githubusercontent.com/devcontainers/spec/main/docs/specs/devcontainer-reference.md>
 - devcontainers/ci action inputs: <https://raw.githubusercontent.com/devcontainers/ci/main/action.yml>
-
-This skill pairs with `devcontainer-feature-authoring` for the features
-baked into images; if it is not installed:
-`npx skills add ryan-minato/skills --skill devcontainer-feature-authoring`.

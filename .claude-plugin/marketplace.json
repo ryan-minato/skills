@@ -24,27 +24,17 @@
       "description": "Skills recommended for global (user-level) installation: commits, sensitivity, skill authoring, methodology."
     },
     {
-      "name": "devcontainer",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/devcontainer/devcontainer-feature-authoring",
-        "./skills/devcontainer/devcontainer-image-prebuild",
-        "./skills/devcontainer/devcontainer-template-authoring"
-      ],
-      "description": "Dev Container authoring skills: Features, Templates, and prebuilt images."
-    },
-    {
       "name": "engineering",
       "source": "./",
       "strict": false,
       "skills": [
         "./skills/engineering/code-refactoring",
+        "./skills/engineering/devcontainer-authoring",
         "./skills/engineering/github-community",
         "./skills/engineering/gitlab-community",
         "./skills/engineering/gitmoji"
       ],
-      "description": "General programming methodology skills, plus GitHub/GitLab community and conventions authoring."
+      "description": "General programming methodology skills, plus GitHub/GitLab community and conventions authoring and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
     },
     {
       "name": "ops",

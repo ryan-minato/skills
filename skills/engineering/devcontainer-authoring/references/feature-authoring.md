@@ -1,51 +1,16 @@
----
-name: devcontainer-feature-authoring
-description: >
-  Dev Container Feature authoring — develop, test, and publish reusable install units.
-  Use when creating, modifying, or releasing a devcontainer Feature or its options;
-  when a tool install or setup script should be reusable across projects' dev
-  containers; when a feature misbehaves — breaks on another base image, fails when
-  applied twice, or a release publishes nothing; when questions arise about Feature
-  mechanics — dependsOn vs installsAfter, option variables, versioning; or when
-  src/*/devcontainer-feature.json, its install.sh, or test/*/scenarios.json is the
-  material at hand. Not for consuming features in a project's devcontainer.json
-  (devcontainer-setup), project starters (devcontainer-template-authoring), or
-  prebuilt images (devcontainer-image-prebuild).
-license: Apache-2.0
-compatibility: >
-  Testing and publishing require the Dev Container CLI (pinned via
-  npx -y @devcontainers/cli@0.87.0 or npm install -g) and a running
-  Docker-compatible engine; publishing also needs push access to an OCI
-  registry (e.g. ghcr.io). Authoring guidance applies without them.
----
+# Feature authoring
 
-# Devcontainer Feature Authoring
-
-A Feature is a self-contained, versioned install unit that consumers
-reference by OCI address and that runs during every container build. The
-three dev container artifacts divide cleanly: a **Feature** installs
-tooling on each build; a **Template** is a starting configuration copied
-once into a project; a **prebuilt image** bakes the results ahead of
-time. Build a Feature when a tool install should be reusable across
-projects; one-off project setup belongs in `postCreateCommand` or the
-project's Dockerfile instead.
-
-## Prerequisites
-
-A Docker-compatible engine and the Dev Container CLI:
-
-```bash
-npm install -g @devcontainers/cli@0.87.0   # or npx -y @devcontainers/cli@0.87.0
-```
-
-Do not scaffold from `devcontainers/feature-starter` — it hardcodes its
-feature/image matrix, tests unpinned tool versions, and has no agent
-harness. This skill ships a modern scaffold instead.
+Read this in full before creating or modifying a Feature. A Feature is a
+self-contained, versioned install unit that consumers reference by OCI
+address and that runs during every container build.
 
 ## Repository scaffold
 
-Copy [`assets/scaffold/`](assets/scaffold/) into the new repository root
-and adapt owner/repo placeholders. Its layout:
+Do not scaffold from `devcontainers/feature-starter` — it hardcodes its
+feature/image matrix, tests unpinned tool versions, and has no agent
+harness. Copy this skill's `assets/feature-scaffold/` directory into the
+new repository root instead and adapt owner/repo placeholders. Its
+layout:
 
 - `src/<id>/devcontainer-feature.json` + `install.sh` (+ `NOTES.md`,
   appended to the auto-generated README) — `id` must equal the directory
@@ -87,7 +52,7 @@ and adapt owner/repo placeholders. Its layout:
 }
 ```
 
-Read [references/feature-json-reference.md](references/feature-json-reference.md)
+Read [feature-json-reference.md](feature-json-reference.md)
 when you need any property beyond these (containerEnv, mounts,
 entrypoint, customizations, privileged, deprecated/legacyIds, or the full
 dependsOn/installsAfter fine print), or when reviewing an existing
@@ -176,32 +141,16 @@ independently, they are one feature.
 
 ## Testing
 
-```bash
-devcontainer features test --project-folder . -f mytool \
-  -i mcr.microsoft.com/devcontainers/base:ubuntu
-```
-
-`test/<id>/test.sh` sources `dev-container-features-test-lib`, asserts
-with `check "<label>" <cmd>`, and ends with `reportResults`. The scaffold
-runs three modes per feature (default install, duplicate install,
-scenarios) — locally via `just test|test-duplicate|test-scenarios <id>`.
-Read [references/testing.md](references/testing.md) when writing
-scenarios, the idempotency test, a base-image matrix, or when debugging
-test failures.
+Read [feature-testing.md](feature-testing.md) before writing or
+debugging any test — the test harness, test.sh contract, scenarios, the
+idempotency test, and the base-image matrix live there. Locally the
+scaffold mirrors CI: `just test|test-duplicate|test-scenarios <id>`.
 
 ## Publishing
 
-```bash
-npx -y @devcontainers/cli@0.87.0 features publish \
-  -r ghcr.io -n <owner>/<repo> ./src
-```
-
-Each release fans out semver tags (`:1`, `:1.2`, `:1.2.3`, `:latest`) and
-regenerates the namespace's `devcontainer-collection.json`. Prefer the
-scaffold's `release.yaml` over manual publishes. Read
-[references/publishing-and-release.md](references/publishing-and-release.md)
-when publishing or adjusting the release pipeline (GHCR visibility,
-docs generation, containers.dev registration).
+Read [feature-publishing.md](feature-publishing.md) when publishing or
+releasing — tag fan-out, GHCR visibility, the scaffold's release
+pipeline, and containers.dev registration live there.
 
 ## Gotchas
 
@@ -211,12 +160,6 @@ docs generation, containers.dev registration).
   already selected; needing the other feature present means `dependsOn`.
 - `version` in the manifest is the **feature's** version, not the tool's;
   tool versions belong in an option.
-- Tests run against local `src/`, but `dependsOn` still resolves from the
-  registry — publish dependencies before testing dependents.
-- GHCR packages default to private; forgetting to flip visibility makes
-  consumers see auth errors that look like a missing feature.
-- Editing files without bumping `version` publishes nothing — releases
-  are keyed on the manifest version.
 
 ## Spec references
 
