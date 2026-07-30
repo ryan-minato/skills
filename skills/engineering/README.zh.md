@@ -20,5 +20,6 @@ npx skills add ryan-minato/skills --skill <skill-name>
 | [code-refactoring](code-refactoring/) | 以测试保障的小步、保持行为不变的方式重构既有代码：把结构调整与行为变更分离，判断何时重构（何时不重构），诊断代码坏味道，并安全地执行标准的具名重构手法。 |
 | [devcontainer-authoring](devcontainer-authoring/) | 创作、测试与发布 Dev Container 工件——Feature（install.sh 契约、幂等性与多基础镜像质量标准、独立性规则）、Template（选项替换、载荷设计、冒烟测试循环）与预构建镜像（devcontainer build --push、metadata 合并语义）——附带仓库脚手架与共享 action CI。 |
 | [gitmoji](gitmoji/) | 起草 gitmoji 提交信息：先确定项目变体（独立语法 vs 叠加 CC 语法、unicode vs 文本代码），再通过首个匹配即停的决策列表为主要意图选出唯一 emoji，最后按交付前清单校验。 |
+| [goal-alignment](goal-alignment/) | 与用户对齐创建物（软件、系统、实验、skill、服务等）应达成的目标：以一轮轮附带建议答案的追问推进直至共识，再把共识记录为单一事实来源的目标文档——整体目标、带验证方式与层级（硬约束/优化目标/偏好）的具体目标、分级要求（强制/尽力/偏好）与权衡决策记录。只谈目标；不含计划与架构。 |
 | [github-community](github-community/) | 为 GitHub 仓库编写协作文件：issue 表单与同步的标签体系、PR 模板与 CONTRIBUTING 规则、commit 规范(附内置 stdlib 校验器与 CI workflow)、版本政策与 release.yml、社区健康文件(CODE_OF_CONDUCT、SECURITY、SUPPORT、GOVERNANCE、FUNDING.yml、组织级 .github 默认仓库),以及生成的项目级 skill。 |
 | [gitlab-community](gitlab-community/) | 为 GitLab 项目编写协作文件(gitlab.com 与自管实例)：带快捷指令的 issue/MR 描述模板、附同步脚本的 scoped 标签体系、含 Changelog trailer 与 tokenless MR 流水线校验的 commit 规范、版本政策与 changelog_config.yml 及 tag 流水线检查、社区文件(CONTRIBUTING、CODE_OF_CONDUCT、SECURITY),以及生成的项目级 skill。 |

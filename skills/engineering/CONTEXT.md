@@ -5,8 +5,8 @@ Rules, notes, and references that apply only to skills in this catalog.
 
 The catalog holds three classes of skills:
 
-- **Methodology skills** (code-refactoring, gitmoji): approaches that
-  transfer across languages and frameworks.
+- **Methodology skills** (code-refactoring, gitmoji, goal-alignment):
+  approaches that transfer across languages and frameworks.
 - **Platform community skills** (github-community, gitlab-community):
   authoring the files that define how a repository's collaboration works —
   templates, label taxonomies, commit and release policy, CI validation,
@@ -83,7 +83,11 @@ The catalog holds three classes of skills:
 ## Disambiguation
 
 How to approach a cross-stack engineering problem → the methodology
-skills · authoring a GitHub repository's conventions or community health
+skills · aligning on what something should achieve and recording it as a
+goal document → `goal-alignment`; clarifying ambiguous requirements while
+already coding → `programming-guidelines` in `core`; implementation
+planning → neither (out of catalog scope) · authoring a GitHub
+repository's conventions or community health
 files → `github-community` · a GitLab project's → `gitlab-community` ·
 performing platform operations (filing issues, opening PRs/MRs, cutting
 releases) → the `ops` catalog's `github-ops`/`gitlab-ops` · authoring

@@ -32,7 +32,8 @@
         "./skills/engineering/devcontainer-authoring",
         "./skills/engineering/github-community",
         "./skills/engineering/gitlab-community",
-        "./skills/engineering/gitmoji"
+        "./skills/engineering/gitmoji",
+        "./skills/engineering/goal-alignment"
       ],
       "description": "General programming methodology skills, plus GitHub/GitLab community and conventions authoring and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
     },
