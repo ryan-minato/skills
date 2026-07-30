@@ -102,7 +102,11 @@ actually wants.
 
 Default: create it as a temporary file in the session's scratchpad or
 temporary directory and hand the user its absolute path, so the document is
-reachable without touching the user's project. Depart from the default when:
+reachable without touching the user's project. Use the harness-provided
+scratchpad directory when one is announced; otherwise fall back to the
+platform's temporary directory — `$TMPDIR` (or `/tmp` when unset) on Linux
+and macOS, `%TEMP%` (typically `C:\Users\<name>\AppData\Local\Temp`) on
+Windows. Depart from the default when:
 
 - the goal work is one part of a larger deliverable (a plan, a proposal, a
   design document) — embed the goal content as a section of that host
