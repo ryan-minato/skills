@@ -38,18 +38,19 @@ the very fact it claims to record — that the user and agent agreed.
    what scenario. Every suggested answer you give later is reasoned from
    these three facts, so pin them down first.
 2. **Interrogate relentlessly.** Ask specific questions in rounds, grouped by
-   theme, and attach your suggested answer to every question — a question
-   without a proposal pushes the whole burden of thought onto the user. This
-   has no exceptions: even for a fact only the user can know (a budget, a
-   deadline, a headcount), propose your best assumption for the user to
-   confirm or correct rather than asking bare.
+   theme. Whenever an answer can be inferred from what you already know —
+   the frame, the draft so far, domain knowledge — attach your suggested
+   answer to the question, because a question without a proposal pushes the
+   whole burden of thought onto the user. When the answer is a fact only the
+   user can know (an unstated goal, a budget, a deadline), ask directly
+   instead — a fabricated suggestion only anchors the user to a guess.
    Everything is open to challenge: the user's stated requirements, your own
    earlier suggestions, and anything already in the draft may all be
    re-questioned against the scenario, the goals, and the target users. The
    user always decides. When two stated goals pull against each other,
    surface the tension as an explicit trade-off question with a proposed
    resolution rather than silently picking a side.
-   Done when: no open items remain and every question asked carried a
+   Done when: no open items remain and every inferable question carried a
    suggested answer.
 3. **Assemble and present the complete draft.** Read
    [references/goal-document.md](references/goal-document.md) when assembling
