@@ -41,7 +41,9 @@ Switch deliberately between three seats:
 
 The reader has the field's background. Do not explain standard concepts,
 notation, or methods at textbook level; cite them. Spelling out what every peer
-knows signals an author who does not belong to the field.
+knows signals an author who does not belong to the field. The same trust covers
+evidence: peers grant the obvious limits and exceptions of any cited source
+without being told.
 
 ## Plan on the argument's spine
 
@@ -78,6 +80,20 @@ claim being cited — a resolving DOI pointing at an unrelated paper is still a
 fabricated citation. If verification fails, drop or replace the citation; never
 keep it on faith.
 
+## Evidence serves the argument
+
+Citations are marshaled to support the manuscript's claims. Once the cited
+sources support the point, state the point and stop — do not over-defend it.
+Rigor lives in real evidence and verified citations, not in armoring every
+sentence against objection: a manuscript argues a position, it is not a
+mathematical proof.
+
+When the argument genuinely breaks — a claim the evidence does not carry — do
+not patch it locally. Clarify the argument logic with the user: show where it
+breaks and why, and decide the repair together (adjust the claim's strength,
+add the missing evidence or step, restructure). Provisos, concessions, and
+qualifiers are never the repair.
+
 ## Register and style
 
 - Purge colloquial phrasing into objective statements: "we found that X" → "the
@@ -92,10 +108,15 @@ keep it on faith.
 - Paragraphs are the default unit. Use an ordered list only for a genuine
   progression, an unordered list only for genuine parallelism, and be ready to
   justify either; otherwise write prose.
+- Headings at every level the venue supports — numbered subsections, run-in
+  paragraph headings — are structure, not emphasis: use them wherever they
+  carve the argument, and realize them with the source format's own sectioning
+  mechanism (`\subsubsection`, `\paragraph`), never as hand-bolded text.
 - Minimize em dashes; prefer commas, parentheses, or a subordinate clause.
 - No bold or italic emphasis in body text by default — sentence structure and
   placement carry emphasis. If the user explicitly allows emphasis markup, spend
-  it on the few positions that truly need it.
+  it on the few positions that truly need it. Bold rendered by a heading
+  mechanism is structure, not emphasis, and exempt.
 - Replace information-free inflation — "毋庸置疑", "范式转移", "颠覆性",
   "不可磨灭的贡献", "groundbreaking", "paradigm shift", 「画期的な」 — with the
   concrete, checkable statement that earned the adjective.
@@ -123,3 +144,5 @@ This pass fills the reader-review seat in `human-writing`'s review loop — the
 peer reviewer is this genre's reader. It replaces only that seat: still run the
 loop's language-and-wording review and AI-writing detection pass from
 `human-writing`, in parallel with this one when the environment supports it.
+Venue-conventional structure — numbered subsections, run-in paragraph
+headings — is not an AI tell; do not let the AI-detection pass flag it.
