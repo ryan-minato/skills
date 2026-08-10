@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-description: Skill lifecycle for this repository — layers repo-specific scaffolding, testing, and validation on top of generic skill authoring. Use when creating a skill here or adding one to a catalog; when modifying, moving, or removing anything under skills/ or .agents/skills/; when deciding which catalog or directory a new skill belongs in; or when this repo's agents should learn a new reusable workflow. Generic Agent-Skill questions and skills outside this repository belong to great-skill-writer.
+description: Skill lifecycle for this repository — layers repo-specific scaffolding, testing, and validation on top of generic skill authoring. Use when creating a skill here or adding one to a catalog; when modifying, moving, or removing anything under skills/ or .agents/skills/; when deciding which catalog or directory a new skill belongs in; or when this repo's agents should learn a new reusable workflow. great-skill-writer supplies the generic authoring layer and fires together with this skill; it works alone only on generic Agent-Skill questions and skills outside this repository.
 metadata:
   internal: true
 ---
@@ -24,17 +24,22 @@ worth building and where it belongs:
 
 ## Before writing anything
 
-1. Read `.agents/knowledge/skill-quality.md` — the quality bar every skill
+1. Load the `great-skill-writer` skill when it is available — it is the
+   generic authoring layer this workflow builds on (value definition,
+   description triggers, information hierarchy, leading words, pruning).
+   `.agents/knowledge/skill-quality.md` records this repository's quality
+   bar; it does not replace that layer.
+2. Read `.agents/knowledge/skill-quality.md` — the quality bar every skill
    must meet (scoping, structure, spec limits, self-containment,
    description/body standards, instruction patterns, progressive
    disclosure, script rules).
-2. Decide where the skill lives:
+3. Decide where the skill lives:
    - **Public skill** (distributable): `skills/<catalog>/<skill-name>/`.
      Pick the catalog from the list in `ARCHITECTURE.md` (Catalogs section)
      and read that catalog's `CONTEXT.md` for catalog-specific requirements.
    - **Project-only workflow skill** (serves this repo itself):
      `.agents/skills/<skill-name>/` as a real directory.
-3. Apply the subagent gate below. If it passes, read
+4. Apply the subagent gate below. If it passes, read
    [references/testing.md](references/testing.md) and design its behavioral
    tests before editing. If it fails, do not read the reference; record the
    skipped behavioral tests and missing capability for the Linear milestone
