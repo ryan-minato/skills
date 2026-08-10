@@ -29,10 +29,14 @@ Assess:
    necessary? Flag every change that a fluent original did not need, and
    every place where editing altered the author's meaning or claim
    strength.
-2. Evident problems — logic gaps between adjacent statements, claims
-   without citations, terminology that shifted names mid-text, colloquial
-   or inflated phrasing that survived, emphasis markup or connective
-   stacking that remains.
+2. Evident problems — logic gaps where the argument genuinely breaks
+   (steps a field reader bridges unaided and obvious exceptions are not
+   gaps; route a real gap to its root — claim, evidence, or structure —
+   for the author to decide, never to a concessive patch); defensive
+   concessions around cited evidence (flag each and judge whether the
+   defensiveness is excessive); claims without citations, terminology
+   that shifted names mid-text, colloquial or inflated phrasing that
+   survived, emphasis markup or connective stacking that remains.
 3. Citations — does each verified record actually support the sentence
    citing it? Flag any citation whose evidence shows a different paper,
    year, or claim, and any source whose tier (peer-reviewed > lab/author
