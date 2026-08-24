@@ -4,7 +4,10 @@
   "hostRequirements": {
     "gpu": "optional"
   },
-  "postCreateCommand": "curl -LsSf https://astral.sh/uv/install.sh | sh && uv venv && uv pip sync requirements.dev.txt --torch-backend <backend> && uv run pre-commit install",
+  "features": {
+    "ghcr.io/stacit-ai/devcontainer-features/uv:1": {}
+  },
+  "postCreateCommand": "uv venv && uv pip sync requirements.dev.txt --torch-backend <backend> && uv run pre-commit install",
   "containerEnv": {
     "HF_HOME": "/workspaces/<project name>/.hf-cache"
   },
