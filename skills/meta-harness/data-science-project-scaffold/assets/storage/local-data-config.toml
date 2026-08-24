@@ -1,0 +1,6 @@
+[[sources]]
+name = "__SOURCE_NAME__"
+backend = "local"
+uri = "data/__SOURCE_NAME__"
+version = "__IMMUTABLE_VERSION__"
+checksum = "__CHECKSUM_OR_MANIFEST_DIGEST__"

@@ -51,17 +51,16 @@ Catalogs section of `ARCHITECTURE.md`.
   improvement. Use `docs` only for supporting documentation that does not
   change an installed skill; file format does not decide the type. Template:
   `.gitmessage` (installed by `just setup`).
-- **Task management**: Linear, team "Aoi", project "Skills" (via the Linear
-  MCP server configured in `.mcp.json`).
-- **Workflow**: every change to tracked files is issue-driven and uses
-  atomic commits, per-commit safety gates, best-effort sensitivity checks,
-  Linear status updates, and a draft PR before review. Full procedure: the
-  `issue-workflow` project skill.
+- **Task management**: no external tracker is required. The work branch,
+  atomic commits, and pull request are the durable record of a change.
+- **Workflow**: every change to tracked files uses a dedicated branch,
+  per-commit safety gates, best-effort sensitivity checks, and a draft PR
+  before review. Full procedure: the `change-workflow` project skill.
 
 ## When To Read What
 
 - Starting any proactive change, or preparing a branch, commit series, or
-  PR handoff → use the `issue-workflow` project skill.
+  PR handoff → use the `change-workflow` project skill.
 - Creating or modifying any skill → use the `skill-authoring` project skill;
   it routes to `.agents/knowledge/skill-quality.md`, the catalog's
   `CONTEXT.md`, subagent-capability-gated behavioral tests, and independent

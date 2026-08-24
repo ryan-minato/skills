@@ -12,6 +12,7 @@
 |---|---|---|
 | [`core`](skills/core/) | 推荐在所有环境安装的 skill | 全局（用户级） |
 | [`engineering`](skills/engineering/) | 通用编程方法论类 skill,外加 GitHub/GitLab 社区文件创作(模板、标签、规范、健康文件)与窄域工件创作工作流(如 Dev Container 工件) | 按需安装到项目 |
+| [`meta-harness`](skills/meta-harness/) | 用于完整 agent harness、DESIGN.md，以及可复现 Python、ML 和数据科学项目脚手架的一次性构建技能 | 安装到项目，harness 验证后移除 |
 | [`ops`](skills/ops/) | 平台操作：整合的 GitHub 与 GitLab 日常工作流，含工具链配置 | 按需安装到项目 |
 | [`writing`](skills/writing/) | 面向人类读者的写作：体裁类（学术、博客/评论、文案）与载体类（LaTeX、Typst、Markdown） | 按需安装到项目 |
 
@@ -34,8 +35,8 @@ npx skills add ryan-minato/skills --skill <skill-name>
 npx skills add ryan-minato/skills --skill <skill-name> -g
 ```
 
-建议将 `core` 类 skill 全局安装，使其在所有项目中可用；
-其他 catalog 的 skill 按需安装到需要的项目中。
+建议将 `core` 类 skill 全局安装，使其在所有项目中可用。其他 catalog 的 skill
+按需安装到需要的项目中；`meta-harness` 包含临时构建技能，其长期产物验证后应移除。
 
 ### 作为 Claude Code 插件
 
@@ -45,7 +46,7 @@ npx skills add ryan-minato/skills --skill <skill-name> -g
 ```
 /plugin marketplace add ryan-minato/skills
 /plugin install core@ryan-minato-skills
-/plugin install ops@ryan-minato-skills      # 或 engineering@、writing@ 等
+/plugin install ops@ryan-minato-skills      # 或 engineering@、meta-harness@、writing@ 等
 ```
 
 ## 参与贡献

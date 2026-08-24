@@ -1,0 +1,28 @@
+# __REPORT_TITLE__
+
+## Question
+
+__DECISION_RELEVANT_QUESTION__
+
+## Data
+
+__SOURCE_IDENTITIES_AND_SCOPE__
+
+## Method
+
+__REPRODUCIBLE_METHOD_AND_CONFIGURATION__
+
+## Findings
+
+__EVIDENCE_BACKED_FINDINGS__
+
+## Limitations
+
+__LIMITATIONS_AND_UNCERTAINTY__
+
+## Provenance
+
+- Run: __RUN_ID__
+- Git commit: __GIT_COMMIT__
+- Configuration: __CONFIG_REFERENCE__
+- Products: __PRODUCT_REFERENCES__

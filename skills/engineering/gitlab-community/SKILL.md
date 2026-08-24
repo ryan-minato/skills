@@ -1,19 +1,15 @@
 ---
 name: gitlab-community
 description: >
-  Community and convention authoring for a GitLab project — issue and MR description
-  templates under .gitlab/, scoped-label taxonomy, commit-message rules and Changelog
-  trailers, versioning and tag policy (changelog_config.yml), tokenless CI validation
-  jobs, and community files (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY) as conventional
-  root files. Use when standardizing how issues are filed, MRs are described and
-  reviewed, commits are written, or releases are versioned ("add an MR template",
-  "define our labels", "set up changelog generation"); when the user says "PR
-  template" but the repository is on
-  GitLab; when intake arrives unstructured and .gitlab/ templates need authoring;
-  when adding a code of conduct or security policy, or documenting contributor and
-  review rules in CONTRIBUTING; or when generating project-level skills for these
-  workflows. Not for performing the operations (gitlab-ops), nor for GitHub
-  (github-community).
+  GitLab community, convention, CI, and guardrail authoring — creates issue and MR
+  templates, scoped labels, commit and release policy, pipelines, CODEOWNERS,
+  Renovate, protection plans, and community files. Use when adding an MR or issue
+  template, changelog conventions, CONTRIBUTING, CODE_OF_CONDUCT, or SECURITY; when
+  standardizing review and release flow; when mirroring local checks in GitLab CI;
+  when designing review routing, dependency updates, protected refs, approvals, or
+  scanning guardrails; or when generating project-level skills for these workflows.
+  Not for applying remote settings or day-to-day GitLab operations (gitlab-ops), nor
+  for GitHub.
 license: Apache-2.0
 compatibility: >
   Bundled scripts require Python 3.9+ (stdlib only); sync_labels.py needs
@@ -94,6 +90,8 @@ and only that file:
 | Commit messages: convention doc, validator, MR-pipeline enforcement, Changelog trailers | [references/commit-conventions.md](references/commit-conventions.md) |
 | Releases: versioning/tag policy, changelog config, milestone policy, tag CI check | [references/release-conventions.md](references/release-conventions.md) |
 | Community files: CONTRIBUTING, CODE_OF_CONDUCT, SECURITY | [references/community-files.md](references/community-files.md) |
+| Harness CI that mirrors existing local checks in GitLab pipelines | [references/harness-ci.md](references/harness-ci.md) |
+| CODEOWNERS, Renovate, protected refs, approvals, or scanning guardrails | [references/harness-guardrails.md](references/harness-guardrails.md) |
 
 Ordering when several domains run together: commit conventions before
 release conventions (the changelog config consumes the trailer habit it

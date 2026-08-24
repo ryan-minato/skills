@@ -6,7 +6,7 @@ skill adds value.
 
 ## 1. Create test worktrees when possible
 
-The current issue worktree is the authoring worktree: design, edit, stage, and
+The current change worktree is the authoring worktree: design, edit, stage, and
 commit there. Do not create a test worktree until immediately before a test
 run.
 
@@ -80,8 +80,8 @@ prompt, then rerun the complete affected evaluation.
 ## 4. Clean up and report
 
 Record the cases, observation method, rubric, results, scores, evidence, every
-isolation degradation, and any skipped test with its reason in the Linear
-milestone comment and handoff. Remove every detached candidate test worktree,
-snapshot, harness, fixture, and evaluation output. Keep the current issue
-worktree for the remaining commit and PR workflow, and confirm its `git status`
-shows only the intended repository changes.
+isolation degradation, and any skipped test with its reason in the handoff or
+pull request. Remove every detached candidate test worktree, snapshot, harness,
+fixture, and evaluation output. Keep the current change worktree for the
+remaining commit and PR workflow, and confirm its `git status` shows only the
+intended repository changes.

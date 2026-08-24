@@ -1,0 +1,19 @@
+services:
+  train:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - hf-cache:/root/.cache/huggingface
+    env_file: .env  # secrets ride in at runtime, never into the image
+    shm_size: "<e.g. 8gb>"  # DataLoader workers exhaust Docker's default shm
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  hf-cache:

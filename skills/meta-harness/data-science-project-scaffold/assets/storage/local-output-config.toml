@@ -1,0 +1,4 @@
+[[products]]
+name = "__PRODUCT_NAME__"
+backend = "local"
+uri = "output/__STEP_OR_FINAL__"

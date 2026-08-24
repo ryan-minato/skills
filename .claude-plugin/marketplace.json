@@ -48,6 +48,20 @@
       "description": "Platform operations: consolidated GitHub and GitLab day-to-day workflows (issues, PRs/MRs, CI, planning, releases, research, wiki) with tooling setup and pre-publish review."
     },
     {
+      "name": "meta-harness",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/meta-harness/data-science-project-scaffold",
+        "./skills/meta-harness/design-md",
+        "./skills/meta-harness/meta-disposal",
+        "./skills/meta-harness/meta-harness-architecture",
+        "./skills/meta-harness/ml-project-scaffold",
+        "./skills/meta-harness/python-project-defaults"
+      ],
+      "description": "Disposable, project-scoped builders for complete agent harness architecture, visual design, and reproducible Python, ML, and data-science project scaffolds."
+    },
+    {
       "name": "writing",
       "source": "./",
       "strict": false,

@@ -42,9 +42,9 @@ worth building and where it belongs:
 4. Apply the subagent gate below. If it passes, read
    [references/testing.md](references/testing.md) and design its behavioral
    tests before editing. If it fails, do not read the reference; record the
-   skipped behavioral tests and missing capability for the Linear milestone
-   comment and handoff. The `issue-workflow` skill must already have placed the
-   current worktree on the issue branch; edit the skill there.
+   skipped behavioral tests and missing capability in the handoff. The
+   `change-workflow` skill must already have placed the current worktree on a
+   dedicated branch; edit the skill there.
 
 Done when: the target location is recorded and either the behavioral cases,
 rubric, critical failures, and passing threshold are defined or the missing
@@ -56,7 +56,7 @@ The gate passes when the invoking agent can dispatch clean-context subagents;
 this is the only required capability. Do not maintain a framework allowlist or
 denylist. If subagents are unavailable, do not load the reference or use the
 authoring agent as a solver or grader; record the skipped tests and missing
-capability in the Linear milestone comment and handoff.
+capability in the handoff.
 
 ## Creating a public skill
 

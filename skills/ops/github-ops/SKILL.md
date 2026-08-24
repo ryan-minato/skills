@@ -1,19 +1,14 @@
 ---
 name: github-ops
 description: >
-  GitHub operations — issues, pull requests, CI checks and Actions, Discussions,
-  planning (milestones, labels, Projects), releases, read-only repo research, and
-  gh/MCP tooling setup. Use when filing, commenting on, triaging, or closing an issue
-  ("file an issue", "comment on #N"); when opening, reviewing, marking ready, or
-  merging a PR, or checking its CI ("did the checks pass", "why is CI red"); when
-  managing milestones, labels, or project boards; when cutting a release, tagging a
-  version, or drafting release notes; when investigating any repository, even
-  without write access — upstream issues, discussions, failed runs, releases; when a
-  GitHub issue, PR, run, or release URL is the material at hand; or when gh or the
-  GitHub MCP server is missing,
-  unauthenticated, or failing ("set up GitHub MCP", "gh auth failed"). Authoring
-  templates, label taxonomies, commit/release policy, or community health files
-  belongs to github-community; GitLab work to gitlab-ops.
+  GitHub operations — issues, PRs, Actions and checks, Discussions, milestones,
+  labels, Projects, releases, repository research, rulesets, branch/tag protection,
+  security settings, and gh/MCP setup. Use when filing or triaging an issue; opening,
+  reviewing, readying, or merging a PR; diagnosing red CI; managing planning or
+  releases; investigating a GitHub URL or public repository; applying reviewed
+  repository guardrails; or fixing missing or unauthenticated GitHub tooling.
+  Authoring templates, taxonomies, workflows, policy, CODEOWNERS, Dependabot, or
+  community files belongs to github-community; GitLab work belongs to gitlab-ops.
 license: Apache-2.0
 compatibility: >
   Bundled scripts require Python 3.9+ (stdlib only). rest_read.py needs
@@ -83,6 +78,7 @@ only that file:
 | Touches Discussions | [references/discussions.md](references/discussions.md) |
 | Manages milestones, label lifecycle, or Projects boards | [references/planning.md](references/planning.md) |
 | Cuts, edits, reads, or deletes releases or tags | [references/releases.md](references/releases.md) |
+| Inspects or changes rulesets, branch/tag protection, or repository security settings | [references/repository-guardrails.md](references/repository-guardrails.md) |
 | Is blocked on missing or broken gh/MCP tooling, or asks to set it up | [references/tooling-setup.md](references/tooling-setup.md) |
 
 Read-only research on a repository you are not acting in uses the same

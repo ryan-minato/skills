@@ -18,14 +18,13 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-
 ANONYMOUS_EMAILS = (
-    re.compile(r"^[^@\s]+@users\.noreply\.github\.com$", re.I),
-    re.compile(r"^[^@\s]+@noreply\.gitlab\.com$", re.I),
-    re.compile(r"^[^@\s]+@users\.noreply\.gitlab\.com$", re.I),
+    re.compile(r"^[^@\s]+@users\.noreply\.github\.com$", re.IGNORECASE),
+    re.compile(r"^[^@\s]+@noreply\.gitlab\.com$", re.IGNORECASE),
+    re.compile(r"^[^@\s]+@users\.noreply\.gitlab\.com$", re.IGNORECASE),
 )
 
-EMAIL_RE = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.I)
+EMAIL_RE = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)
 ENV_VAR_RE = re.compile(r"^\$[A-Za-z_][A-Za-z0-9_]*$")
 BRACED_ENV_VAR_RE = re.compile(r"^\$\{[A-Za-z_][A-Za-z0-9_]*(?:\})?$")
 PRIVATE_KEY_RE = re.compile(r"-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----")
@@ -52,8 +51,7 @@ def git(*args: str) -> str:
         ["git", *args],
         check=False,
         text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
     )
     if result.returncode != 0:
         print(result.stderr.strip() or f"git {' '.join(args)} failed", file=sys.stderr)
@@ -71,8 +69,7 @@ def git_user_email() -> str:
         ["git", "config", "--get", "user.email"],
         check=False,
         text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
     )
     if result.returncode == 0:
         return result.stdout.strip()
@@ -121,9 +118,11 @@ def check_author_email(allow_private_email: bool) -> list[str]:
         print(f"Author email: {email} (private email explicitly allowed)")
         return []
     return [
-        "git config user.email is not a GitHub/GitLab anonymous address. "
-        "Use a noreply address, or rerun with --allow-private-email only "
-        "after the user explicitly approves private email use."
+        (
+            "git config user.email is not a GitHub/GitLab anonymous address. "
+            "Use a noreply address, or rerun with --allow-private-email only "
+            "after the user explicitly approves private email use."
+        )
     ]
 
 

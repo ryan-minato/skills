@@ -1,0 +1,11 @@
+stages:
+  - check
+
+<check-name>:
+  stage: check
+  image: <image matching this project's toolchain>
+  rules:
+    - <merge-request and default-branch rules, per the fetched docs>
+  script:
+    - <toolchain setup this project needs>
+    - <the project's local check command, verbatim>

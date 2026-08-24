@@ -1,0 +1,9 @@
+project_name = "__PROJECT_NAME__"
+random_seed = 0
+
+[logging]
+level = "INFO"
+
+# Merge one source table per real source and one product table per real product
+# from the selected storage assets. Values only: never put credentials or
+# implementation class paths in this file.

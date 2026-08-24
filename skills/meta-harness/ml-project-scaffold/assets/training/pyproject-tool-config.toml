@@ -1,0 +1,36 @@
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 80
+
+[tool.ruff.lint]
+extend-select = [
+    "I",    # isort: Import sorting
+    "N",    # pep8-naming: Check PEP 8 naming conventions
+    "TID",  # flake8-tidy-imports: Import policy checks
+    "W",    # pycodestyle warning: PEP 8 styling warnings
+]
+unfixable = [
+    "F401", # unused-import: Unused import
+]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/*" = [
+    "TID",  # flake8-tidy-imports: Tidy up imports
+]
+"tests/**/*" = [
+    "TID252",   # relative-imports: Relative imports ban
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
+markers = [
+    "slow: manual-only tests that may require GPU, model downloads, or long runs",
+]

@@ -1,0 +1,22 @@
+{
+  "name": "<project name>",
+  "image": "<base image, e.g. nvidia/cuda:<tag> — enumerate live tags first>",
+  "hostRequirements": {
+    "gpu": "optional"
+  },
+  "features": {
+    "ghcr.io/stacit-ai/devcontainer-features/uv:1": {}
+  },
+  "postCreateCommand": "uv venv && uv pip sync requirements.dev.txt --torch-backend <backend> && uv run pre-commit install",
+  "containerEnv": {
+    "HF_HOME": "/workspaces/<project name>/.hf-cache"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "charliermarsh.ruff"
+      ]
+    }
+  }
+}

@@ -1,0 +1,8 @@
+version: 2
+updates:
+  - package-ecosystem: "<ecosystem — from the fetched supported list>"
+    directory: "<where its manifest lives>"
+    schedule:
+      interval: "<cadence agreed with the user>"
+    # Grouping, ignore rules, and PR limits: take current option names
+    # from the fetched schema; delete what this project does not use.

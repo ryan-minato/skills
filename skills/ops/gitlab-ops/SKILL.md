@@ -1,18 +1,14 @@
 ---
 name: gitlab-ops
 description: >
-  GitLab operations on gitlab.com or any self-managed host — issues, merge requests,
-  pipelines, planning (milestones, iterations, boards, epics, labels), releases,
-  wikis, project research, and glab/MCP tooling setup. Use when filing, commenting
-  on, or closing an issue; when opening, reviewing, approving, or merging an MR, or
-  checking why its pipeline is red; when managing milestones, boards, epics, or
-  label lifecycle; when cutting a release, tagging, or generating a changelog; when
-  reading or writing wiki pages ("document this in the wiki"); when investigating
-  any GitLab project, even without write access; when a GitLab issue (#N), MR (!N),
-  pipeline, or wiki URL is the material at hand; or when glab or the GitLab Duo MCP
-  server is missing or unauthenticated ("set up glab"). Authoring description
-  templates, label taxonomies, commit/release policy, or CONTRIBUTING belongs to
-  gitlab-community; GitHub work to github-ops.
+  GitLab operations on gitlab.com or self-managed hosts — issues, MRs, pipelines,
+  milestones, iterations, boards, epics, labels, releases, wikis, research,
+  protected refs, approval rules, security settings, and glab/MCP setup. Use when
+  operating on an issue or MR; diagnosing a red pipeline; managing planning,
+  releases, or wikis; investigating a GitLab URL or project; applying reviewed
+  repository guardrails; or fixing missing or unauthenticated GitLab tooling.
+  Authoring templates, taxonomies, pipelines, policy, CODEOWNERS, Renovate, or
+  community files belongs to gitlab-community; GitHub work belongs to github-ops.
 license: Apache-2.0
 compatibility: >
   Bundled scripts require Python 3.9+ (stdlib only). rest_read.py needs
@@ -95,6 +91,7 @@ only that file:
 | Cuts, edits, reads, or deletes releases or tags (glab only) | [references/releases.md](references/releases.md) |
 | Reads or writes wiki pages (glab only) | [references/wiki.md](references/wiki.md) |
 | Searches the instance, a group, or a project | [references/search.md](references/search.md) |
+| Inspects or changes protected refs, approval rules, or repository security settings | [references/repository-guardrails.md](references/repository-guardrails.md) |
 | Is blocked on missing or broken glab/MCP tooling, or asks to set it up | [references/tooling-setup.md](references/tooling-setup.md) |
 
 Read-only research on a project you are not acting in uses the same
