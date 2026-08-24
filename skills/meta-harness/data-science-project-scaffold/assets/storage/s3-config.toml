@@ -1,0 +1,14 @@
+# Keep the source table only when S3 is an input backend.
+[[sources]]
+name = "__SOURCE_NAME__"
+backend = "s3"
+uri = "s3://__BUCKET__/__KEY__"
+version = "__OBJECT_VERSION_ID__"
+etag = "__ETAG__"
+checksum = "__CHECKSUM__"
+
+# Keep the product table only when S3 is an output backend.
+[[products]]
+name = "__PRODUCT_NAME__"
+backend = "s3"
+uri = "s3://__BUCKET__/__PRODUCT_PREFIX__"

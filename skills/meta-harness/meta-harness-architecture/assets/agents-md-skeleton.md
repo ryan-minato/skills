@@ -1,7 +1,7 @@
 <!-- Maximal AGENTS.md skeleton. Fill only the sections backed by current
 facts or explicit user decisions; delete every section that does not serve
-the project. Target about 100 lines when finished (about 200 at L1, where
-few other harness files exist to hold detail). -->
+the project. Target about 100 lines when finished. Approach 200 only when
+this file is the complete harness for a lightweight project. -->
 
 # [Project Name]
 

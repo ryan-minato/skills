@@ -1,14 +1,13 @@
-# Advanced Autonomy (L3 And L4)
+# Advanced Autonomy
 
-Read this when the user asks for capabilities above L2 on the maturity
-ladder in SKILL.md — a self-maintaining harness, persistent memory,
+Read this when the user asks for a self-evolving harness, persistent memory,
 unattended operation, autonomous task routing, failure-driven knowledge
-updates, or multiple agent roles — or when project evidence makes such an
-upgrade worth proposing. Treat every precondition below
-as missing until verified; when any is missing, design the best single-agent
-L0–L2 harness instead and document what must change before upgrading.
+updates, or multiple agent roles, or when project evidence makes one of these
+independent choices worth proposing. Treat every precondition below as missing
+until verified. When a precondition is missing, retain supervised operation or
+a single-agent topology and document what must change before revisiting it.
 
-## Preconditions for L3
+## Preconditions for self-evolution or unattended operation
 
 - Isolation and approval boundaries that make unattended operation safe.
 - Durable memory in a location agents can read and write across sessions.
@@ -23,7 +22,7 @@ repository can substitute for.
 
 ## Failure-driven feedback loops
 
-At L3, agent failures may feed harness improvement — under controls:
+Agent failures may feed harness improvement only under these controls:
 
 - A failed run produces findings first; nothing edits guidance directly
   from a failure.
@@ -32,7 +31,7 @@ At L3, agent failures may feed harness improvement — under controls:
 - Updates land through the approval path above, and the audit trail records
   them.
 
-## Preconditions for L4
+## Preconditions for multiple agent roles
 
 - The agent framework actually supports coordinated multiple roles.
 - The project is complex enough that separated contexts beat one shared
@@ -58,8 +57,9 @@ own harness must state:
 
 ## Plan output
 
-An advanced-autonomy plan states, beyond the step-5 plan in SKILL.md: the
-target level and why L2 is insufficient, the isolation and approval model,
-the durable memory design, role responsibilities (L4), the
+An advanced-autonomy plan states, beyond the main plan in SKILL.md: each
+requested autonomy capability and why supervised single-agent operation is
+insufficient, the isolation and approval model, the durable memory design,
+role responsibilities, the
 validation-and-audit design, the feedback-loop rules, the delegated
 workflow actions, and the rollback and human-review points.

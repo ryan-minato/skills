@@ -1,0 +1,8 @@
+# Default owners for anything not matched below.
+* <@owner>
+
+# <area>: <why this owner>
+/<path>/ <@owner-or-team>
+
+# <file type>: <why this owner>
+*.<ext> <@owner-or-team>

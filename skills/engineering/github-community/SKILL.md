@@ -1,19 +1,15 @@
 ---
 name: github-community
 description: >
-  Community and convention authoring for a GitHub repository — issue forms, label
-  taxonomy, PR template and review rules, commit-message conventions, versioning and
-  release-notes policy (release.yml), CI validation workflows, and community health
-  files: CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT, GOVERNANCE, FUNDING.yml,
-  and the org-wide .github default repository. Use when standardizing how issues are
-  filed, PRs are opened and reviewed, commits are written, or releases are versioned
-  and tagged ("add a PR template", "define our labels", "set up conventional
-  commits", "enforce commit format in CI"); when adding a code of conduct,
-  security policy, or support/funding/governance file, or
-  completing the community profile checklist; when a repo opens to outside
-  contributors and needs structured intake and written rules; or when generating
-  project-level skills for these workflows. Not for performing the operations
-  (github-ops), nor for GitLab (gitlab-community).
+  GitHub community, convention, CI, and guardrail authoring — creates issue forms,
+  labels, PR and review rules, commit and release policy, Actions workflows,
+  CODEOWNERS, Dependabot, ruleset plans, and community health files. Use when adding
+  a PR or issue template, conventional commits, release notes, CONTRIBUTING,
+  CODE_OF_CONDUCT, SECURITY, SUPPORT, GOVERNANCE, or FUNDING; when opening a repo to
+  contributors; when mirroring local checks in GitHub Actions; when designing review
+  routing, dependency updates, merge protection, or scanning guardrails; or when
+  generating project-level skills for these workflows. Not for applying remote
+  settings or day-to-day GitHub operations (github-ops), nor for GitLab.
 license: Apache-2.0
 compatibility: >
   Bundled scripts require Python 3.9+ (stdlib only); sync_labels.py needs
@@ -88,6 +84,8 @@ and only that file:
 | Commit messages: convention doc, validator, CI enforcement | [references/commit-conventions.md](references/commit-conventions.md) |
 | Releases: versioning/tag policy, release.yml, tag CI check | [references/release-conventions.md](references/release-conventions.md) |
 | Community health files (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, SUPPORT, GOVERNANCE, FUNDING), the `.github` default repo, or the community profile | [references/health-files.md](references/health-files.md) |
+| Harness CI that mirrors existing local checks in GitHub Actions | [references/harness-ci.md](references/harness-ci.md) |
+| CODEOWNERS, Dependabot, rulesets, or repository security guardrails | [references/harness-guardrails.md](references/harness-guardrails.md) |
 
 Ordering when several domains run together: issue conventions before
 release conventions (release.yml categories key on the label taxonomy),

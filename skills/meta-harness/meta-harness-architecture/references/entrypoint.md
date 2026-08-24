@@ -29,9 +29,9 @@ entrypoint, but AGENTS.md is the widely recognized shared convention.
 
 The entrypoint is a map, not a manual. Aim for about 100 lines; when it
 grows past that, move detail into knowledge files, references, or skills and
-leave a pointer. At L1 the budget relaxes to about 200 lines, because an L1
-harness has few other files — rules that a larger harness would push into
-knowledge files have nowhere to go but inline.
+leave a pointer. It may approach about 200 lines only when it is itself the
+complete harness for a lightweight project and separate files would add more
+navigation cost than value.
 
 Two limits on that compression: rules every agent must always see stay in
 the entrypoint no matter what, since content behind a pointer is only loaded

@@ -5,12 +5,12 @@ here must end up project-visible: future agents must be able to find when
 the mechanism runs, what it updates, and how it verifies, without this meta
 skill.
 
-Through L2, keeping the harness current is driven by the source of truth:
-when a visible file, command, interface, or workflow rule changes, dependent
-harness content gets updated in the same change. Repeated agent failures may
-justify findings and recommendations to the user, but not automatic edits to
-knowledge or references — that is an advanced-autonomy capability (see
-[advanced-autonomy.md](advanced-autonomy.md)).
+Unless the user has explicitly authorized self-evolution, keeping the harness
+current is driven by the source of truth: when a visible file, command,
+interface, or workflow rule changes, dependent harness content gets updated
+in the same change. Repeated agent failures may justify findings and
+recommendations, but not automatic edits to knowledge or references; that
+requires the controls in [advanced-autonomy.md](advanced-autonomy.md).
 
 ## Choose the lightest mechanism
 

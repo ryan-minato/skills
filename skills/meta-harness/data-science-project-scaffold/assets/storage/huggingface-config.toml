@@ -1,0 +1,17 @@
+# Keep the source table only when Hub is an input backend.
+[[sources]]
+name = "__SOURCE_NAME__"
+backend = "huggingface"
+uri = "hf://datasets/__REPOSITORY_ID__"
+version = "__COMMIT_REVISION__"
+
+# Keep the product table only when Hub is an output backend.
+[[products]]
+name = "__PRODUCT_NAME__"
+backend = "huggingface"
+uri = "hf://datasets/__REPOSITORY_ID__/__PRODUCT_PATH__"
+
+# Keep this table only when a Hub model is used.
+[model]
+repository = "__MODEL_REPOSITORY_ID__"
+revision = "__MODEL_COMMIT_REVISION__"

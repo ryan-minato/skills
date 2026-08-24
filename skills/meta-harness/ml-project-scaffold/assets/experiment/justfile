@@ -1,0 +1,35 @@
+# torch wheel variant for this project's machines — see AGENTS.md.
+torch_backend := "<cpu|cu130|rocm7.2|auto>"
+
+# Create the dev environment from the committed lockfile.
+setup:
+    uv venv
+    uv pip sync requirements.dev.txt --torch-backend {{torch_backend}}
+    uv run pre-commit install
+
+# Training-box install: runtime deps only.
+setup-train:
+    uv venv
+    uv pip sync requirements.txt --torch-backend {{torch_backend}}
+
+# Recompile both lockfiles after editing an .in file.
+lock:
+    uv pip compile requirements.in -o requirements.txt --torch-backend {{torch_backend}}
+    uv pip compile requirements.dev.in -o requirements.dev.txt --torch-backend {{torch_backend}}
+
+train *args:
+    uv run python train.py {{args}}
+
+eval *args:
+    uv run python eval.py {{args}}
+
+lint:
+    uv run ruff format .
+    uv run ruff check --fix .
+
+test:
+    uv run pytest -m "not slow"
+
+# GPU/long tests; run by hand, never from hooks or CI.
+test-slow:
+    uv run pytest -m slow

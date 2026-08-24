@@ -33,6 +33,11 @@ AGENT_SKILLS_DIR = REPO_ROOT / ".agents" / "skills"
 MARKETPLACE_MANIFEST = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 LEGACY_PLUGIN_MANIFEST = REPO_ROOT / ".claude-plugin" / "plugin.json"
 ARCHITECTURE_MD = REPO_ROOT / "ARCHITECTURE.md"
+CORE_META_HARNESS = SKILLS_DIR / "core" / "meta-harness" / "SKILL.md"
+ARCHITECTURE_META_HARNESS = (
+    SKILLS_DIR / "meta-harness" / "meta-harness-architecture" / "SKILL.md"
+)
+HARNESS_METHODOLOGY_HEADING = "## Harness Methodology"
 
 ESCAPING_LINK = re.compile(r"\]\((?:\.\./|/)[^)]*\)")
 
@@ -106,7 +111,9 @@ def check_architecture_md_catalog_list() -> None:
         )
         return
     text = ARCHITECTURE_MD.read_text(encoding="utf-8")
-    section = re.search(r"^## Catalogs$(.*?)(?=^## |\Z)", text, re.M | re.S)
+    section = re.search(
+        r"^## Catalogs$(.*?)(?=^## |\Z)", text, re.MULTILINE | re.DOTALL
+    )
     if not section:
         fail(
             "ARCHITECTURE.md: no `## Catalogs` section found. The validator "
@@ -114,7 +121,7 @@ def check_architecture_md_catalog_list() -> None:
             "a `## Catalogs` heading listing each catalog as `- `name` — ...`."
         )
         return
-    listed = set(re.findall(r"^- `([\w-]+)`", section.group(1), re.M))
+    listed = set(re.findall(r"^- `([\w-]+)`", section.group(1), re.MULTILINE))
     actual = (
         {p.name for p in SKILLS_DIR.iterdir() if p.is_dir()}
         if SKILLS_DIR.is_dir()
@@ -316,6 +323,49 @@ def check_root_files() -> None:
         )
 
 
+def _markdown_section(text: str, heading: str) -> str | None:
+    """Return one level-2 Markdown section, including its heading."""
+    pattern = re.compile(
+        rf"^{re.escape(heading)}$.*?(?=^## (?!#)|\Z)",
+        re.MULTILINE | re.DOTALL,
+    )
+    match = pattern.search(text)
+    return match.group(0).rstrip() if match else None
+
+
+def check_meta_harness_methodology() -> None:
+    """Keep the durable core methodology equal to its complete superset."""
+    if not CORE_META_HARNESS.is_file() or not ARCHITECTURE_META_HARNESS.is_file():
+        return
+    core = _markdown_section(
+        CORE_META_HARNESS.read_text(encoding="utf-8"),
+        HARNESS_METHODOLOGY_HEADING,
+    )
+    architecture = _markdown_section(
+        ARCHITECTURE_META_HARNESS.read_text(encoding="utf-8"),
+        HARNESS_METHODOLOGY_HEADING,
+    )
+    if core is None:
+        fail(
+            f"{CORE_META_HARNESS.relative_to(REPO_ROOT)}: missing "
+            f"`{HARNESS_METHODOLOGY_HEADING}`. The core skill is the durable "
+            "methodology subset; restore it from meta-harness-architecture."
+        )
+    if architecture is None:
+        fail(
+            f"{ARCHITECTURE_META_HARNESS.relative_to(REPO_ROOT)}: missing "
+            f"`{HARNESS_METHODOLOGY_HEADING}`. The complete skill owns the "
+            "shared methodology section."
+        )
+    if core is not None and architecture is not None and core != architecture:
+        fail(
+            "meta-harness methodology drifted: the `## Harness Methodology` "
+            "sections in core/meta-harness and meta-harness-architecture must "
+            "be byte-identical. Update the architecture source first, then "
+            "copy that section into the core subset."
+        )
+
+
 def main() -> int:
     check_all_skills()
     check_self_containment()
@@ -324,6 +374,7 @@ def main() -> int:
     check_symlinks()
     check_marketplace_manifest()
     check_root_files()
+    check_meta_harness_methodology()
 
     for warning in warnings:
         print(f"WARNING: {warning}\n", file=sys.stderr)
