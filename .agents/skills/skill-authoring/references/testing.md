@@ -80,8 +80,8 @@ prompt, then rerun the complete affected evaluation.
 ## 4. Clean up and report
 
 Record the cases, observation method, rubric, results, scores, evidence, every
-isolation degradation, and any skipped test with its reason in the Linear
-milestone comment and handoff. Remove every detached candidate test worktree,
-snapshot, harness, fixture, and evaluation output. Keep the current issue
-worktree for the remaining commit and PR workflow, and confirm its `git status`
-shows only the intended repository changes.
+isolation degradation, and any skipped test with its reason in the handoff or
+pull request. Remove every detached candidate test worktree, snapshot, harness,
+fixture, and evaluation output. Keep the current change worktree for the
+remaining commit and PR workflow, and confirm its `git status` shows only the
+intended repository changes.
