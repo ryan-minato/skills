@@ -2,19 +2,9 @@
 
 <!-- What this PR changes and why, in one or two sentences. -->
 
-## Linear
-
-<!-- Closing keyword for the parent issue only; sub-issues as plain links. -->
-
-Closes AOI-<n>
-
-Sub-issues:
-
-- AOI-<n> — <title>
-
 ## Changes
 
-<!-- Bulleted, grouped by commit or sub-issue. -->
+<!-- Bulleted, grouped by commit or coherent change. -->
 
 -
 

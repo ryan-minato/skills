@@ -6,7 +6,7 @@ skill adds value.
 
 ## 1. Create test worktrees when possible
 
-The current issue worktree is the authoring worktree: design, edit, stage, and
+The current change worktree is the authoring worktree: design, edit, stage, and
 commit there. Do not create a test worktree until immediately before a test
 run.
 
