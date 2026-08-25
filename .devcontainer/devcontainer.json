@@ -32,10 +32,6 @@
           "agentskills": {
             "url": "https://agentskills.io/mcp",
             "type": "http"
-          },
-          "linear-server": {
-            "url": "https://mcp.linear.app/mcp",
-            "type": "http"
           }
         }
       }

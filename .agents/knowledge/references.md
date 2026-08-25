@@ -28,5 +28,4 @@ skill belong in that catalog's `CONTEXT.md`, not here.
 
 ## Services
 
-- Linear MCP endpoint (knowledge sync only): https://mcp.linear.app/mcp
 - Agent Skills docs MCP endpoint: https://agentskills.io/mcp
