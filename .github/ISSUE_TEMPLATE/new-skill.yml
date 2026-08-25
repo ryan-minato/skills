@@ -1,0 +1,72 @@
+name: New Skill
+description: Propose a new distributable Agent Skill.
+title: "[New skill]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What recurring task or capability gap should this Skill address?
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Skill value
+      description: What will an agent gain that it does not reliably have already?
+    validations:
+      required: true
+  - type: textarea
+    id: triggers
+    attributes:
+      label: Trigger scenarios
+      description: Give direct and indirect requests that should load the Skill.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: State what belongs in the Skill and what is explicitly out of scope.
+    validations:
+      required: true
+  - type: dropdown
+    id: catalog
+    attributes:
+      label: Catalog
+      description: Select the catalog that should own the Skill.
+      options:
+        - core
+        - engineering
+        - meta-harness
+        - ops
+        - writing
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - critical
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable conditions that must hold when the change is complete.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I searched open issues and pull requests for duplicate work.
+          required: true

@@ -1,8 +1,7 @@
 # Architecture
 
 How this repository's mechanisms fit together. For day-to-day conventions,
-start at [AGENTS.md](AGENTS.md). This file is repo-only documentation and is
-not part of the Linear-synced knowledge base.
+start at [AGENTS.md](AGENTS.md).
 
 ## Layout
 
@@ -13,9 +12,10 @@ skills/<catalog>/<skill-name>/   Public, distributable skills
   <catalog>/CONTEXT.md           Catalog-scoped rules and reference URLs
 .agents/
   skills/                        Skills visible to this repo's agents
-  knowledge/                     Local knowledge base (synced to Linear)
+  knowledge/                     Git-tracked local knowledge base
 .claude/skills -> ../.agents/skills
 .claude-plugin/marketplace.json  Plugin marketplace (one plugin per catalog)
+.github/                         GitHub collaboration policy and automation
 scripts/                         Repository tooling
 justfile                         Canonical check recipes
 .gitmessage                      Commit message template
@@ -54,8 +54,7 @@ cross-checks this list against the directories in `skills/`.
 usable skills (the cross-client convention from the Agent Skills spec). It
 contains two kinds of entries:
 
-- **Project-only workflow skills** (`change-workflow`, `knowledge-sync`,
-  `skill-authoring`):
+- **Project-only workflow skills** (`change-workflow`, `skill-authoring`):
   real directories, created directly here. They serve this repo's own
   workflows, are never distributed, and may reference repo paths.
 - **Symlinks to public skills**: every `skills/<catalog>/<name>/` gets a
@@ -97,16 +96,23 @@ Users add the marketplace once, then install catalogs individually:
 Because installed skills are copied out of this repo, public skills must be
 fully self-contained (rules in `.agents/knowledge/skill-quality.md`).
 
-## Knowledge Base Sync
+## Knowledge Base
 
-`.agents/knowledge/*.md` is the local, git-tracked knowledge base. Each file
-maps to one Linear Document in project "Skills" (team "Aoi"). The
-`knowledge-sync` project skill performs the on-demand sync.
+`.agents/knowledge/*.md` is the project knowledge base. It is versioned and
+reviewed with the repository; no external tracker or document service mirrors
+it.
 
 Source of truth: **the knowledge files on origin's latest default branch**.
-The sync always pushes that version to Linear; edits made directly in Linear
-are overwritten. Working-tree edits become authoritative only once merged to
-the default branch.
+Working-tree edits become authoritative only after merge.
+
+## GitHub Workflow
+
+GitHub Issues provide optional task context, while every tracked change uses a
+dedicated branch and pull request. `.github/labels.json` is the label taxonomy;
+Issue Forms collect priority and catalog metadata, and GitHub Actions keeps
+those managed labels aligned. The project-only `change-workflow` skill owns
+tooling checks, explicit remote authorization, atomic commits, and the draft to
+ready review lifecycle.
 
 ## Quality Gates
 
@@ -116,8 +122,8 @@ the default branch.
 - pre-commit hooks are installed by `just setup` (run automatically by the
   devcontainer's `postCreateCommand`), which also sets the `.gitmessage`
   commit template.
-- CI runs secret scanning only (`.github/workflows/secret.yml`); other
-  checks are local by design.
+- CI runs secret scanning and PR policy validation; other repository checks
+  remain local by design.
 
 Longer custom logic belongs in `scripts/`, not inline in justfile recipes or
 hooks.

@@ -22,7 +22,8 @@ Catalogs section of `ARCHITECTURE.md`.
 - `.agents/skills/` — project-only workflow skills (real directories) plus
   symlinks to every public skill, so this repo's agents can use them.
   `.claude/skills` is a symlink to `.agents/skills` for Claude Code discovery.
-- `.agents/knowledge/` — local knowledge base, synced to Linear Documents.
+- `.agents/knowledge/` — git-tracked local knowledge base.
+- `.github/` — GitHub Issue intake, labels, pull request policy, and Actions.
 - `.claude-plugin/marketplace.json` — plugin marketplace: one plugin per
   non-empty catalog.
 - `scripts/` — repository tooling (validators, longer custom logic).
@@ -51,11 +52,12 @@ Catalogs section of `ARCHITECTURE.md`.
   improvement. Use `docs` only for supporting documentation that does not
   change an installed skill; file format does not decide the type. Template:
   `.gitmessage` (installed by `just setup`).
-- **Task management**: no external tracker is required. The work branch,
-  atomic commits, and pull request are the durable record of a change.
-- **Workflow**: every change to tracked files uses a dedicated branch,
-  per-commit safety gates, best-effort sensitivity checks, and a draft PR
-  before review. Full procedure: the `change-workflow` project skill.
+- **Task management**: GitHub is the only task-management platform. Issues are
+  optional; every change has a dedicated branch and PR. Link an Issue with
+  `Closes #N`, or record `N/A — <reason>` in the PR.
+- **Workflow**: before tracked work, verify `gh` installation and login and
+  obtain explicit authorization for remote writes. Use atomic commits and the
+  draft-to-ready PR lifecycle in the `change-workflow` project skill.
 
 ## When To Read What
 
@@ -68,8 +70,8 @@ Catalogs section of `ARCHITECTURE.md`.
 - Catalog-specific rules and references → `skills/<catalog>/CONTEXT.md`
   (catalog-scoped material belongs there, not in the global references).
 - External documentation URLs → `.agents/knowledge/references.md`.
-- Knowledge base changed, or Linear docs may be stale → use the
-  `knowledge-sync` project skill.
+- Labels, Issue Forms, or PR policy changed → inspect `.github/` and keep every
+  referenced label and exact validated heading synchronized.
 - Repo mechanics (symlinks, plugin marketplace, sync design) →
   `ARCHITECTURE.md`.
 
@@ -90,5 +92,7 @@ Catalogs section of `ARCHITECTURE.md`.
 | Public skill added/removed | Symlink in `.agents/skills/`, catalog `README.md` + `README.zh.md`, and `.claude-plugin/marketplace.json` (`just gen-marketplace`) |
 | Catalog added/removed | Catalog scaffold, the Catalogs section in `ARCHITECTURE.md`, `.claude-plugin/marketplace.json` (a plugin entry once the catalog has a skill) |
 | Any `README.md` | The matching `README.zh.md` (and vice versa) |
-| `.agents/knowledge/` documents | Run the `knowledge-sync` project skill after merge |
+| `.github/labels.json` | After explicit authorization, dry-run then apply `skills/engineering/github-community/scripts/sync_labels.py`; never prune |
+| Issue Form `Priority` or `Catalog` options | `.github/labels.json` and `.github/workflows/issue-metadata.yml` mappings |
+| PR template headings or required checklist | `.github/workflows/pr-policy.yml` validation |
 | Repo structure or check commands | This file and `ARCHITECTURE.md` |

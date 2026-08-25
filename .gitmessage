@@ -22,7 +22,7 @@
 #
 # scope: the name(s) of the modified skill(s).
 #   - one skill        -> feat(skill-authoring): add scaffold checklist
-#   - several skills   -> fix(knowledge-sync, skill-authoring): align paths
+#   - several skills   -> fix(change-workflow, skill-authoring): align paths
 #   - no specific skill, or a sweeping change across many skills
 #                      -> omit the scope: chore: update catalog layout
 #

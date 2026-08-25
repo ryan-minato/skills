@@ -1,0 +1,83 @@
+name: Modify Skill
+description: Correct, extend, or restructure an existing Agent Skill.
+title: "[Skill change]: "
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Skill
+      description: Name the affected Skill or Skills.
+      placeholder: skill-name
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Current problem
+      description: Describe the wrong, missing, or difficult behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Describe what should happen after the change.
+    validations:
+      required: true
+  - type: dropdown
+    id: change-kind
+    attributes:
+      label: Change kind
+      options:
+        - Correct incorrect behavior
+        - Add a capability
+        - Refactor without changing behavior
+        - Update supporting documentation
+    validations:
+      required: true
+  - type: dropdown
+    id: catalog
+    attributes:
+      label: Catalog
+      description: Select every affected catalog.
+      multiple: true
+      options:
+        - core
+        - engineering
+        - meta-harness
+        - ops
+        - writing
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - critical
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility considerations
+      description: Note affected clients, runtimes, existing users, or state why none apply.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable conditions that must hold when the change is complete.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I searched open issues and pull requests for duplicate work.
+          required: true
