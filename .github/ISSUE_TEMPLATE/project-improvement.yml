@@ -1,0 +1,61 @@
+name: Project Structure Improvement
+description: Improve the repository harness, tooling, layout, or collaboration flow.
+title: "[Project improvement]: "
+labels:
+  - enhancement
+  - catalog/repository
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Current limitation
+      description: Describe the structural or workflow problem and its impact.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: Describe the intended outcome and approach.
+    validations:
+      required: true
+  - type: dropdown
+    id: layers
+    attributes:
+      label: Impacted layers
+      description: Select every harness layer affected by the proposal.
+      multiple: true
+      options:
+        - Agent entrypoint
+        - Project workflow skills
+        - Knowledge base
+        - Development environment
+        - Repository tooling
+        - GitHub collaboration
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - critical
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List observable conditions that must hold when the change is complete.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I searched open issues and pull requests for duplicate work.
+          required: true

@@ -1,0 +1,97 @@
+[
+  {
+    "name": "bug",
+    "color": "d73a4a",
+    "description": "Something isn't working"
+  },
+  {
+    "name": "documentation",
+    "color": "0075ca",
+    "description": "Improvements or additions to documentation"
+  },
+  {
+    "name": "duplicate",
+    "color": "cfd3d7",
+    "description": "This issue or pull request already exists"
+  },
+  {
+    "name": "enhancement",
+    "color": "a2eeef",
+    "description": "New feature or request"
+  },
+  {
+    "name": "good first issue",
+    "color": "7057ff",
+    "description": "Good for newcomers"
+  },
+  {
+    "name": "help wanted",
+    "color": "008672",
+    "description": "Extra attention is needed"
+  },
+  {
+    "name": "invalid",
+    "color": "e4e669",
+    "description": "This doesn't seem right"
+  },
+  {
+    "name": "question",
+    "color": "d876e3",
+    "description": "Further information is requested"
+  },
+  {
+    "name": "wontfix",
+    "color": "ffffff",
+    "description": "This will not be worked on"
+  },
+  {
+    "name": "priority/critical",
+    "color": "b60205",
+    "description": "Urgent work that blocks critical repository use"
+  },
+  {
+    "name": "priority/high",
+    "color": "d93f0b",
+    "description": "Important work to address before the normal queue"
+  },
+  {
+    "name": "priority/medium",
+    "color": "fbca04",
+    "description": "Normal queue priority"
+  },
+  {
+    "name": "priority/low",
+    "color": "0e8a16",
+    "description": "Useful work with no schedule pressure"
+  },
+  {
+    "name": "catalog/core",
+    "color": "5319e7",
+    "description": "Work affecting the core skill catalog"
+  },
+  {
+    "name": "catalog/engineering",
+    "color": "0052cc",
+    "description": "Work affecting the engineering skill catalog"
+  },
+  {
+    "name": "catalog/meta-harness",
+    "color": "1d76db",
+    "description": "Work affecting the meta-harness skill catalog"
+  },
+  {
+    "name": "catalog/ops",
+    "color": "006b75",
+    "description": "Work affecting the ops skill catalog"
+  },
+  {
+    "name": "catalog/writing",
+    "color": "0e8a16",
+    "description": "Work affecting the writing skill catalog"
+  },
+  {
+    "name": "catalog/repository",
+    "color": "6f42c1",
+    "description": "Work affecting repository structure or workflow"
+  }
+]
