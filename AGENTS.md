@@ -93,4 +93,6 @@ Catalogs section of `ARCHITECTURE.md`.
 | Catalog added/removed | Catalog scaffold, the Catalogs section in `ARCHITECTURE.md`, `.claude-plugin/marketplace.json` (a plugin entry once the catalog has a skill) |
 | Any `README.md` | The matching `README.zh.md` (and vice versa) |
 | `.github/labels.json` | After explicit authorization, dry-run then apply `skills/engineering/github-community/scripts/sync_labels.py`; never prune |
+| Issue Form `Priority` or `Catalog` options | `.github/labels.json` and `.github/workflows/issue-metadata.yml` mappings |
+| PR template headings or required checklist | `.github/workflows/pr-policy.yml` validation |
 | Repo structure or check commands | This file and `ARCHITECTURE.md` |

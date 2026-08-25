@@ -1,19 +1,30 @@
 ## Summary
 
-<!-- What this PR changes and why, in one or two sentences. -->
+<!-- Explain what this PR changes and why in one or two sentences. -->
+
+## Related issue
+
+<!-- Use `Closes #N`, or `N/A — <reason>` when no Issue exists. -->
+
+Closes #
 
 ## Changes
 
-<!-- Bulleted, grouped by commit or coherent change. -->
+<!-- Group bullets by atomic commit or independently reviewable change. -->
+
+-
+
+## Validation
+
+<!-- Record every command or behavioral check and its result. -->
 
 -
 
 ## Checklist
 
 - [ ] `just check` passes locally
-- [ ] No secrets or PII in the diff; no hooks bypassed
-- [ ] Commits are atomic and follow Conventional Commits (`.gitmessage`)
-- [ ] Any changed `README.md` has its `README.zh.md` counterpart updated
-- [ ] Public skill added/removed: symlink in `.agents/skills/`, catalog
-      READMEs, and `.claude-plugin/marketplace.json` (`just gen-marketplace`)
-      are in sync
+- [ ] Task-specific tests are recorded and pass
+- [ ] No secrets, credentials, or personal data are present
+- [ ] Commits are atomic and follow Conventional Commits
+- [ ] Documentation and paired translations are updated where required
+- [ ] Public Skill indexes and marketplace metadata are synchronized where required

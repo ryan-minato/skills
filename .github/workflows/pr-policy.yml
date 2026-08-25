@@ -1,0 +1,89 @@
+name: PR policy
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, ready_for_review, converted_to_draft]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const pullRequest = context.payload.pull_request;
+            const body = pullRequest.body || '';
+            const title = pullRequest.title || '';
+            const requiredHeadings = [
+              '## Summary',
+              '## Related issue',
+              '## Changes',
+              '## Validation',
+              '## Checklist',
+            ];
+            const missing = requiredHeadings.filter((heading) => !body.includes(heading));
+            if (missing.length > 0) {
+              core.setFailed(`PR body is missing required sections: ${missing.join(', ')}.`);
+              return;
+            }
+
+            const conventional = /^(feat|fix|docs|refactor|chore|test|ci)(\([a-z0-9][a-z0-9, -]*\))?!?: [a-z0-9].+/;
+            if (!conventional.test(title)) {
+              core.setFailed('PR title must follow the repository Conventional Commit format.');
+              return;
+            }
+
+            function section(name) {
+              const marker = `## ${name}`;
+              const start = body.indexOf(marker);
+              if (start < 0) return '';
+              const contentStart = body.indexOf('\n', start + marker.length);
+              if (contentStart < 0) return '';
+              const nextSection = body.indexOf('\n## ', contentStart + 1);
+              return body
+                .slice(contentStart + 1, nextSection < 0 ? body.length : nextSection)
+                .replace(/<!--[\s\S]*?-->/g, '')
+                .trim();
+            }
+
+            const related = section('Related issue');
+            const closesIssue = /\b(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#\d+\b/i.test(related);
+            const explainsNoIssue = /^N\/A\s+[—-]\s+\S.+/i.test(related);
+            if (!closesIssue && !explainsNoIssue) {
+              core.setFailed('Related issue must contain `Closes #N` or `N/A — <reason>`.');
+              return;
+            }
+
+            if (pullRequest.draft) {
+              core.info('Draft PR structure, title, and Issue declaration are valid.');
+              return;
+            }
+
+            const validation = section('Validation').replace(/^[-*]\s*$/gm, '').trim();
+            if (!validation) {
+              core.setFailed('Ready PRs must record validation commands and results.');
+              return;
+            }
+
+            const checklist = section('Checklist').split('\n').map((line) => line.trim());
+            const requiredItems = [
+              '`just check` passes locally',
+              'Task-specific tests are recorded and pass',
+              'No secrets, credentials, or personal data are present',
+              'Commits are atomic and follow Conventional Commits',
+              'Documentation and paired translations are updated where required',
+              'Public Skill indexes and marketplace metadata are synchronized where required',
+            ];
+            const incomplete = requiredItems.filter((item) => {
+              const line = checklist.find((candidate) => candidate.includes(item));
+              return !line || !/^- \[[xX]\]/.test(line);
+            });
+            if (incomplete.length > 0) {
+              core.setFailed(`Ready PR checklist is incomplete: ${incomplete.join('; ')}.`);
+              return;
+            }
+
+            core.info('PR is ready for review and satisfies repository policy.');

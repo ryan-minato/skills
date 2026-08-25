@@ -122,8 +122,8 @@ ready review lifecycle.
 - pre-commit hooks are installed by `just setup` (run automatically by the
   devcontainer's `postCreateCommand`), which also sets the `.gitmessage`
   commit template.
-- CI runs secret scanning only (`.github/workflows/secret.yml`); other
-  repository checks remain local by design.
+- CI runs secret scanning and PR policy validation; other repository checks
+  remain local by design.
 
 Longer custom logic belongs in `scripts/`, not inline in justfile recipes or
 hooks.
