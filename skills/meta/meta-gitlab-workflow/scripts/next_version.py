@@ -1,8 +1,4 @@
-#!/usr/bin/env -S uv run
-# /// script
-# dependencies = []
-# requires-python = ">=3.11"
-# ///
+#!/usr/bin/env python3
 """Compute the next semver tag for a release.
 
 Reads the latest version from --latest, or from the git tags of the
@@ -10,9 +6,9 @@ current directory's repository when --latest is omitted, then applies the
 requested bump and prints the next tag to stdout (nothing else).
 
 Usage:
-    uv run scripts/next_version.py --bump patch
-    uv run scripts/next_version.py --bump minor --pre rc
-    uv run scripts/next_version.py --bump major --latest v2.9.3 --prefix v
+    python3 scripts/next_version.py --bump patch
+    python3 scripts/next_version.py --bump minor --pre rc
+    python3 scripts/next_version.py --bump major --latest v2.9.3 --prefix v
 
 Rules:
 - Tags are matched as PREFIX + MAJOR.MINOR.PATCH with an optional
@@ -98,7 +94,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         prog="next_version.py",
         description="Print the next semver tag (see module docstring)",
-        epilog="Example: uv run scripts/next_version.py --latest v1.2.3 --bump patch",
+        epilog="Example: python3 scripts/next_version.py --latest v1.2.3 --bump patch",
     )
     parser.add_argument(
         "--bump", required=True, choices=["major", "minor", "patch"]

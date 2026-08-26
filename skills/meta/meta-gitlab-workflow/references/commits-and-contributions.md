@@ -17,14 +17,15 @@ its authoritative source before writing policy.
 
 Record allowed types, scope meanings, subject rules, breaking-change syntax,
 trailers, merge/revert/fixup exemptions, and examples based on real project
-domains. If `Changelog:` trailers feed releases, match their values and case to
-the changelog configuration; commits without the expected trailer can disappear
+domains; rework `assets/commit-conventions.md` into that document. If
+`Changelog:` trailers feed releases, match their values and case to the
+changelog configuration; commits without the expected trailer can disappear
 from generated notes silently.
 
-Rework [`assets/check_commits.py`](assets/check_commits.py) only when
-mechanical enforcement is selected. Copy it into the target, edit its CONFIG,
-and verify message, file, and MR-range modes. CI needs complete MR history and
-must validate only the intended range. In squash workflows, validate the MR
+Rework `assets/check_commits.py` only when mechanical enforcement is
+selected. Copy it into the target, edit its CONFIG, and verify message, file,
+and MR-range modes. CI needs complete MR history and must validate only the
+intended range. In squash workflows, validate the MR
 title because individual commits may not reach the default branch.
 
 ## Branch and merge contract

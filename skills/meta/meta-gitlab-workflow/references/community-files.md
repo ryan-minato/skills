@@ -11,11 +11,13 @@ useful unsurfaced file from the README.
 
 - **CONTRIBUTING:** document real setup, local checks, issue/task intake,
   branches, commits, early draft MRs, review, and where to ask questions.
+  Rework `assets/contributing.md`.
 - **SECURITY:** give a private monitored reporting channel, supported scope or
   versions, response expectations, disclosure process, and owner. Never direct
-  vulnerabilities to public issues.
+  vulnerabilities to public issues. Rework `assets/security.md`.
 - **SUPPORT:** list only channels somebody monitors and distinguish support
-  from reproducible defects and feature/task intake.
+  from reproducible defects and feature/task intake. Rework
+  `assets/support.md`.
 - **CODE_OF_CONDUCT:** adopt an established current text; record a real
   enforcement contact. Do not invent legal/policy text from scratch.
 - **GOVERNANCE:** create only when decision rights, roles, escalation, or

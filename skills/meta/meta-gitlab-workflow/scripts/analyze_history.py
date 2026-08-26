@@ -1,8 +1,4 @@
-#!/usr/bin/env -S uv run
-# /// script
-# dependencies = []
-# requires-python = ">=3.11"
-# ///
+#!/usr/bin/env python3
 """Analyze a repository's commit-message history to ground a convention.
 
 Reads recent commits from the git repository in --repo-dir (default: the
@@ -12,7 +8,7 @@ prefix, the type and scope frequencies, subject-length statistics, and
 the trailer keys in use. Read-only; makes no network calls.
 
 Usage:
-    uv run scripts/analyze_history.py [--repo-dir PATH] [--max 500]
+    python3 scripts/analyze_history.py [--repo-dir PATH] [--max 500]
 
 Exit codes: 0 = report printed; 1 = git failed (not a repository, or no
 commits); 2 = bad arguments or git not installed.
@@ -82,7 +78,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         prog="analyze_history.py",
         description="Report commit-message style statistics as JSON",
-        epilog="Example: uv run scripts/analyze_history.py --repo-dir . --max 500",
+        epilog="Example: python3 scripts/analyze_history.py --repo-dir . --max 500",
     )
     parser.add_argument("--repo-dir", default=".", help="repository to analyze")
     parser.add_argument("--max", type=int, default=500, help="commits to scan")

@@ -21,9 +21,10 @@ a pipeline that will remain pending or install infrastructure as a side effect.
 
 ## Mirror local checks
 
-Start from commands that exist and pass locally. CI mirrors them; it does not
-invent a second quality system. Record each CI job and its exact local
-reproduction command in the durable harness.
+Rework `assets/gitlab-ci.yml` once CI is approved. Start from commands that
+exist and pass locally; CI mirrors them and does not invent a second quality
+system. Record each CI job and its exact local reproduction command in the
+durable harness.
 
 Default trigger contract when CI is approved:
 
@@ -31,7 +32,8 @@ Default trigger contract when CI is approved:
 - tests run for merge-request pipelines and the default branch, not ordinary
   non-MR branch pipelines;
 - use the target version's supported workflow/rules configuration to avoid
-  duplicate branch and MR pipelines;
+  duplicate branch and MR pipelines; a branch with an open MR must not run both
+  a branch pipeline and an MR pipeline for the same commit;
 - enable redundant-pipeline cancellation and mark cancellable test jobs
   interruptible so one MR retains tests only for its latest commit;
 - keep protected-branch or deployment jobs non-interruptible when cancellation

@@ -8,7 +8,8 @@ builder removable.
 Use the target's existing agent entrypoint. Otherwise create `AGENTS.md` as a
 compact map containing project purpose, always-on safety and validation rules,
 the GitLab workflow skill location, and exact when-to-read pointers to each
-knowledge file. Do not turn it into the full lifecycle manual.
+knowledge file. Do not turn it into the full lifecycle manual. Rework
+`assets/agents-md-gitlab.md` as the GitLab section of that entrypoint.
 
 ## Default structure
 
@@ -30,8 +31,8 @@ undiscoverable skill.
 
 ## Project skill contract
 
-Rework the project-skill asset. Its description triggers recurring GitLab work
-inside this project, not harness construction. Keep the common ownership,
+Rework `assets/project-skill.md`. Its description triggers recurring GitLab
+work inside this project, not harness construction. Keep the common ownership,
 convention discovery, exact-payload safety gate, assignment state machine, and
 early draft-MR flow inline. Put optional planning, release, wiki, guardrail,
 pipeline, and MLOps branches in skill-local references only when selected.
@@ -47,7 +48,7 @@ refs, approvals, merge method, squash behavior, pipeline requirements,
 environments, variables by name (never value), scanners, integrations, boards,
 and labels in project knowledge. For each setting state the owner, verification
 command or UI path, last verification evidence, and implementation↔harness
-update trigger.
+update trigger. Rework `assets/platform-settings.md` as that record.
 
 ## Synchronization and entropy
 

@@ -38,13 +38,30 @@ knowledge file routed for the operation before acting.
 
 ## Publish gate
 
-Draft the exact final title, body, comment, metadata, attachment, branch, tag,
-or setting locally. Review that payload for credentials, confidential
-information, sensitive personal data, internal identifiers or URLs, unrelated
-content, and unintended quick actions. Continue only with
-`SAFE TO PUBLISH: YES` for the unchanged payload and applicable user approval.
-Execute non-interactively and read the result back. Any edit invalidates the
-verdict.
+GitLab publication cannot be reliably undone: descriptions, comments, commit
+messages, tags, attachments, and their notification copies survive deletion.
+Every remote or publishable write passes this gate.
+
+1. Assemble the exact final payload as files in a scratch directory outside the
+   repository. For a merge request include `title.txt`, `body.md`,
+   `commits.txt` from `git log TARGET..SOURCE --format=full`, `diff.patch` from
+   `git diff TARGET...SOURCE`, and every attachment — an MR publishes its
+   commit messages and diff, not only its description.
+2. Review that directory independently: dispatch a clean-context subagent whose
+   whole prompt is the review instruction, or, without subagent support, re-read
+   every file from disk and note `Review mode: file-only (not clean-context)`.
+   Judge only what the files contain.
+3. The review checks every line for credentials and secrets, real personal
+   data, internal-only hosts/URLs/identifiers, unintended quick actions (any
+   line beginning with `/`), unrelated or generated content in the diff, and
+   regret-worthy wording. It ends with exactly `SAFE TO PUBLISH: YES` or
+   `SAFE TO PUBLISH: NO`; any secret, personal-data, or internal-context
+   finding means NO.
+4. Treat anything other than a verbatim `SAFE TO PUBLISH: YES` as NO. Fix every
+   finding, rebuild the directory, and review again.
+5. Confirm applicable user approval, execute non-interactively, and read the
+   result back. Published content must be byte-identical to the reviewed
+   content; any edit after the verdict requires a fresh review.
 
 ## Finish
 

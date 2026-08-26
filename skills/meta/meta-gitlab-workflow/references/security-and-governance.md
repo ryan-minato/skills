@@ -11,8 +11,8 @@ enforcement.
 
 ## Ownership and review
 
-Generate CODEOWNERS only from real paths and real GitLab users/groups. Define a
-default owner only when one team accepts the fallback. Every new top-level
+Rework `assets/codeowners-template` only from real paths and real GitLab
+users/groups. Define a default owner only when one team accepts the fallback. Every new top-level
 ownership boundary must update CODEOWNERS in the same MR. Validate syntax and
 read GitLab's parsed result because invalid lines can be ignored.
 

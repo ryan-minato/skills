@@ -6,6 +6,10 @@ workflow:
   # Replace with rules and auto-cancel syntax verified against the target GitLab.
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Without this guard a branch with an open MR runs a branch pipeline and an
+    # MR pipeline for the same commit. Keep it ahead of any branch rule.
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_BRANCH
 

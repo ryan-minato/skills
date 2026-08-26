@@ -1,8 +1,4 @@
-#!/usr/bin/env -S uv run
-# /// script
-# dependencies = []
-# requires-python = ">=3.11"
-# ///
+#!/usr/bin/env python3
 """Sync a GitLab project's or group's labels to a JSON taxonomy file via glab.
 
 Reads the desired labels from a JSON array of {"name", "color",
@@ -336,7 +332,7 @@ def main():
             "modified."
         ),
         epilog=(
-            "Example: uv run scripts/sync_labels.py --file labels.json "
+            "Example: python3 scripts/sync_labels.py --file labels.json "
             "--project group/project --host gitlab.example.com. Host "
             "resolution without --host: the host of the 'origin' git "
             "remote of the current directory (used as-is, even if it is not "

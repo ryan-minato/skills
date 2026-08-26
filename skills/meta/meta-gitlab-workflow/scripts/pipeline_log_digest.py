@@ -1,8 +1,4 @@
-#!/usr/bin/env -S uv run
-# /// script
-# dependencies = []
-# requires-python = ">=3.11"
-# ///
+#!/usr/bin/env python3
 """Digest a GitLab CI pipeline's failures into one compact JSON object.
 
 Shells out to the glab CLI (must be installed and authenticated) and never
@@ -12,7 +8,7 @@ section markers, and carriage-return progress frames — so multi-megabyte
 logs stay out of agent context.
 
 Usage:
-    uv run scripts/pipeline_log_digest.py --repo GROUP/PROJECT \\
+    python3 scripts/pipeline_log_digest.py --repo GROUP/PROJECT \\
         --pipeline-id ID [--tail N] [--hostname HOST]
 
     --repo         Project as its full path GROUP[/SUBGROUP]/NAME.
@@ -66,8 +62,7 @@ def run_glab_api(endpoint: str, hostname: str | None) -> "subprocess.CompletedPr
     except FileNotFoundError:
         log(
             "error: glab not found on PATH — install and authenticate the "
-            "GitLab CLI (see references/docs-and-tooling.md; "
-            "https://gitlab.com/gitlab-org/cli), then rerun."
+            "GitLab CLI (https://gitlab.com/gitlab-org/cli), then rerun."
         )
         sys.exit(1)
 
@@ -93,7 +88,7 @@ def build_parser() -> argparse.ArgumentParser:
             "lines each). Requires an installed and authenticated glab CLI."
         ),
         epilog=(
-            "Example: uv run scripts/pipeline_log_digest.py --repo "
+            "Example: python3 scripts/pipeline_log_digest.py --repo "
             "group/project --pipeline-id 123 --tail 40. Exit codes: 0 "
             "digest produced (empty failed_jobs on a green "
             "pipeline), 1 glab missing/errored/pipeline not found, 2 bad "
@@ -152,8 +147,7 @@ def main() -> int:
         log(
             f"fix: check that pipeline {args.pipeline_id} exists in "
             f"{args.repo} (`glab ci list --repo {args.repo}`) and that glab "
-            "is installed and authenticated (`glab auth status`); "
-            "references/docs-and-tooling.md covers install and auth."
+            "is installed and authenticated (`glab auth status`)."
         )
         return 1
 
@@ -175,8 +169,8 @@ def main() -> int:
             f"failed (exit {jobs_proc.returncode}): {jobs_proc.stderr.strip()}"
         )
         log(
-            "fix: check glab authentication (`glab auth status`); "
-            "references/docs-and-tooling.md covers install and auth."
+            "fix: check glab authentication (`glab auth status`), then confirm "
+            "the token can read this project's pipelines."
         )
         return 1
 

@@ -21,9 +21,8 @@ artifact set, signing/provenance requirements, milestone relationship, rollback
 or yanking procedure, and who approves publication. Fix and verify a manual
 release path before automating it.
 
-Rework [`assets/versioning-policy.md`](assets/versioning-policy.md) when a
-durable release contract is selected. Rework
-[`assets/changelog-config.yml`](assets/changelog-config.yml) only when the
+Rework `assets/versioning-policy.md` when a durable release contract is
+selected. Rework `assets/changelog-config.yml` only when the
 project chooses GitLab-generated changelog entries; its category keys must
 exactly match the approved commit trailers.
 
