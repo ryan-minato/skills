@@ -13,10 +13,16 @@ Before editing, write:
    indirect phrasing, with the expected load decision for each.
 2. Two or three representative outcome tasks and a rubric of observable
    requirements. Mark critical failures and declare the aggregate score needed
-   to pass before seeing candidate output.
+   to pass at that tier before seeing candidate output.
 
-Keep task text, inputs, model capability, tools, and limits equal across every
-solver that will run them.
+Run every solver — trigger accuracy and outcome quality alike — on the least
+capable model tier the skill is meant to support (the weakest tier the
+harness offers at or above that floor), and keep task text, inputs, tools,
+and limits equal across all of them: a stronger solver clears the rubric on
+its own priors rather than on the skill, certifying one that breaks below the
+tier it claims — and the floor tier is the cheaper run. When the harness
+fixes the solver model or a run escalates the tier, acceptance certifies only
+the tier that ran.
 
 Use framework-native conversation history or skill-load telemetry to determine
 whether a solver loaded the target. If neither is available, append this neutral
@@ -65,16 +71,23 @@ With the intended change in place, test the candidate:
   cannot be obtained.
 - **Independent grading:** anonymize solver identities and give the outputs,
   rubric, and critical requirements to a clean-context subagent that produced
-  none of the answers. Require a score and concrete evidence for every item.
-  Accept the candidate only when it has no critical failure and its aggregate
-  score meets the threshold declared before the run.
+  none of the answers. Grade on a model capable enough to apply the rubric
+  reliably: the floor rule binds solvers, not judges — a weak grader turns
+  every score into noise. Require a score and concrete evidence for every
+  item. Accept the candidate only when it has no critical failure and its
+  aggregate score meets the threshold declared before the run.
 
 On failure, fix the underlying instruction rather than patching one prompt,
-then rerun the complete affected evaluation.
+then rerun the complete affected evaluation. When a floor-tier solver cannot
+complete the task at all with the target loaded, the finding is the claimed
+floor, not the attempt: strengthen the instruction to carry that tier, or
+escalate one tier and rerun. Scoring badly is an instruction failure, never a
+reason to escalate.
 
 ## 4. Clean up and report
 
-Record prompts, observation method, rubric, results, scores, evidence, every
-isolation degradation, and any skipped test with its reason. Remove every
-candidate test worktree, snapshot, fixture, harness, and evaluation output.
-Confirm the authoring worktree contains only intended changes before continuing.
+Record prompts, observation method, solver tier, rubric, results, scores,
+evidence, every isolation degradation, and any skipped test with its reason.
+Remove every candidate test worktree, snapshot, fixture, harness, and
+evaluation output. Confirm the authoring worktree contains only intended
+changes before continuing.
