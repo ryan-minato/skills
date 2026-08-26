@@ -40,7 +40,7 @@ body:
       options:
         - core
         - engineering
-        - meta-harness
+        - meta
         - ops
         - writing
     validations:

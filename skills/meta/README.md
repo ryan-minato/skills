@@ -1,8 +1,11 @@
-# Meta-Harness Skills
+# Meta Skills
 
 Disposable, project-scoped builders for creating a durable agent harness. Install
 the catalog for a harness build, deposit every lasting rule into the target
-project, verify it, then remove the builders with `meta-disposal`.
+project, verify it, then remove the builders with `meta-disposal`. Their shared
+description prefix identifies them as temporary, allowing this catalog to give
+project initialization complete guidance without carrying that context into
+normal development.
 
 | Skill | Purpose |
 |---|---|

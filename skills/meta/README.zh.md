@@ -1,8 +1,9 @@
-# Meta-Harness Skills
+# Meta Skills
 
 用于创建持久 agent harness 的一次性、项目级构建技能。为 harness 构建安装此
 catalog，将所有长期规则写入目标项目并完成验证，然后使用 `meta-disposal`
-移除这些构建技能。
+移除这些构建技能。统一的 description 前缀将其标识为临时 skill，因此该 catalog
+可以为项目初始化提供完整指导，而不会在正常开发阶段持续占用上下文。
 
 | Skill | 用途 |
 |---|---|

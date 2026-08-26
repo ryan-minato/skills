@@ -3,9 +3,9 @@
 
 Examples:
   python3 scripts/discover.py
-  python3 scripts/discover.py --catalog meta-harness --full
-  python3 scripts/discover.py --skill meta-harness/design-md --full
-  python3 scripts/discover.py --full --output /tmp/meta-harness-skills.json
+  python3 scripts/discover.py --catalog meta --full
+  python3 scripts/discover.py --skill meta/design-md --full
+  python3 scripts/discover.py --full --output /tmp/meta-skills.json
 """
 
 from __future__ import annotations
@@ -429,7 +429,7 @@ def load_inventory(repo_root: Path | None = None) -> tuple[Catalog, ...]:
         catalogs: list[Catalog] = []
         marker: str | None = None
         for spec in specs:
-            if spec.name != "meta-harness":
+            if spec.name != "meta":
                 continue
             skills: list[Skill] = []
             for skill_name in spec.skill_names:
@@ -609,12 +609,12 @@ description: "{marker} Builds another useful thing. Use when two is needed."
     manifest = {
         "plugins": [
             {
-                "name": "meta-harness",
+                "name": "meta",
                 "source": "./",
                 "description": "Disposable harness builders.",
                 "skills": [
-                    "./skills/meta-harness/meta-one",
-                    "./skills/meta-harness/meta-two",
+                    "./skills/meta/meta-one",
+                    "./skills/meta/meta-two",
                 ],
             }
         ]
@@ -629,8 +629,8 @@ description: "{marker} Builds another useful thing. Use when two is needed."
                 json.dumps(raw_manifest), encoding="utf-8"
             )
             for relative, content in (
-                ("skills/meta-harness/meta-one/SKILL.md", folded_skill),
-                ("skills/meta-harness/meta-two/SKILL.md", plain_skill),
+                ("skills/meta/meta-one/SKILL.md", folded_skill),
+                ("skills/meta/meta-two/SKILL.md", plain_skill),
             ):
                 path = root / relative
                 path.parent.mkdir(parents=True, exist_ok=True)
@@ -643,8 +643,8 @@ description: "{marker} Builds another useful thing. Use when two is needed."
         assert "\n" not in inventory[0].skills[0].description
         cases += 1
 
-        selected = select_inventory(inventory, "meta-harness", None)
-        assert len(selected) == 1 and selected[0].name == "meta-harness"
+        selected = select_inventory(inventory, "meta", None)
+        assert len(selected) == 1 and selected[0].name == "meta"
         cases += 1
 
         try:
@@ -655,7 +655,7 @@ description: "{marker} Builds another useful thing. Use when two is needed."
             raise AssertionError("unknown catalog was accepted")
         cases += 1
 
-        (root / "skills/meta-harness/meta-two/SKILL.md").unlink()
+        (root / "skills/meta/meta-two/SKILL.md").unlink()
         try:
             load_inventory(root)
         except DiscoveryError as exc:
@@ -666,7 +666,7 @@ description: "{marker} Builds another useful thing. Use when two is needed."
 
         materialize()
         escaping = json.loads(json.dumps(manifest))
-        escaping["plugins"][0]["skills"] = ["./skills/meta-harness/../outside"]
+        escaping["plugins"][0]["skills"] = ["./skills/meta/../outside"]
         materialize(escaping)
         try:
             load_inventory(root)
@@ -689,7 +689,7 @@ description: "{marker} Builds another useful thing. Use when two is needed."
 
         materialize()
         mismatched = plain_skill.replace(marker, "Different test marker):")
-        (root / "skills/meta-harness/meta-two/SKILL.md").write_text(
+        (root / "skills/meta/meta-two/SKILL.md").write_text(
             mismatched, encoding="utf-8"
         )
         try:
@@ -724,7 +724,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=__doc__.splitlines()[0],
         epilog=(
-            "Example: python3 scripts/discover.py --catalog meta-harness --full\n"
+            "Example: python3 scripts/discover.py --catalog meta --full\n"
             "The default source is the live main branch of "
             "ryan-minato/skills."
         ),

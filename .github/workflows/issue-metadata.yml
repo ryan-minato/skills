@@ -28,7 +28,7 @@ jobs:
             const catalogLabels = new Map([
               ['core', 'catalog/core'],
               ['engineering', 'catalog/engineering'],
-              ['meta-harness', 'catalog/meta-harness'],
+              ['meta', 'catalog/meta'],
               ['ops', 'catalog/ops'],
               ['writing', 'catalog/writing'],
             ]);

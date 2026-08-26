@@ -1,4 +1,4 @@
-# meta-harness — Catalog Context
+# meta — Catalog Context
 
 Rules for disposable builders that create durable agent harnesses.
 
@@ -9,6 +9,12 @@ Rules for disposable builders that create durable agent harnesses.
   `Disposable meta-skill (delete after the harness is built):`
 - The marker identifies temporary builders. No asset or generated target
   artifact may carry it.
+- These builders exist only for project initialization. Their prefix and the
+  `meta-disposal` skill make removal after verification explicit, so they do
+  not consume context during normal development.
+- Prefer complete, durable initialization guidance over minimizing this
+  catalog's own instruction budget. The builders are temporary; their durable
+  output belongs in the target project before disposal.
 - Preserve working project choices; scaffolding is not permission to migrate.
 - Builders investigate before editing. The complete architecture builder must
   present its concrete harness plan and receive user approval before construction.
