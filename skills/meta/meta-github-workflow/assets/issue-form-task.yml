@@ -1,0 +1,59 @@
+# .github/ISSUE_TEMPLATE/03-task.yml — rework every field for the project.
+# Tasks are planned work, often executed by an agent: the solution
+# direction stays at architecture level so the executor keeps a feedback
+# loop, and acceptance criteria must be executable — never "improve X".
+# Labels must exist or they are dropped silently. In an organization with
+# native issue types, add `type: Task`.
+name: Task
+description: "Planned {{PROJECT_NAME}} work with an agreed outcome"
+labels: ["task"]
+body:
+  - type: textarea
+    id: content
+    attributes:
+      label: Content
+      description: The planned change, precisely.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: The observable project state when this task is complete.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and references
+      description: Everything the executor needs that lives outside this issue — the design conversation, the module being imitated (link it, not "like A"), constraints.
+    validations:
+      required: true
+  - type: textarea
+    id: direction
+    attributes:
+      label: Solution direction and breakdown
+      description: Architecture-level direction and work decomposition. Not line-by-line prescriptions.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Executable, observable criteria — commands to run, states to verify.
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Adjacent work this task must not absorb.
+    validations:
+      required: true
+  - type: textarea
+    id: cautions
+    attributes:
+      label: Cautions
+      description: Known hazards, fragile areas, rollback notes. Leave empty if none.
+    validations:
+      required: false

@@ -1,0 +1,54 @@
+# .github/workflows/triage.yml — the triage lifecycle for status/* labels.
+# Issue events only (issues have no fork concept, so the token is always
+# writable). Detection, not prevention: on a second priority/* label it
+# COMMENTS rather than silently removing — a hard-removing bot fights
+# maintainers who overrode deliberately.
+name: triage
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled]
+
+permissions:
+  issues: write
+
+concurrency:
+  group: triage-${{ github.event.issue.number }}
+  # cancel-in-progress: true would drop the second label event entirely.
+  cancel-in-progress: false
+
+jobs:
+  lifecycle:
+    name: triage / lifecycle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = (context.payload.issue.labels || []).map((l) => l.name);
+            const TYPES = ['bug', 'enhancement', 'documentation', 'task'];
+            const hasType = labels.some((n) => TYPES.includes(n)) || Boolean(context.payload.issue.type);
+            const priorities = labels.filter((n) => n.startsWith('priority/'));
+            const issue_number = context.payload.issue.number;
+            const { owner, repo } = context.repo;
+
+            if (context.payload.action === 'labeled' && priorities.length > 1) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number,
+                body: 'This issue carries more than one priority label ('
+                  + priorities.join(', ')
+                  + '). The convention is exactly one `priority/*`; please remove the one that no longer applies.',
+              });
+            }
+
+            const triaged = hasType && priorities.length === 1;
+            const hasNeedsTriage = labels.includes('status/needs-triage');
+            if (triaged && hasNeedsTriage) {
+              await github.rest.issues.removeLabel({
+                owner, repo, issue_number, name: 'status/needs-triage',
+              }).catch(() => {});
+            } else if (!triaged && !hasNeedsTriage && context.payload.action === 'opened') {
+              await github.rest.issues.addLabels({
+                owner, repo, issue_number, labels: ['status/needs-triage'],
+              });
+            }

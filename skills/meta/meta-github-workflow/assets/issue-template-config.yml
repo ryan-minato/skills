@@ -1,0 +1,11 @@
+# .github/ISSUE_TEMPLATE/config.yml — intake routing. Note: with blank
+# issues disabled, users with write access still see a maintainers-only
+# blank option.
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: "https://github.com/{{OWNER_REPO}}/discussions"
+    about: Ask questions, share ideas, and get support in Discussions.
+  - name: Report a security vulnerability
+    url: "{{SECURITY_REPORTING_URL — the repository's private vulnerability reporting page on public repositories, or the monitored private channel on private ones}}"
+    about: Never report vulnerabilities through public issues.

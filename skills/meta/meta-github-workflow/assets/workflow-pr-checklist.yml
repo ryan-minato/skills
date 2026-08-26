@@ -1,0 +1,54 @@
+# .github/workflows/pr-checklist.yml — validates the PR body against the
+# PR template by PARSING THE TEMPLATE'S OWN HEADINGS, so editing the
+# template needs no workflow change. The security checkbox must be
+# present AND ticked: a deleted line is a failure, not a pass. Fork-safe:
+# reads the event payload only, no API writes.
+name: pr-checklist
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checklist:
+    name: pr / checklist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const template = fs.readFileSync('.github/pull_request_template.md', 'utf8');
+            const required = template.split('\n')
+              .filter((line) => line.startsWith('## '))
+              .map((line) => line.trim());
+            if (required.length === 0) {
+              core.setFailed('The PR template has no "## " headings to enforce; fix .github/pull_request_template.md.');
+              return;
+            }
+            const body = context.payload.pull_request.body || '';
+            const missing = required.filter((heading) => !body.includes(heading));
+            if (missing.length > 0) {
+              core.setFailed('PR body is missing template sections: ' + missing.join(', ') + '. Restore them from .github/pull_request_template.md.');
+              return;
+            }
+            // Fail-closed security checkbox: unchecked fails, deleted fails.
+            const lines = body.split('\n').map((line) => line.trim());
+            const isSecurityItem = (line) => line.toLowerCase().includes('secrets');
+            if (lines.some((l) => l.startsWith('- [ ]') && isSecurityItem(l))) {
+              core.setFailed('The security checklist item is unchecked. Verify the diff and description, then tick it.');
+              return;
+            }
+            if (!lines.some((l) => /^- \[[xX]\]/.test(l) && isSecurityItem(l))) {
+              core.setFailed('The security checklist item is missing; restore it from .github/pull_request_template.md and tick it.');
+              return;
+            }
+            core.info('PR body matches the template and the security checkbox is ticked.');

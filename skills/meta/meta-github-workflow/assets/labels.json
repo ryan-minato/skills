@@ -1,0 +1,82 @@
+[
+  {
+    "name": "bug",
+    "color": "d73a4a",
+    "description": "Observed behavior differs from the intended design"
+  },
+  {
+    "name": "enhancement",
+    "color": "a2eeef",
+    "description": "A new user- or system-visible capability"
+  },
+  {
+    "name": "documentation",
+    "color": "0075ca",
+    "description": "Documentation only; no behavior change"
+  },
+  {
+    "name": "task",
+    "color": "1d76db",
+    "description": "Planned work with an agreed outcome and acceptance criteria"
+  },
+  {
+    "name": "duplicate",
+    "color": "cfd3d7",
+    "description": "Already tracked elsewhere; link the original before closing"
+  },
+  {
+    "name": "good first issue",
+    "color": "7057ff",
+    "description": "Self-contained and documented well enough for a first contribution"
+  },
+  {
+    "name": "help wanted",
+    "color": "008672",
+    "description": "Maintainers welcome outside contributions here"
+  },
+  {
+    "name": "invalid",
+    "color": "e4e669",
+    "description": "Not actionable as filed"
+  },
+  {
+    "name": "question",
+    "color": "d876e3",
+    "description": "Belongs in Discussions; convert instead of answering here"
+  },
+  {
+    "name": "wontfix",
+    "color": "ffffff",
+    "description": "Deliberately declined; the closing comment records why"
+  },
+  {
+    "name": "priority/high",
+    "color": "b60205",
+    "description": "Work on this before anything of lower priority"
+  },
+  {
+    "name": "priority/medium",
+    "color": "fbca04",
+    "description": "Normal scheduling"
+  },
+  {
+    "name": "priority/low",
+    "color": "0e8a16",
+    "description": "Nice to have; yields to everything above it"
+  },
+  {
+    "name": "status/needs-triage",
+    "color": "ededed",
+    "description": "Awaiting type and priority; applied on arrival"
+  },
+  {
+    "name": "status/blocked",
+    "color": "d93f0b",
+    "description": "Cannot proceed; the blocking issue or reason is linked in a comment"
+  },
+  {
+    "name": "area/{{AREA_NAME}}",
+    "color": "c2e0c6",
+    "description": "{{AREA_DESCRIPTION — derive one area label per real module or ownership boundary; keep in step with CODEOWNERS and labeler.yml}}"
+  }
+]

@@ -1,0 +1,37 @@
+# .github/workflows/commit-check.yml — runs the committed validator over
+# what will actually land on the default branch. Under squash merge the
+# PR TITLE becomes the commit subject, so title mode is the default here;
+# switch to the range step (and delete the title step) when the
+# repository merges or rebases branch commits. fetch-depth: 0 is
+# load-bearing for range mode: a shallow checkout validates nothing.
+name: commit-check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  commits:
+    name: commits / messages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate the squash subject (PR title)
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: python3 scripts/check_commits.py --message "$TITLE"
+      # Range mode — use INSTEAD of the title step when branch commits land:
+      # - name: Validate the PR commit range
+      #   env:
+      #     BASE: ${{ github.event.pull_request.base.sha }}
+      #     HEAD: ${{ github.event.pull_request.head.sha }}
+      #   run: python3 scripts/check_commits.py --range "$BASE..$HEAD"
