@@ -72,19 +72,29 @@ def load_yaml_file(path: Path):
         fail(2, f"cannot parse {path}: {exc}")
 
 
+def as_dict(value):
+    """A YAML key written with no value parses as None, not {}."""
+    return value if isinstance(value, dict) else {}
+
+
+def as_list(value):
+    """A YAML key written with no value parses as None, not []."""
+    return value if isinstance(value, list) else []
+
+
 def collect_references(root: Path) -> list:
     """Return (label, source) pairs for every label reference found."""
     refs = []
     release = root / ".github" / "release.yml"
     if release.is_file():
-        data = load_yaml_file(release) or {}
-        changelog = data.get("changelog", {}) if isinstance(data, dict) else {}
-        for label in changelog.get("exclude", {}).get("labels", []) or []:
+        changelog = as_dict(as_dict(load_yaml_file(release)).get("changelog"))
+        for label in as_list(as_dict(changelog.get("exclude")).get("labels")):
             refs.append((str(label), release))
-        for category in changelog.get("categories", []) or []:
-            for label in category.get("labels", []) or []:
+        for entry in as_list(changelog.get("categories")):
+            category = as_dict(entry)
+            for label in as_list(category.get("labels")):
                 refs.append((str(label), release))
-            for label in category.get("exclude", {}).get("labels", []) or []:
+            for label in as_list(as_dict(category.get("exclude")).get("labels")):
                 refs.append((str(label), release))
     template_dir = root / ".github" / "ISSUE_TEMPLATE"
     if template_dir.is_dir():
@@ -93,18 +103,15 @@ def collect_references(root: Path) -> list:
         ):
             if form.name in ("config.yml", "config.yaml"):
                 continue
-            data = load_yaml_file(form) or {}
-            labels = data.get("labels", []) if isinstance(data, dict) else []
+            labels = as_dict(load_yaml_file(form)).get("labels")
             if isinstance(labels, str):
                 labels = [part.strip() for part in labels.split(",") if part.strip()]
-            for label in labels or []:
+            for label in as_list(labels):
                 refs.append((str(label), form))
     labeler = root / ".github" / "labeler.yml"
     if labeler.is_file():
-        data = load_yaml_file(labeler) or {}
-        if isinstance(data, dict):
-            for label in data:
-                refs.append((str(label), labeler))
+        for label in as_dict(load_yaml_file(labeler)):
+            refs.append((str(label), labeler))
     return refs
 
 

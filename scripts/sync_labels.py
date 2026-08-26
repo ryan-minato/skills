@@ -83,6 +83,11 @@ def load_desired(path):
     return labels
 
 
+# gh paginates label listings; a truncated listing would classify existing
+# labels as "create" and make the apply fail halfway through.
+LABEL_PAGE_LIMIT = 1000
+
+
 def fetch_current(repo):
     stdout = run_gh(
         [
@@ -93,13 +98,21 @@ def fetch_current(repo):
             "--json",
             "name,color,description",
             "--limit",
-            "200",
+            str(LABEL_PAGE_LIMIT),
         ]
     )
     try:
         entries = json.loads(stdout)
     except json.JSONDecodeError:
         fail(1, "could not parse 'gh label list' output as JSON")
+    if isinstance(entries, list) and len(entries) >= LABEL_PAGE_LIMIT:
+        fail(
+            1,
+            f"{repo} returned {len(entries)} labels, at or above the "
+            f"{LABEL_PAGE_LIMIT} listing limit — the listing may be "
+            "truncated, which would turn existing labels into creates. "
+            "Raise LABEL_PAGE_LIMIT and re-run.",
+        )
     return {
         str(entry["name"]).lower(): {
             "name": str(entry["name"]),

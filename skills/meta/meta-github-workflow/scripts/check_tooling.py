@@ -236,9 +236,11 @@ def probe_org(owner: str, owner_type: str | None, hostname: str | None) -> dict:
                 "permissions, or the feature being off"
             ),
         }
-    count = len(issue_types.get("issue_types", issue_types)) if isinstance(
-        issue_types, (list, dict)
-    ) else None
+    # The endpoint returns a JSON array on some versions and an object with
+    # an "issue_types" array on others; anything else is reported as unknown.
+    if isinstance(issue_types, dict):
+        issue_types = issue_types.get("issue_types")
+    count = len(issue_types) if isinstance(issue_types, list) else None
     return {"applicable": True, "issue_types": {"responding": True, "count": count}}
 
 
@@ -290,19 +292,19 @@ def main() -> int:
     if args.repo and not REPO_RE.match(args.repo):
         parser.error("--repo must be OWNER/REPO (no spaces, exactly one '/')")
 
+    # Filled probe by probe so a later crash still reports the earlier ones.
+    report: dict = {}
     try:
         gh = probe_gh(args.hostname)
-        report: dict = {
-            "gh": gh,
-            "token_env": probe_token_env(),
-            "network": probe_network(args.skip_network, args.hostname),
-            "docs": docs_hint(args.hostname),
-            "plan": unknown(
-                "plan/tier is not reliably readable by API — check the owner's "
-                "billing/settings page, or infer from which gated features "
-                "respond"
-            ),
-        }
+        report["gh"] = gh
+        report["token_env"] = probe_token_env()
+        report["network"] = probe_network(args.skip_network, args.hostname)
+        report["docs"] = docs_hint(args.hostname)
+        report["plan"] = unknown(
+            "plan/tier is not reliably readable by API — check the owner's "
+            "billing/settings page, or infer from which gated features "
+            "respond"
+        )
         if args.repo:
             if not (gh["installed"] and gh["authenticated"]):
                 report["repository"] = {
@@ -324,7 +326,12 @@ def main() -> int:
                         owner, repository.get("owner_type"), args.hostname
                     )
     except Exception as exc:  # any probe crash is exit 1, per the contract
+        # Still emit whatever earlier probes gathered: stage 1 evidences the
+        # capability quadrant, and discarding it would cost the whole probe.
         print(f"error: a probe crashed unexpectedly: {exc}", file=sys.stderr)
+        report["error"] = f"a probe crashed unexpectedly: {exc}"
+        json.dump(report, sys.stdout, indent=2)
+        print()
         return 1
 
     json.dump(report, sys.stdout, indent=2)
