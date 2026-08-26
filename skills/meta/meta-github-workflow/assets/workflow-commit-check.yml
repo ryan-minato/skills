@@ -3,7 +3,9 @@
 # PR TITLE becomes the commit subject, so title mode is the default here;
 # switch to the range step (and delete the title step) when the
 # repository merges or rebases branch commits. fetch-depth: 0 is
-# load-bearing for range mode: a shallow checkout validates nothing.
+# load-bearing for range mode: a shallow checkout validates nothing. The
+# checkout is pinned to the BASE commit so a pull request cannot replace
+# the validator that judges it.
 name: commit-check
 
 on:
@@ -24,12 +26,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.base.sha }}
           fetch-depth: 0
       - name: Validate the squash subject (PR title)
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: python3 scripts/check_commits.py --message "$TITLE"
-      # Range mode — use INSTEAD of the title step when branch commits land:
+      # Range mode — use BOTH steps INSTEAD of the title step when branch
+      # commits land. The base checkout does not contain the PR commits, so
+      # they are fetched from the base repository's pull ref, which works for
+      # fork pull requests too.
+      # - name: Fetch the pull request commits
+      #   env:
+      #     PR: ${{ github.event.pull_request.number }}
+      #   run: git fetch --no-tags origin "refs/pull/$PR/head"
       # - name: Validate the PR commit range
       #   env:
       #     BASE: ${{ github.event.pull_request.base.sha }}

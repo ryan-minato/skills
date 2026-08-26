@@ -28,10 +28,13 @@ jobs:
         run: |
           TAG_REGEX="$(sed -n 's/^Tag pattern: `\(.*\)`$/\1/p' {{VERSIONING_POLICY_PATH}})"
           if [ -z "$TAG_REGEX" ]; then
-            echo "::error::Unable to read 'Tag pattern: `...`' from {{VERSIONING_POLICY_PATH}}; the policy and this check are out of step."
+            echo "::error::Unable to read a 'Tag pattern: \`REGEX\`' line from {{VERSIONING_POLICY_PATH}}; the policy and this check are out of step."
             exit 1
           fi
-          if ! printf '%s\n' "$TAG" | grep -Eq "$TAG_REGEX"; then
+          # -x anchors the match: an unanchored policy pattern would let
+          # 'nightly-v1.2.3-wip' satisfy a check documented as enforcing the
+          # tag format.
+          if ! printf '%s\n' "$TAG" | grep -Eqx "$TAG_REGEX"; then
             echo "::error::Tag '$TAG' does not match the policy pattern $TAG_REGEX (see {{VERSIONING_POLICY_PATH}})."
             exit 1
           fi

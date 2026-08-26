@@ -56,7 +56,11 @@ config):
 - `merge_group` event ↔ every required-check workflow (when merge queue is
   on);
 - label taxonomy ↔ `release.yml` categories ↔ issue-form `labels:` ↔
-  labeler config (mechanically checked by the deposited taxonomy check);
+  labeler config (mechanically checked by the deposited taxonomy check, and
+  its paths filter ↔ the files it checks);
+- PR-template security checklist wording ↔ the checklist workflow's
+  `SECURITY_KEYWORD` (rewording the line without it fails every pull
+  request, fail-closed and unexplained);
 - directory or module ↔ CODEOWNERS pattern ↔ area label;
 - ruleset ↔ legacy branch protection (record both layers or drift is
   invisible);
