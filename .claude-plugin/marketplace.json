@@ -32,21 +32,19 @@
         "./skills/engineering/design-md",
         "./skills/engineering/devcontainer-authoring",
         "./skills/engineering/github-community",
-        "./skills/engineering/gitlab-community",
         "./skills/engineering/gitmoji",
         "./skills/engineering/goal-alignment"
       ],
-      "description": "General programming methodology skills, plus GitHub/GitLab community and conventions authoring and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
+      "description": "General programming methodology skills, GitHub community and conventions authoring, and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
     },
     {
       "name": "ops",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/ops/github-ops",
-        "./skills/ops/gitlab-ops"
+        "./skills/ops/github-ops"
       ],
-      "description": "Platform operations: consolidated GitHub and GitLab day-to-day workflows (issues, PRs/MRs, CI, planning, releases, research, wiki) with tooling setup and pre-publish review."
+      "description": "Consolidated GitHub day-to-day operations (issues, PRs, CI, planning, releases, Discussions, research, and guardrails) with tooling setup and pre-publish review."
     },
     {
       "name": "meta",

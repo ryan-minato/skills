@@ -11,9 +11,9 @@
 | Catalog | 内容 | 安装范围 |
 |---|---|---|
 | [`core`](skills/core/) | 推荐在所有环境安装的 skill | 全局（用户级） |
-| [`engineering`](skills/engineering/) | 通用编程方法论类 skill,外加 GitHub/GitLab 社区文件创作(模板、标签、规范、健康文件)与窄域工件创作工作流(如 Dev Container 工件) | 按需安装到项目 |
-| [`meta`](skills/meta/) | 用于完整 agent harness、DESIGN.md，以及可复现 Python、ML 和数据科学项目脚手架的一次性构建技能 | 安装到项目，harness 验证后移除 |
-| [`ops`](skills/ops/) | 平台操作：整合的 GitHub 与 GitLab 日常工作流，含工具链配置 | 按需安装到项目 |
+| [`engineering`](skills/engineering/) | 通用编程方法论类 skill、GitHub 社区文件创作（模板、标签、规范、健康文件）与窄域工件创作工作流（如 Dev Container 工件） | 按需安装到项目 |
+| [`meta`](skills/meta/) | 用于完整 agent harness、GitLab 生命周期工作流、DESIGN.md，以及可复现 Python、ML 和数据科学项目脚手架的一次性构建技能 | 安装到项目，harness 验证后移除 |
+| [`ops`](skills/ops/) | GitHub 日常平台操作，含工具链配置与发布前审查 | 按需安装到项目 |
 | [`writing`](skills/writing/) | 面向人类读者的写作：体裁类（学术、博客/评论、文案）与载体类（LaTeX、Typst、Markdown） | 按需安装到项目 |
 
 每个 catalog 的 README 列出了其包含的 skill。

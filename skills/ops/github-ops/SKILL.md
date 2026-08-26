@@ -8,7 +8,7 @@ description: >
   releases; investigating a GitHub URL or public repository; applying reviewed
   repository guardrails; or fixing missing or unauthenticated GitHub tooling.
   Authoring templates, taxonomies, workflows, policy, CODEOWNERS, Dependabot, or
-  community files belongs to github-community; GitLab work belongs to gitlab-ops.
+  community files belongs to github-community. GitLab work is out of scope.
 license: Apache-2.0
 compatibility: >
   Bundled scripts require Python 3.9+ (stdlib only). rest_read.py needs
@@ -24,7 +24,7 @@ checks, Discussions, planning structures, releases, read-only research on
 any repository, and setting up the tooling all of it uses. Authoring a
 repository's templates, label taxonomy, commit/release policy, or
 community health files is out of scope (the `github-community` skill's
-territory), as is GitLab work (`gitlab-ops`).
+territory). GitLab work is out of scope.
 
 ## Choose your path (do this first, once per session)
 
