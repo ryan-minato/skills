@@ -30,8 +30,10 @@ format and protection agree.
 ## Environments and deployments
 
 Environments gate deployment workflows. Required reviewers and wait timers
-are **public-repository-only below Enterprise**; on a private repository
-deploy authority is a ruleset condition or a named human step — say which.
+are free on public repositories; on a **private** repository they need a
+paid plan, so confirm the probed plan before promising them. Where the plan
+does not carry them, deploy authority is a ruleset condition or a named
+human step — say which.
 Prefer OIDC to long-lived cloud secrets; deployment workflows carry
 `queue`-shaped concurrency, not cancel-in-progress. Record each
 environment, its approvers, and its secrets (names only) in

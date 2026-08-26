@@ -5,9 +5,9 @@ stores machine-learning models.
 
 ## GitHub is the index and the gate, never the tracker or the store
 
-GitHub has **no experiment tracking and no model registry** (GitHub Models
-was a retired third-party inference catalog, not a registry — never cite
-it). Preserve the project's existing tracker (MLflow, W&B, DVC, or
+GitHub has **no experiment tracking and no model registry**. GitHub Models
+is a first-party model catalog and inference/evaluation surface, not a
+registry and not a tracker; never cite it as one. Preserve the project's existing tracker (MLflow, W&B, DVC, or
 similar); do not migrate it, and do not simulate a tracker out of issues.
 GitHub's role is what it is natively good at: the code and config live in
 the repository, the run record is committed, promotion is a pull request

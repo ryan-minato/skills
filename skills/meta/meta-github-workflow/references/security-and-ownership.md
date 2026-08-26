@@ -49,8 +49,9 @@ private reports). Never route security reports through the issue tracker.
 
 Secrets and variables are recorded by name and owner, never by value.
 Prefer OIDC over long-lived cloud credentials. Environment protection
-(required reviewers, wait timers) is public-repository-only below
-Enterprise — on a private repository deploy authority is a ruleset or a
+(required reviewers, wait timers) is free on public repositories and needs
+a paid plan on private ones — check the probed plan rather than assuming
+either way. Where it is unavailable, deploy authority is a ruleset or a
 named human step, and the design says which. The design-tree decision on
 which workflows may hold a secret or an OIDC identity is recorded here and
 enforced by `permissions:` blocks per

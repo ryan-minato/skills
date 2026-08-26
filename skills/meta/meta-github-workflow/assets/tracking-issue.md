@@ -1,12 +1,11 @@
----
-name: Tracking issue
-about: >-
-  A long-horizon goal agreed through the consensus process — maintainers
-  only. The linked milestone holds the date; this issue holds everything
-  else.
-title: "Tracking: {{GOAL_TITLE}}"
-labels: ["task"]
----
+<!-- Body shape for a tracking issue: a long-horizon goal agreed through the
+consensus process. Title it `Tracking: {{GOAL_TITLE}}` and apply the goal
+label; the linked milestone holds the date, this issue holds everything else.
+
+Do NOT install this under .github/ISSUE_TEMPLATE/ — GitHub has no
+maintainer-only template, so it would appear in the chooser for every
+visitor, and non-interactive creation ignores templates anyway. Keep it in
+project knowledge and pass the finished body to the create call. -->
 
 ## Vision
 
