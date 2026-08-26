@@ -12,8 +12,10 @@ description: >-
   invoke it, and neither does the GitHub Flow branching model.
 license: Apache-2.0
 compatibility: >-
-  Bundled tools require Python 3.9+ (stdlib only). Live GitHub discovery
-  requires network access; remote inspection or writes require an
+  Bundled tools require Python 3.9+ and use only the standard library, except
+  `assets/check_taxonomy.py`, which needs PyYAML to parse the four YAML
+  dialects it checks and installs it in the CI job that runs it. Live GitHub
+  discovery requires network access; remote inspection or writes require an
   authenticated gh CLI or a GitHub MCP capability, adequate permissions, and
   explicit user approval.
 ---

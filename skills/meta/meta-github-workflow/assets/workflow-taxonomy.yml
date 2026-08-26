@@ -1,0 +1,45 @@
+# .github/workflows/taxonomy.yml — runs the committed taxonomy checker so a
+# label referenced by an issue form, release.yml, or the labeler but absent
+# from labels.json fails the pull request instead of being dropped silently
+# at runtime. Runs only when one of those files changes; the paths filter and
+# the aggregator gate must agree, or a skipped run reads as a vacuous pass.
+name: taxonomy
+
+on:
+  pull_request:
+    paths:
+      - ".github/labels.json"
+      - ".github/release.yml"
+      - ".github/labeler.yml"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "scripts/check_taxonomy.py"
+  push:
+    branches: ["{{DEFAULT_BRANCH}}"]
+    paths:
+      - ".github/labels.json"
+      - ".github/release.yml"
+      - ".github/labeler.yml"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "scripts/check_taxonomy.py"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  taxonomy:
+    name: taxonomy / consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      # The one dependency this harness installs in CI: the checker parses
+      # four YAML dialects, which the standard library cannot do. Pinned so a
+      # PyYAML release cannot change what the check accepts.
+      - run: pip install pyyaml==6.0.2
+      - run: python3 scripts/check_taxonomy.py

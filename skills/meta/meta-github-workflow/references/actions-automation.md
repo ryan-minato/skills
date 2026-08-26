@@ -20,8 +20,13 @@ the `assets/` directory). Recipes only, adopt on explicit request:
 - **Issue regex labeler** — heuristic guessing on contributor-facing
   objects; the forms' `labels:` key already labels deterministically. Only
   for high-volume repositories that must keep blank issues enabled.
-- **CODEOWNERS errors check** — specified in
-  [security-and-ownership.md](security-and-ownership.md); wire it here.
+- **CODEOWNERS errors check** — `gh api repos/OWNER/REPO/codeowners/errors`
+  returns GitHub's own parse result. Wire it as a job that fails when the
+  response lists any error, triggered on same-repo pull requests touching
+  the file, on push to the default branch, and on a weekly `schedule`:
+  ownership breaks when a user leaves the org, with no commit at all. Fork
+  pull requests cannot read it — the endpoint needs a token with repository
+  access, so keep the trigger same-repo.
 - **Auto-assign and review rotation** — org-level team settings do this
   natively; prefer the platform setting.
 
