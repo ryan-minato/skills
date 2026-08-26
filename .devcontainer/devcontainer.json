@@ -14,9 +14,6 @@
       "toolsToInstall": "pre-commit,rust-just,ruff"
     }
   },
-  "containerEnv": {
-    "GH_TOKEN": "${localEnv:GH_TOKEN}"
-  },
   "customizations": {
     "vscode": {
       "extensions": [
