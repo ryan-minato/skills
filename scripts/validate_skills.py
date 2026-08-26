@@ -34,9 +34,7 @@ MARKETPLACE_MANIFEST = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 LEGACY_PLUGIN_MANIFEST = REPO_ROOT / ".claude-plugin" / "plugin.json"
 ARCHITECTURE_MD = REPO_ROOT / "ARCHITECTURE.md"
 CORE_META_HARNESS = SKILLS_DIR / "core" / "meta-harness" / "SKILL.md"
-ARCHITECTURE_META_HARNESS = (
-    SKILLS_DIR / "meta-harness" / "meta-harness-architecture" / "SKILL.md"
-)
+META_ARCHITECTURE = SKILLS_DIR / "meta" / "meta-harness-architecture" / "SKILL.md"
 HARNESS_METHODOLOGY_HEADING = "## Harness Methodology"
 
 ESCAPING_LINK = re.compile(r"\]\((?:\.\./|/)[^)]*\)")
@@ -335,14 +333,14 @@ def _markdown_section(text: str, heading: str) -> str | None:
 
 def check_meta_harness_methodology() -> None:
     """Keep the durable core methodology equal to its complete superset."""
-    if not CORE_META_HARNESS.is_file() or not ARCHITECTURE_META_HARNESS.is_file():
+    if not CORE_META_HARNESS.is_file() or not META_ARCHITECTURE.is_file():
         return
     core = _markdown_section(
         CORE_META_HARNESS.read_text(encoding="utf-8"),
         HARNESS_METHODOLOGY_HEADING,
     )
     architecture = _markdown_section(
-        ARCHITECTURE_META_HARNESS.read_text(encoding="utf-8"),
+        META_ARCHITECTURE.read_text(encoding="utf-8"),
         HARNESS_METHODOLOGY_HEADING,
     )
     if core is None:
@@ -353,14 +351,14 @@ def check_meta_harness_methodology() -> None:
         )
     if architecture is None:
         fail(
-            f"{ARCHITECTURE_META_HARNESS.relative_to(REPO_ROOT)}: missing "
+            f"{META_ARCHITECTURE.relative_to(REPO_ROOT)}: missing "
             f"`{HARNESS_METHODOLOGY_HEADING}`. The complete skill owns the "
             "shared methodology section."
         )
     if core is not None and architecture is not None and core != architecture:
         fail(
-            "meta-harness methodology drifted: the `## Harness Methodology` "
-            "sections in core/meta-harness and meta-harness-architecture must "
+            "meta methodology drifted: the `## Harness Methodology` sections "
+            "in core/meta-harness and meta/meta-harness-architecture must "
             "be byte-identical. Update the architecture source first, then "
             "copy that section into the core subset."
         )

@@ -32,10 +32,10 @@ Public skills are grouped into catalogs under `skills/`:
   plus narrowly scoped artifact-authoring workflows (e.g. Dev Container
   Features, Templates, and image prebuilds) that do not warrant a
   catalog of their own.
-- `meta-harness` — disposable, project-scoped builders for complete agent
-  harness architecture, visual design, and reproducible Python, ML, and
-  data-science scaffolds. Their durable output lives in the target project;
-  the builders are removed after verification.
+- `meta` — disposable, project-scoped builders for complete agent harness
+  architecture, visual design, and reproducible Python, ML, and data-science
+  scaffolds. Their durable output lives in the target project; the builders are
+  removed after verification.
 - `ops` — platform operations: consolidated GitHub and GitLab day-to-day
   workflow skills (issues, PRs/MRs, CI, planning, releases, research, wiki)
   with embedded tooling setup and pre-publish review.

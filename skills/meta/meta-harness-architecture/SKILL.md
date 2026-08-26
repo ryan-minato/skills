@@ -167,7 +167,7 @@ When the needed builder is unknown, run the bundled
 [live discovery script](scripts/discover.py):
 
 ```bash
-python3 scripts/discover.py --catalog meta-harness
+python3 scripts/discover.py --catalog meta
 ```
 
 It reads the current repository inventory rather than carrying a static catalog.

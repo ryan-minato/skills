@@ -12,7 +12,7 @@ and other compatible clients) how to perform specific tasks well.
 |---|---|---|
 | [`core`](skills/core/) | Skills recommended for every environment | Global (user-level) |
 | [`engineering`](skills/engineering/) | General programming methodology skills, plus GitHub/GitLab community authoring (templates, labels, conventions, health files) and narrow artifact-authoring workflows (e.g. Dev Container artifacts) | Per project, as needed |
-| [`meta-harness`](skills/meta-harness/) | Disposable builders for complete agent harnesses, DESIGN.md, and reproducible Python, ML, and data-science project scaffolds | Per project, remove after the harness is verified |
+| [`meta`](skills/meta/) | Disposable builders for complete agent harnesses, DESIGN.md, and reproducible Python, ML, and data-science project scaffolds | Per project, remove after the harness is verified |
 | [`ops`](skills/ops/) | Platform operations: consolidated GitHub and GitLab day-to-day workflows with tooling setup | Per project, as needed |
 | [`writing`](skills/writing/) | Human-audience writing: genre skills (academic, blog/opinion, copy) and medium skills (LaTeX, Typst, Markdown) | Per project, as needed |
 
@@ -37,7 +37,7 @@ npx skills add ryan-minato/skills --skill <skill-name> -g
 
 `core` skills are recommended for global installation so they are available
 in every project. Install other catalogs into the projects that need them;
-`meta-harness` contains temporary builders that should be removed after their
+`meta` contains temporary builders that should be removed after their
 durable output is verified.
 
 ### As Claude Code plugins
@@ -49,7 +49,7 @@ need:
 ```
 /plugin marketplace add ryan-minato/skills
 /plugin install core@ryan-minato-skills
-/plugin install ops@ryan-minato-skills      # or engineering@, meta-harness@, writing@, ...
+/plugin install ops@ryan-minato-skills      # or engineering@, meta@, writing@, ...
 ```
 
 ## Contributing
