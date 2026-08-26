@@ -1,12 +1,8 @@
-#!/usr/bin/env -S uv run
-# /// script
-# dependencies = []
-# requires-python = ">=3.11"
-# ///
+#!/usr/bin/env python3
 """Probe the local environment for GitLab tooling and print a JSON report.
 
 Usage:
-    uv run scripts/check_tooling.py [--hostname HOST] [--skip-network]
+    python3 scripts/check_tooling.py [--hostname HOST] [--skip-network]
 
 Probes (all read-only; nothing is installed or changed):
 - host:      the GitLab host being probed and where it came from
@@ -22,9 +18,10 @@ Probes (all read-only; nothing is installed or changed):
 - network:   HTTPS reachability of https://HOST/api/v4/projects (any HTTP
              response, including 401, counts as reachable) and the HTTP
              status of https://HOST/api/v4/mcp — a 404 there means the
-             instance is older than GitLab 18.6 or the Duo MCP server is
-             unavailable/disabled; any other response means the endpoint
-             exists. Disabled by --skip-network.
+             endpoint is not available on this instance (version, tier, or
+             configuration; confirm which against the instance's own
+             documentation); any other response means the endpoint exists.
+             Disabled by --skip-network.
 
 This script cannot see MCP session state. Whether a GitLab MCP server is
 connected can only be answered by inspecting the agent's own tool list.
@@ -161,7 +158,7 @@ def main() -> int:
             "unexpectedly, 2 = bad arguments."
         ),
         epilog=(
-            "Example: uv run scripts/check_tooling.py "
+            "Example: python3 scripts/check_tooling.py "
             "--hostname gitlab.example.com --skip-network"
         ),
     )

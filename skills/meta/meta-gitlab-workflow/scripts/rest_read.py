@@ -1,8 +1,4 @@
-#!/usr/bin/env -S uv run
-# /// script
-# dependencies = []
-# requires-python = ">=3.11"
-# ///
+#!/usr/bin/env python3
 """Read-only GitLab reader for the lifecycle-harness fallback tier.
 
 This is the last-resort read tier: prefer an authenticated glab CLI or a
@@ -20,7 +16,7 @@ field projection by default so responses stay small in agent context; --raw
 returns the unprojected payload.
 
 Usage:
-    uv run scripts/rest_read.py SUBCOMMAND --project GROUP/NAME [options]
+    python3 scripts/rest_read.py SUBCOMMAND --project GROUP/NAME [options]
 
 --project takes the full nested path (GROUP[/SUBGROUP]/NAME); it is
 URL-encoded internally. Issues and merge requests are addressed by IID (the
@@ -599,7 +595,7 @@ def build_parser() -> argparse.ArgumentParser:
             "exit codes 0/1/2 per module docstring"
         ),
         epilog=(
-            "Example: uv run scripts/rest_read.py issue --host gitlab.com "
+            "Example: python3 scripts/rest_read.py issue --host gitlab.com "
             "--project group/project --number 42. Last-resort read tier: "
             "prefer an authenticated glab CLI or a "
             "connected MCP server when available, and minimize requests — "

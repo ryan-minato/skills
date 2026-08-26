@@ -10,9 +10,9 @@ description: >-
   isolated operational answer or version-control strategy.
 license: Apache-2.0
 compatibility: >-
-  Bundled tools require uv and Python 3.11+. Live GitLab discovery requires
-  network access; remote inspection or writes require suitable GitLab tooling,
-  authentication, permissions, and explicit user approval.
+  Bundled tools require Python 3.9+ (stdlib only). Live GitLab discovery
+  requires network access; remote inspection or writes require suitable GitLab
+  tooling, authentication, permissions, and explicit user approval.
 ---
 
 # GitLab Lifecycle Harness

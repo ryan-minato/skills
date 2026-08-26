@@ -32,7 +32,7 @@ user named another target, use it and do not silently substitute the checkout.
 
 ## Choose one tool path
 
-Run `uv run scripts/check_tooling.py --hostname HOST`.
+Run `python3 scripts/check_tooling.py --hostname HOST`.
 
 1. Prefer authenticated `glab` for broad GitLab operations.
 2. Otherwise use a connected GitLab MCP capability whose description exactly
