@@ -32,7 +32,8 @@ Default trigger contract when CI is approved:
 - tests run for merge-request pipelines and the default branch, not ordinary
   non-MR branch pipelines;
 - use the target version's supported workflow/rules configuration to avoid
-  duplicate branch and MR pipelines;
+  duplicate branch and MR pipelines; a branch with an open MR must not run both
+  a branch pipeline and an MR pipeline for the same commit;
 - enable redundant-pipeline cancellation and mark cancellable test jobs
   interruptible so one MR retains tests only for its latest commit;
 - keep protected-branch or deployment jobs non-interruptible when cancellation
