@@ -47,7 +47,15 @@ Before editing the skill, write:
    load decision for each.
 2. Two or three representative outcome tasks and a rubric of observable
    requirements. Mark critical failures and declare the aggregate score needed
-   to pass before seeing candidate output.
+   to pass at that tier before seeing candidate output.
+
+Run every solver on the least capable model tier the skill is meant to
+support — the weakest tier this harness offers at or above that floor — for
+trigger accuracy and outcome quality alike. A stronger solver clears the
+rubric on its own priors instead of on the skill, certifying one that breaks
+below the tier it claims, and floor runs cost less. If the harness fixes the
+solver model, or a tier is escalated, acceptance covers only the tier that
+ran.
 
 ## 3. Make the tests green
 
@@ -70,18 +78,24 @@ then test the candidate:
   valid output cannot be obtained.
 - **Independent grading:** anonymize solver identities and give the outputs,
   rubric, and critical requirements to a clean-context subagent that produced
-  none of the answers. Require a score and concrete evidence for every item.
-  Accept the candidate only when it has no critical failure and its aggregate
-  score meets the threshold declared before the run.
+  none of the answers. Grade on a model capable enough to apply the rubric
+  reliably; the floor tier covers solvers, not the grader, and a weak grader
+  turns the scores into noise. Require a score and concrete evidence for every
+  item. Accept the candidate only when it has no critical failure and its
+  aggregate score meets the threshold declared before the run.
 
 On failure, fix the underlying instruction rather than patching one test
-prompt, then rerun the complete affected evaluation.
+prompt, then rerun the complete affected evaluation. A floor-tier solver that
+cannot complete the task at all with the target loaded is a finding about the
+claimed floor, not an invalid attempt: strengthen the instruction to carry
+that tier, or escalate one tier and rerun. A completed but low-scoring output
+is an instruction failure, not a reason to escalate.
 
 ## 4. Clean up and report
 
-Record the cases, observation method, rubric, results, scores, evidence, every
-isolation degradation, and any skipped test with its reason in the handoff or
-pull request. Remove every detached candidate test worktree, snapshot, harness,
-fixture, and evaluation output. Keep the current change worktree for the
-remaining commit and PR workflow, and confirm its `git status` shows only the
-intended repository changes.
+Record the cases, observation method, solver tier, rubric, results, scores,
+evidence, every isolation degradation, and any skipped test with its reason
+in the handoff or pull request. Remove every detached candidate test
+worktree, snapshot, harness, fixture, and evaluation output. Keep the current
+change worktree for the remaining commit and PR workflow, and confirm its
+`git status` shows only the intended repository changes.
