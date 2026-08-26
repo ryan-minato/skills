@@ -93,6 +93,8 @@ Catalogs section of `ARCHITECTURE.md`.
 | Catalog added/removed | Catalog scaffold, the Catalogs section in `ARCHITECTURE.md`, `.claude-plugin/marketplace.json` (a plugin entry once the catalog has a skill) |
 | Any `README.md` | The matching `README.zh.md` (and vice versa) |
 | `.github/labels.json` | After explicit authorization, dry-run `python3 scripts/sync_labels.py --file .github/labels.json --repo ryan-minato/skills`, then re-run with `--apply`; never `--prune` |
+| `scripts/sync_labels.py` | Its origin, `skills/meta/meta-github-workflow/scripts/sync_labels.py` — the copy exists because public skills cannot reference repo files; keep behavior identical or record why it diverged |
+| A catalog is removed | Drop it from `.github/labels.json`, both Issue Forms' `Catalog` options, and the `catalogLabels` map in `.github/workflows/issue-metadata.yml`, and add its label to `retiredCatalogLabels` in that workflow so stale labels can still be stripped |
 | Issue Form `Priority` or `Catalog` options | `.github/labels.json` and `.github/workflows/issue-metadata.yml` mappings |
 | PR template headings or required checklist | `.github/workflows/pr-policy.yml` validation |
 | Repo structure or check commands | This file and `ARCHITECTURE.md` |
