@@ -11,6 +11,10 @@ then use the capability the target actually exposes.
 
 ## Content contracts
 
+Rework the description-template assets for the selected types:
+`assets/issue-template-task.md`, `assets/issue-template-issue.md`,
+`assets/issue-template-incident.md`, and `assets/mr-template-default.md`.
+
 ### Task
 
 Use for planned project evolution. Include content, explicit outcome, context

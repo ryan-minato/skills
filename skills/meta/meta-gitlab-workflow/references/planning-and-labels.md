@@ -32,7 +32,9 @@ needed behavior.
 
 Minimum taxonomy unless equivalent existing labels cover it:
 
-- Type: bug, feature, incident, refactor, task.
+- Type: bug, feature, incident, refactor, task. `bug` is the label for the
+  Issue content contract in [work-items-and-mrs.md](work-items-and-mrs.md);
+  pick one name per concept and use it in labels, templates, and prose alike.
 - Priority: semantic high/medium/low by default; let the user choose P0-P5 or a
   documented project vocabulary instead.
 - Status: needs-triage and blocked. Add workflow labels only when status fields
@@ -41,10 +43,12 @@ Minimum taxonomy unless equivalent existing labels cover it:
   from real ownership and architecture boundaries. Never ship fictional areas.
 
 Every label needs a unique name, distinct color, concise meaning, allowed
-combinations, creator/removal trigger, and owner. Keep the approved taxonomy in
-a target-project JSON file and its human/agent meanings in reachable guidance.
-Run `sync_labels.py` without `--apply`, review creates/updates/deletes, and do
-not prune existing labels without separate explicit approval.
+combinations, creator/removal trigger, and owner. Rework
+`assets/labels.json` into the target-project taxonomy
+file and keep its human/agent meanings in reachable guidance. Run
+`sync_labels.py` against that file without `--apply`, review
+creates/updates/deletes, and do not prune existing labels without separate
+explicit approval.
 
 ## Milestones and hierarchy
 

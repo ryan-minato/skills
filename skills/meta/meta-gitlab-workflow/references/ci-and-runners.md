@@ -21,9 +21,10 @@ a pipeline that will remain pending or install infrastructure as a side effect.
 
 ## Mirror local checks
 
-Start from commands that exist and pass locally. CI mirrors them; it does not
-invent a second quality system. Record each CI job and its exact local
-reproduction command in the durable harness.
+Rework `assets/gitlab-ci.yml` once CI is approved. Start from commands that
+exist and pass locally; CI mirrors them and does not invent a second quality
+system. Record each CI job and its exact local reproduction command in the
+durable harness.
 
 Default trigger contract when CI is approved:
 
