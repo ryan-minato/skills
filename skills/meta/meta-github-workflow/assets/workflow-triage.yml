@@ -44,9 +44,14 @@ jobs:
             const triaged = hasType && priorities.length === 1;
             const hasNeedsTriage = labels.includes('status/needs-triage');
             if (triaged && hasNeedsTriage) {
-              await github.rest.issues.removeLabel({
-                owner, repo, issue_number, name: 'status/needs-triage',
-              }).catch(() => {});
+              try {
+                await github.rest.issues.removeLabel({
+                  owner, repo, issue_number, name: 'status/needs-triage',
+                });
+              } catch (error) {
+                // A concurrent update may already have removed the label.
+                if (error.status !== 404) throw error;
+              }
             } else if (!triaged && !hasNeedsTriage && context.payload.action === 'opened') {
               await github.rest.issues.addLabels({
                 owner, repo, issue_number, labels: ['status/needs-triage'],

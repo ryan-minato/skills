@@ -1,6 +1,6 @@
 <!-- .github/pull_request_template.md — the checklist workflow parses the
-## headings of this file, so renaming a heading and updating the workflow
-is one change, not two. -->
+headings of this file, so renaming a heading and updating the workflow is
+one change, not two. -->
 
 ## What and why
 
