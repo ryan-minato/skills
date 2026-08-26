@@ -80,11 +80,6 @@
     "description": "Work affecting the meta skill catalog"
   },
   {
-    "name": "catalog/ops",
-    "color": "006b75",
-    "description": "Work affecting the ops skill catalog"
-  },
-  {
     "name": "catalog/writing",
     "color": "0e8a16",
     "description": "Work affecting the writing skill catalog"

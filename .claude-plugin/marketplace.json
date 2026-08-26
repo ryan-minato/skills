@@ -31,20 +31,10 @@
         "./skills/engineering/code-refactoring",
         "./skills/engineering/design-md",
         "./skills/engineering/devcontainer-authoring",
-        "./skills/engineering/github-community",
         "./skills/engineering/gitmoji",
         "./skills/engineering/goal-alignment"
       ],
-      "description": "General programming methodology skills, GitHub community and conventions authoring, and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
-    },
-    {
-      "name": "ops",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/ops/github-ops"
-      ],
-      "description": "Consolidated GitHub day-to-day operations (issues, PRs, CI, planning, releases, Discussions, research, and guardrails) with tooling setup and pre-publish review."
+      "description": "General programming methodology skills and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
     },
     {
       "name": "meta",
@@ -53,12 +43,13 @@
       "skills": [
         "./skills/meta/data-science-project-scaffold",
         "./skills/meta/meta-disposal",
+        "./skills/meta/meta-github-workflow",
         "./skills/meta/meta-gitlab-workflow",
         "./skills/meta/meta-harness-architecture",
         "./skills/meta/ml-project-scaffold",
         "./skills/meta/python-project-defaults"
       ],
-      "description": "Disposable, project-scoped builders for complete agent harness architecture, GitLab lifecycle workflows, and reproducible Python, ML, and data-science project scaffolds."
+      "description": "Disposable, project-scoped builders for complete agent harness architecture, GitHub and GitLab lifecycle workflows, and reproducible Python, ML, and data-science project scaffolds."
     },
     {
       "name": "writing",

@@ -3,65 +3,25 @@
 Rules, notes, and references that apply only to skills in this catalog.
 (Repo-wide standards live in `.agents/knowledge/skill-quality.md`.)
 
-The catalog holds three classes of skills:
+The catalog holds two classes of skills:
 
 - **Methodology skills** (code-refactoring, gitmoji, goal-alignment):
   approaches that transfer across languages and frameworks.
-- **Platform community skills** (github-community): authoring the files
-  that define how a repository's collaboration works — templates, label
-  taxonomies, commit and release policy, CI validation, community health
-  files, and generated project-level skills. These are the explicit
-  exemption to the transfer-across-stacks rule: their value lands in what
-  they leave behind in the target project, not in the skill staying
-  installed. Day-to-day platform *operations* belong to the `ops` catalog;
-  building a GitLab project's complete lifecycle harness belongs to the
-  disposable `meta` catalog.
-- **Artifact-authoring skills** (devcontainer-authoring): the full
+- **Artifact-authoring skills** (devcontainer-authoring, design-md): the full
   design→test→publish lifecycle of a specific engineering artifact
   ecosystem that is too narrow to justify its own catalog. Also exempt
   from the transfer-across-stacks rule: toolchain-specific content is
   acceptable; day-to-day operation of a tool is not.
+
+Building a GitHub or GitLab project's complete lifecycle harness —
+including its collaboration files and generated project skills — belongs
+to the disposable `meta` catalog, not here.
 
 ## Requirements — methodology skills
 
 - The guidance must transfer across stacks: examples may use a concrete
   language for illustration, but the instructions themselves must not
   change when the tech stack changes.
-
-## Requirements — platform community skills
-
-- **Local-files doctrine.** Community skills write local files only —
-  templates, configs, workflows, docs, generated skills; the project's own
-  git flow publishes them. Nothing they do publishes directly, so they
-  embed no full pre-publish gate; the *generated* project-level skills
-  that publish carry a condensed gate instead (canonical copies live in
-  each community skill's `assets/project-skill-*.md`).
-- **Assess the project first.** Every community skill opens by
-  inventorying what the project already defines (templates, labels,
-  workflows, community files, AGENTS.md/CLAUDE.md, skills directory) and
-  never invents structure parallel to what exists: build on it, or get
-  the user's explicit approval to replace it.
-- **Generated project skills are products.** Same quality bar as a
-  published skill: frontmatter `name` equals the directory name,
-  placeholders use `{{UPPER_SNAKE}}`, and zero leftover `{{...}}`
-  placeholders survive delivery.
-- **CI validation ships dependency-free and first-party.** First-party
-  actions only (`actions/*`, `github/*`); third-party actions only behind
-  explicit user opt-in, pinned to a commit SHA. Shipped validators are
-  stdlib-only python3 committed into the target repo.
-- **References are split by branching condition, not topic** — same rule
-  as the ops catalog: one file = one load condition, pointers state the
-  condition verbatim, opt-in automation and schema details are
-  sub-branches of their domain file.
-- MCP tools, where mentioned, are described by capability, never by name.
-- Skills are fully independent of each other: sibling skills (including
-  the `ops` skills) are named at most for disambiguation — never
-  path-linked, never accompanied by install instructions, and never
-  depended on behaviorally (self-containment).
-- Exact CLI names, CI keywords, schema keys, and platform file
-  conventions must be re-verified before publishing a skill revision —
-  GitHub form schemas, actions, and `release.yml` against
-  <https://docs.github.com>.
 
 ## Requirements — artifact-authoring skills
 
@@ -79,25 +39,16 @@ How to approach a cross-stack engineering problem → the methodology
 skills · aligning on what something should achieve and recording it as a
 goal document → `goal-alignment`; clarifying ambiguous requirements while
 already coding → `programming-guidelines` in `core`; implementation
-planning → neither (out of catalog scope) · authoring a GitHub
-repository's conventions or community health
-files → `github-community` · performing platform operations (filing
-issues, opening PRs, cutting releases) → the `ops` catalog's
-`github-ops` · building or systematically repairing a GitLab project's
-complete lifecycle harness → the `meta` catalog's
-`meta-gitlab-workflow` · authoring Dev Container artifacts (Features, Templates, prebuilt images) →
-`devcontainer-authoring`; consuming them in a project's own
-devcontainer.json → `devcontainer-setup` in `core`.
+planning → neither (out of catalog scope) · building or systematically
+repairing a GitHub or GitLab project's complete lifecycle harness —
+including its conventions, community files, and day-to-day platform
+workflows — → the `meta` catalog's `meta-github-workflow` /
+`meta-gitlab-workflow` · authoring Dev Container artifacts (Features,
+Templates, prebuilt images) → `devcontainer-authoring`; consuming them in
+a project's own devcontainer.json → `devcontainer-setup` in `core` ·
+durable visual-design specifications → `design-md`.
 
 ## References
-
-Platform community (scope: `github-community`):
-
-- Community health files (GitHub): <https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file>
-- Issue forms schema: <https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms>
-- Automatically generated release notes (`.github/release.yml`): <https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes>
-- GitHub Actions workflow syntax: <https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions>
-- Contributor Covenant: <https://www.contributor-covenant.org/>
 
 Dev Container (scope: `devcontainer-authoring`):
 

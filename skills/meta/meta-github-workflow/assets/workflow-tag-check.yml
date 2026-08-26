@@ -1,0 +1,50 @@
+# .github/workflows/tag-check.yml — validates pushed release tags. The
+# tag pattern is READ FROM the committed versioning policy, not copied
+# here: editing the policy needs no workflow change, and a missing
+# pattern fails loudly.
+name: tag-check
+
+on:
+  push:
+    tags:
+      # Police release tags only; align with the policy's tag prefix so
+      # convenience tags (latest, nightly) are not failed.
+      - "{{TAG_PREFIX}}*"
+
+permissions:
+  contents: read
+
+jobs:
+  tag:
+    name: tags / format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag matches the committed versioning policy
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          TAG_REGEX="$(sed -n 's/^Tag pattern: `\(.*\)`$/\1/p' {{VERSIONING_POLICY_PATH}})"
+          if [ -z "$TAG_REGEX" ]; then
+            echo "::error::Unable to read a 'Tag pattern: \`REGEX\`' line from {{VERSIONING_POLICY_PATH}}; the policy and this check are out of step."
+            exit 1
+          fi
+          # -x anchors the match: an unanchored policy pattern would let
+          # 'nightly-v1.2.3-wip' satisfy a check documented as enforcing the
+          # tag format.
+          if ! printf '%s\n' "$TAG" | grep -Eqx "$TAG_REGEX"; then
+            echo "::error::Tag '$TAG' does not match the policy pattern $TAG_REGEX (see {{VERSIONING_POLICY_PATH}})."
+            exit 1
+          fi
+      - name: Tagged commit is reachable from the default branch
+        env:
+          TAG: ${{ github.ref_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git fetch origin "$DEFAULT_BRANCH" --quiet
+          if ! git merge-base --is-ancestor "$TAG^{commit}" "origin/$DEFAULT_BRANCH"; then
+            echo "::error::Tag '$TAG' is not reachable from $DEFAULT_BRANCH — release tags are cut from the default branch."
+            exit 1
+          fi

@@ -26,19 +26,14 @@ justfile                         Canonical check recipes
 Public skills are grouped into catalogs under `skills/`:
 
 - `core` — skills recommended for global (user-level) installation.
-- `engineering` — general programming methodology skills, plus community
-  authoring for GitHub (templates, labels, commit/release conventions,
-  CI validation, community health files),
-  plus narrowly scoped artifact-authoring workflows (e.g. Dev Container
-  Features, Templates, image prebuilds, and durable visual-design
-  specifications) that do not warrant a catalog of their own.
+- `engineering` — general programming methodology skills, plus narrowly
+  scoped artifact-authoring workflows (e.g. Dev Container Features,
+  Templates, image prebuilds, and durable visual-design specifications)
+  that do not warrant a catalog of their own.
 - `meta` — disposable, project-scoped builders for complete agent harness
-  architecture, GitLab lifecycle workflows, and reproducible Python, ML, and
-  data-science scaffolds. Their durable output lives in the target project;
-  the builders are removed after verification.
-- `ops` — consolidated GitHub day-to-day operations (issues, PRs, CI,
-  planning, releases, Discussions, research, and guardrails) with embedded
-  tooling setup and pre-publish review.
+  architecture, GitHub and GitLab lifecycle workflows, and reproducible
+  Python, ML, and data-science scaffolds. Their durable output lives in the
+  target project; the builders are removed after verification.
 - `writing` — human-audience writing skills: genre skills (academic,
   blog/opinion, promotional copy) and medium skills (LaTeX, Typst,
   Markdown source); the general baseline `human-writing` lives in `core`.

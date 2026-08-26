@@ -1,0 +1,28 @@
+# .github/workflows/labeler.yml — applies area/* labels from
+# .github/labeler.yml, which shares its path map with CODEOWNERS.
+#
+# Default trigger is plain `pull_request`: label mutation then works for
+# same-repo PRs and FAILS on fork PRs (read-only token) — which is the
+# safe default. Escalate to `pull_request_target` ONLY when fork PRs are
+# evidenced, and never add a checkout or run any repository code in that
+# mode: the pinned labeler reads its config via the API and needs neither.
+name: labeler
+
+on: pull_request
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  area-labels:
+    name: pr / area-labels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v6
+        with:
+          sync-labels: false
