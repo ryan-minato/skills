@@ -93,7 +93,8 @@ DESIGN.md`; the dot-free alias avoids the `.md` command-resolution conflict.
    Record intentionally absent token groups in `omitted` when applicable.
 2. Every `{dot.path}` reference resolves; primitives only, except
    composites inside `components`.
-3. Dimensions carry `px`/`em`/`rem`; `fontWeight` numeric.
+3. Dimensions carry `px`/`em`/`rem`; `fontWeight` is numeric or a quoted
+   numeric string.
 4. Section headings are `##`, in spec order, no duplicates.
 5. Prose exists for every section present and matches the tokens it
    describes.
