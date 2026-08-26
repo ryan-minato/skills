@@ -193,9 +193,7 @@ def main():
             '{"name", "color", "description"} objects'
         ),
     )
-    parser.add_argument(
-        "--repo", required=True, help="target repository as OWNER/REPO"
-    )
+    parser.add_argument("--repo", required=True, help="target repository as OWNER/REPO")
     parser.add_argument(
         "--apply",
         action="store_true",
@@ -223,9 +221,7 @@ def main():
 
     pruned = []
     if args.apply:
-        pruned = apply_plan(
-            args.repo, create, update, prune_candidates, args.prune
-        )
+        pruned = apply_plan(args.repo, create, update, prune_candidates, args.prune)
 
     plan = {
         "repo": args.repo,

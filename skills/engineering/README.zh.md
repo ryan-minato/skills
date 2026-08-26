@@ -3,12 +3,10 @@
 [English](README.md)
 
 通用编程**方法论**类 skill——跨语言、跨框架适用的方法、工作流和实践——
-外加 GitHub **社区文件创作**：编写定义仓库协作方式的文件，包括
-issue/PR 模板、标签体系、提交与发布规范、CI 校验,以及社区健康文件
-(CONTRIBUTING、CODE_OF_CONDUCT、SECURITY 等);另有不足以自立 catalog 的
-窄域**工件创作**工作流(如 Dev Container 工件与持久化视觉设计规范)。community
-类 skill 负责制定政策与结构；GitHub 日常操作属于 `ops` catalog。完整的
-GitLab 生命周期 harness 构建属于一次性的 `meta` catalog。
+外加不足以自立 catalog 的窄域**工件创作**工作流（如 Dev Container 工件与
+持久化视觉设计规范）。构建 GitHub 或 GitLab 项目的完整生命周期
+harness——包括协作文件、规范与日常平台工作流——属于一次性的 `meta`
+catalog。
 
 ```bash
 npx skills add ryan-minato/skills --skill <skill-name>
@@ -23,4 +21,3 @@ npx skills add ryan-minato/skills --skill <skill-name>
 | [design-md](design-md/) | 创作并校验持久化、供 agent 读取的 DESIGN.md 视觉设计规范，包含可选 YAML 设计 token、正文指导、上游格式检查和 OKLCH 计算器。 |
 | [gitmoji](gitmoji/) | 起草 gitmoji 提交信息：先确定项目变体（独立语法 vs 叠加 CC 语法、unicode vs 文本代码），再通过首个匹配即停的决策列表为主要意图选出唯一 emoji，最后按交付前清单校验。 |
 | [goal-alignment](goal-alignment/) | 与用户对齐创建物（软件、系统、实验、skill、服务等）应达成的目标：以一轮轮追问推进直至共识（可推断处附建议答案，仅用户可知的事实则直接提问），再把共识记录为单一事实来源的目标文档——整体目标、带验证方式与层级（硬约束/优化目标/偏好）的具体目标、分级要求（强制/尽力/偏好）与权衡决策记录。只谈目标；不含计划与架构。 |
-| [github-community](github-community/) | 为 GitHub 仓库编写协作文件：issue 表单与同步的标签体系、PR 模板与 CONTRIBUTING 规则、commit 规范(附内置 stdlib 校验器与 CI workflow)、版本政策与 release.yml、社区健康文件(CODE_OF_CONDUCT、SECURITY、SUPPORT、GOVERNANCE、FUNDING.yml、组织级 .github 默认仓库),以及生成的项目级 skill。 |

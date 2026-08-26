@@ -30,6 +30,7 @@ Rules for disposable builders that create durable agent harnesses.
 This catalog owns complete harness architecture and disposable project
 scaffolds, including platform-specific builders whose complete lifecycle output
 is deposited into the target project before disposal. Durable cross-project
-methodology remains in `core/meta-harness`; ordinary day-to-day platform skills
-belong outside this catalog unless a builder generates them as project-specific
-durable output.
+methodology remains in `core/meta-harness`. Day-to-day platform operation
+guidance is not published as a standing public skill in this repository: a
+platform builder generates it as project-specific durable output before the
+builder is disposed of.

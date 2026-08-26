@@ -29,7 +29,6 @@ jobs:
               ['core', 'catalog/core'],
               ['engineering', 'catalog/engineering'],
               ['meta', 'catalog/meta'],
-              ['ops', 'catalog/ops'],
               ['writing', 'catalog/writing'],
             ]);
 
