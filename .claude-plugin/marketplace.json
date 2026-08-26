@@ -29,6 +29,7 @@
       "strict": false,
       "skills": [
         "./skills/engineering/code-refactoring",
+        "./skills/engineering/design-md",
         "./skills/engineering/devcontainer-authoring",
         "./skills/engineering/github-community",
         "./skills/engineering/gitlab-community",
@@ -53,7 +54,6 @@
       "strict": false,
       "skills": [
         "./skills/meta/data-science-project-scaffold",
-        "./skills/meta/design-md",
         "./skills/meta/meta-disposal",
         "./skills/meta/meta-harness-architecture",
         "./skills/meta/ml-project-scaffold",

@@ -6,7 +6,7 @@ recommends hex and converts every color to sRGB for WCAG contrast checks,
 so wide-gamut values need a gamut check before they silently clip.
 
 Subcommands (all non-interactive):
-  to-hex   "oklch(62% 0.18 250)"          -> #rrggbb (errors if out of gamut)
+  to-hex   "oklch(62% 0.15 250)"          -> #rrggbb (errors if out of gamut)
   from-hex "#1a1c1e"                       -> oklch(...)
   gamut    "oklch(62% 0.29 27)"            -> in|out of sRGB + nearest in-gamut hex
   contrast "#1a1c1e" "oklch(97% 0.01 90)"  -> WCAG ratio + AA/AAA verdicts
