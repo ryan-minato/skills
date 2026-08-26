@@ -1,0 +1,9 @@
+categories:
+  # Replace keys with the exact approved Changelog trailer values.
+  added: Added
+  fixed: Fixed
+
+template: |
+  ## {{tag_name}} ({{date}})
+
+  {{changelog}}

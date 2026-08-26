@@ -55,11 +55,12 @@
       "skills": [
         "./skills/meta/data-science-project-scaffold",
         "./skills/meta/meta-disposal",
+        "./skills/meta/meta-gitlab-workflow",
         "./skills/meta/meta-harness-architecture",
         "./skills/meta/ml-project-scaffold",
         "./skills/meta/python-project-defaults"
       ],
-      "description": "Disposable, project-scoped builders for complete agent harness architecture, visual design, and reproducible Python, ML, and data-science project scaffolds."
+      "description": "Disposable, project-scoped builders for complete agent harness architecture, GitLab lifecycle workflows, and reproducible Python, ML, and data-science project scaffolds."
     },
     {
       "name": "writing",
