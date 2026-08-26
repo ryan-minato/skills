@@ -45,7 +45,6 @@ body:
         - core
         - engineering
         - meta
-        - ops
         - writing
     validations:
       required: true

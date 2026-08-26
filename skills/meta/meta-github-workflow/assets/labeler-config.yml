@@ -1,0 +1,7 @@
+# .github/labeler.yml — path map for the PR labeler. One entry per area/*
+# label; keep this map, CODEOWNERS, and the area labels in labels.json in
+# step (the taxonomy check verifies the label names exist).
+"area/{{AREA_NAME}}":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "{{AREA_PATH_GLOB}}/**"

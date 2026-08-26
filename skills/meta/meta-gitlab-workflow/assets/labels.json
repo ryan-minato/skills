@@ -1,0 +1,52 @@
+[
+  {
+    "name": "type::bug",
+    "color": "#d73a4a",
+    "description": "Observed behavior differs from the intended design"
+  },
+  {
+    "name": "type::feature",
+    "color": "#a2eeef",
+    "description": "A new user- or system-visible capability"
+  },
+  {
+    "name": "type::incident",
+    "color": "#b60205",
+    "description": "An unplanned operational, security, hardware, or software event"
+  },
+  {
+    "name": "type::refactor",
+    "color": "#7057ff",
+    "description": "Behavior-preserving restructuring"
+  },
+  {
+    "name": "type::task",
+    "color": "#0075ca",
+    "description": "A planned unit of project evolution"
+  },
+  {
+    "name": "priority::high",
+    "color": "#e11d21",
+    "description": "Do before normal-priority work"
+  },
+  {
+    "name": "priority::medium",
+    "color": "#fbca04",
+    "description": "Normal queue priority"
+  },
+  {
+    "name": "priority::low",
+    "color": "#0e8a16",
+    "description": "No current schedule pressure"
+  },
+  {
+    "name": "status::needs-triage",
+    "color": "#ededed",
+    "description": "Awaiting classification, priority, and ownership review"
+  },
+  {
+    "name": "status::blocked",
+    "color": "#000000",
+    "description": "Cannot proceed until a named dependency is resolved"
+  }
+]

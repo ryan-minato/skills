@@ -29,7 +29,6 @@ jobs:
               ['core', 'catalog/core'],
               ['engineering', 'catalog/engineering'],
               ['meta', 'catalog/meta'],
-              ['ops', 'catalog/ops'],
               ['writing', 'catalog/writing'],
             ]);
 
@@ -57,10 +56,17 @@ jobs:
               return;
             }
 
+            // Catalog labels this workflow used to manage. They stay
+            // strippable so an issue edited after its catalog was removed does
+            // not keep the stale label beside the new one; the never-prune rule
+            // means the label itself survives on the repository.
+            const retiredCatalogLabels = ['catalog/ops'];
+
             const desired = new Set();
             const managed = new Set();
             for (const label of priorityLabels.values()) managed.add(label);
             for (const label of catalogLabels.values()) managed.add(label);
+            for (const label of retiredCatalogLabels) managed.add(label);
 
             if (priorities !== null) {
               const selected = priorities.map((value) => priorityLabels.get(value)).filter(Boolean);

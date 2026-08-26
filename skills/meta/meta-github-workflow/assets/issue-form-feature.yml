@@ -1,0 +1,35 @@
+# .github/ISSUE_TEMPLATE/02-feature.yml — rework every field for the
+# project. Labels must exist or they are dropped silently. In an
+# organization with native issue types, add `type: Feature`.
+name: Feature request
+description: "Propose a new capability for {{PROJECT_NAME}}"
+labels: ["enhancement", "status/needs-triage"]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What becomes possible, and for whom, when this exists.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and references
+      description: Why now — prior discussion, alternatives considered, links.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance sketch
+      description: How we would observe that this is done. Rough is fine; triage refines it.
+    validations:
+      required: false
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this request deliberately does not cover.
+    validations:
+      required: false

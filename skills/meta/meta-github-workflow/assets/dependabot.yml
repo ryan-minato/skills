@@ -1,0 +1,16 @@
+# .github/dependabot.yml — version updates only; Dependabot ALERTS are a
+# repository setting, not configured here. One block per ecosystem with a
+# manifest actually present; keep the github-actions block whenever this
+# harness ships workflows.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels: ["task"]
+  - package-ecosystem: "{{ECOSYSTEM — from a manifest that exists}}"
+    directory: "{{MANIFEST_DIRECTORY}}"
+    schedule:
+      interval: weekly
+    labels: ["task"]

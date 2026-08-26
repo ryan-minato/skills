@@ -1,0 +1,11 @@
+# CODEOWNERS — lives at {{CODEOWNERS_LOCATION — .github/, root, or docs/;
+# first found wins}} on the default branch. Owners need explicit write
+# access; the LAST matching pattern wins; `!` negation and character
+# ranges are unsupported; invalid lines are skipped SILENTLY — validate
+# with: gh api repos/{{OWNER_REPO}}/codeowners/errors
+# This file only REQUESTS review; enforcement is the ruleset's
+# require-code-owner-review setting.
+
+*  {{DEFAULT_OWNERS}}
+# One line per real boundary, matching the area/* labels and labeler.yml:
+{{AREA_PATH_GLOB}}  {{AREA_OWNERS}}

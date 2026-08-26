@@ -1,0 +1,6 @@
+# Default ownership only when one real team accepts unmatched paths.
+* <@owner-or-group>
+
+# Replace every example with a real project boundary and real GitLab owner.
+/<path>/ <@owner-or-group>
+*.<extension> <@owner-or-group>

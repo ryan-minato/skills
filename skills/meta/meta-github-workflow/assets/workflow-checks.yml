@@ -1,0 +1,57 @@
+# .github/workflows/checks.yml — the quality gate. Every job mirrors a
+# command that exists and passes locally; the job-name-to-command map
+# lives in .agents/knowledge/github/checks.md. Job names are what
+# rulesets require — keep them unique across all workflows.
+name: checks
+
+on:
+  pull_request:
+  push:
+    branches: ["{{DEFAULT_BRANCH}}"]
+
+# Deny-by-default; grant per job only what it needs.
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: checks / lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint
+        run: replace-with-the-project-lint-command
+  test:
+    name: checks / test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    # If this job gains path filters, the gate job below becomes the only
+    # valid required check: a skipped job reports Success.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
+        run: replace-with-the-project-test-command
+  gate:
+    # The aggregator gate: the ONLY job name a ruleset should require
+    # whenever any dependency is path-filtered. Delete it only if no
+    # required check is ever path-filtered.
+    name: checks / gate
+    if: always()
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All required jobs succeeded or were legitimately skipped
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS"
+          if printf '%s' "$RESULTS" | grep -Eq '"result": *"(failure|cancelled)"'; then
+            echo "::error::Required jobs failed or were cancelled. Fix the failing job; do not weaken this gate."
+            exit 1
+          fi

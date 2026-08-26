@@ -11,9 +11,8 @@ and other compatible clients) how to perform specific tasks well.
 | Catalog | Contents | Install scope |
 |---|---|---|
 | [`core`](skills/core/) | Skills recommended for every environment | Global (user-level) |
-| [`engineering`](skills/engineering/) | General programming methodology skills, plus GitHub/GitLab community authoring (templates, labels, conventions, health files) and narrow artifact-authoring workflows (e.g. Dev Container artifacts) | Per project, as needed |
-| [`meta`](skills/meta/) | Disposable builders for complete agent harnesses, DESIGN.md, and reproducible Python, ML, and data-science project scaffolds | Per project, remove after the harness is verified |
-| [`ops`](skills/ops/) | Platform operations: consolidated GitHub and GitLab day-to-day workflows with tooling setup | Per project, as needed |
+| [`engineering`](skills/engineering/) | General programming methodology skills and narrow artifact-authoring workflows (e.g. Dev Container artifacts) | Per project, as needed |
+| [`meta`](skills/meta/) | Disposable builders for complete agent harnesses, GitHub and GitLab lifecycle workflows, DESIGN.md, and reproducible Python, ML, and data-science project scaffolds | Per project, remove after the harness is verified |
 | [`writing`](skills/writing/) | Human-audience writing: genre skills (academic, blog/opinion, copy) and medium skills (LaTeX, Typst, Markdown) | Per project, as needed |
 
 Each catalog's README lists its skills.
@@ -49,7 +48,7 @@ need:
 ```
 /plugin marketplace add ryan-minato/skills
 /plugin install core@ryan-minato-skills
-/plugin install ops@ryan-minato-skills      # or engineering@, meta@, writing@, ...
+/plugin install meta@ryan-minato-skills     # or core@, engineering@, writing@, ...
 ```
 
 ## Contributing

@@ -1,0 +1,35 @@
+# .github/ISSUE_TEMPLATE/01-bug.yml — rework every field for the project.
+# The `labels:` values must exist in the repository or they are dropped
+# silently. In an organization with native issue types, add `type: Bug`.
+name: Bug report
+description: "{{PROJECT_NAME}} behaves differently from its intended design"
+labels: ["bug", "status/needs-triage"]
+body:
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happens
+      description: The observed behavior, exactly. Paste output rather than paraphrasing it.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen
+      description: The intended behavior. Together with the field above this is the acceptance baseline for the fix.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to reproduce
+      description: Smallest known sequence of steps, commands, or input.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and references
+      description: "Version or commit, environment, related issues or PRs, logs. {{PROJECT_SPECIFIC_CONTEXT_HINT}}"
+    validations:
+      required: false
