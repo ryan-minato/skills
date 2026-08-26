@@ -26,8 +26,8 @@ release-notes policy, community health files, and project-level skills
 that teach agents to follow all of it. This skill writes **local files
 only** — the project's normal git flow publishes them. Performing the
 operations (filing issues, opening PRs, cutting releases) is out of
-scope (the `github-ops` skill's territory), as are GitLab projects
-(`gitlab-community`).
+scope (the `github-ops` skill's territory). GitLab projects require their own
+platform-appropriate lifecycle harness.
 
 ## Assess the project first
 

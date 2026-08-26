@@ -28,6 +28,8 @@ Rules for disposable builders that create durable agent harnesses.
 ## Scope
 
 This catalog owns complete harness architecture and disposable project
-scaffolds. Durable cross-project methodology remains in
-`core/meta-harness`; platform-specific durable authoring and operations
-remain in the engineering and ops catalogs.
+scaffolds, including platform-specific builders whose complete lifecycle output
+is deposited into the target project before disposal. Durable cross-project
+methodology remains in `core/meta-harness`; ordinary day-to-day platform skills
+belong outside this catalog unless a builder generates them as project-specific
+durable output.

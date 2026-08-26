@@ -7,14 +7,15 @@ The catalog holds three classes of skills:
 
 - **Methodology skills** (code-refactoring, gitmoji, goal-alignment):
   approaches that transfer across languages and frameworks.
-- **Platform community skills** (github-community, gitlab-community):
-  authoring the files that define how a repository's collaboration works —
-  templates, label taxonomies, commit and release policy, CI validation,
-  community health files, and generated project-level skills. These are
-  the explicit exemption to the transfer-across-stacks rule: their value
-  lands in what they leave behind in the target project, not in the skill
-  staying installed. Day-to-day platform *operations* belong to the `ops`
-  catalog.
+- **Platform community skills** (github-community): authoring the files
+  that define how a repository's collaboration works — templates, label
+  taxonomies, commit and release policy, CI validation, community health
+  files, and generated project-level skills. These are the explicit
+  exemption to the transfer-across-stacks rule: their value lands in what
+  they leave behind in the target project, not in the skill staying
+  installed. Day-to-day platform *operations* belong to the `ops` catalog;
+  building a GitLab project's complete lifecycle harness belongs to the
+  disposable `meta` catalog.
 - **Artifact-authoring skills** (devcontainer-authoring): the full
   design→test→publish lifecycle of a specific engineering artifact
   ecosystem that is too narrow to justify its own catalog. Also exempt
@@ -44,17 +45,10 @@ The catalog holds three classes of skills:
   published skill: frontmatter `name` equals the directory name,
   placeholders use `{{UPPER_SNAKE}}`, and zero leftover `{{...}}`
   placeholders survive delivery.
-- **CI validation ships dependency-free and first-party.**
-  github-community: first-party actions only (`actions/*`, `github/*`);
-  third-party actions only behind explicit user opt-in, pinned to a
-  commit SHA. gitlab-community: shipped CI snippets run tokenless (MR-
-  event and tag-pipeline checks needing no secrets), default to Free-tier
-  mechanisms with tier badges elsewhere, and write hosts as
-  `$CI_SERVER_HOST`/`$CI_API_V4_URL`, never literal hostnames. Shipped
-  validators are stdlib-only python3 committed into the target repo.
-- **Quick actions are a feature and a hazard (gitlab-community).**
-  Document every quick action a shipped template embeds — in the template
-  and in the skill body.
+- **CI validation ships dependency-free and first-party.** First-party
+  actions only (`actions/*`, `github/*`); third-party actions only behind
+  explicit user opt-in, pinned to a commit SHA. Shipped validators are
+  stdlib-only python3 committed into the target repo.
 - **References are split by branching condition, not topic** — same rule
   as the ops catalog: one file = one load condition, pointers state the
   condition verbatim, opt-in automation and schema details are
@@ -67,8 +61,7 @@ The catalog holds three classes of skills:
 - Exact CLI names, CI keywords, schema keys, and platform file
   conventions must be re-verified before publishing a skill revision —
   GitHub form schemas, actions, and `release.yml` against
-  <https://docs.github.com>; GitLab template mechanics, CI YAML, and
-  changelog config against <https://docs.gitlab.com>.
+  <https://docs.github.com>.
 
 ## Requirements — artifact-authoring skills
 
@@ -88,25 +81,22 @@ goal document → `goal-alignment`; clarifying ambiguous requirements while
 already coding → `programming-guidelines` in `core`; implementation
 planning → neither (out of catalog scope) · authoring a GitHub
 repository's conventions or community health
-files → `github-community` · a GitLab project's → `gitlab-community` ·
-performing platform operations (filing issues, opening PRs/MRs, cutting
-releases) → the `ops` catalog's `github-ops`/`gitlab-ops` · authoring
-Dev Container artifacts (Features, Templates, prebuilt images) →
+files → `github-community` · performing platform operations (filing
+issues, opening PRs, cutting releases) → the `ops` catalog's
+`github-ops` · building or systematically repairing a GitLab project's
+complete lifecycle harness → the `meta` catalog's
+`meta-gitlab-workflow` · authoring Dev Container artifacts (Features, Templates, prebuilt images) →
 `devcontainer-authoring`; consuming them in a project's own
 devcontainer.json → `devcontainer-setup` in `core`.
 
 ## References
 
-Platform community (scope: `github-community`, `gitlab-community`):
+Platform community (scope: `github-community`):
 
 - Community health files (GitHub): <https://docs.github.com/en/communities/setting-up-your-project-for-healthy-contributions/creating-a-default-community-health-file>
 - Issue forms schema: <https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-issue-forms>
 - Automatically generated release notes (`.github/release.yml`): <https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes>
 - GitHub Actions workflow syntax: <https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions>
-- GitLab description templates: <https://docs.gitlab.com/user/project/description_templates/>
-- GitLab CI/CD YAML: <https://docs.gitlab.com/ci/yaml/> · Predefined CI variables: <https://docs.gitlab.com/ci/variables/predefined_variables/>
-- GitLab changelogs: <https://docs.gitlab.com/user/project/changelogs/>
-- GitLab labels: <https://docs.gitlab.com/user/project/labels/>
 - Contributor Covenant: <https://www.contributor-covenant.org/>
 
 Dev Container (scope: `devcontainer-authoring`):

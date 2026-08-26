@@ -1,0 +1,36 @@
+stages:
+  - check
+  - test
+
+workflow:
+  # Replace with rules and auto-cancel syntax verified against the target GitLab.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Without this guard a branch with an open MR runs a branch pipeline and an
+    # MR pipeline for the same commit. Keep it ahead of any branch rule.
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH
+
+lint:
+  stage: check
+  # image: replace with the project's verified toolchain image
+  script:
+    - replace-with-the-project-lint-command
+
+format:
+  stage: check
+  # image: replace with the project's verified toolchain image
+  script:
+    - replace-with-the-project-format-check-command
+
+test:
+  stage: test
+  interruptible: true
+  # image: replace with the project's verified toolchain image
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - replace-with-the-project-test-command
