@@ -27,12 +27,16 @@ Never commit raw secrets, restricted datasets, large generated artifacts, or
 model weights merely to make them discoverable. Record governed locations and
 immutable identifiers instead.
 
+Whatever platform the project keeps or adopts, settle retention, cleanup, and
+read/write access for runs, artifacts, checkpoints, and datasets, and record
+who owns each store. Preserving an existing tracker does not defer these.
+
 ## GitLab experiment and model capabilities
 
 When GitLab experiment tracking is selected, use its current MLflow-compatible
 interface and verify supported client operations before adopting it. Treat
-experiment artifacts stored through the package registry as governed packages:
-define retention, access, cleanup, and promotion.
+experiment artifacts stored through the package registry as governed packages
+under those same rules, plus promotion.
 
 Use the model registry only after agreeing model naming, version immutability,
 required metadata, validation evidence, lineage, owner, stages or aliases,
