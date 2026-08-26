@@ -2,9 +2,6 @@
   "mcpServers": {
     "agentskills": {
       "serverUrl": "https://agentskills.io/mcp"
-    },
-    "github": {
-      "serverUrl": "https://api.githubcopilot.com/mcp/"
     }
   }
 }
