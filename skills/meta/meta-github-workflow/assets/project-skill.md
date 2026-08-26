@@ -39,11 +39,33 @@ tracking issues and milestones go through the consensus process in
 
 ## Publish gate
 
-Draft the exact final payload → review it for credentials, confidential
-information, personal data, internal identifiers, and unrelated content →
-proceed only with `SAFE TO PUBLISH: YES` → confirm approval covers the
-write → execute non-interactively → read back and compare. Any edit after
-review restarts the gate.
+GitHub publication cannot be reliably undone: bodies, comments, commit
+messages, tags, and their notification copies survive deletion, and public
+content is indexed within minutes. Every remote or publishable write passes
+this gate.
+
+1. Assemble the exact final payload as files in a scratch directory outside
+   the repository. For a pull request include `title.txt`, `body.md`,
+   `commits.txt` from `git log BASE..HEAD --format=full`, `diff.patch` from
+   `git diff BASE...HEAD`, and every attachment — a PR publishes its commit
+   messages and diff, not only its description.
+2. Review that directory independently: dispatch a clean-context subagent
+   whose whole prompt is the review instruction, or, without subagent
+   support, re-read every file from disk and note
+   `Review mode: file-only (not clean-context)`. Judge only what the files
+   contain, never what you remember intending to publish.
+3. The review checks every line for credentials and secrets, real personal
+   data, internal-only hosts/URLs/identifiers, unrelated or generated content
+   in the diff, @-mentions and cross-references that would notify uninvolved
+   people, and regret-worthy wording. It ends with exactly
+   `SAFE TO PUBLISH: YES` or `SAFE TO PUBLISH: NO`; any secret, personal-data,
+   or internal-context finding means NO.
+4. Treat anything other than a verbatim `SAFE TO PUBLISH: YES` as NO. Fix
+   every finding, rebuild the directory, and review again. A secret that
+   reaches GitHub is compromised even after deletion — rotate it.
+5. Confirm applicable user approval, execute non-interactively, and read the
+   result back. Published content must be byte-identical to the reviewed
+   content; any edit after the verdict requires a fresh review.
 
 ## Finish
 

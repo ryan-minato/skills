@@ -155,19 +155,21 @@ project skill by default; copy
 chose SemVer, and [`scripts/project_fields.py`](scripts/project_fields.py)
 only when Projects was opted into.
 
-For every remote or publishable write, use this sequence:
+Read [publish-review.md](references/publish-review.md) before the first
+remote or publishable write. For every such write, use this sequence:
 
 1. Inspect current state, permissions, templates, labels, and conventions.
 2. Draft the exact final title, body, comment, metadata, branch, tag, or
-   setting locally.
-3. Review that exact payload for credentials, confidential information,
-   sensitive personal data, internal identifiers or URLs, and unrelated
-   content. Continue only with `SAFE TO PUBLISH: YES`.
+   setting locally, assembled into a scratch directory.
+3. Run the pre-publish review on that exact payload. Continue only with a
+   verbatim `SAFE TO PUBLISH: YES`.
 4. Confirm that prior user approval covers this external action.
 5. Execute non-interactively, then read the result back and compare it with
    the approved payload.
 
 Any edit after review invalidates the verdict and requires a fresh review.
+Deposit the same procedure into the durable project skill: GitHub publication
+cannot be reliably undone, so the gate has to outlive this builder.
 
 ### 5. Verify durability and hand off
 
