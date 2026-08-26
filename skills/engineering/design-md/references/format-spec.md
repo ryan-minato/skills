@@ -3,15 +3,15 @@
 Read when creating a DESIGN.md, changing its front matter or section
 structure, or verifying manually because no Node runtime is available.
 Upstream (normative, version "alpha"):
-<https://github.com/google-labs-code/design.md> — this file condenses it
-and must be updated when the upstream spec changes.
+[google-labs-code/design.md](https://github.com/google-labs-code/design.md).
+This file condenses it and must be updated when the upstream spec changes.
 
 ## Shape
 
 One file, two parts: optional YAML front matter (machine-readable design
-tokens; the normative values) and a markdown body (the design rationale;
-the prose is primary). Prose may use descriptive color names as long as
-they correspond to token names.
+tokens; the normative values) and a markdown body (design rationale and
+application guidance). Prose may use descriptive color names as long as they
+correspond to token names.
 
 ## Front-Matter Schema
 
@@ -19,6 +19,7 @@ they correspond to token names.
 version: <string>          # optional; current: "alpha"
 name: <string>             # required when front matter is present
 description: <string>      # optional
+omitted: <string[] | OmittedSection[]> # optional
 colors:
   <token-name>: <Color>    # at least primary when colors are defined
 typography:
@@ -39,7 +40,8 @@ components:
   preserved for display and export.
 - **Dimension** — a string with unit `px`, `em`, or `rem`.
 - **Typography** — `fontFamily` (string), `fontSize` (Dimension),
-  `fontWeight` (number), `lineHeight` (Dimension or unitless multiplier),
+  `fontWeight` (number or quoted numeric string), `lineHeight` (Dimension or
+  unitless multiplier),
   optional `letterSpacing` (Dimension), `fontFeature`, `fontVariation`
   (strings).
 - **Token references** — `{path.to.token}`; must point to a primitive
@@ -57,8 +59,8 @@ section. Omit freely, but those present keep this order, and a duplicated
 heading rejects the file:
 
 1. Overview (synonym: "Brand & Style") — personality, audience, feel
-2. Colors — palettes; at least primary; common roles: primary, secondary,
-   tertiary, neutral
+2. Colors — palettes; when present, define at least primary; common roles:
+   primary, secondary, tertiary, neutral
 3. Typography — levels (commonly 9–15); semantic names like headline,
    body, label
 4. Layout (synonym: "Layout & Spacing") — grid or spacing strategy
@@ -74,17 +76,21 @@ accepted, not errors (unknown component properties warn).
 
 ## Tooling
 
-`npx @google/design.md` (Windows alias `designmd`):
+`npx @google/design.md`:
 
 - `lint <file>` — structure and token validation
 - `diff <a> <b>` — token-level comparison
 - `export <file>` — Tailwind or W3C design-token output
 - `spec` — prints the full upstream spec
 
+On Windows or PowerShell, use `npx -p @google/design.md designmd lint
+DESIGN.md`; the dot-free alias avoids the `.md` command-resolution conflict.
+
 ## Manual Checklist (No Node)
 
-1. Front matter opens and closes with bare `---`; parses as YAML; `name`
-   present; `colors` includes `primary` if any colors are defined.
+1. If present, front matter opens and closes with bare `---`, parses as YAML,
+   includes `name`, and uses `colors.primary` whenever colors are defined.
+   Record intentionally absent token groups in `omitted` when applicable.
 2. Every `{dot.path}` reference resolves; primitives only, except
    composites inside `components`.
 3. Dimensions carry `px`/`em`/`rem`; `fontWeight` numeric.

@@ -1,24 +1,21 @@
 ---
 name: design-md
 description: >-
-  Disposable meta-skill (delete after the harness is built): authors or
-  edits DESIGN.md, the strict visual-design description format — YAML
-  front-matter design tokens plus a prose body — that makes a project's
-  visual language readable to agents, with a bundled OKLCH color
-  calculator. Use when a project's visual design must be encoded for
-  agents, or a DESIGN.md needs creating, linting, or updating. Not for
-  any other document — the DESIGN.md name is reserved for this format
-  and never repurposed.
+  Authors and validates DESIGN.md, a durable visual-design specification
+  combining optional YAML design tokens with prose guidance, with a bundled
+  OKLCH color calculator. Use when a project's visual design must be encoded
+  for agents, or a DESIGN.md needs creating, linting, or updating. Not for
+  any other document — the DESIGN.md name is reserved for this format and
+  never repurposed.
 ---
 
 # DESIGN.md
 
 This skill produces the project's `DESIGN.md` following the public
-DESIGN.md format: optional YAML front matter carrying the normative design
-tokens, and a prose body — the prose is where the design lives, the tokens
-only pin its values. The file serves agents (and designers) across
-sessions; the name is reserved for this format and must never be used for
-anything else.
+DESIGN.md format: optional YAML front matter carries normative design tokens,
+and the prose body provides rationale and application guidance. The file
+serves agents (and designers) across sessions; the name is reserved for this
+format and must never be used for anything else.
 
 ## Workflow
 
@@ -31,13 +28,14 @@ anything else.
    [design-md-skeleton.md](assets/design-md-skeleton.md): copy it, rework
    every section against the real design, delete sections the project
    does not need, and remove all placeholder text.
-3. Keep the core rules while writing: front matter needs `name` and at
-   least a `primary` color when tokens are present; `{dot.path}`
-   references resolve to primitives (composites only inside
-   `components`); body sections keep the spec order — Overview, Colors,
-   Typography, Layout, Elevation & Depth, Shapes, Components, Do's and
-   Don'ts — omitting freely but never duplicating a heading; hex is the
-   recommended default color format.
+3. Keep the core rules while writing: front matter is optional; when it is
+   present, provide its `name` and schema values, including `primary` when
+   defining colors. Use `omitted` to record intentionally absent token
+   groups when useful. `{dot.path}` references resolve to primitives
+   (composites only inside `components`); body sections keep the spec order
+   — Overview, Colors, Typography, Layout, Elevation & Depth, Shapes,
+   Components, Do's and Don'ts — omitting freely but never duplicating a
+   heading; hex is the recommended default color format.
 4. Validate colors with `scripts/oklch.py` whenever the design uses
    `oklch()` or other wide-gamut notation, or the prose commits to
    contrast ratios: `to-hex` / `from-hex` convert, `gamut` flags values
@@ -53,7 +51,7 @@ anything else.
    design tokens or visual language updates `DESIGN.md` in the same
    change.
 
-Done when: `DESIGN.md` lints clean (or passes the manual checklist), every
+Done when: `DESIGN.md` has no linter errors (or passes the manual checklist), every
 committed contrast pair passes, and the entrypoint points at the file with
 a load condition.
 
