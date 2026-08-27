@@ -2,11 +2,13 @@
 name: meta-disposal
 description: >-
   Disposable meta-skill (delete after the harness is built): removes
-  every installed disposable meta-skill — finds them by their description
-  marker, shows a dry-run listing, deletes only after fresh explicit user
-  confirmation, and deletes itself last. Use when the harness is built
-  and verified and the user asks to remove, clean up, or dispose of the
-  meta-skills. Not for durable project skills or any other files.
+  every installed skill whose description carries this catalog's marker —
+  finds them by that marker, shows a dry-run listing, deletes only after
+  fresh explicit user confirmation, and deletes itself last. Use when the
+  harness is built and verified and the user asks to remove, clean up, or
+  dispose of the meta-skills. A disposable builder from another catalog
+  carries a different marker and is left to that catalog's own disposal
+  skill. Not for durable project skills or any other files.
 ---
 
 # Meta-Skill Disposal
@@ -19,6 +21,9 @@ the marker every disposable meta-skill's description starts with:
 ```text meta-skill-marker
 Disposable meta-skill (delete after the harness is built):
 ```
+
+Disposable builders published under another catalog reserve a different
+marker and are deliberately out of reach here; see the last gotcha.
 
 ## Workflow
 
@@ -67,3 +72,10 @@ and the report was shown.
   that manager instead of deleting files, or the manager will restore or
   mis-track them. File deletion is only for skills copied into the
   project's own skill directories.
+- A project can install more than one disposable catalog, each reserving
+  its own marker. This skill matches only the marker above; a skill
+  carrying a different disposable marker is neither deleted nor listed as
+  skipped, so it leaves no trace in the report. After this run, check the
+  scanned roots for skills whose description still opens with a
+  `Disposable ... (delete after the harness is built):` sentence and run
+  the disposal skill shipped with that catalog.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find and (on request) delete installed disposable meta-skills.
+"""Find and (on request) delete installed disposable skills.
 
 Default run is a dry run: it lists every skill one level below each root
 whose resolved frontmatter description starts with the marker, plus every
@@ -9,7 +9,8 @@ belongs in the conversation between the two runs.
 
 The marker is not embedded here: it is read from this skill's own SKILL.md
 description (the prefix through the first "):"), so the script always
-matches the marker generation it was installed with. --marker exists only
+matches its own catalog's marker generation and leaves another catalog's
+disposable skills to that catalog's disposal skill. --marker exists only
 to recover when this skill's own SKILL.md was damaged.
 """
 
@@ -25,7 +26,7 @@ from pathlib import Path
 SELF_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_ROOT = SELF_DIR.parent
 MARKER_END = "):"
-# The real marker is a 59-character sentence prefix; anything much shorter
+# A real marker is a ~60-character sentence prefix; anything much shorter
 # is a dangerously broad startswith() net. Deliberately NOT validating a
 # "):"" suffix: --marker exists to recover across marker generations, and a
 # future generation may not share the current shape.
@@ -222,7 +223,7 @@ def main() -> None:
         sys.exit(
             f"error: refusing marker {marker!r} — shorter than "
             f"{MIN_MARKER_LEN} characters, which would match far more than "
-            "the disposable meta-skills. Pass the full marker text."
+            "the disposable skills. Pass the full marker text."
         )
 
     cache_paths = [p for p in [*roots, SELF_DIR] if in_plugin_cache(p)]
