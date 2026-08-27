@@ -29,6 +29,7 @@ jobs:
               ['core', 'catalog/core'],
               ['engineering', 'catalog/engineering'],
               ['meta', 'catalog/meta'],
+              ['scaffold', 'catalog/scaffold'],
               ['writing', 'catalog/writing'],
             ]);
 
