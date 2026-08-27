@@ -222,6 +222,11 @@ using the project's disposal mechanism.
 - A skipped Actions job reports "Success": path-filtered required checks
   pass vacuously without an aggregator gate job. Required checks match by
   job name, so job names must be unique across all workflows.
+- Visibility, not plan tier, gates the scanners: secret scanning, push
+  protection, and code scanning are free on **public** repositories and need
+  purchased SKUs (Secret Protection, Code Security) on private or internal
+  ones — a paid plan like Team does not include them. Never promise a
+  scanner a private repository cannot run.
 - On a private Free-plan repository, "required check" does not exist — no
   rulesets, no branch protection, no CODEOWNERS enforcement. Actions buys
   visibility there, not control; write "advisory" and record the upgrade

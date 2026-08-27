@@ -39,12 +39,14 @@ rather than offered as options: **secret scanning**, **push protection**
 (which rejects a push whose commits carry a recognized secret), and
 **code scanning** through CodeQL default setup.
 
-They are free on public repositories. On private or internal ones they
-need the purchased SKUs — GitHub Secret Protection for the first two,
-GitHub Code Security for the third — so on an unpaid private repository
-the baseline is downgraded in writing with its upgrade trigger, exactly as
-the ruleset is in [rules-and-protection.md](rules-and-protection.md).
-Never promise a scanner the plan cannot run.
+They are free on **public** repositories. On private or internal ones they
+need separately purchased SKUs — GitHub Secret Protection for the first
+two, GitHub Code Security for the third. **A paid plan does not include
+them**: a private repository on Team has no scanning until the SKU is
+bought, which is the assumption that most often turns this baseline into a
+promise the repository cannot keep. Downgrade it in writing with its
+upgrade trigger, exactly as the ruleset is in
+[rules-and-protection.md](rules-and-protection.md).
 
 Enable and read back through the repository object: secret scanning and
 push protection are the `security_and_analysis` keys `secret_scanning` and
