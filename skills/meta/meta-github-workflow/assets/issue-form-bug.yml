@@ -1,9 +1,13 @@
 # .github/ISSUE_TEMPLATE/01-bug.yml — rework every field for the project.
 # The `labels:` values must exist in the repository or they are dropped
-# silently. In an organization with native issue types, add `type: Bug`.
+# silently.
+# The `type:` key applies the native issue type; delete it on a personal
+# account, where issue types do not exist, and add the type label to
+# `labels:` instead.
 name: Bug report
 description: "{{PROJECT_NAME}} behaves differently from its intended design"
-labels: ["bug", "status/needs-triage"]
+labels: ["status/needs-triage"]
+type: Bug
 body:
   - type: textarea
     id: actual

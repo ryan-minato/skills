@@ -13,7 +13,8 @@ description: >-
 
 Tool path: {{TOOL_PATH — e.g. "authenticated gh; gh api for milestones
 and discussions"}}. Every metadata change (labels, assignees, milestone,
-type, state) is an explicit call — GitHub has no slash commands.
+type, field value, state) is an explicit call — GitHub has no slash
+commands.
 
 ## Take work
 
@@ -33,7 +34,10 @@ type, state) is an explicit call — GitHub has no slash commands.
 
 Non-interactive creation ignores templates: build the body by mirroring
 the form's `### <label>` headings ({{FORM_PATHS}}), then apply the form's
-labels{{AND_TYPE_IF_ORG}} explicitly in the same call. Human-authored
+labels and `--type` explicitly in the same call (delete the type on a
+personal account). A field value cannot be set that way at all: it needs
+`gh api repos/{{OWNER_REPO}}/issues/<number>/issue-field-values`, so
+priority is a second, separate call. Human-authored
 tracking issues and milestones go through the consensus process in
 {{KNOWLEDGE_PATH}}/planning.md — never create them unilaterally.
 

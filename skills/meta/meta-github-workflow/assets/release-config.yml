@@ -1,7 +1,8 @@
 # .github/release.yml — generated release notes consume merged PR labels.
 # Categories are evaluated in order; '*' must stay last; a category
 # naming a nonexistent label is silently empty (the taxonomy check
-# catches that). Keep in step with labels.json.
+# catches that). Keep in step with labels.json — on the organization
+# branch delete the task category, whose axis is a native issue type.
 changelog:
   exclude:
     labels: ["duplicate", "invalid", "wontfix"]
@@ -12,5 +13,7 @@ changelog:
       labels: ["bug"]
     - title: Documentation
       labels: ["documentation"]
+    - title: Tasks and maintenance
+      labels: ["task"]
     - title: Other changes
       labels: ["*"]

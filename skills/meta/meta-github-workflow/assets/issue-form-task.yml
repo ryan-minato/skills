@@ -2,11 +2,13 @@
 # Tasks are planned work, often executed by an agent: the solution
 # direction stays at architecture level so the executor keeps a feedback
 # loop, and acceptance criteria must be executable — never "improve X".
-# Labels must exist or they are dropped silently. In an organization with
-# native issue types, add `type: Task`.
+# Labels must exist or they are dropped silently.
+# The `type:` key applies the native issue type; delete it on a personal
+# account, where issue types do not exist, and add the type label to
+# `labels:` instead.
 name: Task
 description: "Planned {{PROJECT_NAME}} work with an agreed outcome"
-labels: ["task"]
+type: Task
 body:
   - type: textarea
     id: content

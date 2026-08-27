@@ -41,8 +41,13 @@ and operable after this skill and the conversation are gone.
 - Owner type, plan, and repository visibility are three independent gates.
   Never treat github.com, an organization owner, a paid plan, or a public
   repository as implicit; evidence all three before promising any capability.
+- In an organization, the type axis defaults to native **issue types** and
+  the priority axis to the organization's **`Priority` issue field**. Labels
+  are the personal-account fallback, not the org-owned default; never build
+  a `priority/*` label set beside a field that already exists.
 - Default planning does not use GitHub Projects. Projects is an opt-in the
-  user must request, never a side effect of another decision.
+  user must request, never a side effect of another decision — issue types
+  and fields are org settings and do not imply a board.
 - Use the platform's native mechanism or none: no imitation of capabilities
   GitHub lacks (time tracking, confidential issues, scoped labels), and no
   workflow where a native field already enforces the rule.
@@ -75,7 +80,10 @@ The capability quadrant — owner type, plan, visibility, and any GHES
 version — plus Actions availability, the default token policy, and the
 allowed-actions policy are stage-1 deliverables, not details: they gate
 rulesets, CODEOWNERS enforcement, required reviewers, Discussions, wikis,
-scanning, and every workflow the harness will write.
+scanning, and every workflow the harness will write. For an organization
+owner, the live issue types and issue fields belong to the same
+deliverable: they decide where the type and priority axes live, and the
+two features are version-gated separately on GHES.
 
 Audit every existing harness artifact for its discovery path, load
 condition, source of truth, and update trigger. Classify it as keep, extend,
@@ -100,7 +108,8 @@ third-party action policy, secret and deploy authority, and, only where
 applicable, private-repo billing and runner substrate, alongside planning
 method, review shape, agent autonomy, and outside contributions. Resolve
 organization-versus-personal ownership before any taxonomy decision: issue
-types and issue fields exist only in organizations.
+types and issue fields exist only in organizations, and they change which
+axes labels still carry.
 
 Done when: every branch is resolved without hidden assumptions, or the user
 explicitly says the information is sufficient and confirms the resulting
@@ -213,6 +222,14 @@ using the project's disposal mechanism.
 - Non-interactive creation (`gh issue create`, the API, MCP capabilities)
   ignores issue templates entirely; construct bodies to mirror the form's
   `### <label>` structure.
+- An issue form applies `labels:` and `type:` on submission but **cannot
+  pre-fill an issue field value** — no template, no URL parameter. Field
+  values arrive from triage or a human, so priority starts empty.
+- Issue types reached GHES in 3.18; issue fields only in 3.23. The two are
+  gated separately, so probe both rather than inferring one from the other.
+- Deleting an organization issue type or field strips it from every issue
+  in the organization. Disable a type instead, and remember `admin:org` is
+  organization ownership — a repository admin does not have it.
 - `docs.github.com/llms.txt` is a pointer to the docs Search and Article
   APIs, not a topic index. The search API requires a `client_name` parameter
   it does not document, and API-returned article bodies omit the rendered

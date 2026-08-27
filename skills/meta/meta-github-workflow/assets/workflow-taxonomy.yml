@@ -1,7 +1,7 @@
 # .github/workflows/taxonomy.yml — runs the committed taxonomy checker so a
-# label referenced by an issue form, release.yml, or the labeler but absent
-# from labels.json fails the pull request instead of being dropped silently
-# at runtime. Runs only when one of those files changes; the paths filter and
+# label or issue type referenced by an issue form, release.yml, or the
+# labeler but absent from the committed taxonomy fails the pull request
+# instead of being dropped silently at runtime. Runs only when one of those files changes; the paths filter and
 # the aggregator gate must agree, or a skipped run reads as a vacuous pass.
 name: taxonomy
 
@@ -9,6 +9,7 @@ on:
   pull_request:
     paths:
       - ".github/labels.json"
+      - ".github/org-taxonomy.json"
       - ".github/release.yml"
       - ".github/labeler.yml"
       - ".github/ISSUE_TEMPLATE/**"
@@ -17,6 +18,7 @@ on:
     branches: ["{{DEFAULT_BRANCH}}"]
     paths:
       - ".github/labels.json"
+      - ".github/org-taxonomy.json"
       - ".github/release.yml"
       - ".github/labeler.yml"
       - ".github/ISSUE_TEMPLATE/**"

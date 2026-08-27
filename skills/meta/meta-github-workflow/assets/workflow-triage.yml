@@ -3,6 +3,12 @@
 # writable). Detection, not prevention: on a second priority/* label it
 # COMMENTS rather than silently removing — a hard-removing bot fights
 # maintainers who overrode deliberately.
+#
+# Reads the native issue type and the organization's Priority issue field
+# first, falling back to labels where those do not exist. On a personal
+# account delete the ORG_PRIORITY_FIELD line and keep the label path; in an
+# organization set it to the field's exact name. A form can set the type but
+# can never pre-fill a field value, so priority always starts empty here.
 name: triage
 
 on:
@@ -25,12 +31,36 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
+            const ORG_PRIORITY_FIELD = '{{PRIORITY_FIELD_NAME_OR_EMPTY}}';
             const labels = (context.payload.issue.labels || []).map((l) => l.name);
-            const TYPES = ['bug', 'enhancement', 'documentation', 'task'];
-            const hasType = labels.some((n) => TYPES.includes(n)) || Boolean(context.payload.issue.type);
-            const priorities = labels.filter((n) => n.startsWith('priority/'));
             const issue_number = context.payload.issue.number;
             const { owner, repo } = context.repo;
+
+            // Native type wins; the label list is the personal-account fallback.
+            const TYPES = ['bug', 'enhancement', 'documentation', 'task'];
+            const hasType = Boolean(context.payload.issue.type)
+              || labels.some((n) => TYPES.includes(n));
+
+            // Same for priority: the org field first, priority/* labels after.
+            const priorities = labels.filter((n) => n.startsWith('priority/'));
+            let hasPriority = priorities.length === 1;
+            if (ORG_PRIORITY_FIELD) {
+              try {
+                const { data } = await github.request(
+                  'GET /repos/{owner}/{repo}/issues/{issue_number}/issue-field-values',
+                  { owner, repo, issue_number },
+                );
+                const values = Array.isArray(data) ? data : (data.issue_field_values || []);
+                hasPriority = values.some(
+                  (v) => (v.name || v.field_name) === ORG_PRIORITY_FIELD
+                    && v.value !== null && v.value !== '',
+                );
+              } catch (error) {
+                // Field values are unreadable on a personal account or an
+                // older GHES; the label fallback already answered.
+                if (error.status !== 404 && error.status !== 403) throw error;
+              }
+            }
 
             if (context.payload.action === 'labeled' && priorities.length > 1) {
               await github.rest.issues.createComment({
@@ -41,7 +71,7 @@ jobs:
               });
             }
 
-            const triaged = hasType && priorities.length === 1;
+            const triaged = hasType && hasPriority;
             const hasNeedsTriage = labels.includes('status/needs-triage');
             if (triaged && hasNeedsTriage) {
               try {
