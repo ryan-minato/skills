@@ -30,10 +30,15 @@ Public skills are grouped into catalogs under `skills/`:
   scoped artifact-authoring workflows (e.g. Dev Container Features,
   Templates, image prebuilds, and durable visual-design specifications)
   that do not warrant a catalog of their own.
-- `meta` — disposable, project-scoped builders for complete agent harness
-  architecture, GitHub and GitLab lifecycle workflows, and reproducible
-  Python, ML, and data-science scaffolds. Their durable output lives in the
-  target project; the builders are removed after verification.
+- `meta` — disposable, project-scoped builders for generic, pluggable harness
+  machinery: complete agent harness architecture, GitHub and GitLab lifecycle
+  workflows, and Python convention defaults. Install the whole catalog for a
+  harness build. Their durable output lives in the target project; the builders
+  are removed after verification.
+- `scaffold` — disposable, project-scoped builders for a project of a specific
+  topic (ML, data science). They are alternatives to one another: install the
+  one matching the project, alongside whichever `meta` builders apply. Removed
+  after verification, normally together with `meta`.
 - `writing` — human-audience writing skills: genre skills (academic,
   blog/opinion, promotional copy) and medium skills (LaTeX, Typst,
   Markdown source); the general baseline `human-writing` lives in `core`.
@@ -42,6 +47,19 @@ Adding a catalog requires: the catalog scaffold (`README.md`, `README.zh.md`,
 `CONTEXT.md`), an entry in this list, and — once it has a skill — a plugin
 entry in `.claude-plugin/marketplace.json`. `scripts/validate_skills.py`
 cross-checks this list against the directories in `skills/`.
+
+The two disposable catalogs reserve a name prefix for their own members: every
+skill in `meta` is named `meta-*` and every skill in `scaffold` is named
+`scaffold-*`, enforced by `CATALOG_NAME_PREFIXES` in
+`scripts/validate_skills.py`. The prefix groups a catalog's builders and
+matches the marker their descriptions carry, which matters because installed
+skills are read far from this repository.
+
+The prefix is a grouping convention, not an exclusive claim on the word, and
+the check runs in one direction only: `core/meta-harness` is durable, globally
+installed, and `meta-`-prefixed. What identifies a disposable builder is the
+marker its description opens with — that is what each catalog's disposal skill
+matches on, and the only key it may use.
 
 ## Skill Visibility (symlink mechanism)
 

@@ -1,27 +1,28 @@
 ---
-name: meta-disposal
+name: scaffold-disposal
 description: >-
-  Disposable meta-skill (delete after the harness is built): removes the
-  disposable meta-skills installed in this project — the temporary
-  builders whose descriptions share this catalog's marker. Finds them by
-  that marker, shows a dry-run listing, deletes only after fresh explicit
-  user confirmation, and deletes itself last. Use when the harness is
-  built and verified and the user asks to remove, clean up, or dispose of
-  the meta-skills, or of the temporary builder skills installed for the
-  project. A disposable builder from another catalog carries a different
-  marker and is left to that catalog's own disposal skill. Not for
-  durable project skills or any other files.
+  Disposable scaffold skill (delete after the harness is built): removes
+  the disposable scaffold skills installed in this project — the
+  temporary builders whose descriptions share this catalog's marker.
+  Finds them by that marker, shows a dry-run listing, deletes only after
+  fresh explicit user confirmation, and deletes itself last. Use when the
+  project is scaffolded and verified and the user asks to remove, clean
+  up, or dispose of the scaffold skills, or of the temporary builder
+  skills installed for the project. A disposable builder from another
+  catalog carries a different marker and is left to that catalog's own
+  disposal skill. Not for durable project skills or any other files.
 ---
 
-# Meta-Skill Disposal
+# Scaffold-Skill Disposal
 
-This skill removes the disposable meta-skills from the project once the
-harness is built and verified. Identification is by description, never by
-name or directory — installers rename skills, so the only stable key is
-the marker every disposable meta-skill's description starts with:
+This skill removes the disposable scaffold skills from the project once
+the project is scaffolded and verified. Identification is by description,
+never by name or directory — installers rename skills, so the only stable
+key is the marker every disposable scaffold skill's description starts
+with:
 
-```text meta-skill-marker
-Disposable meta-skill (delete after the harness is built):
+```text scaffold-skill-marker
+Disposable scaffold skill (delete after the harness is built):
 ```
 
 Disposable builders published under another catalog reserve a different
@@ -39,10 +40,10 @@ marker and are deliberately out of reach here; see the last gotcha.
    symlinked entries are reported, not followed. Record the confirmation token
    printed after the exact listing.
 2. Show the listing to the user verbatim and ask for fresh, explicit
-   confirmation. An earlier "build the harness" request is not consent to
-   delete. If anything in the listing looks wrong — a durable skill
-   matched, a meta-skill missing — stop and investigate before deleting
-   anything.
+   confirmation. An earlier "scaffold the project" request is not consent
+   to delete. If anything in the listing looks wrong — a durable skill
+   matched, a scaffold skill missing — stop and investigate before
+   deleting anything.
 3. On confirmation, run the same command plus
    `--delete --confirm <token>`. The script rescans and refuses deletion if the
    roots, marker, matches, or skipped entries differ from the confirmed dry run.
@@ -61,6 +62,9 @@ and the report was shown.
 - Never match by name, directory, or "looks like scaffolding" — the
   description prefix is the only key, and widening it deletes durable
   skills.
+- Only one topic scaffold is normally installed, so a listing with a
+  single builder beside this skill is the expected shape, not a sign the
+  scan missed something.
 - If the script cannot run, do the same steps manually: enumerate
   `SKILL.md` files one level below each skill root, parse each
   frontmatter, list those whose resolved description starts with the

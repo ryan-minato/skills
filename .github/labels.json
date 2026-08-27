@@ -80,6 +80,11 @@
     "description": "Work affecting the meta skill catalog"
   },
   {
+    "name": "catalog/scaffold",
+    "color": "c2185b",
+    "description": "Work affecting the scaffold skill catalog"
+  },
+  {
     "name": "catalog/writing",
     "color": "0e8a16",
     "description": "Work affecting the writing skill catalog"

@@ -90,11 +90,12 @@ Catalogs section of `ARCHITECTURE.md`.
 | When this changes | Update |
 |---|---|
 | Public skill added/removed | Symlink in `.agents/skills/`, catalog `README.md` + `README.zh.md`, and `.claude-plugin/marketplace.json` (`just gen-marketplace`) |
-| Catalog added/removed | Catalog scaffold, the Catalogs section in `ARCHITECTURE.md`, `.claude-plugin/marketplace.json` (a plugin entry once the catalog has a skill) |
+| Catalog added/removed | Catalog scaffold, the Catalogs section in `ARCHITECTURE.md`, `.claude-plugin/marketplace.json` (a plugin entry once the catalog has a skill), the root `README.md` + `README.zh.md` catalog tables and plugin-install lines, `.github/labels.json`, both Issue Forms' `Catalog` options, and the `catalogLabels` map in `.github/workflows/issue-metadata.yml` |
 | Any `README.md` | The matching `README.zh.md` (and vice versa) |
 | `.github/labels.json` | After explicit authorization, dry-run `python3 scripts/sync_labels.py --file .github/labels.json --repo ryan-minato/skills`, then re-run with `--apply`; never `--prune` |
 | `scripts/sync_labels.py` | Its origin, `skills/meta/meta-github-workflow/scripts/sync_labels.py` — the copy exists because public skills cannot reference repo files; keep behavior identical or record why it diverged |
-| A catalog is removed | Drop it from `.github/labels.json`, both Issue Forms' `Catalog` options, and the `catalogLabels` map in `.github/workflows/issue-metadata.yml`, and add its label to `retiredCatalogLabels` in that workflow so stale labels can still be stripped |
+| `skills/meta/meta-disposal/scripts/dispose.py` | Its copy, `skills/scaffold/scaffold-disposal/scripts/dispose.py` — the duplicate exists because public skills cannot reference each other; keep the two byte-identical, enforced by `check_disposal_script_copies()` in `scripts/validate_skills.py` |
+| A catalog is removed | Also add its label to `retiredCatalogLabels` in `.github/workflows/issue-metadata.yml` so stale labels can still be stripped, and drop its prefix from `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.py` if it reserved one |
 | Issue Form `Priority` or `Catalog` options | `.github/labels.json` and `.github/workflows/issue-metadata.yml` mappings |
 | PR template headings or required checklist | `.github/workflows/pr-policy.yml` validation |
 | Repo structure or check commands | This file and `ARCHITECTURE.md` |

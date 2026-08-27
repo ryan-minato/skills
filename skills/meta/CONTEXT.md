@@ -5,6 +5,8 @@ Rules for disposable builders that create durable agent harnesses.
 ## Contract
 
 - Install this catalog per project, never globally by default.
+- Install the catalog whole: its skills stack alongside one another.
+- Every skill directory and `name` begins with `meta-`.
 - Every skill description begins exactly with:
   `Disposable meta-skill (delete after the harness is built):`
 - The marker identifies temporary builders. No asset or generated target
@@ -27,10 +29,13 @@ Rules for disposable builders that create durable agent harnesses.
 
 ## Scope
 
-This catalog owns complete harness architecture and disposable project
-scaffolds, including platform-specific builders whose complete lifecycle output
-is deposited into the target project before disposal. Durable cross-project
-methodology remains in `core/meta-harness`. Day-to-day platform operation
-guidance is not published as a standing public skill in this repository: a
-platform builder generates it as project-specific durable output before the
-builder is disposed of.
+This catalog owns generic, pluggable harness machinery: complete harness
+architecture, platform-specific lifecycle builders whose complete output is
+deposited into the target project before disposal, and language-level
+convention defaults. Its skills stack alongside one another, so the catalog is
+installed whole. A builder whose topic selects the entire project shape — and
+therefore excludes the catalog's other builders — belongs to `scaffold`
+instead. Durable cross-project methodology remains in `core/meta-harness`.
+Day-to-day platform operation guidance is not published as a standing public
+skill in this repository: a platform builder generates it as project-specific
+durable output before the builder is disposed of.

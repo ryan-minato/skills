@@ -1,5 +1,5 @@
 ---
-name: python-project-defaults
+name: meta-python-defaults
 description: >-
   Disposable meta-skill (delete after the harness is built): chooses and
   records coherent defaults for a Python project's documentation style,

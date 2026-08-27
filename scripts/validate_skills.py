@@ -13,6 +13,8 @@ the repository and adds the repo-level checks:
   4. Every catalog has README.md, README.zh.md, and CONTEXT.md; the root
      README.zh.md exists.
   5. Catalog directories match the catalog list in ARCHITECTURE.md.
+  6. Catalogs that reserve a name prefix only hold skills carrying it.
+  7. The duplicated disposal script stays byte-identical across catalogs.
 
 Errors exit 1; warnings from check_skill.py are reported but never fail.
 Messages explain what failed, why it matters, and how to fix it.
@@ -36,6 +38,18 @@ ARCHITECTURE_MD = REPO_ROOT / "ARCHITECTURE.md"
 CORE_META_HARNESS = SKILLS_DIR / "core" / "meta-harness" / "SKILL.md"
 META_ARCHITECTURE = SKILLS_DIR / "meta" / "meta-harness-architecture" / "SKILL.md"
 HARNESS_METHODOLOGY_HEADING = "## Harness Methodology"
+# Catalogs whose CONTEXT.md reserves a name prefix for their skills. The
+# prefix is what tells an installed skill's reader which catalog's disposal
+# skill and contract govern it, so drift here is not cosmetic.
+CATALOG_NAME_PREFIXES = {"meta": "meta-", "scaffold": "scaffold-"}
+# Each disposable catalog ships its own copy of the disposal script:
+# public skills may not reference files outside their own directory, so
+# the duplicate is structural, not accidental. Nothing but this check
+# keeps a fix to one copy from leaving the other behind.
+DISPOSAL_SCRIPT_COPIES = (
+    SKILLS_DIR / "meta" / "meta-disposal" / "scripts" / "dispose.py",
+    SKILLS_DIR / "scaffold" / "scaffold-disposal" / "scripts" / "dispose.py",
+)
 
 ESCAPING_LINK = re.compile(r"\]\((?:\.\./|/)[^)]*\)")
 
@@ -99,6 +113,44 @@ def check_catalogs() -> None:
                     f"translation), and CONTEXT.md (catalog-specific rules). "
                     f"Fix: create {rel}/{required}."
                 )
+
+
+def check_catalog_name_prefixes() -> None:
+    """Keep prefix-reserving catalogs free of skills that omit the prefix."""
+    for catalog, prefix in sorted(CATALOG_NAME_PREFIXES.items()):
+        for skill_dir in sorted(catalog_skill_subdirs(SKILLS_DIR / catalog)):
+            if skill_dir.name.startswith(prefix):
+                continue
+            fail(
+                f"skills/{catalog}/{skill_dir.name}: name does not start "
+                f"with `{prefix}`. The {catalog} catalog reserves that "
+                f"prefix so an installed skill announces which catalog's "
+                f"contract and disposal skill govern it (see "
+                f"skills/{catalog}/CONTEXT.md). Fix: rename the directory "
+                f"and its `name` field to `{prefix}...`, or move the skill "
+                f"to a catalog that fits it."
+            )
+
+
+def check_disposal_script_copies() -> None:
+    """Keep every catalog's copy of the disposal script byte-identical."""
+    present = [path for path in DISPOSAL_SCRIPT_COPIES if path.is_file()]
+    if len(present) < 2:
+        return
+    reference, *others = present
+    baseline = reference.read_bytes()
+    for path in others:
+        if path.read_bytes() == baseline:
+            continue
+        fail(
+            f"{path.relative_to(REPO_ROOT)} drifted from "
+            f"{reference.relative_to(REPO_ROOT)}. Public skills cannot "
+            f"reference each other, so each disposable catalog ships its own "
+            f"copy of the same disposal script; a fix applied to one copy "
+            f"leaves the other catalog disposing differently. Fix: copy the "
+            f"corrected file over the other, or record the divergence in the "
+            f"AGENTS.md Keep In Sync table and update this check."
+        )
 
 
 def check_architecture_md_catalog_list() -> None:
@@ -369,6 +421,8 @@ def main() -> int:
     check_self_containment()
     check_catalogs()
     check_architecture_md_catalog_list()
+    check_catalog_name_prefixes()
+    check_disposal_script_copies()
     check_symlinks()
     check_marketplace_manifest()
     check_root_files()

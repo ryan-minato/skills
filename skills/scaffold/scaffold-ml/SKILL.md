@@ -1,7 +1,7 @@
 ---
-name: ml-project-scaffold
+name: scaffold-ml
 description: >-
-  Disposable meta-skill (delete after the harness is built): scaffolds an
+  Disposable scaffold skill (delete after the harness is built): scaffolds an
   opinionated, reproducible machine-learning project and its agent harness,
   choosing between a quick experiment and a maintainable training codebase
   and discovering current GPU base images when needed. Use for empty or early
