@@ -22,3 +22,5 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | Description |
 |---|---|
+| [scaffold-data-science](scaffold-data-science/) | Scaffold a reproducible Python data-science project: immutable raw inputs, a validated transformation pipeline, and data products that record where they came from, across local, S3, or Hugging Face storage. |
+| [scaffold-ml](scaffold-ml/) | Scaffold a machine-learning project as either a quick experiment or a maintainable training codebase, with hardware-aware dependencies, reproducible runs, optional containers, and live GPU base-image discovery. |

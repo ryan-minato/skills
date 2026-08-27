@@ -14,5 +14,3 @@ normal development.
 | [meta-gitlab-workflow](meta-gitlab-workflow/) | Build or systematically repair a complete GitLab project lifecycle harness for gitlab.com or self-managed instances: planning, work items and early draft MRs, community files, CI/CD, governance, security, Wiki, releases, deployments, registries, optional MLOps, and durable project-agent workflows. |
 | [meta-disposal](meta-disposal/) | Dry-run and remove copied disposable builders after fresh confirmation, without touching durable skills. |
 | [python-project-defaults](python-project-defaults/) | Choose missing Python documentation, testing, and toolchain conventions without replacing working choices. |
-| [ml-project-scaffold](ml-project-scaffold/) | Scaffold a quick ML experiment or maintainable training project with live GPU image discovery. |
-| [data-science-project-scaffold](data-science-project-scaffold/) | Scaffold a reproducible Python data-science project with immutable inputs and product provenance. |

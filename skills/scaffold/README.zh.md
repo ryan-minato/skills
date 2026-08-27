@@ -19,3 +19,5 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | 说明 |
 |---|---|
+| [scaffold-data-science](scaffold-data-science/) | 搭建可复现的 Python 数据科学项目：原始输入不可变、转换流水线带校验、数据产物记录自身来源，支持本地、S3 与 Hugging Face 存储。 |
+| [scaffold-ml](scaffold-ml/) | 按「短期实验」或「长期训练代码库」两种形态搭建机器学习项目，包含硬件感知依赖、可复现运行、可选容器，并实时发现 GPU 基础镜像。 |
