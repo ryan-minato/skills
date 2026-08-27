@@ -92,10 +92,28 @@ def check_required(root: Path, issues: list[Issue]) -> None:
             )
 
 
+def skipped(path: Path, root: Path) -> bool:
+    """True for paths that are not generated project content.
+
+    Besides the usual build and data directories, this excludes skills
+    installation directories (`.agents/skills`, `.claude/skills`, ...). The
+    builders installed there are the installer's payload: their SKILL.md
+    legitimately carries the disposal marker, and reporting it invites an
+    agent to strip the very marker disposal uses to find them.
+    """
+    if any(part in SKIP_PARTS for part in path.parts):
+        return True
+    parts = path.relative_to(root).parts
+    return any(
+        parts[i].startswith(".") and parts[i + 1] == "skills"
+        for i in range(len(parts) - 1)
+    )
+
+
 def iter_harness_text(root: Path) -> list[Path]:
     paths = []
     for path in root.rglob("*"):
-        if not path.is_file() or any(part in SKIP_PARTS for part in path.parts):
+        if not path.is_file() or skipped(path, root):
             continue
         if (
             path.name in {"justfile", ".gitignore", ".editorconfig", ".env.example"}
@@ -131,7 +149,7 @@ def markdown_targets(text: str) -> list[str]:
 
 def check_links(root: Path, issues: list[Issue]) -> None:
     for path in root.rglob("*.md"):
-        if any(part in SKIP_PARTS for part in path.parts):
+        if skipped(path, root):
             continue
         for target in markdown_targets(read_text(path, issues, "link.read")):
             target = target.strip().strip("<>")
