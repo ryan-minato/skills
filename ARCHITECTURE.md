@@ -48,11 +48,18 @@ Adding a catalog requires: the catalog scaffold (`README.md`, `README.zh.md`,
 entry in `.claude-plugin/marketplace.json`. `scripts/validate_skills.py`
 cross-checks this list against the directories in `skills/`.
 
-The two disposable catalogs reserve a name prefix: every skill in `meta` is
-named `meta-*` and every skill in `scaffold` is named `scaffold-*`. Installed
-skills are read far from this repository, and the prefix is what tells their
-reader which catalog's contract and disposal skill govern them. The validator
-enforces it from `CATALOG_NAME_PREFIXES`.
+The two disposable catalogs reserve a name prefix for their own members: every
+skill in `meta` is named `meta-*` and every skill in `scaffold` is named
+`scaffold-*`, enforced by `CATALOG_NAME_PREFIXES` in
+`scripts/validate_skills.py`. The prefix groups a catalog's builders and
+matches the marker their descriptions carry, which matters because installed
+skills are read far from this repository.
+
+The prefix is a grouping convention, not an exclusive claim on the word, and
+the check runs in one direction only: `core/meta-harness` is durable, globally
+installed, and `meta-`-prefixed. What identifies a disposable builder is the
+marker its description opens with — that is what each catalog's disposal skill
+matches on, and the only key it may use.
 
 ## Skill Visibility (symlink mechanism)
 
