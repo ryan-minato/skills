@@ -38,6 +38,11 @@ and operable after this skill and the conversation are gone.
   prove.
 - Do not act from an unapproved design. Local files, remote settings, and
   GitHub objects are all downstream of the consensus and plan gates below.
+- The security baseline is the default proposal, not an option: a protected
+  default branch that admits changes only through a pull request, secret
+  scanning with push protection, and automatic code scanning. Where the
+  quadrant cannot enforce one, downgrade it **in writing** with its owner
+  and upgrade trigger — never drop it from the plan.
 - Owner type, plan, and repository visibility are three independent gates.
   Never treat github.com, an organization owner, a paid plan, or a public
   repository as implicit; evidence all three before promising any capability.
@@ -85,15 +90,22 @@ owner, the live issue types and issue fields belong to the same
 deliverable: they decide where the type and priority axes live, and the
 two features are version-gated separately on GHES.
 
+Snapshot the security configuration as it stands before proposing
+anything: both protection layers, the `security_and_analysis` switches,
+the code-scanning setup, Dependabot alerts, allowed merge methods, and
+branch deletion on merge. Present it as a current-versus-baseline gap
+table, so the plan argues from what is actually configured rather than
+from an assumed empty repository.
+
 Audit every existing harness artifact for its discovery path, load
 condition, source of truth, and update trigger. Classify it as keep, extend,
 reconnect, replace-with-approval, or remove-with-approval.
 
 Done when: owner type, plan (or its recorded unknown), visibility, host,
 default branch, allowed merge methods, Actions availability and token
-policy, existing rulesets and legacy branch protection, and a disposition
-for every existing harness artifact are each evidenced or recorded as an
-unanswered user decision.
+policy, existing rulesets and legacy branch protection, the state of each
+baseline security setting, and a disposition for every existing harness
+artifact are each evidenced or recorded as an unanswered user decision.
 
 ### 2. Build the design tree
 
@@ -103,7 +115,8 @@ Recompute its frontier after every answer. Ask the whole frontier in one
 round, number every question, attach one reasoned recommendation, then wait.
 
 The first frontier leads with enforcement posture — what can actually block
-a merge here — then automation boundaries on people-facing objects,
+a merge here, asked as a subtraction from the security baseline rather than
+as a blank slate — then automation boundaries on people-facing objects,
 third-party action policy, secret and deploy authority, and, only where
 applicable, private-repo billing and runner substrate, alongside planning
 method, review shape, agent autonomy, and outside contributions. Resolve
@@ -216,6 +229,15 @@ using the project's disposal mechanism.
 - Rulesets and legacy branch protection both apply, most-restrictive wins;
   a stale classic rule silently tightens a ruleset. The unattributed-Copilot
   extra-approval setting is on by default and turns "1 approval" into 2.
+- There is no "block direct push" switch: requiring a pull request is what
+  blocks it, and only while the bypass list stays empty. Repository admins
+  bypass rulesets by default, so name the bypass actors or say plainly that
+  admins can still push.
+- Push protection only rejects secrets whose detectors are enabled, and a
+  pusher can bypass it with a recorded reason — it is a strong gate, not an
+  absolute one. Code scanning default setup needs Actions plus a supported
+  language; where the language is unsupported, propose advanced setup
+  instead of reporting coverage that does not exist.
 - CODEOWNERS fails silently: invalid lines are skipped, the file is
   base-branch scoped, the last match wins, and `!` negation is unsupported.
   Validate only via the codeowners/errors API; it merely requests review.
