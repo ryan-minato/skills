@@ -48,6 +48,12 @@ Adding a catalog requires: the catalog scaffold (`README.md`, `README.zh.md`,
 entry in `.claude-plugin/marketplace.json`. `scripts/validate_skills.py`
 cross-checks this list against the directories in `skills/`.
 
+The two disposable catalogs reserve a name prefix: every skill in `meta` is
+named `meta-*` and every skill in `scaffold` is named `scaffold-*`. Installed
+skills are read far from this repository, and the prefix is what tells their
+reader which catalog's contract and disposal skill govern them. The validator
+enforces it from `CATALOG_NAME_PREFIXES`.
+
 ## Skill Visibility (symlink mechanism)
 
 `.agents/skills/` is the canonical directory agents scan for this repo's

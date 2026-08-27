@@ -45,7 +45,7 @@
         "./skills/meta/meta-github-workflow",
         "./skills/meta/meta-gitlab-workflow",
         "./skills/meta/meta-harness-architecture",
-        "./skills/meta/python-project-defaults"
+        "./skills/meta/meta-python-defaults"
       ],
       "description": "Disposable, project-scoped builders for generic harness machinery: complete agent harness architecture, GitHub and GitLab lifecycle workflows, and Python convention defaults."
     },

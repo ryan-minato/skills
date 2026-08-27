@@ -5,6 +5,8 @@ Rules for disposable builders that create durable agent harnesses.
 ## Contract
 
 - Install this catalog per project, never globally by default.
+- Install the catalog whole: its skills stack alongside one another.
+- Every skill directory and `name` begins with `meta-`.
 - Every skill description begins exactly with:
   `Disposable meta-skill (delete after the harness is built):`
 - The marker identifies temporary builders. No asset or generated target
