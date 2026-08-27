@@ -12,7 +12,9 @@ from urllib.parse import urlparse
 import tomllib
 
 PLACEHOLDER_RE = re.compile(r"__[A-Z][A-Z0-9_]*__")
-MARKER = "Disposable meta-" + "skill (delete after the harness is built):"
+MARKER_RE = re.compile(
+    r"Disposable [a-z-]+ ?skill \(delete after the harness is built\):"
+)
 BACKENDS = {"local", "s3", "huggingface"}
 REQUIRED_RECIPES = {
     "setup",
@@ -114,7 +116,7 @@ def check_text_integrity(root: Path, issues: list[Issue]) -> None:
                 path.relative_to(root),
                 f"Unresolved scaffold placeholder {match.group(0)!r}. Replace or delete it.",
             )
-        if MARKER in text:
+        if MARKER_RE.search(text):
             add(
                 issues,
                 "text.marker",
