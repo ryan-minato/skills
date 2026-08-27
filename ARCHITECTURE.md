@@ -30,10 +30,15 @@ Public skills are grouped into catalogs under `skills/`:
   scoped artifact-authoring workflows (e.g. Dev Container Features,
   Templates, image prebuilds, and durable visual-design specifications)
   that do not warrant a catalog of their own.
-- `meta` — disposable, project-scoped builders for complete agent harness
-  architecture, GitHub and GitLab lifecycle workflows, and reproducible
-  Python, ML, and data-science scaffolds. Their durable output lives in the
-  target project; the builders are removed after verification.
+- `meta` — disposable, project-scoped builders for generic, pluggable harness
+  machinery: complete agent harness architecture, GitHub and GitLab lifecycle
+  workflows, and Python convention defaults. Install the whole catalog for a
+  harness build. Their durable output lives in the target project; the builders
+  are removed after verification.
+- `scaffold` — disposable, project-scoped builders for a project of a specific
+  topic (ML, data science). They are alternatives to one another: install the
+  one matching the project, alongside whichever `meta` builders apply. Removed
+  after verification, normally together with `meta`.
 - `writing` — human-audience writing skills: genre skills (academic,
   blog/opinion, promotional copy) and medium skills (LaTeX, Typst,
   Markdown source); the general baseline `human-writing` lives in `core`.
