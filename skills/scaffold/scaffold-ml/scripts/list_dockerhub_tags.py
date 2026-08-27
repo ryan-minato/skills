@@ -43,10 +43,21 @@ def fetch_json(url: str) -> dict:
 
 
 def iter_tags(repository: str):
-    """Yield tag entries for the repository, following API pagination."""
+    """Yield tag entries for the repository, following API pagination.
+
+    A page without `results` is an unexpected body — a changed API or a proxy
+    answering instead — and exits with guidance rather than a bare KeyError,
+    the one failure here that would otherwise print a traceback.
+    """
     url = f"{API_ROOT}/{repository}/tags/?page_size=100"
     while url:
         page = fetch_json(url)
+        if not isinstance(page, dict) or "results" not in page:
+            sys.exit(
+                f"Docker Hub returned a response without a 'results' field "
+                f"for {url}\nThe API may have changed, or a proxy answered "
+                f"instead; browse {BROWSE_URL}<name> instead."
+            )
         yield from page["results"]
         url = page.get("next")
 
@@ -80,7 +91,9 @@ def main() -> None:
 
     shown = 0
     for tag in iter_tags(repository):
-        name = tag["name"]
+        name = tag.get("name") if isinstance(tag, dict) else None
+        if not name:
+            continue
         if pattern and not pattern.search(name):
             continue
         pushed = (tag.get("tag_last_pushed") or "")[:10]
