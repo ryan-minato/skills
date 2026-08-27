@@ -47,11 +47,29 @@ def fetch_json(url: str, headers: dict | None = None) -> dict:
         )
 
 
+def require_field(body: dict, field: str, url: str):
+    """Return body[field], exiting with guidance when the response lacks it.
+
+    A 200 response carrying JSON without the field reaches here: a changed
+    endpoint, or a proxy answering with its own body. Without this the caller
+    raises a bare KeyError, the one failure of this script that would print a
+    traceback instead of saying where to go next.
+    """
+    if not isinstance(body, dict) or field not in body:
+        sys.exit(
+            f"nvcr.io returned a response without a {field!r} field for {url}\n"
+            f"The registry API may have changed, or a proxy answered instead; "
+            f"browse {BROWSE_URL} instead."
+        )
+    return body[field]
+
+
 def list_tags(image: str) -> list[str]:
     """Return all tags of a public nvcr.io image via an anonymous pull token."""
-    token = fetch_json(  # pragma: allowlist secret
-        f"{REGISTRY}/proxy_auth?scope=repository:{image}:pull"
-    )["token"]
+    auth_url = f"{REGISTRY}/proxy_auth?scope=repository:{image}:pull"
+    token = require_field(  # pragma: allowlist secret
+        fetch_json(auth_url), "token", auth_url
+    )
     body = fetch_json(
         f"{REGISTRY}/v2/{image}/tags/list",
         headers={"Authorization": f"Bearer {token}"},
