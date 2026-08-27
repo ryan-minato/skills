@@ -2,14 +2,15 @@
 name: scaffold-disposal
 description: >-
   Disposable scaffold skill (delete after the harness is built): removes
-  every installed skill whose description carries this catalog's marker —
-  finds them by that marker, shows a dry-run listing, deletes only after
+  the disposable scaffold skills installed in this project — the
+  temporary builders whose descriptions share this catalog's marker.
+  Finds them by that marker, shows a dry-run listing, deletes only after
   fresh explicit user confirmation, and deletes itself last. Use when the
   project is scaffolded and verified and the user asks to remove, clean
-  up, or dispose of the scaffold skills. A disposable builder from
-  another catalog carries a different marker and is left to that
-  catalog's own disposal skill. Not for durable project skills or any
-  other files.
+  up, or dispose of the scaffold skills, or of the temporary builder
+  skills installed for the project. A disposable builder from another
+  catalog carries a different marker and is left to that catalog's own
+  disposal skill. Not for durable project skills or any other files.
 ---
 
 # Scaffold-Skill Disposal
