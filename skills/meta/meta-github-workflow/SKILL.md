@@ -116,6 +116,7 @@ load only the references whose conditions now apply:
 |---|---|
 | Commit format, branch naming, merge method, squash behavior, merge queue, or commit enforcement | [commits-and-contributions.md](references/commits-and-contributions.md) |
 | Labels, milestones, tracking issues, sub-issue hierarchy, issue types, or triage states | [planning-and-goals.md](references/planning-and-goals.md) |
+| The repository is organization-owned and its issue types or issue fields need auditing or initializing | [org-configuration.md](references/org-configuration.md) |
 | The user explicitly opted into GitHub Projects | [projects-v2.md](references/projects-v2.md) |
 | Intake forms, issue and pull-request content contracts, claiming, handoff, or autonomous execution | [issues-and-prs.md](references/issues-and-prs.md) |
 | The repository takes issues or PRs from others, or ships a contract only a workflow can enforce | [actions-automation.md](references/actions-automation.md) |
@@ -146,7 +147,11 @@ nothing.
 Use [`scripts/sync_labels.py`](scripts/sync_labels.py) only after the
 taxonomy is approved: dry-run, review the exact plan, apply only with
 explicit authorization, then read labels back. Labels must exist before the
-first labeler, form, or release-notes run. Use
+first labeler, form, or release-notes run.
+[`scripts/sync_org_taxonomy.py`](scripts/sync_org_taxonomy.py) follows the
+same sequence for organization issue types and fields, but its approval is
+a separate and larger one: organization settings reach every repository in
+the organization, so say that before asking. Use
 [`scripts/rest_read.py`](scripts/rest_read.py) only for minimal read-only
 fallback access. Copy
 [`scripts/run_log_digest.py`](scripts/run_log_digest.py) into the durable

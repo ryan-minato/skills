@@ -24,7 +24,9 @@ with a `verify` hint naming the exact command or UI path a human must check):
 - rules:      ruleset count and whether the default branch carries a legacy
               branch protection rule (404 means none visible to this token,
               not proof of absence).
-- org:        for Organization owners, whether org issue types respond.
+- org:        for Organization owners, whether org issue types and issue
+              fields respond, their names, and whether the platform
+              defaults are still untouched.
 - plan:       never probed — plan/tier is not reliably readable by API.
               Reported as unknown with the manual check path.
 - docs:       the docs.github.com `version=` hint derived from the host.
@@ -224,24 +226,65 @@ def probe_rules(repo: str, default_branch: str | None, hostname: str | None) -> 
     return result
 
 
+# The two endpoints return a JSON array on some versions and an object
+# wrapping the array on others; anything else is reported as unknown.
+def _entries(payload, key: str):
+    if isinstance(payload, dict):
+        payload = payload.get(key)
+    return payload if isinstance(payload, list) else None
+
+
+def _taxonomy_probe(payload, key: str, defaults: set) -> dict:
+    entries = _entries(payload, key)
+    if entries is None:
+        return {"responding": True, "count": None}
+    names = [str(e.get("name", "")) for e in entries if isinstance(e, dict)]
+    present = {n.lower() for n in names}
+    return {
+        "responding": True,
+        "count": len(entries),
+        "names": names,
+        # Untouched defaults mean nobody has designed this axis yet; a
+        # changed set is an existing decision the harness must preserve.
+        "defaults_intact": sorted(defaults) == sorted(present),
+    }
+
+
 def probe_org(owner: str, owner_type: str | None, hostname: str | None) -> dict:
     if owner_type != "Organization":
         return {"applicable": False}
+    result: dict = {"applicable": True}
+
     issue_types = gh_json(f"orgs/{owner}/issue-types", hostname)
     if issue_types is None:
-        return {
-            "applicable": True,
-            "issue_types": unknown(
-                f"gh api orgs/{owner}/issue-types — absence can be plan, "
-                "permissions, or the feature being off"
-            ),
-        }
-    # The endpoint returns a JSON array on some versions and an object with
-    # an "issue_types" array on others; anything else is reported as unknown.
-    if isinstance(issue_types, dict):
-        issue_types = issue_types.get("issue_types")
-    count = len(issue_types) if isinstance(issue_types, list) else None
-    return {"applicable": True, "issue_types": {"responding": True, "count": count}}
+        result["issue_types"] = unknown(
+            f"gh api orgs/{owner}/issue-types — absence can be plan, "
+            "permissions, or a GHES older than 3.18"
+        )
+    else:
+        result["issue_types"] = _taxonomy_probe(
+            issue_types, "issue_types", {"task", "bug", "feature"}
+        )
+
+    issue_fields = gh_json(f"orgs/{owner}/issue-fields", hostname)
+    if issue_fields is None:
+        ghes = bool(hostname) and hostname != "github.com"
+        result["issue_fields"] = unknown(
+            f"gh api orgs/{owner}/issue-fields — absence can be permissions"
+            + (
+                " or a GHES older than 3.23, where issue fields do not exist "
+                "yet; fall back to the label priority axis"
+                if ghes
+                else " or the read:org scope being absent"
+            )
+        )
+    else:
+        result["issue_fields"] = _taxonomy_probe(
+            issue_fields,
+            "issue_fields",
+            {"priority", "effort", "start date", "target date"},
+        )
+    return result
 
 
 def docs_hint(hostname: str | None) -> dict:
