@@ -46,7 +46,11 @@ them**: a private repository on Team has no scanning until the SKU is
 bought, which is the assumption that most often turns this baseline into a
 promise the repository cannot keep. Downgrade it in writing with its
 upgrade trigger, exactly as the ruleset is in
-[rules-and-protection.md](rules-and-protection.md).
+[rules-and-protection.md](rules-and-protection.md) — but **record the two
+triggers separately**. They are different purchases: going public or moving
+off Free buys the ruleset, and neither one buys a scanner. A single
+"when we upgrade" note conflates them and leaves whoever acts on it
+expecting scanning that never arrives.
 
 Enable and read back through the repository object: secret scanning and
 push protection are the `security_and_analysis` keys `secret_scanning` and
