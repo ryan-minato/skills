@@ -55,6 +55,7 @@
       "strict": false,
       "skills": [
         "./skills/scaffold/scaffold-data-science",
+        "./skills/scaffold/scaffold-disposal",
         "./skills/scaffold/scaffold-ml"
       ],
       "description": "Disposable, project-scoped builders for a project of a specific topic (machine learning, data science). Install the one that matches the project; remove it once the harness is verified."
