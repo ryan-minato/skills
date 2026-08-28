@@ -12,6 +12,9 @@ apply metadata deterministically — but a label or type that does not exist
 is **dropped silently**, which is why the taxonomy check exists. Forms
 render each element as a `### <label>` heading in the final body; any
 body-scanning automation depends on those headings, so register that edge.
+A form's `type:` applies the native issue type on submission, but **no
+form key, template, or URL parameter can pre-fill an issue field value** —
+those arrive only from the API, a human, or triage automation.
 Resolve the current form schema from first-party docs when authoring —
 forms are still marked preview and the schema moves.
 

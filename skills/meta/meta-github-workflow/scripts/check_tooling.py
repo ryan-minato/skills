@@ -24,7 +24,15 @@ with a `verify` hint naming the exact command or UI path a human must check):
 - rules:      ruleset count and whether the default branch carries a legacy
               branch protection rule (404 means none visible to this token,
               not proof of absence).
-- org:        for Organization owners, whether org issue types respond.
+- org:        for Organization owners, whether org issue types and issue
+              fields respond, their names, and whether the platform
+              defaults are still untouched.
+- security:   the security_and_analysis switches and whether code-scanning
+              default setup is configured.
+- baseline_gaps: every default security baseline item whose probed state
+              differs from the baseline, each with the reason it cannot be
+              enforced here (blocked_by) and its verify command. Proposals
+              for the plan, never actions.
 - plan:       never probed — plan/tier is not reliably readable by API.
               Reported as unknown with the manual check path.
 - docs:       the docs.github.com `version=` hint derived from the host.
@@ -224,24 +232,194 @@ def probe_rules(repo: str, default_branch: str | None, hostname: str | None) -> 
     return result
 
 
+# The two endpoints return a JSON array on some versions and an object
+# wrapping the array on others; anything else is reported as unknown.
+def _entries(payload, key: str):
+    if isinstance(payload, dict):
+        payload = payload.get(key)
+    return payload if isinstance(payload, list) else None
+
+
+def _taxonomy_probe(payload, key: str, defaults: set) -> dict:
+    entries = _entries(payload, key)
+    if entries is None:
+        return {"responding": True, "count": None}
+    names = [str(e.get("name", "")) for e in entries if isinstance(e, dict)]
+    present = {n.lower() for n in names}
+    return {
+        "responding": True,
+        "count": len(entries),
+        "names": names,
+        # Untouched defaults mean nobody has designed this axis yet; a
+        # changed set is an existing decision the harness must preserve.
+        "defaults_intact": sorted(defaults) == sorted(present),
+    }
+
+
 def probe_org(owner: str, owner_type: str | None, hostname: str | None) -> dict:
     if owner_type != "Organization":
         return {"applicable": False}
+    result: dict = {"applicable": True}
+
     issue_types = gh_json(f"orgs/{owner}/issue-types", hostname)
     if issue_types is None:
-        return {
-            "applicable": True,
-            "issue_types": unknown(
-                f"gh api orgs/{owner}/issue-types — absence can be plan, "
-                "permissions, or the feature being off"
+        result["issue_types"] = unknown(
+            f"gh api orgs/{owner}/issue-types — absence can be plan, "
+            "permissions, or a GHES older than 3.18"
+        )
+    else:
+        result["issue_types"] = _taxonomy_probe(
+            issue_types, "issue_types", {"task", "bug", "feature"}
+        )
+
+    issue_fields = gh_json(f"orgs/{owner}/issue-fields", hostname)
+    if issue_fields is None:
+        ghes = bool(hostname) and hostname != "github.com"
+        result["issue_fields"] = unknown(
+            f"gh api orgs/{owner}/issue-fields — absence can be permissions"
+            + (
+                " or a GHES older than 3.23, where issue fields do not exist "
+                "yet; fall back to the label priority axis"
+                if ghes
+                else " or the read:org scope being absent"
+            )
+        )
+    else:
+        result["issue_fields"] = _taxonomy_probe(
+            issue_fields,
+            "issue_fields",
+            {"priority", "effort", "start date", "target date"},
+        )
+    return result
+
+
+def probe_security(repo: str, hostname: str | None) -> dict:
+    """Read the security_and_analysis switches and the code-scanning setup."""
+    result: dict = {}
+    data = gh_json(f"repos/{repo}", hostname)
+    analysis = (data or {}).get("security_and_analysis")
+    if not isinstance(analysis, dict):
+        result["security_and_analysis"] = unknown(
+            f"gh api repos/{repo} --jq .security_and_analysis (needs admin "
+            "scope), or Settings > Code security in the UI"
+        )
+    else:
+        result["security_and_analysis"] = {
+            key: (value or {}).get("status")
+            for key, value in analysis.items()
+            if isinstance(value, dict)
+        }
+    setup = gh_json(f"repos/{repo}/code-scanning/default-setup", hostname)
+    if setup is None:
+        # 404 here is the normal answer for "never configured", not an error.
+        result["code_scanning_default_setup"] = {
+            "value": "absent-or-unreadable",
+            "note": (
+                "404 means default setup was never configured, or the token "
+                "cannot see it. Verify: gh api "
+                f"repos/{repo}/code-scanning/default-setup"
             ),
         }
-    # The endpoint returns a JSON array on some versions and an object with
-    # an "issue_types" array on others; anything else is reported as unknown.
-    if isinstance(issue_types, dict):
-        issue_types = issue_types.get("issue_types")
-    count = len(issue_types) if isinstance(issue_types, list) else None
-    return {"applicable": True, "issue_types": {"responding": True, "count": count}}
+    else:
+        result["code_scanning_default_setup"] = {
+            "state": setup.get("state"),
+            "languages": setup.get("languages"),
+        }
+    return result
+
+
+def _state_of(value):
+    """Reduce a probe value to enabled/disabled/unknown."""
+    if isinstance(value, dict):
+        return "unknown"
+    if value in ("enabled", "configured", "present"):
+        return "enabled"
+    if value in (None, "absent-or-unreadable"):
+        return "unknown"
+    return "disabled"
+
+
+def baseline_gaps(
+    repository: dict, rules: dict, security: dict, actions: dict
+) -> list:
+    """Compare the probed state with the default security baseline.
+
+    Every entry is a proposal for the plan, never an action. `blocked_by`
+    records why a baseline item cannot be enforced here, so an unavailable
+    rule is downgraded in writing rather than silently dropped.
+    """
+    visibility = repository.get("visibility")
+    private = visibility in ("private", "internal")
+    branch = repository.get("default_branch") or "the default branch"
+
+    ruleset_count = rules.get("ruleset_count")
+    legacy = rules.get("legacy_branch_protection")
+    if (isinstance(ruleset_count, int) and ruleset_count > 0) or legacy == "present":
+        protection_state = "enabled"
+    elif isinstance(ruleset_count, dict) or isinstance(legacy, dict):
+        # A 404 on either layer is not proof of absence, so do not report
+        # "disabled" when one of the two could not be read.
+        protection_state = "unknown"
+    else:
+        protection_state = "disabled"
+
+    analysis = security.get("security_and_analysis")
+    analysis = analysis if isinstance(analysis, dict) else {}
+    scanning = security.get("code_scanning_default_setup")
+    scanning_state = (
+        _state_of((scanning or {}).get("state"))
+        if isinstance(scanning, dict) and "state" in scanning
+        else "unknown"
+    )
+
+    private_note = (
+        "private repository — needs the purchased SKU; downgrade to "
+        "convention with an upgrade trigger if the plan lacks it"
+    )
+    gaps = [
+        {
+            "setting": "protected default branch (pull request required)",
+            "current": protection_state,
+            "baseline": "enabled",
+            "blocked_by": (
+                "private repository on an unpaid plan has no rulesets and no "
+                "branch protection — record as convention plus upgrade trigger"
+                if private
+                else None
+            ),
+            "verify": "gh api repos/OWNER/REPO/rulesets",
+        },
+        {
+            "setting": "secret scanning",
+            "current": _state_of(analysis.get("secret_scanning")),
+            "baseline": "enabled",
+            "blocked_by": private_note if private else None,
+            "verify": "gh api repos/OWNER/REPO --jq .security_and_analysis",
+        },
+        {
+            "setting": "secret scanning push protection",
+            "current": _state_of(analysis.get("secret_scanning_push_protection")),
+            "baseline": "enabled",
+            "blocked_by": private_note if private else None,
+            "verify": "gh api repos/OWNER/REPO --jq .security_and_analysis",
+        },
+        {
+            "setting": "code scanning default setup",
+            "current": scanning_state,
+            "baseline": "enabled",
+            "blocked_by": (
+                private_note
+                if private
+                else (
+                    "Actions is not enabled; default setup cannot run"
+                    if actions.get("enabled") is False
+                    else None
+                )
+            ),
+            "verify": "gh api repos/OWNER/REPO/code-scanning/default-setup",
+        },
+    ]
+    return [gap for gap in gaps if gap["current"] != gap["baseline"]]
 
 
 def docs_hint(hostname: str | None) -> dict:
@@ -324,6 +502,13 @@ def main() -> int:
                     )
                     report["org"] = probe_org(
                         owner, repository.get("owner_type"), args.hostname
+                    )
+                    report["security"] = probe_security(args.repo, args.hostname)
+                    report["baseline_gaps"] = baseline_gaps(
+                        repository,
+                        report["rules"],
+                        report["security"],
+                        report["actions"],
                     )
     except Exception as exc:  # any probe crash is exit 1, per the contract
         # Still emit whatever earlier probes gathered: stage 1 evidences the

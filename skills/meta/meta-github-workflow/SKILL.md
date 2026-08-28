@@ -38,11 +38,21 @@ and operable after this skill and the conversation are gone.
   prove.
 - Do not act from an unapproved design. Local files, remote settings, and
   GitHub objects are all downstream of the consensus and plan gates below.
+- The security baseline is the default proposal, not an option: a protected
+  default branch that admits changes only through a pull request, secret
+  scanning with push protection, and automatic code scanning. Where the
+  quadrant cannot enforce one, downgrade it **in writing** with its owner
+  and upgrade trigger — never drop it from the plan.
 - Owner type, plan, and repository visibility are three independent gates.
   Never treat github.com, an organization owner, a paid plan, or a public
   repository as implicit; evidence all three before promising any capability.
+- In an organization, the type axis defaults to native **issue types** and
+  the priority axis to the organization's **`Priority` issue field**. Labels
+  are the personal-account fallback, not the org-owned default; never build
+  a `priority/*` label set beside a field that already exists.
 - Default planning does not use GitHub Projects. Projects is an opt-in the
-  user must request, never a side effect of another decision.
+  user must request, never a side effect of another decision — issue types
+  and fields are org settings and do not imply a board.
 - Use the platform's native mechanism or none: no imitation of capabilities
   GitHub lacks (time tracking, confidential issues, scoped labels), and no
   workflow where a native field already enforces the rule.
@@ -75,7 +85,17 @@ The capability quadrant — owner type, plan, visibility, and any GHES
 version — plus Actions availability, the default token policy, and the
 allowed-actions policy are stage-1 deliverables, not details: they gate
 rulesets, CODEOWNERS enforcement, required reviewers, Discussions, wikis,
-scanning, and every workflow the harness will write.
+scanning, and every workflow the harness will write. For an organization
+owner, the live issue types and issue fields belong to the same
+deliverable: they decide where the type and priority axes live, and the
+two features are version-gated separately on GHES.
+
+Snapshot the security configuration as it stands before proposing
+anything: both protection layers, the `security_and_analysis` switches,
+the code-scanning setup, Dependabot alerts, allowed merge methods, and
+branch deletion on merge. Present it as a current-versus-baseline gap
+table, so the plan argues from what is actually configured rather than
+from an assumed empty repository.
 
 Audit every existing harness artifact for its discovery path, load
 condition, source of truth, and update trigger. Classify it as keep, extend,
@@ -83,9 +103,9 @@ reconnect, replace-with-approval, or remove-with-approval.
 
 Done when: owner type, plan (or its recorded unknown), visibility, host,
 default branch, allowed merge methods, Actions availability and token
-policy, existing rulesets and legacy branch protection, and a disposition
-for every existing harness artifact are each evidenced or recorded as an
-unanswered user decision.
+policy, existing rulesets and legacy branch protection, the state of each
+baseline security setting, and a disposition for every existing harness
+artifact are each evidenced or recorded as an unanswered user decision.
 
 ### 2. Build the design tree
 
@@ -95,12 +115,14 @@ Recompute its frontier after every answer. Ask the whole frontier in one
 round, number every question, attach one reasoned recommendation, then wait.
 
 The first frontier leads with enforcement posture — what can actually block
-a merge here — then automation boundaries on people-facing objects,
+a merge here, asked as a subtraction from the security baseline rather than
+as a blank slate — then automation boundaries on people-facing objects,
 third-party action policy, secret and deploy authority, and, only where
 applicable, private-repo billing and runner substrate, alongside planning
 method, review shape, agent autonomy, and outside contributions. Resolve
 organization-versus-personal ownership before any taxonomy decision: issue
-types and issue fields exist only in organizations.
+types and issue fields exist only in organizations, and they change which
+axes labels still carry.
 
 Done when: every branch is resolved without hidden assumptions, or the user
 explicitly says the information is sufficient and confirms the resulting
@@ -116,6 +138,7 @@ load only the references whose conditions now apply:
 |---|---|
 | Commit format, branch naming, merge method, squash behavior, merge queue, or commit enforcement | [commits-and-contributions.md](references/commits-and-contributions.md) |
 | Labels, milestones, tracking issues, sub-issue hierarchy, issue types, or triage states | [planning-and-goals.md](references/planning-and-goals.md) |
+| The repository is organization-owned and its issue types or issue fields need auditing or initializing | [org-configuration.md](references/org-configuration.md) |
 | The user explicitly opted into GitHub Projects | [projects-v2.md](references/projects-v2.md) |
 | Intake forms, issue and pull-request content contracts, claiming, handoff, or autonomous execution | [issues-and-prs.md](references/issues-and-prs.md) |
 | The repository takes issues or PRs from others, or ships a contract only a workflow can enforce | [actions-automation.md](references/actions-automation.md) |
@@ -146,7 +169,11 @@ nothing.
 Use [`scripts/sync_labels.py`](scripts/sync_labels.py) only after the
 taxonomy is approved: dry-run, review the exact plan, apply only with
 explicit authorization, then read labels back. Labels must exist before the
-first labeler, form, or release-notes run. Use
+first labeler, form, or release-notes run.
+[`scripts/sync_org_taxonomy.py`](scripts/sync_org_taxonomy.py) follows the
+same sequence for organization issue types and fields, but its approval is
+a separate and larger one: organization settings reach every repository in
+the organization, so say that before asking. Use
 [`scripts/rest_read.py`](scripts/rest_read.py) only for minimal read-only
 fallback access. Copy
 [`scripts/run_log_digest.py`](scripts/run_log_digest.py) into the durable
@@ -195,6 +222,11 @@ using the project's disposal mechanism.
 - A skipped Actions job reports "Success": path-filtered required checks
   pass vacuously without an aggregator gate job. Required checks match by
   job name, so job names must be unique across all workflows.
+- Visibility, not plan tier, gates the scanners: secret scanning, push
+  protection, and code scanning are free on **public** repositories and need
+  purchased SKUs (Secret Protection, Code Security) on private or internal
+  ones — a paid plan like Team does not include them. Never promise a
+  scanner a private repository cannot run.
 - On a private Free-plan repository, "required check" does not exist — no
   rulesets, no branch protection, no CODEOWNERS enforcement. Actions buys
   visibility there, not control; write "advisory" and record the upgrade
@@ -202,12 +234,29 @@ using the project's disposal mechanism.
 - Rulesets and legacy branch protection both apply, most-restrictive wins;
   a stale classic rule silently tightens a ruleset. The unattributed-Copilot
   extra-approval setting is on by default and turns "1 approval" into 2.
+- There is no "block direct push" switch: requiring a pull request is what
+  blocks it, and only while the bypass list stays empty. Repository admins
+  bypass rulesets by default, so name the bypass actors or say plainly that
+  admins can still push.
+- Push protection only rejects secrets whose detectors are enabled, and a
+  pusher can bypass it with a recorded reason — it is a strong gate, not an
+  absolute one. Code scanning default setup needs Actions plus a supported
+  language; where the language is unsupported, propose advanced setup
+  instead of reporting coverage that does not exist.
 - CODEOWNERS fails silently: invalid lines are skipped, the file is
   base-branch scoped, the last match wins, and `!` negation is unsupported.
   Validate only via the codeowners/errors API; it merely requests review.
 - Non-interactive creation (`gh issue create`, the API, MCP capabilities)
   ignores issue templates entirely; construct bodies to mirror the form's
   `### <label>` structure.
+- An issue form applies `labels:` and `type:` on submission but **cannot
+  pre-fill an issue field value** — no template, no URL parameter. Field
+  values arrive from triage or a human, so priority starts empty.
+- Issue types reached GHES in 3.18; issue fields only in 3.23. The two are
+  gated separately, so probe both rather than inferring one from the other.
+- Deleting an organization issue type or field strips it from every issue
+  in the organization. Disable a type instead, and remember `admin:org` is
+  organization ownership — a repository admin does not have it.
 - `docs.github.com/llms.txt` is a pointer to the docs Search and Article
   APIs, not a topic index. The search API requires a `client_name` parameter
   it does not document, and API-returned article bodies omit the rendered

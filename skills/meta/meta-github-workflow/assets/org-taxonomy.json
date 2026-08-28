@@ -1,0 +1,99 @@
+{
+  "types": [
+    {
+      "name": "Task",
+      "color": "blue",
+      "description": "Planned work with an agreed outcome and acceptance criteria",
+      "is_enabled": true
+    },
+    {
+      "name": "Bug",
+      "color": "red",
+      "description": "Observed behavior differs from the intended design",
+      "is_enabled": true
+    },
+    {
+      "name": "Feature",
+      "color": "green",
+      "description": "A new user- or system-visible capability",
+      "is_enabled": true
+    },
+    {
+      "name": "{{EXTRA_TYPE_OR_DELETE_THIS_ENTRY}}",
+      "color": "purple",
+      "description": "{{WHAT_THIS_TYPE_MEANS_HERE}}",
+      "is_enabled": true
+    }
+  ],
+  "fields": [
+    {
+      "name": "Priority",
+      "data_type": "single_select",
+      "description": "Relative urgency, set during triage",
+      "visibility": "all",
+      "options": [
+        {
+          "name": "Urgent",
+          "color": "red",
+          "priority": 0
+        },
+        {
+          "name": "High",
+          "color": "orange",
+          "priority": 1
+        },
+        {
+          "name": "Medium",
+          "color": "yellow",
+          "priority": 2
+        },
+        {
+          "name": "Low",
+          "color": "green",
+          "priority": 3
+        }
+      ]
+    },
+    {
+      "name": "Effort",
+      "data_type": "single_select",
+      "description": "Rough size, used for grooming only",
+      "visibility": "all",
+      "options": [
+        {
+          "name": "High",
+          "color": "red",
+          "priority": 0
+        },
+        {
+          "name": "Medium",
+          "color": "yellow",
+          "priority": 1
+        },
+        {
+          "name": "Low",
+          "color": "green",
+          "priority": 2
+        }
+      ]
+    },
+    {
+      "name": "Start date",
+      "data_type": "date",
+      "description": "When work is expected to begin",
+      "visibility": "all"
+    },
+    {
+      "name": "Target date",
+      "data_type": "date",
+      "description": "When work is expected to be complete",
+      "visibility": "all"
+    },
+    {
+      "name": "{{EXTRA_FIELD_OR_DELETE_THIS_ENTRY}}",
+      "data_type": "text",
+      "description": "{{WHAT_THIS_FIELD_RECORDS}}",
+      "visibility": "organization_members_only"
+    }
+  ]
+}
