@@ -50,11 +50,18 @@ jobs:
                   'GET /repos/{owner}/{repo}/issues/{issue_number}/issue-field-values',
                   { owner, repo, issue_number },
                 );
-                const values = Array.isArray(data) ? data : (data.issue_field_values || []);
-                hasPriority = values.some(
-                  (v) => (v.name || v.field_name) === ORG_PRIORITY_FIELD
-                    && v.value !== null && v.value !== '',
-                );
+                // The endpoint returns a bare array; each entry names its
+                // field in issue_field_name, and a single-select answer
+                // arrives in single_select_option, not in `value`.
+                const values = Array.isArray(data) ? data : [];
+                hasPriority = values.some((v) => {
+                  if (v.issue_field_name !== ORG_PRIORITY_FIELD) return false;
+                  if (v.single_select_option) return true;
+                  if (Array.isArray(v.multi_select_options)) {
+                    return v.multi_select_options.length > 0;
+                  }
+                  return v.value !== null && v.value !== undefined && v.value !== '';
+                });
               } catch (error) {
                 // Field values are unreadable on a personal account or an
                 // older GHES; the label fallback already answered.

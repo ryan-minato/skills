@@ -260,9 +260,16 @@ def merge_option_ids(desired_options, existing_options):
 
 
 def options_differ(desired_options, existing_options):
+    # priority is the display order, so it belongs in the comparison:
+    # without it, reordering a select in the file is a silent no-op.
     def shape(options):
         return [
-            (o["name"].lower(), o.get("color"), o.get("description", ""))
+            (
+                o["name"].lower(),
+                o.get("color"),
+                o.get("description", ""),
+                o.get("priority"),
+            )
             for o in options
         ]
 
