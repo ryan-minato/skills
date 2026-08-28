@@ -38,6 +38,8 @@ After facts are gathered, the first user-owned frontier normally includes:
 3. Planning method: tracking issues + milestones (default), no cadence
    object, or an explicit GitHub Projects opt-in. Scrum without Projects
    has no sprint object — present that consequence, not a broken Scrum.
+   In an organization this is a separate question from the taxonomy: types
+   and fields are already the default there and do not need a board.
 4. Review shape and whether outside contributions are accepted.
 5. Agent autonomy: supervised or unattended, and its approval boundary.
 6. Third-party action policy (default: first-party only, SHA-pinned).
@@ -48,7 +50,10 @@ After facts are gathered, the first user-owned frontier normally includes:
 
 Resolve organization-versus-personal ownership before any taxonomy
 question: issue types and issue fields exist only in organizations, and
-that fact changes the type and priority axes.
+that fact changes the type and priority axes. Where they exist they are
+the default home for both axes, so the remaining taxonomy questions are
+about area, status, and community labels — not about inventing a type or
+priority label set.
 
 ## Goal consensus gate: tracking issue plus milestone
 
@@ -73,7 +78,8 @@ approved write.
 ## Human-authored issue gate
 
 Use the same loop, scaled to the object. Resolve outcome or facts, context,
-acceptance, scope, relationships, labels, type, milestone, assignee choice,
-and confidentiality. Suggest decomposition into sub-issues when one issue
+acceptance, scope, relationships, type, priority, labels, milestone,
+assignee choice, and confidentiality — type and priority meaning the native
+type and field in an organization, and their label stand-ins elsewhere. Suggest decomposition into sub-issues when one issue
 contains independently valuable outcomes. Do not publish before the user
 confirms the complete draft.

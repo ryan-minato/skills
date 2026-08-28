@@ -55,6 +55,8 @@ config):
 - path filter ↔ aggregator gate job;
 - `merge_group` event ↔ every required-check workflow (when merge queue is
   on);
+- organization issue types ↔ issue-form `type:` ↔ the triage
+  workflow ↔ the `platform-settings.md` row recording them;
 - label taxonomy ↔ `release.yml` categories ↔ issue-form `labels:` ↔
   labeler config (mechanically checked by the deposited taxonomy check, and
   its paths filter ↔ the files it checks);
