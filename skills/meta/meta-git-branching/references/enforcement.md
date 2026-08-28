@@ -18,6 +18,19 @@ Where the catalog's platform builder for the host is present —
 protection settings and the settings register. Supply it with the branch
 contract and let it configure; do not build a second, competing register.
 
+## Establish the host before assigning tiers
+
+A checkout with no configured remote is not proof that the project is unhosted.
+The entrypoint, the CI configuration, the contribution documents, and the
+project's own knowledge files routinely name a host the local clone does not
+have. Reconcile them before deciding anything: where the checkout and the
+project's documents disagree, ask rather than trusting `git remote`.
+
+Getting this wrong is expensive in one direction only. Recording every rule as
+convention because the remote list was empty parks the whole contract at the
+weakest tier and attaches upgrade triggers whose condition has already been
+met, so nothing ever fires them.
+
 ## What to enforce
 
 For every long-lived branch the model defines:

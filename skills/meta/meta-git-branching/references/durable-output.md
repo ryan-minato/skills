@@ -77,7 +77,10 @@ knows when to revisit rather than trust:
 ## Disposal test
 
 Before recommending cleanup, search the target project for this skill's name,
-its paths, and its disposable marker; none may appear in a deposited file. Then
+its paths, and its disposable marker; none may appear in a deposited file. The
+same holds for every other disposable builder: an upgrade trigger reading
+"configure this with <builder>" points the next agent at a skill that was
+deleted, so name the action and the platform instead of the builder. Then
 verify the reverse direction: from the entrypoint alone, the pointer resolves,
 and from the contract alone, an agent can name the model, create a correctly
 named branch, choose the merge method, and route a hotfix. If any of those needs
