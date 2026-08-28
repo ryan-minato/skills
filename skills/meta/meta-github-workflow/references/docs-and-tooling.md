@@ -43,8 +43,11 @@ Prefer, in order, and do not mix within one operation:
 2. A connected GitHub MCP capability, matched by its described purpose —
    never by tool name, which churns across server versions. Some toolsets
    (discussions, labels, several Actions operations) are off by default in
-   the reference MCP server, and `gh` has no `milestone` or `discussion`
-   command group — those go through `gh api` on the CLI path.
+   the reference MCP server, and `gh` has no `milestone`, `discussion`, or
+   issue-field command group — those go through `gh api` on the CLI path.
+   Issue types do have flags (`gh issue create/edit --type`,
+   `gh issue list --type`), but only from gh 2.94.0; below that they are a
+   `gh api` call too, so probe the version before designing on them.
 3. `scripts/rest_read.py` for read-only fallback: public
    target or a token in the environment, minimum requests, never writes.
 4. Stop, and tell the user exactly which tooling and authentication the

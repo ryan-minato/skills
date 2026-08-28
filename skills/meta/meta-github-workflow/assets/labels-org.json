@@ -15,11 +15,6 @@
     "description": "Documentation only; no behavior change"
   },
   {
-    "name": "task",
-    "color": "1d76db",
-    "description": "Planned work with an agreed outcome and acceptance criteria"
-  },
-  {
     "name": "duplicate",
     "color": "cfd3d7",
     "description": "Already tracked elsewhere; link the original before closing"
@@ -51,24 +46,6 @@
     "name": "wontfix",
     "color": "ffffff",
     "description": "Deliberately declined; the closing comment records why"
-  },
-  {
-    "name": "priority/high",
-    "color": "b60205",
-    "description": "Work on this before anything of lower priority",
-    "applied_by": "human"
-  },
-  {
-    "name": "priority/medium",
-    "color": "fbca04",
-    "description": "Normal scheduling",
-    "applied_by": "human"
-  },
-  {
-    "name": "priority/low",
-    "color": "0e8a16",
-    "description": "Nice to have; yields to everything above it",
-    "applied_by": "human"
   },
   {
     "name": "status/needs-triage",
