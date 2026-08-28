@@ -16,3 +16,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | 说明 |
 |---|---|
+| [clarify-thinking](clarify-thinking/) | 追问一个计划、想法或决定，直到 agent 与用户达成同一理解：将其建模为决策树，每轮把当前可问的问题连同推荐答案通过宿主自带的提问工具抛出，所有事实自己去查，且不在工作区留下任何文件。 |
