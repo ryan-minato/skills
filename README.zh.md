@@ -14,6 +14,7 @@
 | [`engineering`](skills/engineering/) | 通用编程方法论类 skill 与窄域工件创作工作流（如 Dev Container 工件） | 按需安装到项目 |
 | [`meta`](skills/meta/) | 通用 harness 机制的一次性构建技能：完整 agent harness、GitHub 与 GitLab 生命周期工作流、Python 约定默认值 | 安装到项目，harness 验证后移除 |
 | [`scaffold`](skills/scaffold/) | 特定主题项目（ML、数据科学）的一次性构建技能——只安装匹配的那一个 | 安装到项目，harness 验证后移除 |
+| [`util`](skills/util/) | 作用于协作过程本身的 skill：一起澄清、追问与决策——不依赖领域与技术栈，产物是共识而非文件 | 按需安装到项目，也可全局安装以随处可用 |
 | [`writing`](skills/writing/) | 面向人类读者的写作：体裁类（学术、博客/评论、文案）与载体类（LaTeX、Typst、Markdown） | 按需安装到项目 |
 
 每个 catalog 的 README 列出了其包含的 skill。
@@ -47,7 +48,7 @@ npx skills add ryan-minato/skills --skill <skill-name> -g
 ```
 /plugin marketplace add ryan-minato/skills
 /plugin install core@ryan-minato-skills
-/plugin install meta@ryan-minato-skills     # 或 core@、engineering@、scaffold@、writing@ 等
+/plugin install meta@ryan-minato-skills     # 或 core@、engineering@、scaffold@、util@、writing@ 等
 ```
 
 ## 参与贡献

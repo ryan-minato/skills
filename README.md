@@ -14,6 +14,7 @@ and other compatible clients) how to perform specific tasks well.
 | [`engineering`](skills/engineering/) | General programming methodology skills and narrow artifact-authoring workflows (e.g. Dev Container artifacts) | Per project, as needed |
 | [`meta`](skills/meta/) | Disposable builders for generic harness machinery: complete agent harnesses, GitHub and GitLab lifecycle workflows, Python convention defaults | Per project, remove after the harness is verified |
 | [`scaffold`](skills/scaffold/) | Disposable builders for a project of a specific topic (ML, data science) — install the one that matches | Per project, remove after the harness is verified |
+| [`util`](skills/util/) | Process skills for clarifying, questioning, and deciding together — domain-independent, they produce shared understanding rather than files | Per project, or globally to keep the method everywhere |
 | [`writing`](skills/writing/) | Human-audience writing: genre skills (academic, blog/opinion, copy) and medium skills (LaTeX, Typst, Markdown) | Per project, as needed |
 
 Each catalog's README lists its skills.
@@ -49,7 +50,7 @@ need:
 ```
 /plugin marketplace add ryan-minato/skills
 /plugin install core@ryan-minato-skills
-/plugin install meta@ryan-minato-skills     # or core@, engineering@, scaffold@, writing@, ...
+/plugin install meta@ryan-minato-skills     # or core@, engineering@, scaffold@, util@, writing@, ...
 ```
 
 ## Contributing

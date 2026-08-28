@@ -30,6 +30,7 @@ jobs:
               ['engineering', 'catalog/engineering'],
               ['meta', 'catalog/meta'],
               ['scaffold', 'catalog/scaffold'],
+              ['util', 'catalog/util'],
               ['writing', 'catalog/writing'],
             ]);
 

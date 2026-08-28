@@ -63,6 +63,15 @@
       "description": "Disposable, project-scoped builders for a project of a specific topic (machine learning, data science), plus the disposal skill that removes them. Use whichever topic builder matches the project; remove them once the harness is verified."
     },
     {
+      "name": "util",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/util/clarify-thinking"
+      ],
+      "description": "Process skills that act on the collaboration itself — clarifying, questioning, deciding, and organizing ideas together. Independent of domain and tech stack, they produce a shared understanding rather than files and keep their working material out of the workspace."
+    },
+    {
       "name": "writing",
       "source": "./",
       "strict": false,
