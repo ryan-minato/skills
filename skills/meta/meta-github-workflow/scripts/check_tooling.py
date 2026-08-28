@@ -354,13 +354,14 @@ def baseline_gaps(
 
     ruleset_count = rules.get("ruleset_count")
     legacy = rules.get("legacy_branch_protection")
-    protected = (isinstance(ruleset_count, int) and ruleset_count > 0) or (
-        legacy == "present"
-    )
-    if isinstance(ruleset_count, dict):
+    if (isinstance(ruleset_count, int) and ruleset_count > 0) or legacy == "present":
+        protection_state = "enabled"
+    elif isinstance(ruleset_count, dict) or isinstance(legacy, dict):
+        # A 404 on either layer is not proof of absence, so do not report
+        # "disabled" when one of the two could not be read.
         protection_state = "unknown"
     else:
-        protection_state = "enabled" if protected else "disabled"
+        protection_state = "disabled"
 
     analysis = security.get("security_and_analysis")
     analysis = analysis if isinstance(analysis, dict) else {}

@@ -54,9 +54,10 @@ a per-board annotation.
 
 ## Visibility, pinning, and limits
 
-Fields are either **Public** or organization-only. Only Public fields appear
-in public and internal projects; an organization-only field renders as an
-empty cell there. Decide visibility per field against repository visibility,
+Fields are either **Public** or organization-only — `all` and
+`organization_members_only` in the API, which is the spelling the request
+body needs. Only Public fields appear in public and internal projects; an
+organization-only field renders as an empty cell there. Decide visibility per field against repository visibility,
 and record the choice — it is invisible from the repository side.
 
 Pinning a field to an issue type makes it appear automatically in that
