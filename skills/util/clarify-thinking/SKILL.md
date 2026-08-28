@@ -1,16 +1,15 @@
 ---
 name: clarify-thinking
 description: >
-  Grills a plan, an idea, or a decision into a shared understanding — models
-  the subject as a design tree and works it in rounds, putting every currently
-  unblocked question to the user with a recommended answer attached, until
-  nothing is left silently assumed. Use when the user wants their thinking
-  clarified, stress-tested, poked at, or pinned down — "grill me on this",
-  "poke holes in this", "help me think this through", "what am I not
-  considering", "帮我把这个想法理清楚"; before committing to a decision whose
-  alternatives were never enumerated; when a request is too under-specified to
-  act on and guessing would waste the work; or when a half-formed idea is
-  handed over for a reaction. Not for defining what something should achieve
+  Interrogates a plan, an idea, or a decision in rounds until the user and the
+  agent hold one understanding of it, with nothing left silently assumed. Use
+  whenever the user hands over thinking rather than a task: a plan, an idea, or
+  a decision they have already half-made, offered for a reaction or a look-over
+  before they commit to it — "帮我看看还有哪些没想清楚", "grill me on this",
+  "poke holes in this", "what am I not considering", "help me think this
+  through", "帮我把这个想法理清楚"; when the alternatives behind a decision were
+  never enumerated; or when a request is too under-specified to act on and
+  guessing would waste the work. Not for defining what something should achieve
   from scratch and recording it as a goal document, and not for the
   implementation plan, task breakdown, or code that follows once the
   understanding is shared.
