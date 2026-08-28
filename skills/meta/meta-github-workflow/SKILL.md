@@ -9,7 +9,8 @@ description: >-
   layers. The deliverable is a durable project operating system, not an
   isolated operational answer, a single template, or a branching strategy; a
   one-off issue, pull request, release, or failing-run question does not
-  invoke it, and neither does the GitHub Flow branching model.
+  invoke it, and neither does the GitHub Flow branching model, which belongs
+  to meta-git-branching.
 license: Apache-2.0
 compatibility: >-
   Bundled tools require Python 3.9+ and use only the standard library, except
@@ -50,7 +51,9 @@ and operable after this skill and the conversation are gone.
   type, or state change is an explicit reviewed API call, never a line
   inside a published body.
 - Do not confuse this lifecycle harness with **GitHub Flow**, the branching
-  model. A request about that model does not invoke this skill.
+  model. A request about that model, or about which branching model a project
+  should run, belongs to `meta-git-branching`; use it instead. This skill
+  consumes the branch contract that skill produces and never invents one.
 
 ## Workflow
 

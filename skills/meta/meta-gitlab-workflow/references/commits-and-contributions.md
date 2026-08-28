@@ -36,7 +36,9 @@ expectations. Use GitLab's draft/ready operations rather than manually editing a
 title prefix.
 
 Do not impose git-flow or GitLab Flow merely because the host is GitLab. The
-branch model follows release/deployment needs and existing practice.
+branch model follows release/deployment needs and existing practice, and
+selecting it belongs to `meta-git-branching`. Take the branch contract from
+there and wire the platform to it.
 
 ## Contribution enforcement
 
