@@ -18,9 +18,13 @@ approval and, usually, broader credentials than repository work.
 
 Up to 50 fields and 50,000 items per project. Field types: text, number,
 date, single select, iteration, plus fields surfaced from issues (type,
-parent, sub-issue progress). **Single-select fields** are the platform's
-real mutual-exclusivity mechanism — prefer one over any label-pair
-convention the moment Projects is in play. **Iteration fields** are the
+parent, sub-issue progress). **Organization issue fields also appear here
+and count toward that 50** — they are org-level, so a project-level
+single-select duplicating one is a second source of truth for the same
+axis. Where the organization already owns `Priority`, use it and do not
+create a project Priority field. **Single-select fields** are the
+platform's real mutual-exclusivity mechanism — prefer one over any
+label-pair convention the moment Projects is in play. **Iteration fields** are the
 only sprint primitive on GitHub: arbitrary lengths, breaks, and
 `@current`/`@next` filters; a Scrum shape lives here or nowhere. Views:
 table, board, roadmap.
@@ -31,9 +35,10 @@ Projects has built-in workflows (item closed → status, PR merged → status,
 auto-add by filter, auto-archive) attributed to
 `@github-project-automation`. Use them before writing any Actions
 workflow; add an Actions step only for what the built-ins cannot express.
-The API surface is GraphQL plus a REST API for Projects v2 — verify the
-REST availability against the live instance before depending on it, and
-mind the separate `project` token scope, which default tokens lack.
+The API surface is GraphQL plus a REST API for Projects v2, including
+field endpoints under `orgs/{org}/projectsV2/{number}/fields` — verify
+availability against the live instance before depending on it, and mind
+the separate `project` token scope, which default tokens lack.
 
 ## Deterministic tooling
 

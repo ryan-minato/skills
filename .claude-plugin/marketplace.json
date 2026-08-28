@@ -11,6 +11,7 @@
       "source": "./",
       "strict": false,
       "skills": [
+        "./skills/core/agent-first-writing",
         "./skills/core/conventional-commits",
         "./skills/core/devcontainer-setup",
         "./skills/core/git-commit",
@@ -42,6 +43,7 @@
       "strict": false,
       "skills": [
         "./skills/meta/meta-disposal",
+        "./skills/meta/meta-git-branching",
         "./skills/meta/meta-github-workflow",
         "./skills/meta/meta-gitlab-workflow",
         "./skills/meta/meta-harness-architecture",

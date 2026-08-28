@@ -30,9 +30,11 @@ Content contracts per form:
   hypotheses, impact, a timezone-stamped timeline, response state, and
   follow-up links. Add it only when the design tree selected it.
 
-A complete issue carries its type (or type label), priority, area when one
-applies, and a milestone when it serves a goal; leave the assignee empty
-unless the creator will execute it themselves — ask a human creator which.
+A complete issue carries its type, priority, area when one applies, and a
+milestone when it serves a goal; leave the assignee empty unless the
+creator will execute it themselves — ask a human creator which. In an
+organization "type" is the native issue type and "priority" the `Priority`
+field value; elsewhere both are labels.
 
 ## Pull requests: the hub
 

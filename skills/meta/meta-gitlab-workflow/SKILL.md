@@ -7,7 +7,8 @@ description: >-
   project, establishing or replacing its platform-wide lifecycle scaffolding,
   or systematically auditing and repairing several connected GitLab harness
   layers. The deliverable is a durable project operating system, not an
-  isolated operational answer or version-control strategy.
+  isolated operational answer or version-control strategy; choosing a
+  branching model belongs to meta-git-branching.
 license: Apache-2.0
 compatibility: >-
   Bundled tools require Python 3.9+ (stdlib only). Live GitLab discovery
@@ -33,7 +34,9 @@ operable after this skill and the conversation are gone.
 - Never treat GitLab.com, the latest GitLab version, a paid tier, an available
   runner, or a particular API/UI shape as implicit.
 - Do not confuse this lifecycle harness with **GitLab Flow**, the branching
-  model. A request about that model does not invoke this skill.
+  model. A request about that model, or about which branching model a project
+  should run, belongs to `meta-git-branching`; use it instead. This skill
+  consumes the branch contract that skill produces and never invents one.
 
 ## Workflow
 

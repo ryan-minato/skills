@@ -1,9 +1,12 @@
 # .github/ISSUE_TEMPLATE/02-feature.yml — rework every field for the
-# project. Labels must exist or they are dropped silently. In an
-# organization with native issue types, add `type: Feature`.
+# project. Labels must exist or they are dropped silently.
+# The `type:` key applies the native issue type; delete it on a personal
+# account, where issue types do not exist, and add the type label to
+# `labels:` instead.
 name: Feature request
 description: "Propose a new capability for {{PROJECT_NAME}}"
-labels: ["enhancement", "status/needs-triage"]
+labels: ["status/needs-triage"]
+type: Feature
 body:
   - type: textarea
     id: outcome
