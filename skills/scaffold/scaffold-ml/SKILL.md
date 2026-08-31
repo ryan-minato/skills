@@ -4,11 +4,10 @@ description: >-
   Disposable scaffold skill (delete after the harness is built): scaffolds an
   opinionated, reproducible machine-learning project and its agent harness,
   choosing between a quick experiment and a maintainable training codebase.
-  Use for empty or early
-  repositories that train or evaluate models and need structure, hardware-aware
-  dependencies, commands, checks, optional containers, and durable agent
-  guidance. Not for mature migrations, inference-only applications, or
-  replacing working project choices.
+  Use for empty or early repositories that train or evaluate models and need
+  structure, hardware-aware dependencies, commands, checks, optional
+  containers, and durable agent guidance. Not for mature migrations,
+  inference-only applications, or replacing working project choices.
 license: Apache-2.0
 ---
 
@@ -49,11 +48,12 @@ explicitly asks for migration.
    contract tests by default, with GPU, full-training, large-data, and
    equivalence tests behind explicit slow commands.
 6. Containers are opt-in. When the user requests a dev container, Compose
-   environment, or remote training image, make the generic GPU container
-   decisions — whether a container is warranted, CUDA/ROCm base-image
-   selection with live tag discovery, and GPU access wiring — with the
-   `meta-gpu-container` skill when it is installed, then load the selected
-   mode's `containers.md` reference for the ML-specific integration.
+   environment, or remote training image, read
+   [references/containers.md](references/containers.md) for this scaffold's
+   constraints first, then make the generic GPU container decisions —
+   whether a container is warranted, CUDA/ROCm base-image selection with
+   live tag discovery, and GPU access wiring — with the
+   `meta-gpu-container` skill when it is installed.
 7. Deposit durable project rules and when-to-read pointers into the target
    harness. Do not copy the disposable marker into any generated file.
 8. Run the selected commands and inspect the result with the user.

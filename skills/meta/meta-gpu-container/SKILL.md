@@ -74,14 +74,16 @@ project.
 - Compose: a device reservation under the service
   (`deploy.resources.reservations.devices` with `driver: nvidia` and
   `capabilities: [gpu]`); verify current syntax in the Compose documentation.
-- Dev container: declare `"hostRequirements": {"gpu": "optional"}` and nothing
-  else — implementations inject `--gpus all` when a GPU runtime is present and
-  skip it otherwise, so one config serves GPU and CPU-only machines. Verify
-  the current dev-container specification. Two known limits: detection keys on
-  the *runtime*, so a machine with the NVIDIA runtime but no GPU can fail to
-  start; and compose-based dev containers ignore the field. In both cases fall
-  back to explicit `"runArgs": ["--gpus", "all"]`, accepting the config then
-  only works on GPU machines.
+- Dev container: `"hostRequirements": {"gpu": "optional"}` is metadata —
+  implementations that honor it inject `--gpus all` when a GPU runtime is
+  present, but detection keys on the *runtime* (a machine with the NVIDIA
+  runtime and no GPU can fail to start) and compose-based dev containers
+  ignore the field entirely. Actual exposure is `runArgs`: pair
+  `"runArgs": ["--gpus", "all"]` with the `hostRequirements` declaration for
+  NVIDIA, accepting the config then only works on GPU machines; for ROCm put
+  the device passthrough above into `runArgs` plus
+  `"--group-add", "video", "--group-add", "render"`. Verify the current
+  dev-container specification.
 - Workloads that move tensors between worker processes (e.g. PyTorch
   DataLoader workers) exhaust Docker's default shared memory: raise it
   (`--shm-size`, compose `shm_size`, or `ipc: host`) in any such container.
@@ -101,6 +103,9 @@ at runtime.
 Before this builder is disposed of, the target project must carry everything
 needed to operate the containers without it: the chosen image and its
 rationale, the image-authority rule when a preinstalled stack was selected,
-the container-path ↔ config-path mapping for mounted volumes, and the build
-and run commands, recorded in AGENTS.md or the project's task runner. Do not
-copy this skill's disposable marker into any generated file.
+the container-path ↔ config-path mapping for mounted volumes, the build and
+run commands, and an event-triggered refresh rule — when bumping the base
+image or its tag, enumerate current tags from the registry's live listing
+(the repository's Docker Hub tags page, the NGC catalog) or reinstall this
+skill, never assuming a tag — recorded in AGENTS.md or the project's task
+runner. Do not copy this skill's disposable marker into any generated file.
