@@ -19,6 +19,7 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | 说明 |
 |---|---|
+| [scaffold-colab](scaffold-colab/) | 搭建以 Google Colab 笔记本为交付物的 Colab 中心项目：根目录笔记本与真实 Colab 互为镜像、官方 Colab runtime 镜像 devcontainer 做本地初验、colab-mcp 连接真实会话，并附一套可读笔记本写作准则。 |
 | [scaffold-data-science](scaffold-data-science/) | 搭建可复现的 Python 数据科学项目：原始输入不可变、转换流水线带校验、数据产物记录自身来源，支持本地、S3 与 Hugging Face 存储。 |
 | [scaffold-disposal](scaffold-disposal/) | 在取得新的明确确认后，先 dry-run 再移除复制安装的一次性 scaffold 技能，不触碰长期技能，也不越界删除其他 catalog 的构建技能。 |
 | [scaffold-ml](scaffold-ml/) | 按「短期实验」或「长期训练代码库」两种形态搭建机器学习项目，包含硬件感知依赖、可复现运行与可选容器。 |
