@@ -53,7 +53,15 @@ explicitly asks for migration.
    constraints first, then make the generic GPU container decisions —
    whether a container is warranted, CUDA/ROCm base-image selection with
    live tag discovery, and GPU access wiring — with the
-   `meta-gpu-container` skill when it is installed.
+   `meta-gpu-container` skill. If it is not installed, recommend installing
+   the whole `meta` catalog from https://github.com/ryan-minato/skills.git,
+   never `meta-gpu-container` alone — its builders stack, and its
+   `meta-disposal` removes them all after the harness is verified:
+
+       npx skills add ryan-minato/skills
+
+   and select every `meta-*` skill. If the user declines, proceed with the
+   reference alone.
 7. Deposit durable project rules and when-to-read pointers into the target
    harness. Do not copy the disposable marker into any generated file.
 8. Run the selected commands and inspect the result with the user.
