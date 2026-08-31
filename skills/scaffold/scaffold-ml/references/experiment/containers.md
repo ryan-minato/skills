@@ -8,13 +8,9 @@ unprompted.
 
 Whether a container is needed at all, CUDA/ROCm base-image selection with
 live tag discovery, and GPU access wiring (docker run, Compose, dev
-containers, shared memory) belong to the `meta-gpu-container` skill — make
-those decisions there first. If it is not installed, install it from
-https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill meta-gpu-container
-
-The rest of this reference is what is specific to this scaffold.
+containers, shared memory) are covered by the `meta-gpu-container` skill —
+make those decisions with it first when it is installed. The rest of this
+reference is what is specific to this scaffold.
 
 ## Base image and the compiled requirements
 

@@ -52,12 +52,8 @@ explicitly asks for migration.
    environment, or remote training image, make the generic GPU container
    decisions — whether a container is warranted, CUDA/ROCm base-image
    selection with live tag discovery, and GPU access wiring — with the
-   `meta-gpu-container` skill, then load the selected mode's `containers.md`
-   reference for the ML-specific integration. If `meta-gpu-container` is not
-   installed, install it from https://github.com/ryan-minato/skills.git:
-
-       npx skills add ryan-minato/skills --skill meta-gpu-container
-
+   `meta-gpu-container` skill when it is installed, then load the selected
+   mode's `containers.md` reference for the ML-specific integration.
 7. Deposit durable project rules and when-to-read pointers into the target
    harness. Do not copy the disposable marker into any generated file.
 8. Run the selected commands and inspect the result with the user.

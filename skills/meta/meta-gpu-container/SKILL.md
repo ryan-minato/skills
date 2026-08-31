@@ -86,8 +86,8 @@ project.
   DataLoader workers) exhaust Docker's default shared memory: raise it
   (`--shm-size`, compose `shm_size`, or `ipc: host`) in any such container.
 
-The `devcontainer-setup` skill covers dev-container authoring generally; this
-skill supplies the GPU-specific decisions on top of it.
+When a `devcontainer-setup` skill is installed, let it drive dev-container
+authoring generally; this skill supplies the GPU-specific decisions on top.
 
 ## Volumes and data
 
