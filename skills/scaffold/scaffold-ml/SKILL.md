@@ -3,14 +3,13 @@ name: scaffold-ml
 description: >-
   Disposable scaffold skill (delete after the harness is built): scaffolds an
   opinionated, reproducible machine-learning project and its agent harness,
-  choosing between a quick experiment and a maintainable training codebase
-  and discovering current GPU base images when needed. Use for empty or early
+  choosing between a quick experiment and a maintainable training codebase.
+  Use for empty or early
   repositories that train or evaluate models and need structure, hardware-aware
   dependencies, commands, checks, optional containers, and durable agent
   guidance. Not for mature migrations, inference-only applications, or
   replacing working project choices.
 license: Apache-2.0
-compatibility: GPU image discovery scripts require Python 3.11+ and network access.
 ---
 
 # Machine-Learning Project Scaffold
@@ -49,21 +48,19 @@ explicitly asks for migration.
 5. Add only feedback whose cost the lifecycle earns: fast lint/format and
    contract tests by default, with GPU, full-training, large-data, and
    equivalence tests behind explicit slow commands.
-6. Containers are opt-in. Load the selected mode's `containers.md` reference
-   only when the user requests a dev container, Compose environment, or remote
-   training image.
-7. When a CUDA or ROCm base image must be selected or refreshed, read
-   [references/gpu/image-discovery.md](references/gpu/image-discovery.md) and
-   run the relevant live script:
-   - [scripts/list_dockerhub_tags.py](scripts/list_dockerhub_tags.py)
-   - [scripts/list_ngc_images.py](scripts/list_ngc_images.py)
-   - [scripts/list_ngc_tags.py](scripts/list_ngc_tags.py)
+6. Containers are opt-in. When the user requests a dev container, Compose
+   environment, or remote training image, make the generic GPU container
+   decisions — whether a container is warranted, CUDA/ROCm base-image
+   selection with live tag discovery, and GPU access wiring — with the
+   `meta-gpu-container` skill, then load the selected mode's `containers.md`
+   reference for the ML-specific integration. If `meta-gpu-container` is not
+   installed, install it from https://github.com/ryan-minato/skills.git:
 
-   Record the verified image choice and rationale, never a static catalog of
-   available tags.
-8. Deposit durable project rules and when-to-read pointers into the target
+       npx skills add ryan-minato/skills --skill meta-gpu-container
+
+7. Deposit durable project rules and when-to-read pointers into the target
    harness. Do not copy the disposable marker into any generated file.
-9. Run the selected commands and inspect the result with the user.
+8. Run the selected commands and inspect the result with the user.
 
 ## Mode requirements
 
@@ -97,8 +94,6 @@ and immutable inputs plus output provenance are enforced.
 
 ## Gotchas
 
-- A current image tag is a live inventory fact; verify it when choosing, do not
-  preserve a static tag directory in the skill.
 - `data/raw/` is ground truth. Transformations write elsewhere.
 - Catch only expected data or environment failures; fail early with context for
   everything else.

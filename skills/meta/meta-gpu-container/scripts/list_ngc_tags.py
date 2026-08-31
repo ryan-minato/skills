@@ -45,6 +45,11 @@ def fetch_json(url: str, headers: dict | None = None) -> dict:
             f"Could not reach nvcr.io ({error.reason}).\n"
             f"Check network access, or browse {BROWSE_URL} instead."
         )
+    except TimeoutError:
+        sys.exit(
+            f"nvcr.io timed out answering {url}\n"
+            f"Retry, or browse {BROWSE_URL} instead."
+        )
 
 
 def require_field(body: dict, field: str, url: str):

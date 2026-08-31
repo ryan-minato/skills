@@ -46,6 +46,7 @@
         "./skills/meta/meta-git-branching",
         "./skills/meta/meta-github-workflow",
         "./skills/meta/meta-gitlab-workflow",
+        "./skills/meta/meta-gpu-container",
         "./skills/meta/meta-harness-architecture",
         "./skills/meta/meta-python-defaults"
       ],

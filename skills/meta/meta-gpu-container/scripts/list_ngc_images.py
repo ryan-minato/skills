@@ -48,6 +48,11 @@ def search_page(query: str, page: int) -> dict:
             f"Could not reach the NGC catalog ({error.reason}).\n"
             f"Check network access, or browse {BROWSE_URL} instead."
         )
+    except TimeoutError:
+        sys.exit(
+            "The NGC catalog timed out answering the search request.\n"
+            f"Retry, or browse {BROWSE_URL} instead."
+        )
 
 
 def iter_images(query: str):

@@ -40,6 +40,11 @@ def fetch_json(url: str) -> dict:
             f"Could not reach Docker Hub ({error.reason}).\n"
             f"Check network access, or browse {BROWSE_URL}<name> instead."
         )
+    except TimeoutError:
+        sys.exit(
+            f"Docker Hub timed out answering {url}\n"
+            f"Retry, or browse {BROWSE_URL}<name> instead."
+        )
 
 
 def iter_tags(repository: str):

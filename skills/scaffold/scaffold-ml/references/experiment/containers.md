@@ -4,59 +4,37 @@ Read when the user asks for a containerized dev environment or for
 training to run on a server or in a container. Never scaffold either
 unprompted.
 
-## Is a container needed at all?
+## Generic GPU container decisions
 
-When `uv pip sync requirements.txt` works directly on the target machine,
-skip containers. Legitimate reasons to add one: the server's environment
-is not yours to control, CUDA/driver versions drift between machines, the
-team needs identical dev environments, or the deployment platform demands
-an image. The dev container and the training image are two independent
-decisions — take either without the other.
+Whether a container is needed at all, CUDA/ROCm base-image selection with
+live tag discovery, and GPU access wiring (docker run, Compose, dev
+containers, shared memory) belong to the `meta-gpu-container` skill — make
+those decisions there first. If it is not installed, install it from
+https://github.com/ryan-minato/skills.git:
 
-## Base image
+    npx skills add ryan-minato/skills --skill meta-gpu-container
 
-| Image | Positioning |
-|---|---|
-| `nvidia/cuda` (`base`/`runtime`/`devel` variants) + Python and torch from this project's compiled requirements — the default here | Only the CUDA layer comes from the image; the environment equals the committed `requirements.txt`, which is this scaffold's whole reproducibility story |
-| `nvcr.io/nvidia/pytorch` (NGC) | NVIDIA's tuned full stack (CUDA, cuDNN, NCCL) with torch preinstalled; large |
-| `pytorch/pytorch` (`-runtime`/`-devel`) | The PyTorch project's slim images, torch preinstalled |
-| `rocm/pytorch` | AMD GPUs |
+The rest of this reference is what is specific to this scaffold.
 
-Preinstalled-torch images conflict with the compiled requirements: either
-the image's torch is authoritative (drop torch from `requirements.in` and
-record that rule in AGENTS.md) or — the default — build on `nvidia/cuda`
-and install everything from the compiled file. Tags are always enumerated
-live from the registry, never assumed.
+## Base image and the compiled requirements
 
-## GPU access
-
-- Host prerequisite for NVIDIA: the NVIDIA Container Toolkit. AMD needs the
-  kernel driver plus device nodes only. Verify current setup in official
-  first-party documentation.
-- `docker run`: `--gpus all` (or `--gpus 'device=N'` to expose a subset);
-  ROCm passes devices through with `--device /dev/kfd --device /dev/dri`.
-- Compose: a device reservation under the service
-  (`deploy.resources.reservations.devices` with `driver: nvidia` and
-  `capabilities: [gpu]`); verify current syntax in the Compose documentation.
-- Dev container: declare `"hostRequirements": {"gpu": "optional"}` and
-  nothing else — implementations inject `--gpus all` when a GPU runtime
-  is present and skip it otherwise, so one config serves GPU and
-  CPU-only machines. Verify the current dev-container specification. Two known limits:
-  detection keys on the *runtime*, so a machine with the NVIDIA runtime
-  but no GPU can fail to start; and compose-based dev containers ignore
-  the field. In both cases fall back to explicit
-  `"runArgs": ["--gpus", "all"]`, accepting the config then only works
-  on GPU machines.
-- DataLoader workers exhaust Docker's default shared memory: raise it
-  (`--shm-size`, compose `shm_size`, or `ipc: host`) in any training
-  container.
+The default is `nvidia/cuda` (a `runtime` variant unless something compiles
+CUDA code) with Python and every package installed by
+`uv pip sync requirements.txt`: only the CUDA layer comes from the image,
+and the environment equals the committed `requirements.txt` — this
+scaffold's whole reproducibility story. A preinstalled-torch image (NGC
+`nvcr.io/nvidia/pytorch`, `pytorch/pytorch`) conflicts with the compiled
+requirements; if one is chosen, the image's torch is authoritative — drop
+torch from `requirements.in` and record that rule in AGENTS.md. Tags are
+always enumerated live from the registry, never assumed.
 
 ## Volumes and data
 
 Mount `data/`, `outputs/`, and the Hugging Face cache directory as
 volumes. Images contain the environment only — never data, checkpoints,
 or credentials. Record the container-path ↔ config-path mapping in
-AGENTS.md.
+AGENTS.md. DataLoader workers exhaust Docker's default shared memory;
+the assets raise it.
 
 ## Assets
 
