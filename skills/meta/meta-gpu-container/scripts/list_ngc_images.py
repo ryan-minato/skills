@@ -43,10 +43,10 @@ def search_page(query: str, page: int) -> dict:
             f"The unofficial search endpoint may have changed; "
             f"browse {BROWSE_URL} instead."
         )
-    except urllib.error.URLError as error:
+    except (urllib.error.URLError, TimeoutError, OSError) as error:
         sys.exit(
-            f"Could not reach the NGC catalog ({error.reason}).\n"
-            f"Check network access, or browse {BROWSE_URL} instead."
+            f"Could not reach the NGC catalog ({error}).\n"
+            f"Check network access, retry, or browse {BROWSE_URL} instead."
         )
 
 

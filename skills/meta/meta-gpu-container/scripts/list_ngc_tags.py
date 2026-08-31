@@ -40,10 +40,10 @@ def fetch_json(url: str, headers: dict | None = None) -> dict:
             f"Check the image name (an <org>/<repo> from the catalog), or "
             f"browse {BROWSE_URL} instead. Non-public images need credentials."
         )
-    except urllib.error.URLError as error:
+    except (urllib.error.URLError, TimeoutError, OSError) as error:
         sys.exit(
-            f"Could not reach nvcr.io ({error.reason}).\n"
-            f"Check network access, or browse {BROWSE_URL} instead."
+            f"Could not reach nvcr.io ({error}) for {url}\n"
+            f"Check network access, retry, or browse {BROWSE_URL} instead."
         )
 
 

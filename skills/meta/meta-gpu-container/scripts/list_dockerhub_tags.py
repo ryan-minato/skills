@@ -35,10 +35,10 @@ def fetch_json(url: str) -> dict:
             f"Docker Hub returned HTTP {error.code} for {url}\n"
             f"Check the repository name, or browse {BROWSE_URL}<name> instead."
         )
-    except urllib.error.URLError as error:
+    except (urllib.error.URLError, TimeoutError, OSError) as error:
         sys.exit(
-            f"Could not reach Docker Hub ({error.reason}).\n"
-            f"Check network access, or browse {BROWSE_URL}<name> instead."
+            f"Could not reach Docker Hub ({error}) for {url}\n"
+            f"Check network access, retry, or browse {BROWSE_URL}<name> instead."
         )
 
 
