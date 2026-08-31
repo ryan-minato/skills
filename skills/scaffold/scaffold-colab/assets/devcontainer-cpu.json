@@ -1,0 +1,27 @@
+{
+  "name": "<project name>",
+  "image": "<region>-docker.pkg.dev/colab-images/public/cpu-runtime",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "configureZshAsDefaultShell": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/git-lfs:1": {},
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "none",
+      "toolsToInstall": "uv,google-colab-cli,pre-commit,rust-just,ruff"
+    }
+  },
+  "postCreateCommand": "pre-commit install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "editorconfig.editorconfig",
+        "google.colab",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "ms-vscode-remote.remote-containers"
+      ]
+    }
+  }
+}

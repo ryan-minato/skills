@@ -22,6 +22,7 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | Description |
 |---|---|
+| [scaffold-colab](scaffold-colab/) | Scaffold a Colab-centric project whose deliverable is Google Colab notebooks: root-level notebooks mirrored to real Colab, an official Colab-runtime devcontainer for first-pass validation, colab-mcp connectivity, and a readable-notebook doctrine. |
 | [scaffold-data-science](scaffold-data-science/) | Scaffold a reproducible Python data-science project: immutable raw inputs, a validated transformation pipeline, and data products that record where they came from, across local, S3, or Hugging Face storage. |
 | [scaffold-disposal](scaffold-disposal/) | Dry-run and remove the copied disposable scaffold skills after fresh confirmation, without touching durable skills or another catalog's builders. |
 | [scaffold-ml](scaffold-ml/) | Scaffold a machine-learning project as either a quick experiment or a maintainable training codebase, with hardware-aware dependencies, reproducible runs, and optional containers. |

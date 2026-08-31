@@ -1,0 +1,19 @@
+# Colab runtime image — region chosen by the user; GPU projects use
+# .../public/runtime and add --gpus=all to the docker run lines.
+image := "<region>-docker.pkg.dev/colab-images/public/cpu-runtime"
+
+# Start a local Colab runtime for the web UI (Connect → local runtime;
+# paste the tokened URL the container prints).
+runtime:
+    docker run -p 127.0.0.1:9000:8080 {{image}}
+
+# Execute a notebook headlessly in the runtime image — first-pass check
+# only; the confirming run happens on real Colab.
+validate nb:
+    docker run --rm -v "$PWD:/content" -w /content {{image}} \
+        python -m jupyter nbconvert --to notebook --execute \
+        --output-dir /tmp --output validated {{nb}}
+
+lint:
+    ruff check .
+    ruff format --check .
