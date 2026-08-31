@@ -36,7 +36,7 @@ Public skills are grouped into catalogs under `skills/`:
   Install the whole catalog for a harness build. Their durable output lives
   in the target project; the builders are removed after verification.
 - `scaffold` — disposable, project-scoped builders for a project of a specific
-  topic (ML, data science). They are alternatives to one another: install the
+  topic (ML, data science, Colab notebooks). They are alternatives to one another: install the
   one matching the project, alongside whichever `meta` builders apply. Removed
   after verification, normally together with `meta`.
 - `util` — process skills that act on the collaboration itself: clarifying,
