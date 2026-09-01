@@ -1,5 +1,5 @@
 ---
-name: agent-first-writing
+name: agentic-writing
 description: >
   Agent-first documents — writes, reviews, improves, and prunes the files an
   agent reads before it works: AGENTS.md and other entrypoints, CLAUDE.md,
@@ -15,7 +15,7 @@ description: >
 license: Apache-2.0
 ---
 
-# Agent-First Writing
+# Agentic Writing
 
 An agent-first document is read by an agent first and a person second. Every
 line it loads spends a scarce resource — not only tokens, but attention:

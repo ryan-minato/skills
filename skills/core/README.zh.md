@@ -12,7 +12,7 @@ npx skills add ryan-minato/skills --skill <skill-name> -g
 
 | Skill | 说明 |
 |---|---|
-| [agent-first-writing](agent-first-writing/) | 编写、审查并精简 agent 阅读的文档——入口点文件、知识库、agent 面向的规范格式：把上下文花在改变行为上，按加载形态而非主题拆分，以触发条件措辞上下文指针，用 leading word 锚定行为，以正向表述取代禁令，每个含义只留一个权威来源，并按预期最弱的模型精简。 |
+| [agentic-writing](agentic-writing/) | 编写、审查并精简 agent 阅读的文档——入口点文件、知识库、agent 面向的规范格式：把上下文花在改变行为上，按加载形态而非主题拆分，以触发条件措辞上下文指针，用 leading word 锚定行为，以正向表述取代禁令，每个含义只留一个权威来源，并按预期最弱的模型精简。 |
 | [conventional-commits](conventional-commits/) | 起草符合 Conventional Commits 1.0.0 规范的 git 提交信息：规则优先级（文档 > commitlint 配置 > 历史 > 默认值）、首个匹配即停的 type 决策列表、scope 与破坏性变更策略，以及交付前校验清单。 |
 | [devcontainer-setup](devcontainer-setup/) | 在可信来源策略下创建与修改 dev container 配置（mcr.microsoft.com/devcontainers、NVIDIA NGC、ghcr.io/devcontainers、ghcr.io/stacit-ai），内置来源枚举脚本、非预构建镜像的基线 feature 规则，以及 NVIDIA/AMD GPU 指引。 |
 | [git-commit](git-commit/) | 以有序门禁执行完整的 git 提交工作流：按明确优先级发现项目约定、检查变更原子性、扫描暂存 diff 中的机密与 PII、核对提交者身份、运行 hooks 与本地检查，并在提交前用内置脚本校验提交信息。 |
