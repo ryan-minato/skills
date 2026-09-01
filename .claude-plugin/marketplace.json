@@ -11,7 +11,7 @@
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/core/agent-first-writing",
+        "./skills/core/agentic-writing",
         "./skills/core/conventional-commits",
         "./skills/core/devcontainer-setup",
         "./skills/core/git-commit",
