@@ -33,7 +33,9 @@
         "./skills/engineering/design-md",
         "./skills/engineering/devcontainer-authoring",
         "./skills/engineering/gitmoji",
-        "./skills/engineering/goal-alignment"
+        "./skills/engineering/goal-alignment",
+        "./skills/engineering/knowledge-deposition",
+        "./skills/engineering/session-retrospective"
       ],
       "description": "General programming methodology skills and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
     },

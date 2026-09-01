@@ -5,8 +5,9 @@ Rules, notes, and references that apply only to skills in this catalog.
 
 The catalog holds two classes of skills:
 
-- **Methodology skills** (code-refactoring, gitmoji, goal-alignment):
-  approaches that transfer across languages and frameworks.
+- **Methodology skills** (code-refactoring, gitmoji, goal-alignment,
+  knowledge-deposition, session-retrospective): approaches that transfer
+  across languages and frameworks.
 - **Artifact-authoring skills** (devcontainer-authoring, design-md): the full
   design→test→publish lifecycle of a specific engineering artifact
   ecosystem that is too narrow to justify its own catalog. Also exempt
@@ -46,7 +47,18 @@ workflows — → the `meta` catalog's `meta-github-workflow` /
 `meta-gitlab-workflow` · authoring Dev Container artifacts (Features,
 Templates, prebuilt images) → `devcontainer-authoring`; consuming them in
 a project's own devcontainer.json → `devcontainer-setup` in `core` ·
-durable visual-design specifications → `design-md`.
+durable visual-design specifications → `design-md` · mining a work session
+for durable lessons and getting them approved → `session-retrospective`;
+saving one confirmed piece of knowledge into a project's entrypoint,
+knowledge base, or skills → `knowledge-deposition`; how the deposited
+agent-facing text is written — pointers, pruning, one source of truth — →
+`agentic-writing` in `core`; building, auditing, or restructuring a
+project's complete agent harness — entrypoints, knowledge trees, sync
+mechanisms — → the `meta` catalog's `meta-harness-architecture` (the two
+skills here only evolve an existing setup incrementally during normal
+work); authoring a public or substantial Agent Skill →
+`great-skill-writer` in `core`, plus the `skill-authoring` project skill
+for skills in this repository.
 
 ## References
 
