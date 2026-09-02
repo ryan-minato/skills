@@ -2,11 +2,11 @@
 name: meta-agent-authority
 description: >-
   Disposable meta-skill (delete after the harness is built): sets the project
-  policy for what coding agents may do on their own — whether an agent may
+  policy for what agents may do on their own — whether an agent may
   mark a PR or MR ready, request review, approve, merge, or release — via the
   H0–H3 authority levels, the review-admission and integration gates,
-  escalation conditions, and the no-self-escalation rule. Use when deciding or asked
-  whether the agent can merge, release, or send its work to review by itself;
+  escalation conditions, and the no-self-escalation rule. Use when deciding,
+  or when asked, whether the agent can merge, release, or send its work to review by itself;
   when the user wants an agent to have more (or less) autonomy as official
   project policy; or when an agent marked work ready, requested review, or
   merged without asking and the project needs rules so it does not recur. Not

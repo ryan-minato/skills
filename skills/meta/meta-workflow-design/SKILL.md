@@ -29,9 +29,11 @@ platform in mind and survive this builder and this conversation.
 
 - The contract is platform-neutral. No platform object — a board product, an
   epic object, a label system, a sprint feature — may appear in the model or
-  in the deposited contract; platform names appear only in the sentence that
-  hands off to the next builder. Platform capability never implies management
-  necessity: nothing enters the model because some host has a feature for it.
+  in the deposited contract, and platform names never enter the deposited
+  file at all: the hand-off to the next builder lives in the conversation
+  and the entrypoint pointer, and the step-5 vocabulary check enforces
+  exactly this. Platform capability never implies management necessity:
+  nothing enters the model because some host has a feature for it.
 - No entity without necessity. Every work-item kind, hierarchy level, status,
   attribute, planning surface, or boundary must answer the deletion test —
   what management ability is lost if it is removed — and its benefit must

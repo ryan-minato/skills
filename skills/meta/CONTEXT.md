@@ -34,8 +34,8 @@ Rules for disposable builders that create durable agent harnesses.
 ## Scope
 
 This catalog owns generic, pluggable harness machinery: complete harness
-architecture, platform-neutral contract builders (branching model, project
-management model, agent authority) whose contracts the platform builders
+architecture, platform-neutral contract builders (branching, project
+workflow, agent authority) whose contracts the platform builders
 consume, platform-specific lifecycle builders whose complete output is
 deposited into the target project before disposal, and language-level
 convention defaults. Its skills stack alongside one another, so the catalog is

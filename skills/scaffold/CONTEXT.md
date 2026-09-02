@@ -43,8 +43,8 @@ it excludes the catalog's other topic builders. The catalog also holds
 them, and it ships here so the catalog can be installed without `meta`.
 
 Generic, pluggable harness machinery — complete harness architecture,
-platform-neutral contract builders (branching model, project management
-model, agent authority), platform lifecycle workflows, language-level
+platform-neutral contract builders (branching, project workflow, agent
+authority), platform lifecycle workflows, language-level
 convention defaults — belongs to the `meta` catalog, whose skills stack
 alongside whichever scaffold is chosen. Durable
 cross-project methodology remains in `core/meta-harness`.

@@ -31,8 +31,8 @@ operable after this skill and the conversation are gone.
   prove.
 - This builder expresses upstream decisions; it does not make them. Read the
   target's platform-neutral contracts first —
-  `.agents/knowledge/project-workflow.md` (management model) and
-  `.agents/knowledge/agent-authority.md` (agent authority) — and treat every
+  `.agents/knowledge/project-workflow.md` (workflow contract) and
+  `.agents/knowledge/agent-authority.md` (authority policy) — and treat every
   decision they settle as fixed: map it, never re-ask, reopen, or quietly
   bypass it. Platform capability implies neither management necessity nor
   agent authority — a Maintainer token raises nothing — and where GitLab
