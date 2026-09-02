@@ -1,16 +1,17 @@
 ---
 name: meta-workflow-design
 description: >-
-  Disposable meta-skill (delete after the harness is built): co-designs a
-  project's management model with its human developers — which work-tracking
-  semantics the project actually earns, a workflow profile matching how it
-  really ships, and the overlays and change-propagation risks that adjust it —
-  then deposits a platform-neutral workflow contract that the platform
-  lifecycle builders map. Use when initializing or redesigning how a project
-  tracks, plans, and accepts work — "how should we track work", "do we need
-  sprints, epics, or a board", "our issue tracker is a mess", "design the
-  project management workflow". Not for expressing the contract on GitHub or
-  GitLab (the platform lifecycle builders), choosing a branching model
+  Disposable meta-skill (delete after the harness is built): designs how a
+  project tracks, plans, and accepts work — settling with the humans
+  which structures the project actually earns (work items, hierarchy,
+  objectives, timeboxes, priorities, planning views) and depositing a
+  platform-neutral workflow contract the platform builders then
+  express. Use when asked how a project or team should track, plan, organize,
+  or prioritize its work; whether it needs sprints, epics, boards, milestones,
+  or priorities; when a solo project grows into a team and the process must be
+  rethought; or when an issue tracker or backlog is a mess and the management
+  process needs redesign ("帮我设计项目管理流程"). Not for expressing the
+  contract on GitHub or GitLab (the platform builders), choosing a branching model
   (meta-git-branching), agent permissions (meta-agent-authority), or one-off
   issue and pull-request operations.
 license: Apache-2.0

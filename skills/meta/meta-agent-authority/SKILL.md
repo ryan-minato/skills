@@ -1,18 +1,19 @@
 ---
 name: meta-agent-authority
 description: >-
-  Disposable meta-skill (delete after the harness is built): designs the
-  human–agent governance policy for a project — how much project-management
-  authority coding agents hold (H0–H3), where the review-admission and
-  integration gates sit, what escalates to a human, and the rule that agents
-  never widen their own authority — then deposits it as a durable policy file.
-  Use when deciding whether an agent may mark work ready, request review,
-  approve, merge, or release; when asked to give an agent more or less
-  autonomy or to make its boundaries official; or when an agent took one of
-  those actions uninvited and the project needs a policy. Not for harness
-  permission allowlists or tool approval settings, platform token scopes or
-  branch-protection configuration (the platform lifecycle builders), or how
-  finely a human phrases individual task instructions.
+  Disposable meta-skill (delete after the harness is built): sets the project
+  policy for what coding agents may do on their own — whether an agent may
+  mark a PR or MR ready, request review, approve, merge, or release — via the
+  H0–H3 authority levels, the review-admission and integration gates,
+  escalation conditions, and the no-self-escalation rule. Use when deciding or asked
+  whether the agent can merge, release, or send its work to review by itself;
+  when the user wants an agent to have more (or less) autonomy as official
+  project policy; or when an agent marked work ready, requested review, or
+  merged without asking and the project needs rules so it does not recur. Not
+  for harness permission allowlists or tool approval settings (configuration,
+  not project policy), platform token scopes or branch protection (the
+  platform lifecycle builders), or how finely a human phrases task
+  instructions.
 license: Apache-2.0
 ---
 
