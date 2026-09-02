@@ -37,6 +37,21 @@ and operable after this skill and the conversation are gone.
 - Research facts before asking. Ask the user only for preferences, authority,
   risk tolerance, ownership, and decisions the repository or GitHub cannot
   prove.
+- This builder expresses upstream decisions; it does not make them. Read the
+  target's platform-neutral contracts first —
+  `.agents/knowledge/project-workflow.md` (management model) and
+  `.agents/knowledge/agent-authority.md` (agent authority) — and treat every
+  decision they settle as fixed: map it, never re-ask, reopen, or quietly
+  bypass it. Platform capability implies neither management necessity nor
+  agent authority — an admin token raises nothing — and where GitHub lacks a
+  faithful representation of a contract semantic, degrade to an explicit
+  convention instead of a near-fitting object with different semantics.
+  When no contract exists, offer to design one first with
+  `meta-workflow-design` (install from
+  https://github.com/ryan-minato/skills.git: `npx skills add
+  ryan-minato/skills`); if the user declines, decide here as before, and
+  treat agent authority as the conservative default: agents stop at draft
+  pull requests and a human admits changes to review.
 - Do not act from an unapproved design. Local files, remote settings, and
   GitHub objects are all downstream of the consensus and plan gates below.
 - The security baseline is the default proposal, not an option: a protected
@@ -84,6 +99,11 @@ read-only tooling and capability probe, and
 [`scripts/analyze_history.py`](scripts/analyze_history.py) when commit or
 release conventions are in scope.
 
+The workflow and authority contracts — `.agents/knowledge/project-workflow.md`
+and `.agents/knowledge/agent-authority.md`, when present — are stage-1
+deliverables: read them before anything else and record which decisions they
+settle, because those decisions never re-enter the design tree.
+
 The capability quadrant — owner type, plan, visibility, and any GHES
 version — plus Actions availability, the default token policy, and the
 allowed-actions policy are stage-1 deliverables, not details: they gate
@@ -117,9 +137,11 @@ explicit tree of prerequisites, decisions, answers, and dependency edges.
 Recompute its frontier after every answer. Ask the whole frontier in one
 round, number every question, attach one reasoned recommendation, then wait.
 
-The first frontier leads with enforcement posture — what can actually block
-a merge here, asked as a subtraction from the security baseline rather than
-as a blank slate — then automation boundaries on people-facing objects,
+Filter the frontier against the contracts first: a planning method, axis,
+hierarchy, cadence, or autonomy decision the workflow or authority contract
+settles is a fact to map, not a question to ask. The first frontier leads
+with enforcement posture — what can actually block a merge here, asked as a
+subtraction from the security baseline rather than as a blank slate — then automation boundaries on people-facing objects,
 third-party action policy, secret and deploy authority, and, only where
 applicable, private-repo billing and runner substrate, alongside planning
 method, review shape, agent autonomy, and outside contributions. Resolve
@@ -139,6 +161,7 @@ load only the references whose conditions now apply:
 
 | Selected capability | Read |
 |---|---|
+| The target carries a workflow or authority contract, or contract semantics (objective boundaries, timeboxes, planning surfaces, hierarchy, priority) need GitHub representations | [semantic-mapping.md](references/semantic-mapping.md) |
 | Commit format, branch naming, merge method, squash behavior, merge queue, or commit enforcement | [commits-and-contributions.md](references/commits-and-contributions.md) |
 | Labels, milestones, tracking issues, sub-issue hierarchy, issue types, or triage states | [planning-and-goals.md](references/planning-and-goals.md) |
 | The repository is organization-owned and its issue types or issue fields need auditing or initializing | [org-configuration.md](references/org-configuration.md) |
