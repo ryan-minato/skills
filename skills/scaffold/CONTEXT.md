@@ -42,9 +42,11 @@ it excludes the catalog's other topic builders. The catalog also holds
 `scaffold-disposal`, which is not a topic builder: it is the tool that removes
 them, and it ships here so the catalog can be installed without `meta`.
 
-Generic, pluggable harness machinery — complete harness architecture, platform
-lifecycle workflows, language-level convention defaults — belongs to the `meta`
-catalog, whose skills stack alongside whichever scaffold is chosen. Durable
+Generic, pluggable harness machinery — complete harness architecture,
+platform-neutral contract builders (branching model, project management
+model, agent authority), platform lifecycle workflows, language-level
+convention defaults — belongs to the `meta` catalog, whose skills stack
+alongside whichever scaffold is chosen. Durable
 cross-project methodology remains in `core/meta-harness`.
 
 Both catalogs are disposable and are normally removed together once the project

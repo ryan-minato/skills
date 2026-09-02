@@ -20,6 +20,10 @@ Rules for disposable builders that create durable agent harnesses.
 - Preserve working project choices; scaffolding is not permission to migrate.
 - Builders investigate before editing. The complete architecture builder must
   present its concrete harness plan and receive user approval before construction.
+- Contract flow is one-way. Contract builders (branching model, workflow
+  design, agent authority) deposit platform-neutral contracts into the target
+  project; platform builders consume those contracts, never reopen a settled
+  decision, and never let a platform capability reshape the upstream model.
 - Durable rules must land in the target repository, registered tools, or other
   reachable sources before disposal.
 - Do not ship documentation indexes, URL registries, docs-navigation tables, or
@@ -30,7 +34,9 @@ Rules for disposable builders that create durable agent harnesses.
 ## Scope
 
 This catalog owns generic, pluggable harness machinery: complete harness
-architecture, platform-specific lifecycle builders whose complete output is
+architecture, platform-neutral contract builders (branching model, project
+management model, agent authority) whose contracts the platform builders
+consume, platform-specific lifecycle builders whose complete output is
 deposited into the target project before disposal, and language-level
 convention defaults. Its skills stack alongside one another, so the catalog is
 installed whole. A builder whose topic selects the entire project shape — and
