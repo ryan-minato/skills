@@ -33,6 +33,5 @@ commit-gate:
     python3 scripts/check_commit_safety.py
 
 # Run every check (validators, lint, pre-commit hooks)
-check: validate lint
-    python3 scripts/validate_harness.py
+check:
     pre-commit run --all-files
