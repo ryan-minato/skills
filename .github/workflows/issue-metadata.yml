@@ -5,108 +5,24 @@ on:
     types: [opened, edited]
 
 permissions:
+  contents: read
   issues: write
 
 concurrency:
   group: issue-metadata-${{ github.event.issue.number }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   sync-labels:
+    name: issues / metadata
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v7
-        with:
-          script: |
-            const body = context.payload.issue.body || '';
-            const priorityLabels = new Map([
-              ['critical', 'priority/critical'],
-              ['high', 'priority/high'],
-              ['medium', 'priority/medium'],
-              ['low', 'priority/low'],
-            ]);
-            const catalogLabels = new Map([
-              ['core', 'catalog/core'],
-              ['engineering', 'catalog/engineering'],
-              ['meta', 'catalog/meta'],
-              ['scaffold', 'catalog/scaffold'],
-              ['util', 'catalog/util'],
-              ['writing', 'catalog/writing'],
-            ]);
-
-            function section(name) {
-              const marker = `### ${name}`;
-              const start = body.toLowerCase().indexOf(marker.toLowerCase());
-              if (start < 0) return null;
-              const contentStart = body.indexOf('\n', start + marker.length);
-              if (contentStart < 0) return [];
-              const nextSection = body.indexOf('\n### ', contentStart + 1);
-              const value = body
-                .slice(contentStart + 1, nextSection < 0 ? body.length : nextSection)
-                .trim();
-              if (!value || value === '_No response_') return [];
-              return value
-                .split(/\r?\n|,/)
-                .map((item) => item.replace(/^[-*]\s*/, '').trim().toLowerCase())
-                .filter(Boolean);
-            }
-
-            const priorities = section('Priority');
-            const catalogs = section('Catalog');
-            if (priorities === null && catalogs === null) {
-              core.info('No managed Issue Form fields found; leaving labels unchanged.');
-              return;
-            }
-
-            // Catalog labels this workflow used to manage. They stay
-            // strippable so an issue edited after its catalog was removed does
-            // not keep the stale label beside the new one; the never-prune rule
-            // means the label itself survives on the repository.
-            const retiredCatalogLabels = ['catalog/ops'];
-
-            const desired = new Set();
-            const managed = new Set();
-            for (const label of priorityLabels.values()) managed.add(label);
-            for (const label of catalogLabels.values()) managed.add(label);
-            for (const label of retiredCatalogLabels) managed.add(label);
-
-            if (priorities !== null) {
-              const selected = priorities.map((value) => priorityLabels.get(value)).filter(Boolean);
-              if (selected.length !== 1) {
-                core.warning('Priority is missing or invalid; leaving managed labels unchanged.');
-                return;
-              }
-              desired.add(selected[0]);
-            }
-            if (catalogs !== null) {
-              const selected = catalogs.map((value) => catalogLabels.get(value)).filter(Boolean);
-              if (selected.length === 0) {
-                core.warning('Catalog is missing or invalid; leaving managed labels unchanged.');
-                return;
-              }
-              for (const label of selected) desired.add(label);
-            }
-
-            const current = context.payload.issue.labels.map((label) => label.name);
-            const toRemove = current.filter((label) => {
-              if (!managed.has(label) || desired.has(label)) return false;
-              if (label.startsWith('priority/')) return priorities !== null;
-              return catalogs !== null;
-            });
-            const toAdd = [...desired].filter((label) => !current.includes(label));
-
-            for (const label of toRemove) {
-              await github.rest.issues.removeLabel({
-                ...context.repo,
-                issue_number: context.issue.number,
-                name: label,
-              });
-            }
-            if (toAdd.length > 0) {
-              await github.rest.issues.addLabels({
-                ...context.repo,
-                issue_number: context.issue.number,
-                labels: toAdd,
-              });
-            }
-            core.info(`Added: ${toAdd.join(', ') || 'none'}; removed: ${toRemove.join(', ') || 'none'}.`);
+      - name: Checkout default branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Synchronize managed labels
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          python3 scripts/sync_issue_metadata.py
+          --event "$GITHUB_EVENT_PATH"
+          --apply

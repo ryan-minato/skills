@@ -25,6 +25,6 @@ Closes #
 - [ ] `just check` passes locally
 - [ ] Task-specific tests are recorded and pass
 - [ ] No secrets, credentials, or personal data are present
-- [ ] Commits are atomic and follow Conventional Commits
+- [ ] Non-merge/revert commits are atomic and follow Conventional Commits
 - [ ] Documentation and paired translations are updated where required
 - [ ] Public Skill indexes and marketplace metadata are synchronized where required

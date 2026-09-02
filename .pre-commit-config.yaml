@@ -29,7 +29,7 @@ repos:
         args: ['--config', '.gitleaks.toml']
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.2
+    rev: v0.16.5
     hooks:
       - id: ruff
         files: ^scripts/
@@ -38,6 +38,12 @@ repos:
 
   - repo: local
     hooks:
+      - id: validate-harness
+        name: validate repository harness synchronization
+        entry: python3 scripts/validate_harness.py
+        language: system
+        pass_filenames: false
+        always_run: true
       - id: validate-skills
         name: validate skill layout and harness consistency
         entry: python3 scripts/validate_skills.py

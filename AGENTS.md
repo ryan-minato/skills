@@ -44,9 +44,9 @@ Catalogs section of `ARCHITECTURE.md`.
   `.agents/knowledge/skill-quality.md`.
 - **Checks**: always run checks through justfile recipes (`just check`),
   never ad-hoc equivalents, so results are consistent everywhere.
-- **Commits**: Conventional Commits in English; scope is the modified skill
-  name(s), `", "`-separated; omit the scope for non-skill or repo-wide
-  changes. Classify changes to distributable skills by their effect: `fix`
+- **Commits**: non-merge/revert commits use Conventional Commits in English;
+  scope is the modified skill name(s), `", "`-separated; omit the scope for
+  non-skill or repo-wide changes. Classify changes to distributable skills by their effect: `fix`
   corrects wrong, misleading, overly restrictive, or overly permissive
   installed behavior; `feat` adds a new capability; and `refactor`
   restructures without changing behavior. Correction takes precedence over
@@ -54,16 +54,24 @@ Catalogs section of `ARCHITECTURE.md`.
   change an installed skill; file format does not decide the type. Template:
   `.gitmessage` (installed by `just setup`).
 - **Task management**: GitHub is the only task-management platform. Issues are
-  optional; every change has a dedicated branch and PR. Link an Issue with
-  `Closes #N`, or record `N/A — <reason>` in the PR.
-- **Workflow**: before tracked work, verify `gh` installation and login and
-  obtain explicit authorization for remote writes. Use atomic commits and the
-  draft-to-ready PR lifecycle in the `change-workflow` project skill.
+  optional; the platform-neutral rules live in
+  `.agents/knowledge/project-workflow.md`.
+- **Agent authority**: `.agents/knowledge/agent-authority.md` is the sole
+  source of truth for ready, review, merge, release, and escalation authority.
+- **Workflow**: use the `change-workflow` project skill for tracked work. It
+  requires atomic commits, explicit authorization for remote writes, and the
+  draft-to-ready pull-request lifecycle.
 
 ## When To Read What
 
 - Starting any proactive change, or preparing a branch, commit series, or
   PR handoff → use the `change-workflow` project skill.
+- Creating, splitting, or closing tracked work; starting a change request; or
+  proposing management structure → read
+  `.agents/knowledge/project-workflow.md`.
+- Marking work ready, requesting review, approving, merging, releasing,
+  deploying, or resolving an authority question → read
+  `.agents/knowledge/agent-authority.md`.
 - Creating or modifying any skill → use the `skill-authoring` project skill;
   it routes to `.agents/knowledge/skill-quality.md`, the catalog's
   `CONTEXT.md`, subagent-capability-gated behavioral tests, and independent
@@ -73,6 +81,9 @@ Catalogs section of `ARCHITECTURE.md`.
 - External documentation URLs → `.agents/knowledge/references.md`.
 - Labels, Issue Forms, or PR policy changed → inspect `.github/` and keep every
   referenced label and exact validated heading synchronized.
+- GitHub checks or remote settings changed → read
+  `.agents/knowledge/github/checks.md` and
+  `.agents/knowledge/github/platform-settings.md`.
 - Repo mechanics (symlinks, plugin marketplace, sync design) →
   `ARCHITECTURE.md`.
 
@@ -82,6 +93,7 @@ Catalogs section of `ARCHITECTURE.md`.
 - `just validate` — skill layout and harness consistency only.
 - `just check-skill <dir>...` — lint specific skill directories while drafting.
 - `just lint` — ruff over `scripts/`.
+- `just test` — unit tests for repository tooling.
 - `just commit-gate` — pre-commit safety gate over staged changes.
 - `just gen-marketplace` — regenerate `marketplace.json` skills[] after
   adding or removing a public skill.
@@ -91,13 +103,16 @@ Catalogs section of `ARCHITECTURE.md`.
 | When this changes | Update |
 |---|---|
 | Public skill added/removed | Symlink in `.agents/skills/`, catalog `README.md` + `README.zh.md`, and `.claude-plugin/marketplace.json` (`just gen-marketplace`) |
-| Catalog added/removed | Catalog scaffold, the Catalogs section in `ARCHITECTURE.md`, `.claude-plugin/marketplace.json` (a plugin entry once the catalog has a skill), the root `README.md` + `README.zh.md` catalog tables and plugin-install lines, `.github/labels.json`, both Issue Forms' `Catalog` options, and the `catalogLabels` map in `.github/workflows/issue-metadata.yml` |
+| Catalog added/removed | Catalog scaffold, the Catalogs section in `ARCHITECTURE.md`, `.claude-plugin/marketplace.json` (a plugin entry once the catalog has a skill), the root `README.md` + `README.zh.md` catalog tables and plugin-install lines, `.github/labels.json`, both Issue Forms' `Catalog` options, and `CATALOG_LABELS` in `scripts/sync_issue_metadata.py` |
 | Any `README.md` | The matching `README.zh.md` (and vice versa) |
 | `.github/labels.json` | After explicit authorization, dry-run `python3 scripts/sync_labels.py --file .github/labels.json --repo ryan-minato/skills`, then re-run with `--apply`; never `--prune` |
 | `scripts/sync_labels.py` | Its origin, `skills/meta/meta-github-workflow/scripts/sync_labels.py` — the copy exists because public skills cannot reference repo files; keep behavior identical or record why it diverged |
 | `skills/meta/meta-disposal/scripts/dispose.py` | Its copy, `skills/scaffold/scaffold-disposal/scripts/dispose.py` — the duplicate exists because public skills cannot reference each other; keep the two byte-identical, enforced by `check_disposal_script_copies()` in `scripts/validate_skills.py` |
 | NGC/registry access in `skills/meta/meta-gpu-container/scripts/` | `skills/core/devcontainer-setup/scripts/list_sources.py` — both hit the same undocumented NGC search endpoint and nvcr.io token handshake; self-containment keeps the implementations independent, so when a registry change breaks one, check and fix the other |
-| A catalog is removed | Also add its label to `retiredCatalogLabels` in `.github/workflows/issue-metadata.yml` so stale labels can still be stripped, and drop its prefix from `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.py` if it reserved one |
-| Issue Form `Priority` or `Catalog` options | `.github/labels.json` and `.github/workflows/issue-metadata.yml` mappings |
-| PR template headings or required checklist | `.github/workflows/pr-policy.yml` validation |
+| A catalog is removed | Also add its label to `RETIRED_CATALOG_LABELS` in `scripts/sync_issue_metadata.py` so stale labels can still be stripped, and drop its prefix from `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.py` if it reserved one |
+| Issue Form `Priority` or `Catalog` options | `.github/labels.json` and `scripts/sync_issue_metadata.py` mappings |
+| PR template headings or required checklist | `scripts/check_pr_policy.py` validation |
+| GitHub check name or command | `.agents/knowledge/github/checks.md`, its workflow, the remote ruleset, and `.agents/knowledge/github/platform-settings.md` |
+| GitHub merge, protection, Actions, or security setting | `.agents/knowledge/github/platform-settings.md` and the corresponding workflow/authority rule |
+| Project management or agent-authority policy | Its knowledge contract, `change-workflow`, and this entrypoint's routing line |
 | Repo structure or check commands | This file and `ARCHITECTURE.md` |

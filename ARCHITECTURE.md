@@ -12,7 +12,7 @@ skills/<catalog>/<skill-name>/   Public, distributable skills
   <catalog>/CONTEXT.md           Catalog-scoped rules and reference URLs
 .agents/
   skills/                        Skills visible to this repo's agents
-  knowledge/                     Git-tracked local knowledge base
+  knowledge/                     Contracts and conditional project knowledge
 .claude/skills -> ../.agents/skills
 .claude-plugin/marketplace.json  Plugin marketplace (one plugin per catalog)
 .github/                         GitHub collaboration policy and automation
@@ -125,6 +125,12 @@ it.
 Source of truth: **the knowledge files on origin's latest default branch**.
 Working-tree edits become authoritative only after merge.
 
+The knowledge base is layered. `project-workflow.md` defines platform-neutral
+management semantics, and `agent-authority.md` defines the H1 human-agent
+boundary. GitHub-specific check and settings registers live under
+`.agents/knowledge/github/`. `AGENTS.md` routes agents to each file only when
+its decisions apply.
+
 ## GitHub Workflow
 
 GitHub Issues provide optional task context, while every tracked change uses a
@@ -132,18 +138,29 @@ dedicated branch and pull request. `.github/labels.json` is the label taxonomy;
 Issue Forms collect priority and catalog metadata, and GitHub Actions keeps
 those managed labels aligned. The project-only `change-workflow` skill owns
 tooling checks, explicit remote authorization, atomic commits, and the draft to
-ready review lifecycle.
+ready review lifecycle. It consumes the workflow and authority contracts rather
+than defining their policy again.
+
+The human maintainer owns integration. Same-repository pull requests use rebase
+merge and fork pull requests use squash merge. GitHub cannot enforce that
+conditional choice, so the target remote configuration disables merge commits
+while the project skill and contributor guidance enforce the remaining
+convention. `.agents/knowledge/github/platform-settings.md` records whether
+that target has been synchronized.
 
 ## Quality Gates
 
-- `just check` = `validate` (skill layout/consistency) + `lint` (ruff over
-  `scripts/`) + `pre-commit run --all-files` (whitespace, secrets scanning,
-  ruff, validator).
+- `just check` = skill and harness validation + repository-tooling tests +
+  `lint` (ruff over `scripts/`) + `pre-commit run --all-files` (whitespace,
+  secrets scanning, ruff, validators).
 - pre-commit hooks are installed by `just setup` (run automatically by the
   devcontainer's `postCreateCommand`), which also sets the `.gitmessage`
   commit template.
-- CI runs secret scanning and PR policy validation; other repository checks
-  remain local by design.
+- CI runs `just check` as `checks / quality`, validates pull-request structure
+  and same-repository commit subjects as `pr / policy`, and retains the
+  existing `scan-secrets` workflow. All three are intended remote required
+  checks; the platform-settings register records current enforcement. CodeQL
+  remains advisory.
 
 Longer custom logic belongs in `scripts/`, not inline in justfile recipes or
 hooks.

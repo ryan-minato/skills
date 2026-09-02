@@ -10,7 +10,19 @@ metadata:
 Follow this for every tracked-file change. GitHub Issues are optional; the work
 branch and pull request are the durable record for every change.
 
-## 1. Gate GitHub tooling and authorization
+## 1. Resolve the governing contracts
+
+Read `.agents/knowledge/project-workflow.md` before starting the change and
+`.agents/knowledge/agent-authority.md` before any review-admission or
+integration action. H1 applies only after the goal, scope, non-goals,
+constraints, and acceptance criteria are complete. If they are incomplete,
+resolve them with the user before treating the work as autonomously authored.
+
+The authority contract is policy even when GitHub or an available token would
+permit more. Never edit either contract, a required check, or repository
+protection to unblock your own change.
+
+## 2. Gate GitHub tooling and authorization
 
 Run these checks before any other workflow step:
 
@@ -37,7 +49,7 @@ local branch and commit work but no remote writes.
 Done when: `gh auth status` succeeds and the allowed remote operations are
 recorded, or the workflow has stopped with exact setup or authorization needs.
 
-## 2. Resolve optional Issue context
+## 3. Resolve optional Issue context
 
 Derive `OWNER/REPO` from `git remote get-url origin`. If the user supplied an
 Issue, verify it with `gh issue view` and use it. Otherwise search open Issues
@@ -52,7 +64,7 @@ use `catalog/repository`.
 Record either the verified Issue number or a short reason why the change has no
 Issue. Never invent an identifier.
 
-## 3. Establish the branch
+## 4. Establish the branch
 
 Before the first tracked edit:
 
@@ -66,7 +78,7 @@ Before the first tracked edit:
 Use the dominant Conventional Commit type for `<type>`. Preserve unrelated user
 changes and never reset them away.
 
-## 4. Work in atomic milestones
+## 5. Work in atomic milestones
 
 Each commit is the smallest independently valid logical change:
 
@@ -86,7 +98,7 @@ approves a private address.
 After each milestone, record completed work, remaining work, deviations, and
 validation in the draft PR or current handoff.
 
-## 5. Publish the draft PR
+## 6. Publish the draft PR
 
 Open the draft after a coherent baseline implementation works and passes its
 applicable checks, before optional refinement and the final test pass:
@@ -102,7 +114,7 @@ The draft is the public ownership signal that prevents duplicate effort; it is
 not a claim that review can begin. Keep improvements, tests, and additional
 atomic commits on the same branch and update the PR body as evidence changes.
 
-## 6. Ready for review
+## 7. Ready for review
 
 Mark the PR ready only when all requested scope and refinement are complete:
 
@@ -114,10 +126,30 @@ Mark the PR ready only when all requested scope and refinement are complete:
    follow-ups; tick every required checklist item.
 5. Mark the draft ready for human review. Never merge it automatically.
 
+## 8. Hand off integration
+
+The human maintainer owns the integration decision and performs the merge.
+Use rebase merge for a branch in `ryan-minato/skills`; use squash merge for a
+fork pull request. GitHub cannot enforce this distinction by pull-request
+origin, so report the required method explicitly in the handoff. Merge commits
+are not allowed.
+
+Every readiness or escalation handoff must make the authority boundary
+decision-ready. State which authorized H1 author actions remain available
+(push, update the draft, mark ready, and request review), that the agent will
+not approve or merge, and the required integration method. Also state that the
+agent will not edit authority policy, required checks, or protection rules to
+unblock the change. If a required check is unavailable or unreliable, identify
+it as an escalation condition rather than presenting the change as ready.
+Include the goal, tests and CI state, actual scope and deviations, risks and
+limitations, and the human maintainer's available decisions.
+
 ## Gotchas
 
 - GitHub authorization is task-scoped; a successful `gh auth status` is not
   permission to publish.
+- A complete specification permits H1 review admission; it never permits an
+  agent to approve or merge.
 - Issue closing keywords take effect on merge, not when the PR becomes ready.
 - A branch, Issue, or PR does not authorize unrelated cleanup.
 - If unrelated work is discovered, report it separately instead of expanding
