@@ -21,7 +21,8 @@ Catalogs section of `ARCHITECTURE.md`.
 - `skills/<catalog>/<skill-name>/` — public, distributable skills.
 - `.agents/skills/` — project-only workflow skills (real directories) plus
   symlinks to every public skill, so this repo's agents can use them.
-  `.claude/skills` is a symlink to `.agents/skills` for Claude Code discovery.
+  `.claude/skills` (Claude Code discovery) and `.github/skills` (Copilot
+  code review) are both symlinks to `.agents/skills`.
 - `.agents/knowledge/` — git-tracked local knowledge base.
 - `.github/` — GitHub Issue intake, labels, pull request policy, and Actions.
 - `.claude-plugin/marketplace.json` — plugin marketplace: one plugin per

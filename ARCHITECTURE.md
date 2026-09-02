@@ -16,6 +16,7 @@ skills/<catalog>/<skill-name>/   Public, distributable skills
 .claude/skills -> ../.agents/skills
 .claude-plugin/marketplace.json  Plugin marketplace (one plugin per catalog)
 .github/                         GitHub collaboration policy and automation
+  skills -> ../.agents/skills    Copilot-facing path to the same skills
 scripts/                         Repository tooling
 justfile                         Canonical check recipes
 .gitmessage                      Commit message template
@@ -71,16 +72,18 @@ matches on, and the only key it may use.
 usable skills (the cross-client convention from the Agent Skills spec). It
 contains two kinds of entries:
 
-- **Project-only workflow skills** (`change-workflow`, `skill-authoring`):
-  real directories, created directly here. They serve this repo's own
-  workflows, are never distributed, and may reference repo paths.
+- **Project-only workflow skills** (`change-workflow`, `skill-authoring`,
+  `code-review`): real directories, created directly here. They serve this
+  repo's own workflows, are never distributed, and may reference repo paths.
 - **Symlinks to public skills**: every `skills/<catalog>/<name>/` gets a
   relative symlink `.agents/skills/<name> -> ../../skills/<catalog>/<name>`,
   so the repo can dogfood the skills it publishes.
 
 Claude Code only scans `.claude/skills/` for project skills, so
-`.claude/skills` is a directory symlink to `.agents/skills`. Other clients
-(Codex, Copilot, and anything following the spec) scan `.agents/skills/`
+`.claude/skills` is a directory symlink to `.agents/skills`. GitHub Copilot
+code review expects its review skill at `.github/skills/code-review/`, so
+`.github/skills` is a directory symlink to `.agents/skills` as well. Other
+clients (Codex, and anything following the spec) scan `.agents/skills/`
 directly.
 
 `scripts/validate_skills.py` (via `just validate` and pre-commit) enforces
