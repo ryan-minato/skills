@@ -80,10 +80,14 @@ leave assignee empty; ask a human creator whether they intend to self-assign.
 ## Unattended operation
 
 Enable only after explicit user approval and verified isolation, rollback,
-validation, audit, and external-write boundaries. The durable project skill
-must state which reads, assignments, comments, branch pushes, draft MRs,
-metadata edits, ready transitions, and merges are delegated. Merging and
-security-sensitive settings remain human-approved by default.
+validation, audit, and external-write boundaries. Delegations come from the
+target's authority policy (`.agents/knowledge/agent-authority.md`) when one
+exists — never from a green pipeline or an available role. The durable
+project skill must state which reads, assignments, comments, branch pushes,
+draft MRs, metadata edits, ready transitions, and merges are delegated. By
+default the agent stops at the draft MR with a decision-ready report, and
+ready transitions, review requests, merging, and security-sensitive
+settings remain human-approved.
 
 ## Confidentiality
 
