@@ -77,8 +77,17 @@ this gate.
    ({{KNOWLEDGE_PATH}}/checks.md maps jobs to commands — diagnose with
    {{DIGEST_COMMAND_IF_COPIED}}; never fetch full logs, never weaken a
    check).
-2. Complete the PR checklist, update the final description, `gh pr ready`.
+2. Complete the PR checklist and update the final description. Then follow
+   {{AUTHORITY_POLICY_PATH — e.g. .agents/knowledge/agent-authority.md}}:
+   green checks are evidence, not acceptance. {{READY_POLICY — default:
+   stop at the draft and hand the human a decision-ready report (goal
+   addressed, tests and CI state, actual scope, known risks, remaining
+   limitations; their options: request fixes, reject, or accept and admit
+   to review) — gh pr ready and requesting review are the human's call.
+   Replace with the granted procedure only if the policy delegates it.}}
    {{AUTO_MERGE_POLICY — whether gh pr merge --auto is approved here}}.
+   Never edit the policy, protections, or required checks to unblock
+   yourself — propose the change to a human instead.
 3. Merge closes the linked issue via the closing keyword; verify it
    closed. {{RELEASE_POINTER — when and how releases are cut, per
    knowledge}}.

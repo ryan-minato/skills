@@ -70,8 +70,15 @@ For agent-initiated work:
    abandonment using the target version's verified mechanism.
 6. If abandoning, explain the state and remaining work, remove the assignee,
    and leave the object open for pickup unless the user chooses otherwise.
-7. When acceptance criteria pass and the MR is reviewable, update the exact
-   final description, complete the checklist, and remove draft status.
+7. When acceptance criteria pass and the pipeline is green, update the exact
+   final description and complete the checklist. What happens next is set by
+   the project's authority policy (`.agents/knowledge/agent-authority.md`,
+   or the location the entrypoint records), not by a green pipeline: by
+   default removing draft status, requesting review, and merging are the
+   human's acceptance decision, and the agent stops at the draft MR with a
+   decision-ready report — goal addressed, tests and pipeline state, actual
+   scope, known risks, remaining limitations. Remove draft status yourself
+   only where the deposited policy grants it.
 
 For human-authored objects, use the consensus tree before step 1. If project
 policy does not assign at creation and the creator will not begin immediately,
@@ -80,10 +87,14 @@ leave assignee empty; ask a human creator whether they intend to self-assign.
 ## Unattended operation
 
 Enable only after explicit user approval and verified isolation, rollback,
-validation, audit, and external-write boundaries. The durable project skill
-must state which reads, assignments, comments, branch pushes, draft MRs,
-metadata edits, ready transitions, and merges are delegated. Merging and
-security-sensitive settings remain human-approved by default.
+validation, audit, and external-write boundaries. Delegations come from the
+target's authority policy (`.agents/knowledge/agent-authority.md`, or the
+location the entrypoint records) when one exists — never from a green pipeline or an available role. The durable
+project skill must state which reads, assignments, comments, branch pushes,
+draft MRs, metadata edits, ready transitions, and merges are delegated. By
+default the agent stops at the draft MR with a decision-ready report, and
+ready transitions, review requests, merging, and security-sensitive
+settings remain human-approved.
 
 ## Confidentiality
 

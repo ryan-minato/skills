@@ -38,6 +38,14 @@ descendant.
 
 ## First frontier
 
+A decision the target's workflow or authority contract
+(`.agents/knowledge/project-workflow.md` and
+`.agents/knowledge/agent-authority.md` by default; the entrypoint's pointers
+are authoritative on location) already settles — planning method,
+cadence objects, hierarchy, priority or status axes, agent autonomy — is a
+fact, not a frontier item: map it per
+[semantic-mapping.md](semantic-mapping.md) and never re-ask it.
+
 After facts are gathered, the first user-owned frontier normally includes:
 
 1. Planning system: Kanban, Scrum, another maintained board workflow, or no

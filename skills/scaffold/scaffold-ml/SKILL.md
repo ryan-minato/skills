@@ -62,9 +62,15 @@ explicitly asks for migration.
 
    and select every `meta-*` skill. If the user declines, proceed with the
    reference alone.
-7. Deposit durable project rules and when-to-read pointers into the target
+7. Work tracking, planning, and agent-autonomy rules are designed with the
+   `meta-workflow-design` and `meta-agent-authority` skills, not improvised
+   here — do not invent an issue, review, or autonomy flow in the scaffold.
+   If they are not installed, the same `meta` catalog install from step 6
+   covers them; if the user declines, leave management design out and
+   record the gap in the handoff.
+8. Deposit durable project rules and when-to-read pointers into the target
    harness. Do not copy the disposable marker into any generated file.
-8. Run the selected commands and inspect the result with the user.
+9. Run the selected commands and inspect the result with the user.
 
 ## Mode requirements
 

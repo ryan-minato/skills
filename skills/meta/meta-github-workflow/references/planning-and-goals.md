@@ -6,6 +6,13 @@ plans work without GitHub Projects.
 
 ## The default planning system
 
+When the target carries a workflow contract, the planning system is not
+designed here: the contract says which semantics exist, and
+[semantic-mapping.md](semantic-mapping.md) says what each becomes on
+GitHub — a contract without a planning surface gets no board, one without
+priority gets no priority home at all. The defaults below apply where no
+contract settles the question.
+
 The native day-to-day view is issue filters and the pull-request list, not
 a board. The default cadence object is the **milestone per release**;
 long-horizon goals are **tracking issues** (vision, non-goals, acceptance,

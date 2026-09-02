@@ -88,10 +88,20 @@ project.
    side, synchronize the other immediately — colab-mcp is the primary
    channel, `colab upload` / `colab download` the auxiliary one when the CLI
    is installed. The mirror and the remote notebook must never drift.
-8. Deposit the durable rules — mirror consistency, dependency baseline,
+8. Work tracking, planning, and agent-autonomy rules are designed with the
+   `meta-workflow-design` and `meta-agent-authority` skills, not improvised
+   here — do not invent an issue, review, or autonomy flow in the scaffold.
+   If they are not installed, recommend installing the whole `meta` catalog
+   from https://github.com/ryan-minato/skills.git (its builders stack):
+
+       npx skills add ryan-minato/skills
+
+   If the user declines, leave management design out and record the gap in
+   the handoff.
+9. Deposit the durable rules — mirror consistency, dependency baseline,
    notebook doctrine digest, validation loop — into the target `AGENTS.md`.
    Never copy this skill's disposable marker into any generated file.
-9. Run the target repository's checks and inspect the result with the user.
+10. Run the target repository's checks and inspect the result with the user.
 
 Done when: a fresh checkout opens in the devcontainer, colab-mcp is
 registered and reachable, every root notebook matches its remote Colab

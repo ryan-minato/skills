@@ -8,8 +8,11 @@ removal of this builder.
 Probe before creating. Look for an existing agent knowledge location — a
 knowledge directory beside the agent entrypoint, a docs tree the entrypoint
 already points into, or an existing contribution document — and put the
-contract there under a name that matches its neighbours. Create a new location
-only when none exists.
+contract there under a name that matches its neighbours. When no location
+exists, create `.agents/knowledge/git-workflow.md`: it is the path the
+platform lifecycle builders probe first, so the contract stays discoverable
+after this builder is gone. Either way the entrypoint pointer below is what
+makes the location authoritative.
 
 Do not split the contract across files. Branch naming, tag naming, protected
 refs, merge method, and the hotfix path are consulted together, at the same

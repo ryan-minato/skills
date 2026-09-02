@@ -67,8 +67,14 @@ generated release notes consume — plus milestone and reviewer per policy.
    changed assumptions, and decisions reviewers will need.
 6. Abandon by un-assigning, closing the draft with a comment stating the
    state and remaining work, and leaving the issue open for pickup.
-7. When acceptance criteria and checks pass, update the final description,
-   complete the checklist, and `gh pr ready`. Auto-merge
+7. When acceptance criteria and checks pass, update the final description
+   and complete the checklist. What happens next is set by the project's
+   authority policy (`.agents/knowledge/agent-authority.md`, or the location
+   the entrypoint records), not by green checks: by default `gh pr ready` and requesting review are the human's
+   acceptance decision, and the agent stops at the draft with a
+   decision-ready report — goal addressed, tests and CI state, actual
+   scope, known risks, remaining limitations. Run `gh pr ready` yourself
+   only where the deposited policy grants it. Auto-merge
    (`gh pr merge --auto`) may arm only where approved policy says so, and
    the unattributed-Copilot extra-approval default can demand a second
    review — check it rather than waiting on a phantom.

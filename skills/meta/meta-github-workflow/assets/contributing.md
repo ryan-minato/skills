@@ -23,8 +23,11 @@ Bugs, features, and tasks → the issue forms. Questions and ideas →
    `Closes #N`.
 3. Commits: {{COMMIT_RULE_SUMMARY — under squash merge, the PR title is
    what must conform}}.
-4. Mark the PR ready when the checklist is complete and checks are green.
-   {{REVIEW_EXPECTATION — approvals required and from whom}}.
+4. Green checks are evidence, not acceptance. Mark the PR ready when the
+   checklist is complete and {{REVIEW_EXPECTATION — approvals required and
+   from whom}} is met; agents follow the authority policy at
+   {{AUTHORITY_POLICY_PATH — e.g. .agents/knowledge/agent-authority.md}},
+   which by default reserves ready and review requests for a human.
 
 ## Merging and releases
 

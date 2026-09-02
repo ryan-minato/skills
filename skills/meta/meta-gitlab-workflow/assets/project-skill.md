@@ -34,7 +34,16 @@ knowledge file routed for the operation before acting.
 4. Keep the MR's what/why, changes, links, discoveries, and checklist current.
 5. On pause, material change, completion, or abandonment, log time and status.
    On abandonment, explain the handoff and clear the assignee.
-6. Mark the MR ready only after acceptance criteria and required checks pass.
+6. When acceptance criteria and required checks pass, follow
+   {{AUTHORITY_POLICY_PATH — e.g. .agents/knowledge/agent-authority.md}}: a
+   green pipeline is evidence, not acceptance. {{READY_POLICY — default:
+   stop at the draft and hand the human a decision-ready report (goal
+   addressed, tests and pipeline state, actual scope, known risks,
+   remaining limitations; their options: request fixes, reject, or accept
+   and admit to review) — marking ready and requesting review are the
+   human's call. Replace with the granted procedure only if the policy
+   delegates it.}} Never edit the policy, protections, or approval rules
+   to unblock yourself — propose the change to a human instead.
 
 ## Publish gate
 
