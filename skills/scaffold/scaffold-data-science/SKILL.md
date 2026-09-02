@@ -96,7 +96,16 @@ a migration mandate.
    and model-equivalence tests manual under `slow`.
 10. Ask how the team handles commits, review, sensitivity scanning, pushes,
     and experimental worktrees; record the agreed rules in `AGENTS.md` without
-    inventing workflow automation.
+    inventing workflow automation. Work tracking, planning, and
+    agent-autonomy rules are designed with the `meta-workflow-design` and
+    `meta-agent-authority` skills, not improvised here; if they are not
+    installed, recommend installing the whole `meta` catalog from
+    https://github.com/ryan-minato/skills.git (its builders stack):
+
+        npx skills add ryan-minato/skills
+
+    If the user declines, leave management design out and record the gap in
+    the handoff.
 11. Run
     [validate_scaffold.py](scripts/validate_scaffold.py) with
     `python3 scripts/validate_scaffold.py --project-root <target>`. Fix every
