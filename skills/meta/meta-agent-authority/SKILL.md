@@ -77,7 +77,8 @@ project's verification strength are recorded as facts.
 ### 2. Place the two gates
 
 Every change set that enters a long-lived branch is an engineering
-responsibility unit. Two human gates structure its path:
+responsibility unit. Two gates structure its path — both human-owned at the
+default level; a rising level moves an owner downstream, never off the path:
 
 - **Review Admission** — accepting the implementation and admitting it to
   formal review. By default this includes turning a draft into a ready
@@ -87,7 +88,10 @@ responsibility unit. Two human gates structure its path:
 - **Integration** — the final decision that the change set enters the
   long-lived branch, and with it the engineering responsibility.
 
-Done when: both gates have a named owner (a role or person, not "the team").
+Done when: both gates have a named owner at the settled level — a human role
+or person (never "the team"), or the agent under a delegation this policy
+records — and a named human still owns a point on the path: a gate, or at
+the most autonomous level the accountability boundary.
 
 ### 3. Select the authority level
 
@@ -131,8 +135,8 @@ Read [durable-output.md](references/durable-output.md) on every build. Adapt
 [assets/agent-authority.md](assets/agent-authority.md) to the settled
 answers; every placeholder and inapplicable section must be gone, and the
 deposited file must carry the may/may-not lists, both gates with owners, the
-escalation list, the acceptance-evidence report format, and the
-no-self-escalation rule verbatim in substance.
+escalation list, the acceptance-evidence report format, the policy-change
+proposal procedure, and the no-self-escalation rule verbatim in substance.
 
 Verify by removal simulation: with this builder deleted, a future agent must
 be able to state its own limits, both gate owners, and what to do at a

@@ -1,9 +1,11 @@
 <!--
 Raw shape for the authority policy deposited into the target project at
 .agents/knowledge/agent-authority.md. Rework every line against the settled
-answers, delete every section the design does not use, and remove every
-placeholder and this comment before the file is written. Keep the
-no-self-escalation section in every deposit, at every level.
+answers. Markup convention: <angle brackets> mark fill-in slots to replace;
+HTML comments carry adaptation guidance to act on and delete; everything
+outside both is default text that stays unless a settled answer changes it.
+No slot, comment, or inapplicable section may survive into the written
+file. Keep the no-self-escalation section in every deposit, at every level.
 -->
 
 # Agent Authority Policy
@@ -17,13 +19,13 @@ set it and the date>. Outside any delegated scope below, the level is H0.
 
 ## What agents may do
 
-<Adapt to the level. H0 baseline:>
+<!-- Adapt to the settled level; the list below is the H0 baseline. -->
 Take tasks; analyze and plan; implement; run tests and CI; self-review;
 create and update draft changes; fix findings; prepare acceptance evidence.
 
 ## What agents may not do without a human
 
-<Adapt to the level. H0 baseline:>
+<!-- Adapt to the settled level; the list below is the H0 baseline. -->
 Turn a draft into a ready change; request formal review; approve; merge;
 release; deploy; move or weaken any gate in this file.
 
@@ -31,10 +33,20 @@ release; deploy; move or weaken any gate in this file.
 
 | Gate | Meaning | Owner |
 |---|---|---|
-| Review Admission | accepting the implementation and admitting it to formal review<; includes draft-to-ready and requesting review> | <role or person> |
-| Integration | the change set enters a long-lived branch; engineering responsibility transfers | <role or person> |
+| Review Admission | accepting the implementation and admitting it to formal review — includes draft-to-ready and requesting review | <owner at the settled level> |
+| Integration | the change set enters a long-lived branch; engineering responsibility transfers | <owner at the settled level> |
 
-<H2 only:> ## Delegation
+<!-- Owners by level. H0: both rows name a human — a role or person, never
+"the team". H1: Review Admission is "the agent, under this policy" and
+Integration names a human. H2: a row inside the delegated scope may name
+the agent with a pointer to the Delegation section; outside that scope the
+H0 owners apply. H3: both rows may name the agent within the authorized
+scope, and the human owner moves to the Accountability boundary section,
+which must then exist. Only if the project records in writing that ready is
+a technical state that does not enter a review queue, move draft-to-ready
+out of the Review Admission meaning. -->
+
+<!-- H2 only: --> ## Delegation
 
 Scope: <exact boundary of delegated reviewer/approval/merge authority>.
 Acceptance policy: <what the agent verifies before acting>.
@@ -42,7 +54,8 @@ Verification requirements: <checks that must pass, evidence retained>.
 Independent review: <who reviews, and that the author agent is not the sole
 independent reviewer — or the explicit recorded waiver>.
 
-<H3 only:> ## Accountability boundary
+<!-- H3 only; required whenever a Gates owner is the agent at H3: -->
+## Accountability boundary
 
 <The bounded engineering boundary a human still owns: an objective
 boundary's completion, a delivery, a deployment. Name it, its owner, and
@@ -61,7 +74,7 @@ does not qualify on its own.>
 - Review evidence conflicts, or confidence is insufficient for an
   authorized decision.
 - A significant architectural decision appears.
-<Adapt: every condition must be observable by the agent obeying it.>
+<!-- Adapt: every condition must be observable by the agent obeying it. -->
 
 Escalating earlier is always allowed. Bypassing a closed gate never is.
 
@@ -72,8 +85,10 @@ Escalating earlier is always allowed. Bypassing a closed gate never is.
 - Scope actually touched, including anything beyond the original intent.
 - Known risks and remaining limitations.
 - Close the report by naming every decision available to the human, not
-  only the accept path<, for H0: request fixes, reject, or accept and
-  admit to formal review>.
+  only the accept path — at the default level: request fixes, reject, or
+  accept and admit to formal review.
+<!-- Adapt the decision list to the settled level; it must never collapse
+to the accept path alone. -->
 
 ## No self-escalation
 
