@@ -134,7 +134,7 @@ in it carries its deletion-test answer and every omitted semantic its
 trigger; and this exact platform-vocabulary check over the deposited file
 returns nothing:
 
-    grep -inE 'github|gitlab|jira|\bepics?\b|\bsprints?\b|\bboards?\b|\blabels?\b|\bmilestones?\b|\biterations?\b|\bbacklog\b|\btickets?\b' <file>
+    grep -inwE 'github|gitlab|jira|epics?|sprints?|boards?|labels?|milestones?|iterations?|backlog|tickets?' <file>
 
 A hit that looks platform-neutral is still a hit: rewrite the sentence in
 contract vocabulary (Objective Boundary, Timebox, Planning Surface) rather

@@ -46,7 +46,8 @@ which must then exist. Only if the project records in writing that ready is
 a technical state that does not enter a review queue, move draft-to-ready
 out of the Review Admission meaning. -->
 
-<!-- H2 only: --> ## Delegation
+<!-- H2 only: -->
+## Delegation
 
 Scope: <exact boundary of delegated reviewer/approval/merge authority>.
 Acceptance policy: <what the agent verifies before acting>.
