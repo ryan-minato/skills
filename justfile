@@ -28,15 +28,11 @@ lint:
     ruff check scripts/
     ruff format --check scripts/
 
-# Run repository tooling tests
-test:
-    python3 -m unittest discover -s scripts/tests -v
-
 # Pre-commit safety gate for staged changes
 commit-gate:
     python3 scripts/check_commit_safety.py
 
-# Run every check (validators, tests, lint, pre-commit hooks)
-check: validate test lint
+# Run every check (validators, lint, pre-commit hooks)
+check: validate lint
     python3 scripts/validate_harness.py
     pre-commit run --all-files

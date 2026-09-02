@@ -9,7 +9,7 @@ is enforced by the current ruleset.
 
 | Check | Command or source | Events | Tier | Healthy result |
 |---|---|---|---|---|
-| `checks / quality` | `just check` | Pull requests and pushes to `main` | Required | Repository validation, script tests, lint, formatting, hooks, and secret checks all pass. |
+| `checks / quality` | `just check` | Pull requests and pushes to `main` | Required | Repository validation, lint, formatting, hooks, and secret checks all pass. |
 | `pr / policy` | `python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"` | Pull-request lifecycle events | Required | Title, body, readiness evidence, and applicable commit subjects satisfy policy. |
 | `scan-secrets` | `.github/workflows/secret.yml` | Pull requests and all pushes | Required | The existing TruffleHog action reports no verified secret. |
 | `Analyze (python)` | CodeQL default setup | Platform-managed | Advisory | Analysis completes without an open blocking alert. |

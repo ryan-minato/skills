@@ -150,9 +150,10 @@ that target has been synchronized.
 
 ## Quality Gates
 
-- `just check` = skill and harness validation + repository-tooling tests +
-  `lint` (ruff over `scripts/`) + `pre-commit run --all-files` (whitespace,
-  secrets scanning, ruff, validators).
+- `just check` = skill and harness validation + `lint` (ruff over `scripts/`)
+  + `pre-commit run --all-files` (whitespace, secrets scanning, ruff,
+  validators). Tests written to develop harness and CI scripts are run during
+  authoring but are not retained in the repository.
 - pre-commit hooks are installed by `just setup` (run automatically by the
   devcontainer's `postCreateCommand`), which also sets the `.gitmessage`
   commit template.

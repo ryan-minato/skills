@@ -93,7 +93,6 @@ Catalogs section of `ARCHITECTURE.md`.
 - `just validate` — skill layout and harness consistency only.
 - `just check-skill <dir>...` — lint specific skill directories while drafting.
 - `just lint` — ruff over `scripts/`.
-- `just test` — unit tests for repository tooling.
 - `just commit-gate` — pre-commit safety gate over staged changes.
 - `just gen-marketplace` — regenerate `marketplace.json` skills[] after
   adding or removing a public skill.
