@@ -30,11 +30,13 @@ rule:
 
 ## Branches and claiming
 
-Branch naming rides on the native mechanism: `gh issue develop` creates an
-issue-linked branch named `<number>-<slug>`; adopt that shape as the
-default rather than inventing a scheme, and record any project-specific
-prefix on top of it. The full claim procedure lives in
-[issues-and-prs.md](issues-and-prs.md).
+Branch naming, protected refs, and merge method come from the branch
+contract deposited by `meta-git-branching` when one exists; wire the
+platform to it rather than restating it. Only absent that contract, ride
+the native mechanism: `gh issue develop` creates an issue-linked branch
+named `<number>-<slug>`; adopt that shape as the default rather than
+inventing a scheme, and record any project-specific prefix on top of it.
+The full claim procedure lives in [issues-and-prs.md](issues-and-prs.md).
 
 ## Enforcement
 

@@ -74,7 +74,10 @@ The workflow and authority contracts — `.agents/knowledge/project-workflow.md`
 and `.agents/knowledge/agent-authority.md` by default; when the entrypoint's
 pointers record another location, follow them — are stage-1 deliverables:
 read them before anything else and record which decisions they settle,
-because those decisions never re-enter the design tree.
+because those decisions never re-enter the design tree. Read the branch
+contract deposited by `meta-git-branching` the same way —
+`.agents/knowledge/git-workflow.md` by default — and treat its settled
+naming, protection, and merge-method decisions as equally fixed.
 
 Audit every existing harness artifact for its discovery path, load condition,
 source of truth, and update trigger. Classify it as keep, extend, reconnect,
