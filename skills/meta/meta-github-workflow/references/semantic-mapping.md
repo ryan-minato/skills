@@ -19,9 +19,11 @@ fallback is always acceptable; a semantically wrong object never is.
 | Planning Surface | GitHub Projects — always the opt-in view, never the record | Saved issue filters — lose custom fields, keep every fact |
 | Type | Native issue type (organization) | Type labels (personal account) — lose single-select enforcement; say so |
 | Priority | Organization `Priority` issue field | `priority/*` labels — same loss; never both homes at once |
+| Severity | An organization `Severity` issue field where issue fields exist | `severity/*` labels — lose single-select. **Never the Priority home**: Priority is what the team does first, Severity is how bad the problem objectively is, and merging them loses both |
 | Delivery | Release | Tag plus notes file — loses the release UI and assets |
 | Source Marker | Tag | — |
 | Acceptance | Required checks plus review rules, at the evidenced enforcement tier | Written convention with a named owner — record the tier honestly |
+| Automation | Actions workflows producing the checks and deliveries the contract automates | A documented manual procedure with a named owner — loses machine enforcement; record it as convention, not as a check that exists |
 | Ownership | CODEOWNERS plus the sync-ownership register | Plain ownership section in project knowledge |
 | Deliberation | Discussion (or an RFC issue where Discussions is off) | — |
 | Decision Record | A committed repository document | Never an issue: issues are lifecycle objects, and a closed issue reads as "done", not "decided" |

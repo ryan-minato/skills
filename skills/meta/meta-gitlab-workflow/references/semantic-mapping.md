@@ -22,9 +22,11 @@ configuration on the live instance rather than assuming the feature.
 | Planning Surface | Board, work-items list, group board, or roadmap — all views over the same items, deletable without loss | Filtered issue lists — lose columns, keep every fact |
 | Type | Scoped `type::*` labels (work-item types are the platform's containers, and their names never rewrite the contract's `Type` attribute) | Plain `type/*` labels where scoped labels are unavailable — lose mutual exclusion; say so |
 | Priority | Scoped `priority::*` labels. **Never Weight**: Weight is effort estimation, orthogonal to priority | Plain `priority/*` labels — same loss |
+| Severity | Native severity on Incident work items; scoped `severity::*` labels for other work | Plain `severity/*` labels — lose mutual exclusion. **Never the Priority home and never Weight**: Priority is what the team does first, Severity is how bad the problem objectively is |
 | Delivery | Release | Tag plus notes file — loses the release UI and assets |
 | Source Marker | Tag | — |
 | Acceptance | Approval rules plus required pipeline status, at the evidenced tier | Written convention with a named owner — record the tier honestly |
+| Automation | CI/CD pipelines producing the checks and deliveries the contract automates | A documented manual procedure with a named owner — loses machine enforcement; record it as convention, not as a check that exists |
 | Ownership | CODEOWNERS plus protected refs | Plain ownership section in project knowledge |
 | Deliberation | An issue or design discussion thread | — |
 | Decision Record | A committed repository document | Never an issue: a closed issue reads as "done", not "decided" |

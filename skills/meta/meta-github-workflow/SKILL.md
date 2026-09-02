@@ -100,9 +100,10 @@ read-only tooling and capability probe, and
 release conventions are in scope.
 
 The workflow and authority contracts — `.agents/knowledge/project-workflow.md`
-and `.agents/knowledge/agent-authority.md`, when present — are stage-1
-deliverables: read them before anything else and record which decisions they
-settle, because those decisions never re-enter the design tree.
+and `.agents/knowledge/agent-authority.md` by default; when the entrypoint's
+pointers record another location, follow them — are stage-1 deliverables:
+read them before anything else and record which decisions they settle,
+because those decisions never re-enter the design tree.
 
 The capability quadrant — owner type, plan, visibility, and any GHES
 version — plus Actions availability, the default token policy, and the

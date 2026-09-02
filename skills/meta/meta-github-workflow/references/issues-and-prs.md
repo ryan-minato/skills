@@ -69,8 +69,8 @@ generated release notes consume — plus milestone and reviewer per policy.
    state and remaining work, and leaving the issue open for pickup.
 7. When acceptance criteria and checks pass, update the final description
    and complete the checklist. What happens next is set by the project's
-   authority policy (`.agents/knowledge/agent-authority.md`), not by green
-   checks: by default `gh pr ready` and requesting review are the human's
+   authority policy (`.agents/knowledge/agent-authority.md`, or the location
+   the entrypoint records), not by green checks: by default `gh pr ready` and requesting review are the human's
    acceptance decision, and the agent stops at the draft with a
    decision-ready report — goal addressed, tests and CI state, actual
    scope, known risks, remaining limitations. Run `gh pr ready` yourself
