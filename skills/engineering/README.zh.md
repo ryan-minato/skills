@@ -21,3 +21,5 @@ npx skills add ryan-minato/skills --skill <skill-name>
 | [design-md](design-md/) | 创作并校验持久化、供 agent 读取的 DESIGN.md 视觉设计规范，包含可选 YAML 设计 token、正文指导、上游格式检查和 OKLCH 计算器。 |
 | [gitmoji](gitmoji/) | 起草 gitmoji 提交信息：先确定项目变体（独立语法 vs 叠加 CC 语法、unicode vs 文本代码），再通过首个匹配即停的决策列表为主要意图选出唯一 emoji，最后按交付前清单校验。 |
 | [goal-alignment](goal-alignment/) | 与用户对齐创建物（软件、系统、实验、skill、服务等）应达成的目标：以一轮轮追问推进直至共识（可推断处附建议答案，仅用户可知的事实则直接提问），再把共识记录为单一事实来源的目标文档——整体目标、带验证方式与层级（硬约束/优化目标/偏好）的具体目标、分级要求（强制/尽力/偏好）与权衡决策记录。只谈目标；不含计划与架构。 |
+| [knowledge-deposition](knowledge-deposition/) | 把一条已确认的知识沉淀进项目，让未来的 agent 能找到并遵循：探测项目已有的 agent 指导存放位置，选择合适的载体（entrypoint 行仅用于每个会话都必须看到的内容，知识库文件加事件指针为默认，项目 skill 用于复现且脆弱的过程，或先搁置等待复现），写成可独立执行的指令，并注册事件触发式指针。 |
+| [session-retrospective](session-retrospective/) | 把一次工作会话蒸馏为持久的项目经验：从对话中挖掘六类信号（反复失败、工具反复标记的修正、代价高昂的发现、实验结论、被用户否决的默认做法、文档与实际不符），以"复现性乘以影响"权衡记录带来的上下文租金，并呈现按序排列的 findings 清单供逐条批准——只产出 findings，用户批准前不写任何内容。 |
