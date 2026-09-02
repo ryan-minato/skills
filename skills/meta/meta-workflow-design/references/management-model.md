@@ -48,9 +48,9 @@ answer is not enabled.
   achieved*.
   *Deletion test: is there a real theme whose completion people need to
   judge, or is work genuinely piecemeal?*
-- **Timebox** — a planned execution window (an iteration- or sprint-like
-  fact). It says *when work is planned to happen*. Never merged with
-  Objective Boundary: a project may need either, both, or neither.
+- **Timebox** — a planned execution window with a start and an end. It says
+  *when work is planned to happen*. Never merged with Objective Boundary: a
+  project may need either, both, or neither.
 - **Planning Surface** — a constructed view for filtering, ordering, and
   observing tracked work. It is a view, not a record: it can be deleted and
   rebuilt with no loss of project fact, because the facts live in tracked

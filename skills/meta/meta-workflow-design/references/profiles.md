@@ -4,7 +4,7 @@ Read when matching evidenced facts to a base profile, and when phrasing the
 driver question with a recommendation. A profile is a composition strategy
 over the management model — which semantics a project of this kind normally
 earns — never a configuration template. The selecting facts matter more than
-the label: recommend the profile whose facts the inspection actually found,
+the name: recommend the profile whose facts the inspection actually found,
 and let the user overrule.
 
 Every profile lists what it does **not** force. Those lines are load-bearing:
@@ -40,7 +40,7 @@ policy, release-readiness acceptance.
 ("Python 3.14 Compatibility" may span releases), a timebox, or a planning
 surface.
 
-## C — Product iteration
+## C — Continuous product
 
 Selected by: a continuously running product — SaaS, website, long-lived
 service, enterprise application — where the core loop is changing and
@@ -54,9 +54,9 @@ Scale decides the structure, not the profile name:
   filtered list insufficient.
 - **Large**: the planning surface may span repositories to plan one system.
 
-**Not forced:** a board-like surface of any kind, a timebox, or estimation
-ceremony. A two-person product on a filtered work list is a correct
-instance of this profile.
+**Not forced:** a dedicated planning surface of any kind, a timebox, or
+estimation ceremony. A two-person product on a filtered work list is a
+correct instance of this profile.
 
 ## D — Research / Experiment
 

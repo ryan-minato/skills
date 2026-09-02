@@ -19,7 +19,7 @@ maintenance, security, migration, and regression work.
 
 ### Community Contribution
 
-Selected by: a meaningful volume of external issues and change requests.
+Selected by: a meaningful volume of external reports and change requests.
 Adds: triage as an explicit lifecycle stage, contributor-suitability
 signals, needs-info / needs-reproducer states, area ownership for routing,
 and attention management. A planning surface, if any, is never forced to
@@ -30,7 +30,7 @@ contain the whole historical intake.
 Selected by: most changes are self-explanatory and not worth a separate
 tracked-work item. Allows a change request to stand alone as the record of
 work in progress. The boundary is absolute in one direction: a draft change
-records work already happening and never becomes a future backlog.
+records work already happening, never a store of future planned work.
 
 ### Template / Scaffold
 
