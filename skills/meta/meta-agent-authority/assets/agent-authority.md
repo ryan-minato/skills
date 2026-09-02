@@ -71,8 +71,9 @@ Escalating earlier is always allowed. Bypassing a closed gate never is.
 - Tests executed and results; CI state.
 - Scope actually touched, including anything beyond the original intent.
 - Known risks and remaining limitations.
-- The decisions available to the human<, for H0: request fixes, reject, or
-  accept and admit to formal review>.
+- Close the report by naming every decision available to the human, not
+  only the accept path<, for H0: request fixes, reject, or accept and
+  admit to formal review>.
 
 ## No self-escalation
 
@@ -81,7 +82,9 @@ itself more. Editing this file, the agent entrypoint, approval
 requirements, protection rules, or required checks to relax an agent's own
 limits is prohibited at every level. At a policy boundary: stop; propose
 the change to a human with benefit, risk, and exact scope; wait; resume
-only after a human explicitly updates this policy.
+only after a human explicitly updates this policy. When refusing a request
+that exceeds policy, state this path to the requester — the limit is
+changeable, but only by the human who owns it.
 
 ## Update this file when
 
