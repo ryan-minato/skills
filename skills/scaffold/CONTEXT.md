@@ -74,3 +74,12 @@ cross-project methodology remains in `core/meta-harness`.
 
 Both catalogs are disposable and are removed together once the project is
 initialized and verified, through `meta-disposal`.
+
+## Use inside this repository
+
+This repository publishes these builders; it is not a project of any of
+their topics, so none of them runs on its own harness. If one ever does,
+the `## Use inside this repository` section of `skills/meta/CONTEXT.md`
+applies unchanged: the builders are tracked files that are never excluded
+from commits or deleted, `meta-disposal` is never run here, and the
+closing step records "builders retained (published source)".

@@ -12,15 +12,27 @@ skills/<catalog>/<skill-name>/   Public, distributable skills
   <catalog>/CONTEXT.md           Catalog-scoped rules and reference URLs
 .agents/
   skills/                        Skills visible to this repo's agents
-  knowledge/                     Git-tracked local knowledge base
+  knowledge/                     Rules and registers, each with a pointer in AGENTS.md
+  mcp_config.json                agentskills MCP server (generic clients)
+openspec/                        Specifications: specs/ (source of truth), changes/, changes/archive/
 .claude/skills -> ../.agents/skills
+.claude/settings.json            Claude Code read-only command allowlist
 .claude-plugin/marketplace.json  Plugin marketplace (one plugin per catalog)
-.github/                         GitHub collaboration policy and automation
+.codex/config.toml               agentskills MCP server (Codex)
+.mcp.json                        agentskills MCP server (Claude Code)
+.devcontainer/                   Dev container: tools, MCP server, `just setup` on create
+.github/                         Issue forms, PR template, workflows, labels, health files
   skills -> ../.agents/skills    Copilot-facing path to the same skills
 scripts/                         Repository tooling
-justfile                         Canonical check recipes
+justfile                         Canonical check recipes and tool version pins
+ruff.toml                        Lint and format configuration (repo and skill scripts)
+.pre-commit-config.yaml          Hooks: commit safety, secrets, ruff, validators
 .gitmessage                      Commit message template
 ```
+
+This file is also the as-built map for everything `openspec/specs/` does
+not cover: descriptive, never normative. Behavior that a spec describes is
+ruled by the spec.
 
 ## Catalogs
 
@@ -79,6 +91,10 @@ contains two kinds of entries:
 - **Project-only workflow skills** (`change-workflow`, `skill-authoring`,
   `code-review`): real directories, created directly here. They serve this
   repo's own workflows, are never distributed, and may reference repo paths.
+- **OpenSpec-generated skills** (`openspec-*`, plus the
+  `.agents/skills/.openspec-target` marker): real directories written by the OpenSpec CLI for the shared
+  `.agents/skills` target and regenerated only by `just spec-sync`. Tracked,
+  never hand-edited, never distributed.
 - **Symlinks to public skills**: every `skills/<catalog>/<name>/` gets a
   relative symlink `.agents/skills/<name> -> ../../skills/<catalog>/<name>`,
   so the repo can dogfood the skills it publishes.
@@ -103,8 +119,9 @@ paths do double duty: Claude Code loads each as a single skill (and with a
 marketplace-root source the explicit list *replaces* the default scan, so a
 plugin loads only its own catalog), and the `npx skills add` picker groups
 skills under the catalog name by matching each path to a discovered skill.
-No skill files move. Project-only skills live in `.agents/skills/` (marked
-`metadata.internal: true`) and are excluded.
+No skill files move. The real directories in `.agents/skills/` (project-only
+and OpenSpec-generated skills) are excluded because the generator reads
+`skills/` only.
 
 `scripts/gen_marketplace.py` (via `just gen-marketplace`) regenerates the
 `skills` arrays from the catalogs on disk, and the validator fails if any
@@ -125,32 +142,54 @@ repository — with every handoff routed through `ryan-minato-skills-installing`
 
 ## Knowledge Base
 
-`.agents/knowledge/*.md` is the project knowledge base. It is versioned and
-reviewed with the repository; no external tracker or document service mirrors
-it.
+`.agents/knowledge/*.md` is the project knowledge base: three rule files
+(`github-workflow.md`, `spec-workflow.md`, `agent-authority.md`), two
+GitHub registers (`github-checks.md`, `github-settings.md`), the
+synchronization and entropy register (`harness-maintenance.md`), the skill
+quality bar (`skill-quality.md`), and external URLs (`references.md`).
+`AGENTS.md` names every file with the condition that loads it;
+`scripts/validate_harness.py` fails when a knowledge file has no pointer.
 
 Source of truth: **the knowledge files on origin's latest default branch**.
-Working-tree edits become authoritative only after merge.
+Working-tree edits become authoritative only after merge. GitHub is the only
+remote and task platform, so the rules are written in GitHub terms.
+
+## Specifications
+
+`openspec/specs/<domain>/spec.md` is the source of truth for what each
+public skill (one domain per skill) and each repository tool does. A
+behavior change goes through `openspec/changes/<slug>/` on the branch of
+the same slug, its scenarios become the behavioral tests, and the change
+is archived inside the pull request, so `main` never holds an unarchived
+change. Specs exist only for domains a change has touched. The OpenSpec CLI
+version is pinned in the `justfile`; `just spec-validate` runs its strict
+validator and `just spec-sync` regenerates the `openspec-*` skills.
 
 ## GitHub Workflow
 
-GitHub Issues provide optional task context, while every tracked change uses a
-dedicated branch and pull request. `.github/labels.json` is the label taxonomy;
-Issue Forms collect priority and catalog metadata, and GitHub Actions keeps
-those managed labels aligned. The project-only `change-workflow` skill owns
-tooling checks, explicit remote authorization, atomic commits, and the draft to
-ready review lifecycle.
+Every change is a branch and a pull request; issues are optional and link
+their OpenSpec change instead of restating its acceptance. The issue forms
+apply type and `status/needs-triage` labels; the `issues / triage`
+workflow derives `priority/*` and `catalog/*` from the form answers with
+`scripts/sync_issue_metadata.py`, whose mapping comes from
+`.github/labels.json` by prefix. `scripts/check_pr_policy.py` validates
+each pull request against the template's own headings and the commit
+convention (commit range for in-repo branches, title for forks). Agents
+may ready a pull request under the H1 policy; the maintainer merges.
 
 ## Quality Gates
 
-- `just check` = `validate` (skill layout/consistency) + `lint` (ruff over
-  `scripts/`) + `pre-commit run --all-files` (whitespace, secrets scanning,
-  ruff, validator).
+- `just check` = `validate` (`scripts/validate_skills.py` +
+  `scripts/validate_harness.py`) + `lint` (ruff over `scripts/` and every
+  `skills/*/*/scripts/`) + `spec-validate` + `pre-commit run --all-files`
+  (whitespace, secrets, ruff, both validators; the `commit-safety` hook
+  runs only on `git commit`).
 - pre-commit hooks are installed by `just setup` (run automatically by the
-  devcontainer's `postCreateCommand`), which also sets the `.gitmessage`
-  commit template.
-- CI runs secret scanning and PR policy validation; other repository checks
-  remain local by design.
+  devcontainer's `postCreateCommand`), which also installs the pinned
+  OpenSpec CLI and sets the `.gitmessage` commit template.
+- CI (`.github/workflows/checks.yml`) runs `just check` and the OpenSpec
+  validation with the same pins; `checks / gate`, `pr / policy`, and
+  `scan-secrets` are the required checks (`.agents/knowledge/github-checks.md`).
 
 Longer custom logic belongs in `scripts/`, not inline in justfile recipes or
 hooks.
