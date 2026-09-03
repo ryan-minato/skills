@@ -55,6 +55,7 @@
         "./skills/meta/meta-harness-architecture",
         "./skills/meta/meta-harness-building",
         "./skills/meta/meta-python-defaults",
+        "./skills/meta/meta-spec-workflow",
         "./skills/meta/meta-workflow-design"
       ],
       "description": "Disposable, project-scoped builders for generic harness machinery: complete agent harness architecture, platform-neutral workflow and agent-authority contracts, git branching contracts, GitHub and GitLab lifecycle workflows, GPU container environments, and Python convention defaults."
