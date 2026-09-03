@@ -61,7 +61,7 @@ down a plan, idea, or decision already on the table → `plan-clarification`
 in `core`; clarifying ambiguous requirements while already coding →
 `programming-guidelines` in `core`; implementation planning → none of them
 (out of catalog scope) · working from written specifications — the
-specify-plan-tasks-implement-verify loop, choosing the level and tool, and
+specify-clarify-plan-tasks-implement-verify loop, choosing the level and tool, and
 converting a prototype or brownfield codebase to it → `spec-driven-development`
 (a goal document from `goal-alignment` precedes any spec); making the
 harness, templates, and tracker agree with the chosen spec tool → the

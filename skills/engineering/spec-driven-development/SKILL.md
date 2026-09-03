@@ -58,13 +58,17 @@ not its author.
 ## Choose the approach
 
 One default per situation; the user decides, and a recommendation is not a
-decision. Present the default with its reason and the one deviation.
+decision. A spec tool the project already runs is the answer unless the
+user asks to change it. Present the default with its reason and the one
+deviation.
 
 - **No code yet, and the product is an application delivered feature by
   feature:** a spec-first kit with a project constitution and per-feature
   spec, plan, and task files — GitHub Spec-Kit. It is the heavier,
   whole-process option, organized around requirements and a solution per
   feature; that weight is what a new application needs to form habits.
+  The kit does not oblige anyone to keep a spec current after the feature
+  ships; at spec-anchored, write that obligation down as a project rule.
   Deviate to a lighter change workflow when the team already resists
   process.
 - **No code yet, and the product is a library, framework, or
@@ -95,8 +99,11 @@ describing one. This skill deliberately lists none.
 ## The loop
 
 Run every change through these steps, using the chosen tool's equivalent
-command for each. Read `plan-clarification` alongside step 2 when it is
-available; it is the interrogation the clarify step needs.
+command for each. This skill pairs with `plan-clarification` for step 2,
+the interrogation the clarify step needs. If it is not installed, load the
+`ryan-minato-skills-installing` skill and install `plan-clarification` as
+it directs; never run an install command yourself. If the user declines,
+run step 2 from the questions in this file.
 
 1. **Specify.** Write the requirements and their scenarios for this change
    only, plus non-goals. Done when: every requirement has at least one
@@ -113,7 +120,9 @@ available; it is the interrogation the clarify step needs.
    with the scenarios each one closes. Done when: no task lacks a scenario
    and no scenario lacks a task.
 5. **Implement.** Work task by task; when the code must deviate from the
-   spec, stop and change the spec first, with the user's approval.
+   spec, stop and change the spec first, with the user's approval. Done
+   when: every task is closed or its deviation is recorded as an approved
+   spec change.
 6. **Verify.** Execute the scenarios — tests, commands, observed states —
    against the running result, not against the diff. Done when: every
    scenario has passed or is recorded as a spec change.
