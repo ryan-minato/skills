@@ -32,6 +32,24 @@ Rules for disposable builders that establish a project of a specific topic.
 - Assets are raw starting shapes. Rework every line and remove every
   placeholder.
 
+## Dependencies
+
+- Builders here may depend on `meta` builders by name (work tracking, agent
+  authority, GPU containers) and on `core` skills. The expected install is
+  one scaffold builder plus the whole `meta` catalog, both at project scope
+  and disposed together.
+- A missing `meta` builder is handed off through
+  `ryan-minato-skills-installing`, installing the whole `meta` catalog —
+  never one builder alone.
+- No grant between scaffold builders (they are alternatives), and no
+  dependency on or recommendation of skills from other repositories.
+
+## Naming
+
+Catalog prefix `scaffold-` on every directory and `name`, enforced by
+`CATALOG_NAME_PREFIXES`; the body names the project topic
+(`scaffold-data-science`, `scaffold-colab`).
+
 ## Scope
 
 This catalog owns topic-specific project scaffolding methodology: what a

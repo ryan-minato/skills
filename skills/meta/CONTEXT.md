@@ -31,6 +31,26 @@ Rules for disposable builders that create durable agent harnesses.
   when the selected procedure needs them.
 - Assets are raw starting shapes. Rework every line and remove every placeholder.
 
+## Dependencies
+
+- Builders here may depend on one another by name: the catalog is installed
+  whole, so a sibling builder is present whenever this one is. They may also
+  depend on `core` skills.
+- A missing sibling is still handed off through
+  `ryan-minato-skills-installing`, installing the whole `meta` catalog at
+  project scope — never one builder alone.
+- No grant to `scaffold` or any other catalog, and no dependency on or
+  recommendation of skills from other repositories.
+- `meta-harness-architecture` carries the `## Harness Methodology` section of
+  `core/meta-harness` verbatim (validator-enforced) so it works when the core
+  skill is absent; that is duplication, not a dependency.
+
+## Naming
+
+Catalog prefix `meta-` on every directory and `name`, enforced by
+`CATALOG_NAME_PREFIXES`; the body after the prefix follows the default
+`<subject>-<action>` shape (`meta-git-branching`, `meta-gpu-container`).
+
 ## Scope
 
 This catalog owns generic, pluggable harness machinery: complete harness

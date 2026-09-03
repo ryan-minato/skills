@@ -34,6 +34,23 @@ to the disposable `meta` catalog, not here.
   so agents can verify interfaces on demand instead of trusting
   paraphrases.
 
+## Dependencies
+
+- Default range only: skills here may depend on `core` skills. No grant for
+  other engineering skills or other catalogs — they are installed one at a
+  time per project, so co-presence is never guaranteed. A pairing between
+  two engineering skills is an optional handoff with a fallback, routed
+  through `ryan-minato-skills-installing`.
+- No dependency on or recommendation of skills from other repositories; no
+  exemptions.
+
+## Naming
+
+Default shape for methodology skills (`code-refactoring`, `goal-alignment`).
+Artifact-authoring skills take the `-authoring` suffix
+(`devcontainer-authoring`); `design-md` is the format's proper noun and
+`gitmoji` the convention's, and both stand as they are.
+
 ## Disambiguation
 
 How to approach a cross-stack engineering problem → the methodology

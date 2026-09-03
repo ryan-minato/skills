@@ -49,12 +49,15 @@ Adding a catalog requires: the catalog scaffold (`README.md`, `README.zh.md`,
 entry in `.claude-plugin/marketplace.json`. `scripts/validate_skills.py`
 cross-checks this list against the directories in `skills/`.
 
-The two disposable catalogs reserve a name prefix for their own members: every
+Skill names follow a recommended `[<prefix>-]<body>[-<suffix>]` shape,
+described in `.agents/knowledge/skill-quality.md` and refined per catalog in
+its `CONTEXT.md` `## Naming` section; the shape is advisory. What is enforced
+is the prefix the two disposable catalogs reserve for their members: every
 skill in `meta` is named `meta-*` and every skill in `scaffold` is named
-`scaffold-*`, enforced by `CATALOG_NAME_PREFIXES` in
-`scripts/validate_skills.py`. The prefix groups a catalog's builders and
-matches the marker their descriptions carry, which matters because installed
-skills are read far from this repository.
+`scaffold-*`, via `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.py`.
+The prefix groups a catalog's builders and matches the marker their
+descriptions carry, which matters because installed skills are read far from
+this repository.
 
 The prefix is a grouping convention, not an exclusive claim on the word, and
 the check runs in one direction only: `core/meta-harness` is durable, globally
@@ -110,7 +113,10 @@ Users add the marketplace once, then install catalogs individually:
 ```
 
 Because installed skills are copied out of this repo, public skills must be
-fully self-contained (rules in `.agents/knowledge/skill-quality.md`).
+fully self-contained, and what they may depend on is governed by the
+dependency policy in `.agents/knowledge/skill-quality.md`: `core` always,
+other catalogs only by a grant in that catalog's `CONTEXT.md`, never another
+repository — with every handoff routed through `ryan-minato-skills-installing`.
 
 ## Knowledge Base
 

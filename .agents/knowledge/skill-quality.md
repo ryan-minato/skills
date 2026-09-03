@@ -28,6 +28,36 @@ workflow that applies these standards.
   catalog's skills; SKILL.md is the skill's own document.
 - Everything is written in English.
 
+## Naming (recommended default)
+
+Names are `[<prefix>-]<body>[-<suffix>]` in lowercase kebab-case. This is
+the recommended shape, not a rule: only the spec limits below and the
+catalog name prefixes are enforced, a name that departs from the shape is
+not a defect, and the name chosen when a skill was created is respected. A
+catalog's `CONTEXT.md` may add to or override it in a `## Naming` section.
+
+- **Body** (required): by default `<subject>-<action>` — what the skill
+  acts on, then what it does: a singular noun (`git`, `latex`, `goal`,
+  `session`) followed by a gerund or action noun (`commit`, `writing`,
+  `check`, `alignment`, `refactoring`, `setup`). When the subject is itself
+  a proper noun for a standard, format, product, or established concept,
+  that noun is the whole body, unsplit and with its own number:
+  `conventional-commits`, `gitmoji`, `design-md`, `meta-harness`. One to
+  four words. A default name is the body alone.
+- **Prefix** (off by default): what the skill belongs to. A catalog prefix
+  is reserved by the catalog's `CONTEXT.md` and listed in
+  `CATALOG_NAME_PREFIXES` (`meta-`, `scaffold-`), which the validator
+  enforces for that catalog's members; an ownership prefix marks a skill
+  bound to one named owner or product (`ryan-minato-skills-installing`). A
+  proper-noun body that happens to start with a reserved prefix
+  (`meta-harness`) is not using the prefix.
+- **Suffix** (off by default): the kind of skill, for catalogs where
+  several skills share a subject and need telling apart; the vocabulary
+  belongs to the catalog's `CONTEXT.md` (`writing`: genre skills end in
+  `-writing`, source-medium skills in `-authoring`).
+- Prefer to avoid agent nouns (`-writer`, `-helper`), leading verbs
+  (`clarify-`), and splitting a proper noun into subject and action.
+
 ## Spec limits (mechanically enforced)
 
 `just check-skill <dir>` (and `just validate` across the repo) enforces
@@ -41,29 +71,54 @@ these, so a one-line summary suffices here:
 | Body | recommended <500 lines / ~5,000 tokens | warning |
 | Empty `scripts/`/`references/`/`assets/` | don't create them | warning |
 
-## Self-containment (public skills)
+## Self-containment and dependencies (public skills)
 
 Users install a skill by copying its directory out of this repository, so a
 public skill loses access to everything outside its own root the moment it
-is installed.
+is installed, and it cannot assume any other skill was installed beside it.
 
 - No links or path references to repository files, other skills, or anything
   above the skill's root directory. Relative paths inside SKILL.md must stay
   within the skill directory.
-- No behavioral dependency on another skill being present.
-- If a skill genuinely builds on another skill in this repository, do not
-  link to it. Instead, tell the agent/user to install it:
+- A *dependency* is naming another skill and instructing the agent to load,
+  pair with, use, or install it. Describing a role without a name ("a genre
+  writing skill"), naming a convention or tool that happens to share a
+  skill's name (the gitmoji convention), and provenance URLs in frontmatter
+  `metadata.references` are not dependencies.
+- Allowed range: every public skill may depend on skills in the `core`
+  catalog, which users install globally. Dependencies inside the skill's
+  own catalog or on another catalog are allowed only when the catalog's
+  `CONTEXT.md` grants them in its `## Dependencies` section (today: `meta`
+  builders on one another, `scaffold` builders on `meta`). Default: not
+  granted. An in-range dependency may be hard — "load it alongside; do not
+  work from this skill alone".
+- A skill outside the allowed range may only be an *optional handoff*: the
+  skill's own path works without it, the handoff states what happens when
+  the user declines, and the description refers to it by role, not by skill
+  name.
+- No dependency on, and no recommendation of, skills from other
+  repositories or skill libraries, unless the catalog's `CONTEXT.md`
+  exempts the catalog or a named skill. This library stays independent.
+- Never print an install command. Every handoff — in range or optional —
+  routes through the `ryan-minato-skills-installing` skill in `core`, which
+  owns runner choice, install scope, and whole-catalog installs:
 
   ```markdown
-  This skill pairs with `other-skill`. If it is not installed, install it
-  from https://github.com/ryan-minato/skills.git:
-
-      npx skills add ryan-minato/skills --skill other-skill
+  This skill pairs with `other-skill`. If it is not installed, load the
+  `ryan-minato-skills-installing` skill and install `other-skill` as it
+  directs; never run an install command yourself. (If that installer skill
+  is absent too, it lives in the `core` catalog of
+  https://github.com/ryan-minato/skills.)
   ```
 
+  For a whole catalog: "install the whole `meta` catalog at project scope
+  as it directs — its builders stack and are disposed together." For an
+  optional handoff, end with "If the user declines, <what this skill does
+  instead>."
 - Exemption: project-only workflow skills in `.agents/skills/` exist to
   operate this repository, are never distributed, and may reference repo
-  paths freely. All other rules in this document still apply to them.
+  paths and each other freely. All other rules in this document still
+  apply to them.
 
 ## Writing the description
 
@@ -156,10 +211,16 @@ Rules for anything in a skill's `scripts/`:
 1. Scope: the skill covers one coherent work unit and adds something the
    agent lacks.
 2. `description` states what + when, including indirect trigger phrasings.
-3. No path escapes the skill directory (public skills).
-4. SKILL.md holds the common path; branch-specific detail lives in
+3. No path escapes the skill directory; every skill it names is within the
+   allowed dependency range and handed off through
+   `ryan-minato-skills-installing`, with no install command (public skills).
+4. The name was considered against the default shape and the catalog's
+   `## Naming` section (recommended, not enforced).
+5. SKILL.md holds the common path; branch-specific detail lives in
    `references/` behind precise load conditions; deterministic logic lives
    in `scripts/`.
-5. Catalog README.md and README.zh.md both list the skill; the symlink in
+6. Catalog README.md and README.zh.md both list the skill; the symlink in
    `.agents/skills/` exists (public skills).
-6. `just check-skill <dir>` is clean, then `just check` passes.
+7. When moving or renaming: every reference `git grep -n <old-name>` finds
+   is updated in the same change.
+8. `just check-skill <dir>` is clean, then `just check` passes.
