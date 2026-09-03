@@ -11,8 +11,8 @@ description: >
   mistake", "remember this for next time", "do a retrospective or postmortem
   of this session". Produces findings only; nothing is written until the
   user approves each one. Not for saving an already-confirmed lesson into
-  the project — that is knowledge-deposition — and not for status reports or
-  code review.
+  the project — that is a separate deposition step — and not for status
+  reports or code review.
 license: Apache-2.0
 ---
 
@@ -79,11 +79,10 @@ Done when: every finding has an explicit per-item verdict.
 ## Hand off approved findings
 
 Approved findings need a durable home chosen by the project's own
-conventions. This skill pairs with `knowledge-deposition` for that step. If
-it is not installed, install it from
-https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill knowledge-deposition
+conventions. This skill hands off to `knowledge-deposition` for that step. If
+it is not installed, load the `ryan-minato-skills-installing` skill and
+install `knowledge-deposition` as it directs; never run an install command
+yourself.
 
 If the user declines the install, the approved findings list presented in
 the conversation is the deliverable; write findings only to locations the

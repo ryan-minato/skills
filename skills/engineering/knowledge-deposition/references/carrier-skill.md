@@ -4,10 +4,9 @@ Load this when the chosen carrier is a project skill — a recurring,
 non-obvious procedure that is fragile, order-sensitive, or branchy. This
 covers the minimal skill a deposit produces; for a substantial skill —
 bundled scripts, multiple references, distribution beyond this project —
-this pairs with `great-skill-writing`. If it is not installed, install it
-from https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill great-skill-writing
+this pairs with `great-skill-writing`. If it is not installed, load the
+`ryan-minato-skills-installing` skill and install `great-skill-writing` as it
+directs; never run an install command yourself.
 
 ## Place the skill
 

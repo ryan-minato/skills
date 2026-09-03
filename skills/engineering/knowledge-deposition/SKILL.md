@@ -10,7 +10,7 @@ description: >
   this to AGENTS.md or CLAUDE.md", "write this down so we stop repeating
   it", or approves findings from a session retrospective; or whenever a
   lesson worth keeping has just been confirmed and needs a durable home.
-  Not for mining a session for lessons — that is session-retrospective —
+  Not for mining a session for lessons — that is a retrospective's job —
   and not for building or restructuring a project's whole agent setup; it
   adds one piece of knowledge to the conventions that already exist.
 license: Apache-2.0
@@ -115,8 +115,8 @@ tell the user a proper setup pass is a separate job.
 
 ## Pairs with
 
-To mine a session for lessons before depositing, this skill pairs with
-`session-retrospective`. If it is not installed, install it from
-https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill session-retrospective
+To mine a session for lessons before depositing, this skill hands off to
+`session-retrospective`. If it is not installed, load the
+`ryan-minato-skills-installing` skill and install `session-retrospective` as
+it directs; never run an install command yourself. If the user declines,
+deposit the lesson they already confirmed and skip the mining step.
