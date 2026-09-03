@@ -16,7 +16,7 @@ npx skills add ryan-minato/skills --skill <skill-name> -g
 | [conventional-commits](conventional-commits/) | 起草符合 Conventional Commits 1.0.0 规范的 git 提交信息：规则优先级（文档 > commitlint 配置 > 历史 > 默认值）、首个匹配即停的 type 决策列表、scope 与破坏性变更策略，以及交付前校验清单。 |
 | [devcontainer-setup](devcontainer-setup/) | 在可信来源策略下创建与修改 dev container 配置（mcr.microsoft.com/devcontainers、NVIDIA NGC、ghcr.io/devcontainers、ghcr.io/stacit-ai），内置来源枚举脚本、非预构建镜像的基线 feature 规则，以及 NVIDIA/AMD GPU 指引。 |
 | [git-commit](git-commit/) | 以有序门禁执行完整的 git 提交工作流：按明确优先级发现项目约定、检查变更原子性、扫描暂存 diff 中的机密与 PII、核对提交者身份、运行 hooks 与本地检查，并在提交前用内置脚本校验提交信息。 |
-| [great-skill-writer](great-skill-writer/) | 编写并改进行为可预测的 Agent Skill：触发准确的 description、渐进式披露、subagent 辅助的行为评估、隔离的脚本测试，以及内置校验脚本。 |
+| [great-skill-writing](great-skill-writing/) | 编写并改进行为可预测的 Agent Skill：触发准确的 description、渐进式披露、subagent 辅助的行为评估、隔离的脚本测试，以及内置校验脚本。 |
 | [human-writing](human-writing/) | 以英文、中文或日文起草、修改和审读面向人类读者的文本：先明确类型/作者/读者/预期效果，按长度预算列大纲，保留作者立场，规避可识别的 AI 写作模式，核实引用，并克制地修改。 |
 | [meta-harness](meta-harness/) | 将核心方法论应用于所有 harness 相关行动：先调研，以 AGENTS.md 作为渐进加载地图，按项目校准各层厚度，闭合前馈与反馈循环，并管理长期 harness 熵增。 |
 | [plan-clarification](plan-clarification/) | 追问一个计划、想法或决定，直到 agent 与用户达成同一理解：将其建模为决策树，每轮把当前可问的问题连同推荐答案通过宿主自带的提问工具抛出，所有事实自己去查，且不在工作区留下任何文件。 |
