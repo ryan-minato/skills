@@ -77,3 +77,25 @@ instead. Durable cross-project methodology remains in `core/meta-harness`.
 Day-to-day platform operation guidance is not published as a standing public
 skill in this repository: a platform builder generates it as project-specific
 durable output before the builder is disposed of.
+
+## Use inside this repository
+
+This repository is the published source of these builders, and it also
+runs them on its own harness. Two rules of the contract above therefore do
+not apply when a builder runs here, and every builder's "when run alone"
+closing step reads as follows in this repository:
+
+- The builders are tracked files. Do not add them to `info/exclude`, do
+  not keep them out of commits, and never delete them: the closing step
+  records "builders retained (published source)" instead of asking about
+  deletion, and `meta-disposal` is never run here.
+- This repository's remote and task platform is GitHub and will not change
+  (decision recorded in `.agents/knowledge/harness-maintenance.md`). The
+  contract builders' platform-neutral layer and vocabulary check are
+  skipped; their decision content is written straight into the GitHub
+  knowledge files under `.agents/knowledge/`.
+
+Everything else holds: investigate before editing, present the plan, get
+approval, deposit durable output, and verify by independent reading. The
+marker sentence and its validation are unchanged — they describe what
+happens in a target project, which this repository is not.

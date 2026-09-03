@@ -12,7 +12,7 @@
 |---|---|---|
 | [`core`](skills/core/) | 推荐在所有环境安装的 skill | 全局（用户级） |
 | [`engineering`](skills/engineering/) | 通用编程方法论类 skill 与窄域工件创作工作流（如 Dev Container 工件） | 按需安装到项目 |
-| [`meta`](skills/meta/) | 通用 harness 机制的一次性构建技能：完整 agent harness、GitHub 与 GitLab 生命周期工作流、GPU 容器环境、Python 约定默认值 | 安装到项目，harness 验证后移除 |
+| [`meta`](skills/meta/) | 通用 harness 机制的一次性构建技能：harness 构建入口工作流，分支、项目工作流、规格工作流、agent 权限四类合同构建器，GitHub 与 GitLab 生命周期工作流，GPU 容器环境，Python 约定默认值，以及清除步骤 | 安装到项目，harness 验证后移除 |
 | [`scaffold`](skills/scaffold/) | 特定主题项目（ML、数据科学、Colab 笔记本）的一次性构建技能——只安装匹配的那一个 | 安装到项目，harness 验证后移除 |
 | [`writing`](skills/writing/) | 面向人类读者的写作：体裁类（学术、博客/评论、文案）与载体类（LaTeX、Typst、Markdown） | 按需安装到项目 |
 

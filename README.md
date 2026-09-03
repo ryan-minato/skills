@@ -12,7 +12,7 @@ and other compatible clients) how to perform specific tasks well.
 |---|---|---|
 | [`core`](skills/core/) | Skills recommended for every environment | Global (user-level) |
 | [`engineering`](skills/engineering/) | General programming methodology skills and narrow artifact-authoring workflows (e.g. Dev Container artifacts) | Per project, as needed |
-| [`meta`](skills/meta/) | Disposable builders for generic harness machinery: complete agent harnesses, GitHub and GitLab lifecycle workflows, GPU container environments, Python convention defaults | Per project, remove after the harness is verified |
+| [`meta`](skills/meta/) | Disposable builders for generic harness machinery: a harness-build entry workflow, contract builders for branching, project workflow, specification workflow, and agent authority, GitHub and GitLab lifecycle workflows, GPU container environments, Python convention defaults, and the disposal step | Per project, remove after the harness is verified |
 | [`scaffold`](skills/scaffold/) | Disposable builders for a project of a specific topic (ML, data science, Colab notebooks) — install the one that matches | Per project, remove after the harness is verified |
 | [`writing`](skills/writing/) | Human-audience writing: genre skills (academic, blog/opinion, copy) and medium skills (LaTeX, Typst, Markdown) | Per project, as needed |
 
