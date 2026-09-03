@@ -75,7 +75,8 @@ python3 scripts/detect_spec_tooling.py --root .
 It reports which spec tool layouts exist, how many specs and change records
 each holds, the tool-owned paths, every agent-entrypoint line that points at
 a spec artifact, and every document that looks like it restates
-requirements or acceptance criteria. Quote its summary line in the
+requirements or acceptance criteria; installed agent skills are skipped,
+because their instructions are not project requirements. Quote its summary line in the
 inspection record. The script recognizes requirement-shaped text only; a
 plain sentence in the entrypoint that states what the system does ("five
 failed attempts lock the account") is invisible to it, so read the
@@ -164,8 +165,9 @@ silently replaced.
 - Feature directory and branch naming follow the branching contract; where
   the tool numbers or names directories, record the mapping between a spec
   directory and its branch instead of letting two schemes coexist.
-- Every requirement-bearing document the inspection flagged becomes a spec,
-  a pointer to a spec, or a deletion, each with the user's approval.
+- Every requirement-bearing document the inspection flagged — a project
+  document, never an installed skill's instruction file — becomes a spec, a
+  pointer to a spec, or a deletion, each with the user's approval.
 - The goal document stays above the constitution or steering: they may cite
   it, never restate it.
 
