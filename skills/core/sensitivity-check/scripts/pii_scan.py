@@ -46,10 +46,7 @@ MODEL_VERSION = "3.8.0"  # matches the spacy>=3.8,<3.9 pin above
 
 
 def _model_wheel_url(model: str) -> str:
-    return (
-        f"{_MODEL_RELEASES}/{model}-{MODEL_VERSION}/"
-        f"{model}-{MODEL_VERSION}-py3-none-any.whl"
-    )
+    return f"{_MODEL_RELEASES}/{model}-{MODEL_VERSION}/{model}-{MODEL_VERSION}-py3-none-any.whl"
 
 
 def _with_requirement(model: str) -> str:
@@ -87,9 +84,7 @@ def _build_analyzer(language: str):
             "models": [{"lang_code": language, "model_name": model}],
         }
     )
-    return AnalyzerEngine(
-        nlp_engine=provider.create_engine(), supported_languages=[language]
-    )
+    return AnalyzerEngine(nlp_engine=provider.create_engine(), supported_languages=[language])
 
 
 def _excerpt(text: str, beg: int, end: int) -> str:
@@ -97,10 +92,7 @@ def _excerpt(text: str, beg: int, end: int) -> str:
     right = min(len(text), end + CONTEXT_CHARS)
     prefix = "..." if left > 0 else ""
     suffix = "..." if right < len(text) else ""
-    return (
-        f"{prefix}{text[left:beg]}[{text[beg:end]}]{text[end:right]}{suffix}"
-        .replace("\n", "\\n")
-    )
+    return f"{prefix}{text[left:beg]}[{text[beg:end]}]{text[end:right]}{suffix}".replace("\n", "\\n")
 
 
 def scan_text(analyzer, text: str, source: str, language: str, threshold: float) -> list:
@@ -205,8 +197,7 @@ def main() -> int:
         path = Path(path_str)
         if not path.is_file():
             print(
-                f"error: {path_str}: not a file. Findings would be "
-                f"incomplete; fix the path and re-run.",
+                f"error: {path_str}: not a file. Findings would be incomplete; fix the path and re-run.",
                 file=sys.stderr,
             )
             had_error = True
@@ -215,22 +206,15 @@ def main() -> int:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             print(
-                f"warning: {path_str}: not valid UTF-8, skipped. Record it "
-                f"as an unscanned binary in the report.",
+                f"warning: {path_str}: not valid UTF-8, skipped. Record it as an unscanned binary in the report.",
                 file=sys.stderr,
             )
             continue
         sources.append(path_str)
-        findings.extend(
-            scan_text(analyzer, text, path_str, args.language, args.threshold)
-        )
+        findings.extend(scan_text(analyzer, text, path_str, args.language, args.threshold))
     if args.text is not None:
         sources.append("<inline-text>")
-        findings.extend(
-            scan_text(
-                analyzer, args.text, "<inline-text>", args.language, args.threshold
-            )
-        )
+        findings.extend(scan_text(analyzer, args.text, "<inline-text>", args.language, args.threshold))
 
     print(
         json.dumps(

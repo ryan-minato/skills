@@ -61,9 +61,7 @@ TOPIC_PREFIXES = (
     "wip/",
 )
 RELEASE_PREFIXES = ("release/", "releases/", "rel/", "hotfix/", "support/")
-VERSION_BRANCH_RE = re.compile(
-    r"^v?\d+([._-]\d+)*([._-](x|stable|maintenance|lts))?$", re.IGNORECASE
-)
+VERSION_BRANCH_RE = re.compile(r"^v?\d+([._-]\d+)*([._-](x|stable|maintenance|lts))?$", re.IGNORECASE)
 STABLE_SUFFIX_RE = re.compile(r"[-_](stable|maintenance|lts)$", re.IGNORECASE)
 SEMVER_TAG_RE = re.compile(r"^v?\d+\.\d+\.\d+([-+].*)?$")
 CI_FILES = (
@@ -214,11 +212,7 @@ def tag_report(repo_dir: str, default: str) -> dict:
     return {
         "total": len(names),
         "recent": recent,
-        "semver_share": round(
-            sum(1 for t in recent if SEMVER_TAG_RE.match(t)) / len(recent), 2
-        )
-        if recent
-        else 0.0,
+        "semver_share": round(sum(1 for t in recent if SEMVER_TAG_RE.match(t)) / len(recent), 2) if recent else 0.0,
         "off_default_line": off_default,
     }
 
@@ -255,11 +249,7 @@ def ci_references(repo_dir: str, candidates: list[str]) -> dict[str, list[str]]:
                 text = handle.read(CI_READ_LIMIT)
         except OSError:
             continue
-        hits = [
-            name
-            for name in candidates
-            if re.search(rf"(?<![\w/-]){re.escape(name)}(?![\w/-])", text)
-        ]
+        hits = [name for name in candidates if re.search(rf"(?<![\w/-]){re.escape(name)}(?![\w/-])", text)]
         if hits:
             found[rel] = hits
     return found
@@ -267,9 +257,7 @@ def ci_references(repo_dir: str, candidates: list[str]) -> dict[str, list[str]]:
 
 def rank_models(evidence: dict) -> list[dict]:
     groups = evidence["groups"]
-    active = {
-        name for name, info in evidence["long_lived"].items() if not info["stale"]
-    }
+    active = {name for name, info in evidence["long_lived"].items() if not info["stale"]}
     integration = [n for n in groups.get("integration", []) if n in active]
     environments = [n for n in groups.get("environment", []) if n in active]
     releases = [n for n in groups.get("release", []) if n in active]
@@ -299,16 +287,14 @@ def rank_models(evidence: dict) -> list[dict]:
         ranked.append(
             {
                 "model": "GitLab Flow, release branches",
-                "reason": f"{len(releases)} active release branches: "
-                f"{', '.join(releases[:3])}",
+                "reason": f"{len(releases)} active release branches: {', '.join(releases[:3])}",
             }
         )
     if len(environments) >= 2:
         ranked.append(
             {
                 "model": "GitLab Flow, environment branches",
-                "reason": f"{len(environments)} active environment branches: "
-                f"{', '.join(environments[:4])}",
+                "reason": f"{len(environments)} active environment branches: {', '.join(environments[:4])}",
             }
         )
     elif len(environments) == 1:
@@ -334,16 +320,10 @@ def rank_models(evidence: dict) -> list[dict]:
 def build_report(args: argparse.Namespace) -> dict:
     repo_dir = args.repo_dir
     if not git_ok(repo_dir, "rev-parse", "--is-inside-work-tree"):
-        raise GitError(
-            f"{repo_dir!r} is not a git repository. Pass --repo-dir pointing at a "
-            "git checkout."
-        )
+        raise GitError(f"{repo_dir!r} is not a git repository. Pass --repo-dir pointing at a git checkout.")
     branches = collect_branches(repo_dir, args.remote)
     if not branches:
-        raise GitError(
-            "the repository has no branches. Commit something, or point "
-            "--repo-dir at a populated checkout."
-        )
+        raise GitError("the repository has no branches. Commit something, or point --repo-dir at a populated checkout.")
     default = resolve_default(repo_dir, args.remote, branches)
     now = int(time.time())
 
@@ -363,11 +343,7 @@ def build_report(args: argparse.Namespace) -> dict:
                 groups[kind] = names[:LIST_CAP]
 
     long_lived: dict[str, dict] = {}
-    watch = [
-        name
-        for kind in ("integration", "environment", "release", "other")
-        for name in groups.get(kind, [])
-    ][:30]
+    watch = [name for kind in ("integration", "environment", "release", "other") for name in groups.get(kind, [])][:30]
     for name in watch:
         age_days = (now - branches[name]) // SECONDS_PER_DAY
         entry = {
@@ -389,9 +365,7 @@ def build_report(args: argparse.Namespace) -> dict:
         "long_lived": long_lived,
         "tags": tag_report(repo_dir, default),
         "default_branch_history": merge_ratio(repo_dir, default, args.sample),
-        "ci_branch_references": ci_references(
-            repo_dir, sorted(set(list(long_lived) + [default]))
-        ),
+        "ci_branch_references": ci_references(repo_dir, sorted(set([*list(long_lived), default]))),
     }
     evidence["candidate_models"] = rank_models(evidence)
     return evidence
@@ -421,14 +395,8 @@ def render(report: dict) -> str:
             state = "stale" if info["stale"] else "active"
             div = ""
             if "ahead_of_default" in info:
-                div = (
-                    f", {info['ahead_of_default']} ahead / "
-                    f"{info['behind_default']} behind default"
-                )
-            lines.append(
-                f"  {name} [{info['kind']}] {state}, last commit "
-                f"{info['days_since_last_commit']}d ago{div}"
-            )
+                div = f", {info['ahead_of_default']} ahead / {info['behind_default']} behind default"
+            lines.append(f"  {name} [{info['kind']}] {state}, last commit {info['days_since_last_commit']}d ago{div}")
     else:
         lines.append("  none")
 
@@ -440,10 +408,7 @@ def render(report: dict) -> str:
     if tags["recent"]:
         lines.append(f"  recent: {', '.join(tags['recent'])}")
     if tags["off_default_line"]:
-        lines.append(
-            "  off the default line (parallel maintenance): "
-            + ", ".join(tags["off_default_line"])
-        )
+        lines.append("  off the default line (parallel maintenance): " + ", ".join(tags["off_default_line"]))
 
     history = report["default_branch_history"]
     lines += [
@@ -467,10 +432,7 @@ def render(report: dict) -> str:
         lines.append(f"  {item['model']} — {item['reason']}")
     lines += [
         "",
-        (
-            "This ranking is evidence, not a verdict. Confirm the model with "
-            "the user before recording it."
-        ),
+        ("This ranking is evidence, not a verdict. Confirm the model with the user before recording it."),
     ]
     return "\n".join(lines)
 
@@ -480,9 +442,7 @@ def main() -> None:
         description="Collect read-only evidence of a repository's branching model.",
         epilog="Example: python3 scripts/detect_branching.py --repo-dir . --json",
     )
-    parser.add_argument(
-        "--repo-dir", default=".", help="git checkout to inspect (default: .)"
-    )
+    parser.add_argument("--repo-dir", default=".", help="git checkout to inspect (default: .)")
     parser.add_argument(
         "--remote",
         default="origin",

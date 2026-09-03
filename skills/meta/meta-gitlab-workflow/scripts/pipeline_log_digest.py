@@ -51,7 +51,7 @@ def log(message: str) -> None:
     print(message, file=sys.stderr)
 
 
-def run_glab_api(endpoint: str, hostname: str | None) -> "subprocess.CompletedProcess":
+def run_glab_api(endpoint: str, hostname: str | None) -> subprocess.CompletedProcess:
     """Run `glab api ENDPOINT`, exiting 1 with guidance if glab is missing."""
     cmd = ["glab", "api"]
     if hostname:
@@ -100,9 +100,7 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
         help="project as its full path GROUP[/SUBGROUP]/NAME",
     )
-    parser.add_argument(
-        "--pipeline-id", required=True, type=int, help="numeric pipeline id"
-    )
+    parser.add_argument("--pipeline-id", required=True, type=int, help="numeric pipeline id")
     parser.add_argument(
         "--tail",
         type=int,
@@ -123,21 +121,16 @@ def main() -> int:
     parts = args.repo.split("/")
     if len(parts) < 2 or not all(parts):
         parser.error(
-            f"--repo must be the full GROUP[/SUBGROUP]/NAME path (got "
-            f"{args.repo!r}), e.g. --repo gitlab-org/cli"
+            f"--repo must be the full GROUP[/SUBGROUP]/NAME path (got {args.repo!r}), e.g. --repo gitlab-org/cli"
         )
     if args.pipeline_id <= 0:
-        parser.error(
-            f"--pipeline-id must be a positive integer (got {args.pipeline_id})"
-        )
+        parser.error(f"--pipeline-id must be a positive integer (got {args.pipeline_id})")
     if args.tail <= 0:
         parser.error(f"--tail must be a positive integer (got {args.tail})")
 
     project = urllib.parse.quote(args.repo, safe="")
 
-    view = run_glab_api(
-        f"projects/{project}/pipelines/{args.pipeline_id}", args.hostname
-    )
+    view = run_glab_api(f"projects/{project}/pipelines/{args.pipeline_id}", args.hostname)
     if view.returncode != 0:
         log(
             f"error: `glab api projects/{args.repo}/pipelines/"
@@ -159,8 +152,7 @@ def main() -> int:
         return 1
 
     jobs_proc = run_glab_api(
-        f"projects/{project}/pipelines/{args.pipeline_id}/jobs"
-        "?scope[]=failed&per_page=100",
+        f"projects/{project}/pipelines/{args.pipeline_id}/jobs?scope[]=failed&per_page=100",
         args.hostname,
     )
     if jobs_proc.returncode != 0:
@@ -185,9 +177,7 @@ def main() -> int:
     for job in jobs:
         job_id = job.get("id")
         name = job.get("name", "")
-        trace_proc = run_glab_api(
-            f"projects/{project}/jobs/{job_id}/trace", args.hostname
-        )
+        trace_proc = run_glab_api(f"projects/{project}/jobs/{job_id}/trace", args.hostname)
         entry = {
             "job_id": job_id,
             "name": name,

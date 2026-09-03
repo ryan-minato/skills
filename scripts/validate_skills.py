@@ -63,9 +63,7 @@ def fail(message: str) -> None:
 def check_all_skills() -> None:
     """Run the per-skill linter over public and project-only skills."""
     for severity, message in [
-        finding
-        for skill_dir in skill_linter.repo_skill_dirs()
-        for finding in skill_linter.check_skill_dir(skill_dir)
+        finding for skill_dir in skill_linter.repo_skill_dirs() for finding in skill_linter.check_skill_dir(skill_dir)
     ]:
         if severity == skill_linter.ERROR:
             fail(message)
@@ -136,9 +134,7 @@ def check_disposable_markers() -> None:
     for catalog in DISPOSABLE_CATALOGS:
         for skill_dir in sorted(catalog_skill_subdirs(SKILLS_DIR / catalog)):
             skill_md = skill_dir / "SKILL.md"
-            fields, _body = skill_linter.parse_frontmatter(
-                skill_md.read_text(encoding="utf-8")
-            )
+            fields, _body = skill_linter.parse_frontmatter(skill_md.read_text(encoding="utf-8"))
             description = (fields or {}).get("description", "")
             if description.startswith(DISPOSABLE_MARKER):
                 continue
@@ -160,9 +156,7 @@ def check_architecture_md_catalog_list() -> None:
         )
         return
     text = ARCHITECTURE_MD.read_text(encoding="utf-8")
-    section = re.search(
-        r"^## Catalogs$(.*?)(?=^## |\Z)", text, re.MULTILINE | re.DOTALL
-    )
+    section = re.search(r"^## Catalogs$(.*?)(?=^## |\Z)", text, re.MULTILINE | re.DOTALL)
     if not section:
         fail(
             "ARCHITECTURE.md: no `## Catalogs` section found. The validator "
@@ -171,11 +165,7 @@ def check_architecture_md_catalog_list() -> None:
         )
         return
     listed = set(re.findall(r"^- `([\w-]+)`", section.group(1), re.MULTILINE))
-    actual = (
-        {p.name for p in SKILLS_DIR.iterdir() if p.is_dir()}
-        if SKILLS_DIR.is_dir()
-        else set()
-    )
+    actual = {p.name for p in SKILLS_DIR.iterdir() if p.is_dir()} if SKILLS_DIR.is_dir() else set()
     for missing in sorted(actual - listed):
         fail(
             f"ARCHITECTURE.md: catalog `{missing}` exists in skills/ but is "
@@ -326,10 +316,7 @@ def check_marketplace_manifest() -> None:
         # Each plugin must enumerate exactly its catalog's skill directories,
         # so the vercel picker groups them and Claude Code loads them. The
         # generator (scripts/gen_marketplace.py) keeps this list in sync.
-        expected = [
-            f"./skills/{name}/{d.name}"
-            for d in catalog_skill_subdirs(SKILLS_DIR / name)
-        ]
+        expected = [f"./skills/{name}/{d.name}" for d in catalog_skill_subdirs(SKILLS_DIR / name)]
         if not expected:
             fail(
                 f".claude-plugin/marketplace.json: plugin `{name}` has no "
@@ -363,9 +350,7 @@ def check_marketplace_manifest() -> None:
 
 
 def check_root_files() -> None:
-    if (REPO_ROOT / "README.md").is_file() and not (
-        REPO_ROOT / "README.zh.md"
-    ).is_file():
+    if (REPO_ROOT / "README.md").is_file() and not (REPO_ROOT / "README.zh.md").is_file():
         fail(
             "README.zh.md: missing. The root README must have a "
             "content-identical Chinese translation. Fix: create README.zh.md."

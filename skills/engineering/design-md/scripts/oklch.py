@@ -31,9 +31,7 @@ OKLCH_RE = re.compile(
 def parse_oklch(text: str) -> tuple[float, float, float]:
     m = OKLCH_RE.match(text)
     if not m:
-        sys.exit(
-            f'error: cannot parse OKLCH value: {text!r} (expected like "oklch(62% 0.18 250)")'
-        )
+        sys.exit(f'error: cannot parse OKLCH value: {text!r} (expected like "oklch(62% 0.18 250)")')
     lit, c_lit, h_lit = m.groups()
     if lit.endswith("%"):
         percent = float(lit[:-1])
@@ -43,9 +41,7 @@ def parse_oklch(text: str) -> tuple[float, float, float]:
     else:
         lightness = float(lit)
         if lightness > 1:
-            sys.exit(
-                f"error: bare lightness {lit} is out of range (0-1) — did you mean {lit}%?"
-            )
+            sys.exit(f"error: bare lightness {lit} is out of range (0-1) — did you mean {lit}%?")
     hue = float(h_lit[:-3]) if h_lit.lower().endswith("deg") else float(h_lit)
     return lightness, float(c_lit), hue % 360
 
@@ -67,9 +63,7 @@ def parse_hex(text: str) -> tuple[float, float, float]:
     return tuple(int(t[i : i + 2], 16) / 255 for i in (0, 2, 4))  # type: ignore[return-value]
 
 
-_HEX_BODY_RE = re.compile(
-    r"[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8}"
-)
+_HEX_BODY_RE = re.compile(r"[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8}")
 
 
 def parse_color(text: str) -> tuple[float, float, float]:
@@ -131,9 +125,7 @@ def in_gamut(rgb, eps: float = 3e-3) -> bool:
 
 
 def to_hex(rgb) -> str:
-    return "#" + "".join(
-        f"{round(255 * min(1.0, max(0.0, linear_to_srgb(v)))):02x}" for v in rgb
-    )
+    return "#" + "".join(f"{round(255 * min(1.0, max(0.0, linear_to_srgb(v)))):02x}" for v in rgb)
 
 
 def clamp_chroma(lightness: float, chroma: float, hue: float):
@@ -201,8 +193,7 @@ def main() -> None:
         for label, rgb in (("first", rgb_a), ("second", rgb_b)):
             if not in_gamut(rgb):
                 print(
-                    f"warning: the {label} color is outside sRGB — the "
-                    "ratio below is computed on the clipped color",
+                    f"warning: the {label} color is outside sRGB — the ratio below is computed on the clipped color",
                     file=sys.stderr,
                 )
         la = relative_luminance(rgb_a)

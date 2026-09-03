@@ -40,12 +40,10 @@ def log(message: str) -> None:
     print(message, file=sys.stderr)
 
 
-def run_gh(args: list) -> "subprocess.CompletedProcess":
+def run_gh(args: list) -> subprocess.CompletedProcess:
     """Run a gh command, exiting 1 with guidance if gh is not installed."""
     try:
-        return subprocess.run(
-            ["gh", *args], capture_output=True, text=True, check=False
-        )
+        return subprocess.run(["gh", *args], capture_output=True, text=True, check=False)
     except FileNotFoundError:
         log(
             "error: gh not found — install and authenticate the GitHub CLI "
@@ -67,9 +65,7 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument("--repo", required=True, help="repository as OWNER/REPO")
-    parser.add_argument(
-        "--run-id", required=True, type=int, help="numeric workflow run id"
-    )
+    parser.add_argument("--run-id", required=True, type=int, help="numeric workflow run id")
     parser.add_argument(
         "--tail",
         type=int,
@@ -85,10 +81,7 @@ def main() -> int:
 
     parts = args.repo.split("/")
     if len(parts) != 2 or not all(parts):
-        parser.error(
-            f"--repo must be OWNER/REPO (got {args.repo!r}), "
-            "e.g. --repo octocat/hello-world"
-        )
+        parser.error(f"--repo must be OWNER/REPO (got {args.repo!r}), e.g. --repo octocat/hello-world")
     if args.run_id <= 0:
         parser.error(f"--run-id must be a positive integer (got {args.run_id})")
     if args.tail <= 0:
@@ -106,10 +99,7 @@ def main() -> int:
         ]
     )
     if view.returncode != 0:
-        log(
-            f"error: `gh run view {args.run_id}` failed "
-            f"(exit {view.returncode}): {view.stderr.strip()}"
-        )
+        log(f"error: `gh run view {args.run_id}` failed (exit {view.returncode}): {view.stderr.strip()}")
         log(
             f"fix: check that run {args.run_id} exists in {args.repo} "
             "(`gh run list -R " + args.repo + " --limit 20`) and that gh is "
@@ -140,16 +130,11 @@ def main() -> int:
         job_id = job.get("databaseId")
         name = job.get("name", "")
         steps = job.get("steps") or []
-        failed_steps = [
-            s.get("name", "") for s in steps if s.get("conclusion") == "failure"
-        ]
-        log_proc = run_gh(
-            ["run", "view", "-R", args.repo, "--job", str(job_id), "--log-failed"]
-        )
+        failed_steps = [s.get("name", "") for s in steps if s.get("conclusion") == "failure"]
+        log_proc = run_gh(["run", "view", "-R", args.repo, "--job", str(job_id), "--log-failed"])
         if log_proc.returncode != 0:
             log(
-                f"note: no failed-step log for job {job_id} ({name}): "
-                f"{log_proc.stderr.strip() or 'gh returned no log'}"
+                f"note: no failed-step log for job {job_id} ({name}): {log_proc.stderr.strip() or 'gh returned no log'}"
             )
             tail = []
         else:

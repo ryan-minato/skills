@@ -97,9 +97,7 @@ def _parse_subset(lines: list[str]) -> dict[str, str]:
         elif len(rest) >= 2 and rest[0] == rest[-1] and rest[0] in "'\"":
             fields[key] = rest[1:-1]
         elif rest.startswith(("[", "{")):
-            raise FrontmatterError(
-                f"unsupported or malformed collection value for {key!r}: {rest!r}"
-            )
+            raise FrontmatterError(f"unsupported or malformed collection value for {key!r}: {rest!r}")
         else:
             fields[key] = rest
     return fields
@@ -133,9 +131,7 @@ def in_plugin_cache(path: Path) -> bool:
     removed by uninstalling through the manager, never by this script.
     """
     parts = path.parts
-    return any(
-        parts[i] == "plugins" and parts[i + 1] == "cache" for i in range(len(parts) - 1)
-    )
+    return any(parts[i] == "plugins" and parts[i + 1] == "cache" for i in range(len(parts) - 1))
 
 
 def scan(roots: list[Path], marker: str):
@@ -180,8 +176,7 @@ def inventory_token(
         "roots": [str(path) for path in roots],
         "marker": marker,
         "matches": [
-            {"path": str(path), "name": name, "description": description}
-            for path, name, description in matches
+            {"path": str(path), "name": name, "description": description} for path, name, description in matches
         ],
         "skipped": [{"path": str(path), "reason": reason} for path, reason in skipped],
     }
@@ -201,8 +196,7 @@ def main() -> None:
     parser.add_argument(
         "--delete",
         action="store_true",
-        help="delete matched skill directories after --confirm TOKEN; "
-        "this skill's own directory is deleted last",
+        help="delete matched skill directories after --confirm TOKEN; this skill's own directory is deleted last",
     )
     parser.add_argument(
         "--confirm",
@@ -212,8 +206,7 @@ def main() -> None:
     parser.add_argument(
         "--marker",
         default=None,
-        help="override the marker text; recovery use only, when this "
-        "skill's own SKILL.md cannot be read",
+        help="override the marker text; recovery use only, when this skill's own SKILL.md cannot be read",
     )
     args = parser.parse_args()
 
@@ -277,10 +270,7 @@ def main() -> None:
             print(f"FAILED to delete {path}: {exc}")
 
     if failures and self_matches:
-        print(
-            f"retained {SELF_DIR}: another deletion failed, so the recovery "
-            "tool remains available"
-        )
+        print(f"retained {SELF_DIR}: another deletion failed, so the recovery tool remains available")
     else:
         for path, _name, _line in self_matches:
             try:

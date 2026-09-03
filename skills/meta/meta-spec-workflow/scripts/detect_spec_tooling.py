@@ -102,9 +102,7 @@ def detect_spec_kit(root: Path) -> dict | None:
     specs = root / "specs"
     numbered = []
     if specs.is_dir():
-        numbered = sorted(
-            p for p in specs.iterdir() if p.is_dir() and re.match(r"^\d{3,}-", p.name)
-        )
+        numbered = sorted(p for p in specs.iterdir() if p.is_dir() and re.match(r"^\d{3,}-", p.name))
     if not hidden.is_dir() and not numbered:
         return None
     constitution = hidden / "memory" / "constitution.md"
@@ -128,19 +126,13 @@ def detect_openspec(root: Path) -> dict | None:
     archive = changes / "archive"
     active = []
     if changes.is_dir():
-        active = sorted(
-            rel(root, p)
-            for p in changes.iterdir()
-            if p.is_dir() and p.name != "archive"
-        )
+        active = sorted(rel(root, p) for p in changes.iterdir() if p.is_dir() and p.name != "archive")
     config = None
     for candidate in ("config.yaml", "config.yml", "project.md"):
         if (base / candidate).is_file():
             config = rel(root, base / candidate)
             break
-    archived = (
-        sum(1 for p in archive.iterdir() if p.is_dir()) if archive.is_dir() else 0
-    )
+    archived = sum(1 for p in archive.iterdir() if p.is_dir()) if archive.is_dir() else 0
     return {
         "tool": "openspec",
         "main_specs": count_files(base / "specs", "spec.md"),
@@ -156,26 +148,18 @@ def detect_kiro(root: Path) -> dict | None:
     if not base.is_dir():
         return None
     specs = base / "specs"
-    features = (
-        sorted(p for p in specs.iterdir() if p.is_dir()) if specs.is_dir() else []
-    )
+    features = sorted(p for p in specs.iterdir() if p.is_dir()) if specs.is_dir() else []
     steering = base / "steering"
     hooks = base / "hooks"
     required = ("requirements.md", "design.md", "tasks.md")
-    steering_files = (
-        sorted(rel(root, p) for p in steering.glob("*.md")) if steering.is_dir() else []
-    )
-    hook_files = (
-        sorted(rel(root, p) for p in hooks.glob("*.json")) if hooks.is_dir() else []
-    )
+    steering_files = sorted(rel(root, p) for p in steering.glob("*.md")) if steering.is_dir() else []
+    hook_files = sorted(rel(root, p) for p in hooks.glob("*.json")) if hooks.is_dir() else []
     if not features and not steering_files and not hook_files:
         return None
     return {
         "tool": "kiro",
         "feature_directories": [rel(root, p) for p in features],
-        "complete_specs": sum(
-            1 for p in features if all((p / f).is_file() for f in required)
-        ),
+        "complete_specs": sum(1 for p in features if all((p / f).is_file() for f in required)),
         "steering_files": steering_files,
         "hook_files": hook_files,
         "owned_paths": [rel(root, base)],
@@ -198,9 +182,7 @@ def detect_committed_documents(root: Path, owned: set[str]) -> dict | None:
             continue
         markdown = count_files(directory, "*.md")
         if markdown:
-            candidates.append(
-                {"path": rel(root, directory), "markdown_files": markdown}
-            )
+            candidates.append({"path": rel(root, directory), "markdown_files": markdown})
     if not candidates:
         return None
     return {"tool": "committed-documents", "directories": candidates}
@@ -255,17 +237,13 @@ def iter_markdown(root: Path, owned: set[str]):
                 yield current / filename
 
 
-def requirement_candidates(
-    root: Path, owned: set[str], limit: int
-) -> tuple[list[dict], int]:
+def requirement_candidates(root: Path, owned: set[str], limit: int) -> tuple[list[dict], int]:
     found: dict[str, dict] = {}
     for file in iter_markdown(root, owned):
         text = read_text(file)
         if text is None:
             continue
-        signals = {
-            name: len(pattern.findall(text)) for name, pattern in REQUIREMENT_SIGNALS
-        }
+        signals = {name: len(pattern.findall(text)) for name, pattern in REQUIREMENT_SIGNALS}
         signals = {k: v for k, v in signals.items() if v}
         if signals:
             found[rel(root, file)] = {"file": rel(root, file), "signals": signals}
@@ -276,9 +254,7 @@ def requirement_candidates(
             text = read_text(file)
             if text is None or not re.search(r"acceptance", text, re.IGNORECASE):
                 continue
-            entry = found.setdefault(
-                rel(root, file), {"file": rel(root, file), "signals": {}}
-            )
+            entry = found.setdefault(rel(root, file), {"file": rel(root, file), "signals": {}})
             entry["signals"]["acceptance-field"] = 1
             entry["template"] = True
     ordered = [found[key] for key in sorted(found)]
@@ -291,9 +267,7 @@ def main(argv: list[str] | None = None) -> int:
         epilog="Example: python3 detect_spec_tooling.py --root .",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument(
-        "--root", default=".", help="checkout to inspect (default: current directory)"
-    )
+    parser.add_argument("--root", default=".", help="checkout to inspect (default: current directory)")
     parser.add_argument(
         "--max-candidates",
         type=int,
@@ -305,8 +279,7 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.root)
     if not root.is_dir():
         print(
-            f"error: --root {args.root!r} is not a directory; pass the checkout to inspect "
-            "(for example --root .)",
+            f"error: --root {args.root!r} is not a directory; pass the checkout to inspect (for example --root .)",
             file=sys.stderr,
         )
         return 2
@@ -316,11 +289,7 @@ def main(argv: list[str] | None = None) -> int:
     root = root.resolve()
 
     try:
-        tools = [
-            t
-            for t in (detect_spec_kit(root), detect_openspec(root), detect_kiro(root))
-            if t
-        ]
+        tools = [t for t in (detect_spec_kit(root), detect_openspec(root), detect_kiro(root)) if t]
         owned = {p for t in tools for p in t.get("owned_paths", [])}
         committed = detect_committed_documents(root, owned)
         if committed:

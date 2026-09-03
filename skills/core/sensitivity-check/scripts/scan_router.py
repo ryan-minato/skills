@@ -48,7 +48,7 @@ def _load_encoder():
         return None
 
 
-def _count_tokens(text: str, encoder) -> "tuple[int, bool]":
+def _count_tokens(text: str, encoder) -> tuple[int, bool]:
     """Return (token_count, estimated)."""
     if encoder is not None:
         return len(encoder.encode(text)), False
@@ -81,9 +81,7 @@ def _route_text(item: str, text: str, threshold: int, encoder) -> dict:
         "method": "deep" if count <= threshold else "script",
     }
     if estimated:
-        entry["note"] = (
-            "token count estimated from characters/4; flag this in the report"
-        )
+        entry["note"] = "token count estimated from characters/4; flag this in the report"
     return entry
 
 
@@ -185,9 +183,7 @@ def main() -> int:
     encoder = _load_encoder()
     items = [_route_file(path, args.threshold, encoder) for path in args.files]
     if args.text is not None:
-        items.append(
-            _route_text("<inline-text>", args.text, args.threshold, encoder)
-        )
+        items.append(_route_text("<inline-text>", args.text, args.threshold, encoder))
 
     had_error = any("error" in item for item in items)
     for item in items:

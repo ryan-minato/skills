@@ -113,9 +113,7 @@ def _rate_limit_message(err: urllib.error.HTTPError) -> str | None:
     reset = err.headers.get("X-RateLimit-Reset")
     when = "unknown"
     if reset and reset.isdigit():
-        when = datetime.datetime.fromtimestamp(
-            int(reset), datetime.timezone.utc
-        ).strftime("%H:%M:%S UTC")
+        when = datetime.datetime.fromtimestamp(int(reset), datetime.timezone.utc).strftime("%H:%M:%S UTC")
     return (
         f"GitHub rate limit exhausted; it resets at {when}. "
         "Unauthenticated clients get 60 requests/hour (search: 10/minute); "
@@ -133,11 +131,7 @@ def _request(
     req = urllib.request.Request(url, data=data, headers=_headers(accept, auth))
     if data is not None:
         req.add_header("Content-Type", "application/json")
-    opener = (
-        urllib.request.build_opener()
-        if follow_redirects
-        else urllib.request.build_opener(_NoRedirect())
-    )
+    opener = urllib.request.build_opener() if follow_redirects else urllib.request.build_opener(_NoRedirect())
     try:
         with opener.open(req, timeout=TIMEOUT) as resp:
             return resp.read()
@@ -278,13 +272,7 @@ def cmd_issues(args) -> None:
     if args.raw:
         emit(raw)
         return
-    emit(
-        [
-            _issue_item(entry, with_body=False)
-            for entry in raw
-            if "pull_request" not in entry
-        ]
-    )
+    emit([_issue_item(entry, with_body=False) for entry in raw if "pull_request" not in entry])
 
 
 def cmd_issue(args) -> None:
@@ -322,20 +310,13 @@ def _release_item(raw: dict, *, with_body: bool) -> dict:
     }
     if with_body:
         item["body"] = raw.get("body")
-        item["assets"] = [
-            {"name": asset.get("name"), "size": asset.get("size")}
-            for asset in raw.get("assets") or []
-        ]
+        item["assets"] = [{"name": asset.get("name"), "size": asset.get("size")} for asset in raw.get("assets") or []]
     return item
 
 
 def cmd_releases(args) -> None:
     if args.latest or args.tag:
-        path = (
-            f"/repos/{args.repo}/releases/latest"
-            if args.latest
-            else f"/repos/{args.repo}/releases/tags/{args.tag}"
-        )
+        path = f"/repos/{args.repo}/releases/latest" if args.latest else f"/repos/{args.repo}/releases/tags/{args.tag}"
         raw = _api_json(path)
         if args.raw:
             emit(raw)
@@ -354,12 +335,7 @@ def cmd_tags(args) -> None:
     if args.raw:
         emit(raw)
         return
-    emit(
-        [
-            {"name": tag["name"], "commit_sha": (tag.get("commit") or {}).get("sha")}
-            for tag in raw
-        ]
-    )
+    emit([{"name": tag["name"], "commit_sha": (tag.get("commit") or {}).get("sha")} for tag in raw])
 
 
 def cmd_prs(args) -> None:
@@ -376,9 +352,7 @@ def cmd_prs(args) -> None:
 def cmd_pr(args) -> None:
     base = f"/repos/{args.repo}/pulls/{args.number}"
     if args.diff:
-        text = _request(f"{API}{base}", accept=ACCEPT_DIFF).decode(
-            "utf-8", errors="replace"
-        )
+        text = _request(f"{API}{base}", accept=ACCEPT_DIFF).decode("utf-8", errors="replace")
         print(text)
         return
     if args.files:
@@ -479,11 +453,7 @@ def _job_item(raw: dict) -> dict:
         "name": raw.get("name"),
         "status": raw.get("status"),
         "conclusion": raw.get("conclusion"),
-        "failed_steps": [
-            step["name"]
-            for step in raw.get("steps", [])
-            if step.get("conclusion") == "failure"
-        ],
+        "failed_steps": [step["name"] for step in raw.get("steps", []) if step.get("conclusion") == "failure"],
     }
 
 
@@ -555,8 +525,7 @@ def cmd_run_failures(args) -> None:
         item["log_tail"] = _job_log_tail(args.repo, job["id"], args.tail)
         if item["log_tail"] is None:
             item["log_note"] = (
-                "log text requires a token (GH_TOKEN/GITHUB_TOKEN); the "
-                "failed step names above come from the jobs API"
+                "log text requires a token (GH_TOKEN/GITHUB_TOKEN); the failed step names above come from the jobs API"
             )
         result["failed_jobs"].append(item)
     emit(result)
@@ -704,9 +673,7 @@ def cmd_discussion(args) -> None:
             }
         )
         return
-    page = _request(f"{WEB}/{args.repo}/discussions/{args.number}", auth=False).decode(
-        "utf-8", errors="replace"
-    )
+    page = _request(f"{WEB}/{args.repo}/discussions/{args.number}", auth=False).decode("utf-8", errors="replace")
     title_match = re.search(r"<title>(.*?)</title>", page, re.S)
     title = title_match.group(1).split(" · ")[0].strip() if title_match else ""
     parser = _MarkdownBodyParser()
@@ -721,8 +688,7 @@ def cmd_discussion(args) -> None:
         {
             "engine": "html-besteffort",
             "note": (
-                "tokenless extraction from the public HTML page; text only, "
-                "authorship and threading are not preserved"
+                "tokenless extraction from the public HTML page; text only, authorship and threading are not preserved"
             ),
             "number": args.number,
             "title": title,

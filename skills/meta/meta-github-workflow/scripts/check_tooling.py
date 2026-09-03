@@ -193,14 +193,11 @@ def probe_actions(repo: str, hostname: str | None) -> dict:
     wf = gh_json(f"repos/{repo}/actions/permissions/workflow", hostname)
     if wf is None:
         result["default_workflow_permissions"] = unknown(
-            f"gh api repos/{repo}/actions/permissions/workflow, or "
-            "Settings > Actions > General > Workflow permissions"
+            f"gh api repos/{repo}/actions/permissions/workflow, or Settings > Actions > General > Workflow permissions"
         )
     else:
         result["default_workflow_permissions"] = wf.get("default_workflow_permissions")
-        result["can_approve_pull_request_reviews"] = wf.get(
-            "can_approve_pull_request_reviews"
-        )
+        result["can_approve_pull_request_reviews"] = wf.get("can_approve_pull_request_reviews")
     return result
 
 
@@ -215,9 +212,7 @@ def probe_rules(repo: str, default_branch: str | None, hostname: str | None) -> 
     else:
         result["ruleset_count"] = len(rulesets)
     if default_branch:
-        protection = gh_json(
-            f"repos/{repo}/branches/{default_branch}/protection", hostname
-        )
+        protection = gh_json(f"repos/{repo}/branches/{default_branch}/protection", hostname)
         if protection is None:
             result["legacy_branch_protection"] = {
                 "value": "absent-or-unreadable",
@@ -264,13 +259,10 @@ def probe_org(owner: str, owner_type: str | None, hostname: str | None) -> dict:
     issue_types = gh_json(f"orgs/{owner}/issue-types", hostname)
     if issue_types is None:
         result["issue_types"] = unknown(
-            f"gh api orgs/{owner}/issue-types — absence can be plan, "
-            "permissions, or a GHES older than 3.18"
+            f"gh api orgs/{owner}/issue-types — absence can be plan, permissions, or a GHES older than 3.18"
         )
     else:
-        result["issue_types"] = _taxonomy_probe(
-            issue_types, "issue_types", {"task", "bug", "feature"}
-        )
+        result["issue_types"] = _taxonomy_probe(issue_types, "issue_types", {"task", "bug", "feature"})
 
     issue_fields = gh_json(f"orgs/{owner}/issue-fields", hostname)
     if issue_fields is None:
@@ -278,8 +270,7 @@ def probe_org(owner: str, owner_type: str | None, hostname: str | None) -> dict:
         result["issue_fields"] = unknown(
             f"gh api orgs/{owner}/issue-fields — absence can be permissions"
             + (
-                " or a GHES older than 3.23, where issue fields do not exist "
-                "yet; fall back to the label priority axis"
+                " or a GHES older than 3.23, where issue fields do not exist yet; fall back to the label priority axis"
                 if ghes
                 else " or the read:org scope being absent"
             )
@@ -305,9 +296,7 @@ def probe_security(repo: str, hostname: str | None) -> dict:
         )
     else:
         result["security_and_analysis"] = {
-            key: (value or {}).get("status")
-            for key, value in analysis.items()
-            if isinstance(value, dict)
+            key: (value or {}).get("status") for key, value in analysis.items() if isinstance(value, dict)
         }
     setup = gh_json(f"repos/{repo}/code-scanning/default-setup", hostname)
     if setup is None:
@@ -339,9 +328,7 @@ def _state_of(value):
     return "disabled"
 
 
-def baseline_gaps(
-    repository: dict, rules: dict, security: dict, actions: dict
-) -> list:
+def baseline_gaps(repository: dict, rules: dict, security: dict, actions: dict) -> list:
     """Compare the probed state with the default security baseline.
 
     Every entry is a proposal for the plan, never an action. `blocked_by`
@@ -350,7 +337,6 @@ def baseline_gaps(
     """
     visibility = repository.get("visibility")
     private = visibility in ("private", "internal")
-    branch = repository.get("default_branch") or "the default branch"
 
     ruleset_count = rules.get("ruleset_count")
     legacy = rules.get("legacy_branch_protection")
@@ -367,9 +353,7 @@ def baseline_gaps(
     analysis = analysis if isinstance(analysis, dict) else {}
     scanning = security.get("code_scanning_default_setup")
     scanning_state = (
-        _state_of((scanning or {}).get("state"))
-        if isinstance(scanning, dict) and "state" in scanning
-        else "unknown"
+        _state_of((scanning or {}).get("state")) if isinstance(scanning, dict) and "state" in scanning else "unknown"
     )
 
     private_note = (
@@ -410,11 +394,7 @@ def baseline_gaps(
             "blocked_by": (
                 private_note
                 if private
-                else (
-                    "Actions is not enabled; default setup cannot run"
-                    if actions.get("enabled") is False
-                    else None
-                )
+                else ("Actions is not enabled; default setup cannot run" if actions.get("enabled") is False else None)
             ),
             "verify": "gh api repos/OWNER/REPO/code-scanning/default-setup",
         },
@@ -434,8 +414,7 @@ def docs_hint(hostname: str | None) -> dict:
     return {
         "host": "github.com",
         "version_param": (
-            "free-pro-team@latest; use enterprise-cloud@latest only after the "
-            "plan is confirmed Enterprise"
+            "free-pro-team@latest; use enterprise-cloud@latest only after the plan is confirmed Enterprise"
         ),
     }
 
@@ -449,9 +428,7 @@ def main() -> int:
             "data, not failure), 1 = a probe crashed unexpectedly, 2 = bad "
             "arguments."
         ),
-        epilog=(
-            "Example: python3 scripts/check_tooling.py --repo octo/widget"
-        ),
+        epilog=("Example: python3 scripts/check_tooling.py --repo octo/widget"),
     )
     parser.add_argument(
         "--repo",
@@ -487,8 +464,7 @@ def main() -> int:
             if not (gh["installed"] and gh["authenticated"]):
                 report["repository"] = {
                     "skipped": (
-                        "gh is missing or unauthenticated — install gh, run "
-                        "`gh auth login`, then re-run with --repo"
+                        "gh is missing or unauthenticated — install gh, run `gh auth login`, then re-run with --repo"
                     )
                 }
             else:
@@ -497,12 +473,8 @@ def main() -> int:
                 if "skipped" not in repository:
                     owner = args.repo.split("/", 1)[0]
                     report["actions"] = probe_actions(args.repo, args.hostname)
-                    report["rules"] = probe_rules(
-                        args.repo, repository.get("default_branch"), args.hostname
-                    )
-                    report["org"] = probe_org(
-                        owner, repository.get("owner_type"), args.hostname
-                    )
+                    report["rules"] = probe_rules(args.repo, repository.get("default_branch"), args.hostname)
+                    report["org"] = probe_org(owner, repository.get("owner_type"), args.hostname)
                     report["security"] = probe_security(args.repo, args.hostname)
                     report["baseline_gaps"] = baseline_gaps(
                         repository,

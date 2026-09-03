@@ -42,8 +42,7 @@ def fetch_json(url: str, headers: dict | None = None) -> dict:
         )
     except (urllib.error.URLError, TimeoutError, OSError) as error:
         sys.exit(
-            f"Could not reach nvcr.io ({error}) for {url}\n"
-            f"Check network access, retry, or browse {BROWSE_URL} instead."
+            f"Could not reach nvcr.io ({error}) for {url}\nCheck network access, retry, or browse {BROWSE_URL} instead."
         )
 
 

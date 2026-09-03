@@ -102,7 +102,7 @@ class SourceError(Exception):
 
 
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: D102
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
 
 
@@ -116,9 +116,7 @@ def _http_get(
     follow_redirects: bool = True,
 ) -> tuple[bytes, dict]:
     """GET url, returning (body, response headers). Raises SourceError."""
-    request = urllib.request.Request(
-        url, headers={"User-Agent": USER_AGENT, **(headers or {})}
-    )
+    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, **(headers or {})})
     handlers = [] if follow_redirects else [_NoRedirect()]
     opener = urllib.request.build_opener(*handlers)
     try:
@@ -183,8 +181,7 @@ def _registry_token(domain: dict, repository: str) -> str:
     token = _get_json(url).get("token")
     if not token:
         raise SourceError(
-            f"no anonymous pull token from {url}. The repository may be "
-            f"private or the token endpoint may have changed."
+            f"no anonymous pull token from {url}. The repository may be private or the token endpoint may have changed."
         )
     return token
 
@@ -217,11 +214,7 @@ def fetch_docker_registry(domain: dict, args: argparse.Namespace) -> list[dict]:
         repos.extend(data.get("repositories") or [])
         url = _next_link(headers.get("Link"), registry)
     prefix = domain["repo_prefix"]
-    return [
-        {"id": repo, "ref": f"{host}/{repo}", "name": repo}
-        for repo in repos
-        if repo.startswith(prefix)
-    ]
+    return [{"id": repo, "ref": f"{host}/{repo}", "name": repo} for repo in repos if repo.startswith(prefix)]
 
 
 def fetch_oci_collection(domain: dict, args: argparse.Namespace) -> list[dict]:
@@ -235,11 +228,7 @@ def fetch_oci_collection(domain: dict, args: argparse.Namespace) -> list[dict]:
         },
     )
     layer = next(
-        (
-            entry
-            for entry in manifest.get("layers") or []
-            if entry.get("mediaType") == COLLECTION_MEDIA_TYPE
-        ),
+        (entry for entry in manifest.get("layers") or [] if entry.get("mediaType") == COLLECTION_MEDIA_TYPE),
         None,
     )
     if layer is None:
@@ -253,24 +242,18 @@ def fetch_oci_collection(domain: dict, args: argparse.Namespace) -> list[dict]:
     try:
         collection = json.loads(blob)
     except json.JSONDecodeError as exc:
-        raise SourceError(
-            f"collection blob from {namespace} is not JSON ({exc})."
-        ) from exc
+        raise SourceError(f"collection blob from {namespace} is not JSON ({exc}).") from exc
     entries = collection.get("features") or collection.get("templates") or []
     deprecated = sum(1 for entry in entries if entry.get("deprecated"))
     if deprecated:
         print(
-            f"note [{domain['name']}]: skipped {deprecated} deprecated "
-            f"entr{'y' if deprecated == 1 else 'ies'}",
+            f"note [{domain['name']}]: skipped {deprecated} deprecated entr{'y' if deprecated == 1 else 'ies'}",
             file=sys.stderr,
         )
     return [
         {
             "id": entry["id"],
-            "ref": (
-                f"{domain['ref_prefix']}{entry['id']}"
-                f":{_major_tag(entry.get('version'))}"
-            ),
+            "ref": (f"{domain['ref_prefix']}{entry['id']}:{_major_tag(entry.get('version'))}"),
             "name": entry.get("name") or entry["id"],
             "version": entry.get("version"),
             "options": sorted((entry.get("options") or {}).keys()),
@@ -291,20 +274,14 @@ def fetch_ngc_catalog(domain: dict, args: argparse.Namespace) -> list[dict]:
         url = f"{domain['search_api']}?{urllib.parse.urlencode({'q': query})}"
         data = _get_json(url)
         total = data.get("resultTotal") or 0
-        resources = [
-            resource
-            for group in data.get("results") or []
-            for resource in group.get("resources") or []
-        ]
+        resources = [resource for group in data.get("results") or [] for resource in group.get("resources") or []]
         if not resources:
             break
         for resource in resources:
             resource_id = resource.get("resourceId")
             if not resource_id or resource_id in seen:
                 continue
-            if not args.all_orgs and not resource_id.startswith(
-                domain["default_org"] + "/"
-            ):
+            if not args.all_orgs and not resource_id.startswith(domain["default_org"] + "/"):
                 continue
             seen.add(resource_id)
             items.append(
@@ -335,9 +312,7 @@ FETCHERS = {
 
 
 def _match_domain(ref: str) -> dict | None:
-    matches = [
-        domain for domain in TRUST_DOMAINS if ref.startswith(domain["ref_prefix"])
-    ]
+    matches = [domain for domain in TRUST_DOMAINS if ref.startswith(domain["ref_prefix"])]
     return max(matches, key=lambda d: len(d["ref_prefix"])) if matches else None
 
 
@@ -373,8 +348,7 @@ def list_tags(args: argparse.Namespace) -> int:
     shown = tags[: args.limit]
     if truncated:
         print(
-            f"note: {len(tags)} tags; showing the first {args.limit} in "
-            f"registry order. Raise --limit to see more.",
+            f"note: {len(tags)} tags; showing the first {args.limit} in registry order. Raise --limit to see more.",
             file=sys.stderr,
         )
     if args.format == "json":
@@ -395,14 +369,12 @@ def list_sources(args: argparse.Namespace) -> int:
     domains = [
         domain
         for domain in TRUST_DOMAINS
-        if (not args.kind or domain["provides"] == args.kind)
-        and (not args.source or domain["name"] == args.source)
+        if (not args.kind or domain["provides"] == args.kind) and (not args.source or domain["name"] == args.source)
     ]
     if not domains:
         names = ", ".join(domain["name"] for domain in TRUST_DOMAINS)
         print(
-            f"error: no trusted source matches --kind/--source. Known "
-            f"sources: {names}.",
+            f"error: no trusted source matches --kind/--source. Known sources: {names}.",
             file=sys.stderr,
         )
         return 2
@@ -413,10 +385,7 @@ def list_sources(args: argparse.Namespace) -> int:
             if args.filter and domain["kind"] != "ngc-catalog":
                 needle = args.filter.lower()
                 items = [
-                    item
-                    for item in items
-                    if needle in item["id"].lower()
-                    or needle in (item.get("name") or "").lower()
+                    item for item in items if needle in item["id"].lower() or needle in (item.get("name") or "").lower()
                 ]
             if len(items) > args.limit:
                 print(
@@ -428,9 +397,7 @@ def list_sources(args: argparse.Namespace) -> int:
             results.append({**_source_meta(domain), "ok": True, "items": items})
         except SourceError as exc:
             print(f"error [{domain['name']}]: {exc}", file=sys.stderr)
-            results.append(
-                {**_source_meta(domain), "ok": False, "error": str(exc), "items": []}
-            )
+            results.append({**_source_meta(domain), "ok": False, "error": str(exc), "items": []})
     if args.format == "json":
         print(json.dumps({"sources": results}, indent=2))
     else:
@@ -455,15 +422,10 @@ def self_test() -> int:
     """Environment smoke check: Python version and endpoint reachability."""
     probes = {
         "mcr.microsoft.com": "https://mcr.microsoft.com/v2/_catalog?n=1",
-        "ghcr.io": (
-            "https://ghcr.io/token"
-            "?scope=repository:devcontainers/features:pull&service=ghcr.io"
-        ),
+        "ghcr.io": ("https://ghcr.io/token?scope=repository:devcontainers/features:pull&service=ghcr.io"),
         "api.ngc.nvidia.com": (
             "https://api.ngc.nvidia.com/v2/search/catalog/resources/CONTAINER?"
-            + urllib.parse.urlencode(
-                {"q": json.dumps({"query": "cuda", "page": 0, "pageSize": 1})}
-            )
+            + urllib.parse.urlencode({"q": json.dumps({"query": "cuda", "page": 0, "pageSize": 1})})
         ),
         "nvcr.io": "https://nvcr.io/proxy_auth?scope=repository:nvidia/cuda:pull",
     }
@@ -491,10 +453,7 @@ def self_test() -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description=(
-            "List images, features, and templates available from the "
-            "trusted dev container sources."
-        ),
+        description=("List images, features, and templates available from the trusted dev container sources."),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""\
 Modes:
@@ -526,10 +485,7 @@ Examples:
     )
     parser.add_argument(
         "--filter",
-        help=(
-            "substring filter on id/name; for the NGC source it is passed "
-            "to the server-side search instead"
-        ),
+        help=("substring filter on id/name; for the NGC source it is passed to the server-side search instead"),
     )
     parser.add_argument(
         "--tags",

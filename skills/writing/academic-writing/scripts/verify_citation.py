@@ -61,9 +61,7 @@ def crossref_metadata(item: dict) -> dict:
     return {
         "title": (item.get("title") or [""])[0],
         "authors": [
-            " ".join(
-                part for part in (author.get("given"), author.get("family")) if part
-            )
+            " ".join(part for part in (author.get("given"), author.get("family")) if part)
             for author in item.get("author", [])
         ],
         "year": (item.get("issued", {}).get("date-parts") or [[None]])[0][0],
@@ -75,18 +73,14 @@ def crossref_metadata(item: dict) -> dict:
 
 def lookup_doi(doi: str, timeout: int) -> dict | None:
     try:
-        data = fetch_json(
-            f"https://api.crossref.org/works/{urllib.parse.quote(doi)}", timeout
-        )
+        data = fetch_json(f"https://api.crossref.org/works/{urllib.parse.quote(doi)}", timeout)
         return {"source": "crossref", "metadata": crossref_metadata(data["message"])}
     except urllib.error.HTTPError as error:
         if error.code != 404:
             raise
         log(f"Crossref has no record for DOI {doi}; trying DOI.org resolution.")
     try:
-        data = fetch_json(
-            f"https://doi.org/api/handles/{urllib.parse.quote(doi)}", timeout
-        )
+        data = fetch_json(f"https://doi.org/api/handles/{urllib.parse.quote(doi)}", timeout)
     except urllib.error.HTTPError as error:
         if error.code == 404:
             return None
@@ -94,11 +88,7 @@ def lookup_doi(doi: str, timeout: int) -> dict | None:
     if data.get("responseCode") != 1:
         return None
     url = next(
-        (
-            value["data"]["value"]
-            for value in data.get("values", [])
-            if value.get("type") == "URL"
-        ),
+        (value["data"]["value"] for value in data.get("values", []) if value.get("type") == "URL"),
         None,
     )
     return {"source": "doi.org", "metadata": {"doi": doi, "url": url}}
@@ -120,11 +110,7 @@ def lookup_arxiv(arxiv_id: str, timeout: int) -> dict | None:
         "source": "arxiv",
         "metadata": {
             "title": " ".join(title_node.text.split()),
-            "authors": [
-                node.text
-                for node in entry.findall("atom:author/atom:name", ns)
-                if node.text
-            ],
+            "authors": [node.text for node in entry.findall("atom:author/atom:name", ns) if node.text],
             "year": (entry.findtext("atom:published", "", ns) or "")[:4] or None,
             "venue": "arXiv",
             "url": entry.findtext("atom:id", "", ns),
@@ -149,11 +135,7 @@ def lookup_pmid(pmid: str, timeout: int) -> dict | None:
             "year": (record.get("pubdate") or "")[:4] or None,
             "venue": record.get("fulljournalname"),
             "doi": next(
-                (
-                    aid.get("value")
-                    for aid in record.get("articleids", [])
-                    if aid.get("idtype") == "doi"
-                ),
+                (aid.get("value") for aid in record.get("articleids", []) if aid.get("idtype") == "doi"),
                 None,
             ),
             "url": f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/",
@@ -161,15 +143,11 @@ def lookup_pmid(pmid: str, timeout: int) -> dict | None:
     }
 
 
-def search_crossref(
-    title: str, author: str | None, year: int | None, timeout: int
-) -> dict | None:
+def search_crossref(title: str, author: str | None, year: int | None, timeout: int) -> dict | None:
     params = {"query.bibliographic": title, "rows": "5"}
     if author:
         params["query.author"] = author
-    data = fetch_json(
-        f"https://api.crossref.org/works?{urllib.parse.urlencode(params)}", timeout
-    )
+    data = fetch_json(f"https://api.crossref.org/works?{urllib.parse.urlencode(params)}", timeout)
     for item in data.get("message", {}).get("items", []):
         metadata = crossref_metadata(item)
         if not title_matches(title, metadata["title"]):
@@ -187,8 +165,7 @@ def search_semantic_scholar(title: str, year: int | None, timeout: int) -> dict 
         "fields": "title,authors,year,venue,externalIds,url",
     }
     data = fetch_json(
-        "https://api.semanticscholar.org/graph/v1/paper/search?"
-        + urllib.parse.urlencode(params),
+        "https://api.semanticscholar.org/graph/v1/paper/search?" + urllib.parse.urlencode(params),
         timeout,
     )
     for item in data.get("data", []):
@@ -224,13 +201,8 @@ def search_arxiv(title: str, timeout: int) -> dict | None:
                 "source": "arxiv",
                 "metadata": {
                     "title": candidate,
-                    "authors": [
-                        node.text
-                        for node in entry.findall("atom:author/atom:name", ns)
-                        if node.text
-                    ],
-                    "year": (entry.findtext("atom:published", "", ns) or "")[:4]
-                    or None,
+                    "authors": [node.text for node in entry.findall("atom:author/atom:name", ns) if node.text],
+                    "year": (entry.findtext("atom:published", "", ns) or "")[:4] or None,
                     "venue": "arXiv",
                     "url": entry.findtext("atom:id", "", ns),
                 },
@@ -262,9 +234,7 @@ def build_parser() -> argparse.ArgumentParser:
     identifier.add_argument("--pmid", help="PubMed id to verify, e.g. 32015508")
     identifier.add_argument("--title", help="Title to search for across sources")
     parser.add_argument("--author", help="Author surname to narrow a --title search")
-    parser.add_argument(
-        "--year", type=int, help="Publication year (±1 tolerated) for --title"
-    )
+    parser.add_argument("--year", type=int, help="Publication year (±1 tolerated) for --title")
     parser.add_argument(
         "--timeout",
         type=int,
@@ -290,7 +260,7 @@ def resolve(args: argparse.Namespace) -> dict | None:
     for searcher in searchers:
         try:
             result = searcher()
-        except Exception as error:  # noqa: BLE001 - continue the cascade, report on stderr
+        except Exception as error:
             log(f"Search step failed ({error}); trying the next source.")
             continue
         if result:
@@ -304,14 +274,10 @@ def main() -> int:
     if (args.author or args.year) and not args.title:
         parser.error("--author/--year only apply together with --title")
 
-    query = {
-        key: value
-        for key, value in vars(args).items()
-        if key != "timeout" and value is not None
-    }
+    query = {key: value for key, value in vars(args).items() if key != "timeout" and value is not None}
     try:
         result = resolve(args)
-    except Exception as error:  # noqa: BLE001 - single reporting point for lookup failures
+    except Exception as error:
         log(
             f"Lookup failed: {error}. Check network access to the citation APIs, "
             "then rerun; the command is read-only and safe to retry."
@@ -320,10 +286,7 @@ def main() -> int:
         return 1
 
     if result is None:
-        log(
-            "No matching record found. Treat the citation as unverified: "
-            "correct the identifier or drop the reference."
-        )
+        log("No matching record found. Treat the citation as unverified: correct the identifier or drop the reference.")
         print(json.dumps({"query": query, "status": "not_found"}))
         return 1
 

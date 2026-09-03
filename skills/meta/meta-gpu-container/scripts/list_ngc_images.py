@@ -22,12 +22,8 @@ PAGE_SIZE = 100
 
 def search_page(query: str, page: int) -> dict:
     """Fetch one page of catalog search results, exiting with guidance on failure."""
-    params = urllib.parse.quote(
-        json.dumps({"query": query, "page": page, "pageSize": PAGE_SIZE})
-    )
-    request = urllib.request.Request(
-        f"{SEARCH_URL}?q={params}", headers={"Accept": "application/json"}
-    )
+    params = urllib.parse.quote(json.dumps({"query": query, "page": page, "pageSize": PAGE_SIZE}))
+    request = urllib.request.Request(f"{SEARCH_URL}?q={params}", headers={"Accept": "application/json"})
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             return json.load(response)
@@ -45,8 +41,7 @@ def search_page(query: str, page: int) -> dict:
         )
     except (urllib.error.URLError, TimeoutError, OSError) as error:
         sys.exit(
-            f"Could not reach the NGC catalog ({error}).\n"
-            f"Check network access, retry, or browse {BROWSE_URL} instead."
+            f"Could not reach the NGC catalog ({error}).\nCheck network access, retry, or browse {BROWSE_URL} instead."
         )
 
 

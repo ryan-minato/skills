@@ -70,7 +70,7 @@ def read_commits(repo_dir: str, limit: int) -> list[tuple[str, str]]:
 def percentile(sorted_values: list[int], pct: float) -> int:
     if not sorted_values:
         return 0
-    index = min(len(sorted_values) - 1, int(round(pct * (len(sorted_values) - 1))))
+    index = min(len(sorted_values) - 1, round(pct * (len(sorted_values) - 1)))
     return sorted_values[index]
 
 
@@ -126,21 +126,15 @@ def main() -> None:
     report = {
         "commits_scanned": len(commits),
         "title_styles": styles,
-        "type_frequencies": dict(
-            sorted(types.items(), key=lambda kv: -kv[1])
-        ),
-        "scope_frequencies": dict(
-            sorted(scopes.items(), key=lambda kv: -kv[1])[:20]
-        ),
+        "type_frequencies": dict(sorted(types.items(), key=lambda kv: -kv[1])),
+        "scope_frequencies": dict(sorted(scopes.items(), key=lambda kv: -kv[1])[:20]),
         "subject_length": {
             "p50": percentile(lengths, 0.50),
             "p95": percentile(lengths, 0.95),
             "max": lengths[-1] if lengths else 0,
         },
         "breaking_markers": breaking,
-        "trailer_keys": dict(
-            sorted(trailers.items(), key=lambda kv: -kv[1])[:15]
-        ),
+        "trailer_keys": dict(sorted(trailers.items(), key=lambda kv: -kv[1])[:15]),
     }
     print(json.dumps(report, indent=2))
 
