@@ -6,8 +6,8 @@ Rules, notes, and references that apply only to skills in this catalog.
 The catalog holds two classes of skills:
 
 - **Methodology skills** (code-refactoring, gitmoji, goal-alignment,
-  knowledge-deposition, session-retrospective): approaches that transfer
-  across languages and frameworks.
+  knowledge-deposition, session-retrospective, spec-driven-development):
+  approaches that transfer across languages and frameworks.
 - **Artifact-authoring skills** (devcontainer-authoring, design-md): the full
   design→test→publish lifecycle of a specific engineering artifact
   ecosystem that is too narrow to justify its own catalog. Also exempt
@@ -46,7 +46,8 @@ to the disposable `meta` catalog, not here.
 
 ## Naming
 
-Default shape for methodology skills (`code-refactoring`, `goal-alignment`).
+Default shape for methodology skills (`code-refactoring`, `goal-alignment`);
+`spec-driven-development` is the practice's proper noun and stands whole.
 Artifact-authoring skills take the `-authoring` suffix
 (`devcontainer-authoring`); `design-md` is the format's proper noun and
 `gitmoji` the convention's, and both stand as they are.
@@ -59,7 +60,12 @@ goal document → `goal-alignment`; clarifying, stress-testing, or pinning
 down a plan, idea, or decision already on the table → `plan-clarification`
 in `core`; clarifying ambiguous requirements while already coding →
 `programming-guidelines` in `core`; implementation planning → none of them
-(out of catalog scope) · building or systematically
+(out of catalog scope) · working from written specifications — the
+specify-plan-tasks-implement-verify loop, choosing the level and tool, and
+converting a prototype or brownfield codebase to it → `spec-driven-development`
+(a goal document from `goal-alignment` precedes any spec); making the
+harness, templates, and tracker agree with the chosen spec tool → the
+`meta` catalog's `meta-spec-workflow` · building or systematically
 repairing a GitHub or GitLab project's complete lifecycle harness —
 including its conventions, community files, and day-to-day platform
 workflows — → the `meta` catalog's `meta-github-workflow` /

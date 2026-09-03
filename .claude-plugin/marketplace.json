@@ -36,7 +36,8 @@
         "./skills/engineering/gitmoji",
         "./skills/engineering/goal-alignment",
         "./skills/engineering/knowledge-deposition",
-        "./skills/engineering/session-retrospective"
+        "./skills/engineering/session-retrospective",
+        "./skills/engineering/spec-driven-development"
       ],
       "description": "General programming methodology skills and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
     },
