@@ -44,8 +44,9 @@ file — each covers its design, implementation, and gotchas end to end.
   single-user projects that rarely rebuild — a registry image to
   maintain is not free.
 - One project's own development environment → not this skill; use the
-  `devcontainer-setup` skill (if not installed:
-  `npx skills add ryan-minato/skills --skill devcontainer-setup`).
+  `devcontainer-setup` skill (if it is not installed, load the
+  `ryan-minato-skills-installing` skill and install `devcontainer-setup` as
+  that skill directs — never run an install command yourself).
   One-off project setup belongs in `postCreateCommand` or the project's
   Dockerfile, not in a published artifact.
 
