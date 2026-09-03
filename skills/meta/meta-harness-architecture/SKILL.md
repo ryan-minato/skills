@@ -1,25 +1,29 @@
 ---
 name: meta-harness-architecture
 description: >-
-  Disposable builder skill (delete after the harness is built): investigates,
-  plans, builds, audits, or systematically restructures a project's complete
-  agent harness. Use together with the core meta-harness methodology when a
-  concrete project needs AGENTS.md or CLAUDE.md, architecture and knowledge
-  files, project skills, development and feedback tooling, autonomy boundaries,
-  synchronization, or entropy management implemented as one coherent system.
-  Also use when an existing harness has become stale, contradictory, invisible,
-  or too thick. Not for an isolated artifact edit that does not affect the
-  surrounding harness.
+  Disposable builder skill (delete after the harness is built): the
+  architecture practice manual for agent harness layers — entrypoints and
+  architecture documents, knowledge files and external backends, project
+  skills (warrant, design, retrofit), sync and entropy mechanisms, periodic
+  reclamation, multi-agent topology, advanced autonomy, and public-convention
+  files — with the design axes and starting-shape assets for each. Use when
+  a harness build selects an artifact and needs the practice for that layer,
+  when auditing what an existing harness gets wrong, or when asked how a
+  specific harness layer should be designed. Not the build workflow itself:
+  investigation, clarification, planning, approval, build order,
+  verification, and cleanup belong to the entry builder
+  meta-harness-building.
 license: Apache-2.0
-compatibility: Live catalog discovery requires Python 3.11+ and network access.
 ---
 
-# Meta-Harness Architecture
+# Harness Architecture Manual
 
-This is a complete, self-contained harness builder. It carries the full core
-methodology so it still works when the durable `meta-harness` skill is absent.
-Every durable decision and artifact must land in the target project; this
-disposable skill and the conversation are not part of the finished harness.
+The practice behind every layer of an agent harness, loaded one layer at a
+time by whatever workflow is building it — normally `meta-harness-building`,
+which owns investigation, planning, approval, verification, and cleanup and
+returns here for each artifact. Every durable decision and artifact must land
+in the target project; this manual and the conversation are not part of the
+finished harness.
 
 ## Harness Methodology
 
@@ -97,51 +101,7 @@ Record team workflow choices without inventing automation, keep one source of tr
 per fact, and verify that feed-forward guidance and feedback mechanisms remain
 reachable after any temporary harness-building skills are removed.
 
-## Route by task
-
-- Read [references/audit.md](references/audit.md) before auditing, repairing,
-  slimming, or de-conflicting an existing harness.
-- Read [references/advanced-autonomy.md](references/advanced-autonomy.md) when
-  self-evolution, persistent memory, unattended operation, autonomous routing,
-  or multiple agent roles are requested or seriously considered.
-- Read [references/layers.md](references/layers.md) when designing a full
-  harness or recalibrating several layers.
-- Read [references/multi-agent.md](references/multi-agent.md) before choosing
-  more than one agent role, and
-  [references/public-files.md](references/public-files.md) before changing
-  README, LICENSE, SECURITY, CONTRIBUTING, or architecture documents.
-- Otherwise continue with the workflow below and load builder references only
-  when their artifact is selected.
-
-## Architecture workflow
-
-### 1. Investigate the project
-
-Inspect the repository before asking questions. Record the target and exposed
-interfaces; layout and dependency skeleton; technology stack; development,
-test, deployment, and CI environments; validation commands; error cost;
-lifecycle and maintenance horizon; existing agent files and tools; version-
-control workflow; and maintained sources of truth.
-
-Then resolve team facts that the repository cannot prove: team and review
-structure, confidentiality boundary, agent involvement, approvals, delegated
-external actions, and where findings reach humans.
-
-Done when: every fact is either supported by inspected evidence or appears as
-a concrete unanswered user decision.
-
-### 2. Audit what already exists
-
-For every entrypoint, knowledge file, project skill, registered tool, script,
-check, CI workflow, and framework configuration, record how future agents find
-it, its load condition, source of truth, and keep-current mechanism. Classify
-problems as stale, duplicated, contradictory, invisible, missing, excessive,
-or orphaned. Preserve working choices and plan only justified gaps.
-
-Done when: every existing artifact has an evidence-backed keep, update, move,
-merge, split, reconnect, thin, or remove disposition.
-
-### 3. Design the independent axes
+## Design axes
 
 Rate every capability and constraint layer omitted, light, medium, or thick:
 
@@ -161,39 +121,15 @@ Choose separately:
   reclamation, or the lifecycle-appropriate combination.
 
 Do not collapse these axes into a maturity level. Record one value and one
-reason for every decision.
+reason for every decision. Read [references/layers.md](references/layers.md)
+when designing a full harness or recalibrating several layers.
 
-When the needed builder is unknown, run the bundled
-[live discovery script](scripts/discover.py):
+## Load by artifact
 
-```bash
-python3 scripts/discover.py --catalog meta
-```
+Load only the reference for the artifact being audited or built:
 
-It reads the current repository inventory rather than carrying a static catalog.
-
-### 4. Plan before building
-
-Present a harness plan that groups files by layer and states:
-
-- the entrypoint map and every when-to-read route;
-- feed-forward context and feedback mechanisms;
-- each layer's thickness and evidence;
-- delegated agent actions versus human approvals;
-- implementation-to-harness and harness-to-implementation sync ownership;
-- the entropy strategy and periodic routine, if any;
-- exact verification and completion criteria;
-- assumptions and unresolved user decisions.
-
-Do not create or change target artifacts until the user approves this plan.
-If the project already has a harness, plan a gap repair rather than a rebuild.
-Use [assets/harness-plan-template.md](assets/harness-plan-template.md) only as
-a shape, then remove every fill instruction and inapplicable row.
-
-### 5. Build approved artifacts
-
-Load only the references for selected artifacts:
-
+- Auditing, repairing, slimming, or de-conflicting an existing harness:
+  read [references/audit.md](references/audit.md) first.
 - Entrypoints and architecture documents: read
   [references/entrypoint.md](references/entrypoint.md); when architecture
   detail exceeds the entrypoint budget, also read
@@ -215,9 +151,21 @@ Load only the references for selected artifacts:
   mechanism family in [references/sync-entrypoint.md](references/sync-entrypoint.md)
   or [references/sync-project-skill.md](references/sync-project-skill.md).
   Read [references/periodic-reclamation.md](references/periodic-reclamation.md)
-  when the lifecycle calls for a scheduled entropy review.
-- Advanced autonomy: follow
+  when the lifecycle calls for a scheduled entropy review. For every changing
+  relationship choose one owner; a real-time control is bidirectional, and
+  two mechanisms for one concern is one too many. Failure-driven
+  self-updates require the advanced-autonomy approval, audit, and rollback
+  controls.
+- More than one agent role: read
+  [references/multi-agent.md](references/multi-agent.md) before choosing it.
+- README, LICENSE, SECURITY, CONTRIBUTING, or architecture documents: read
+  [references/public-files.md](references/public-files.md) before changing
+  them.
+- Self-evolution, persistent memory, unattended operation, autonomous
+  routing, or multiple agent roles: follow
   [references/advanced-autonomy.md](references/advanced-autonomy.md).
+
+## Using the assets
 
 Use the corresponding [assets](assets/) only as starting shapes. Rework every
 line against inspected facts, delete inapplicable sections, and remove every
@@ -229,44 +177,8 @@ For scripts, tests, linters, CI, hooks, task runners, and framework settings,
 implement the approved feedback and safety layers. Custom checks must explain
 what failed, why it matters, and the likely fix.
 
-Done when: every approved artifact exists, is reachable from the entrypoint,
-and contains only real project information.
-
-### 6. Install entropy controls
-
-For every changing relationship, choose one owner. A real-time control is
-bidirectional: a concrete implementation change triggers the dependent
-harness update, and a harness edit names the implementation evidence to
-re-check. Never install two mechanisms for the same concern.
-
-For long-lived, high-change projects, add a periodic reclamation workflow or
-project skill that checks stale paths, dead commands, duplication,
-contradictions, unreachable content, entrypoint growth, and unjustified
-constraint thickness. Failure-driven self-updates require the advanced-
-autonomy approval, audit, and rollback controls.
-
-### 7. Verify and hand off
-
-Verify that:
-
-- future agents can reach every rule and knowledge source from the entrypoint;
-- AGENTS.md remains a map near its 100-line target;
-- local links resolve and documented commands run;
-- feed-forward context and feedback mechanisms form a usable loop;
-- each sync concern has one owner in both directions;
-- the entropy strategy matches the lifecycle;
-- no durable target artifact carries the disposable marker;
-- every temporary builder can be removed without losing a rule.
-
-Report every artifact changed, its role, validation results, and any human or
-platform action still required. If the harness is complete and verified,
-route explicit cleanup requests to `meta-disposal`; never treat the earlier
-build request as deletion consent.
-
 ## Gotchas
 
-- A plan is not approval to delete, publish, change remote settings, or grant
-  agent autonomy.
 - Name categories in durable guidance; enumerate products only where the
   project has actually selected one.
 - A document with no discovery path does not exist for future agents.

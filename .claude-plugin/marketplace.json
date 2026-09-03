@@ -52,6 +52,7 @@
         "./skills/meta/meta-gitlab-workflow",
         "./skills/meta/meta-gpu-container",
         "./skills/meta/meta-harness-architecture",
+        "./skills/meta/meta-harness-building",
         "./skills/meta/meta-python-defaults",
         "./skills/meta/meta-workflow-design"
       ],

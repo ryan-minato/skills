@@ -4,7 +4,7 @@
 Examples:
   python3 scripts/discover.py
   python3 scripts/discover.py --catalog meta --full
-  python3 scripts/discover.py --skill meta/design-md --full
+  python3 scripts/discover.py --skill meta/meta-git-branching --full
   python3 scripts/discover.py --full --output /tmp/meta-skills.json
 """
 
