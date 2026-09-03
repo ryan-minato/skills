@@ -1,0 +1,72 @@
+# Labels must exist in .github/labels.json or GitHub drops them silently;
+# scripts/validate_harness.py checks that. The Catalog and Priority answers
+# are turned into labels by the `issues / triage` check.
+name: Bug report
+description: A skill or repository tool behaves differently from its spec or its documented intent.
+title: "[Bug]: "
+labels:
+  - bug
+  - status/needs-triage
+body:
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happens
+      description: The observed behavior, exactly. Paste the agent's output or the command output rather than paraphrasing it.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen
+      description: The intended behavior. Under openspec/specs/ this is the current requirement; together with the field above it is the acceptance baseline for the fix.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to reproduce
+      description: The smallest prompt, command sequence, or input that shows it, and the agent or model it ran on.
+    validations:
+      required: true
+  - type: input
+    id: skill
+    attributes:
+      label: Skill or tool
+      description: The skill name (for example `git-commit`) or script path.
+    validations:
+      required: true
+  - type: dropdown
+    id: catalog
+    attributes:
+      label: Catalog
+      description: The catalog the skill lives in, or `repository` for harness and tooling.
+      multiple: true
+      options:
+        - core
+        - engineering
+        - meta
+        - scaffold
+        - writing
+        - repository
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Your estimate; triage may change it.
+      options:
+        - critical
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and references
+      description: Commit or install date, environment, related issues or pull requests, logs.
+    validations:
+      required: false

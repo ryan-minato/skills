@@ -1,2 +1,11 @@
-blank_issues_enabled: true
-contact_links: []
+# Intake routing. Blank issues are off: questions and ideas go to
+# Discussions, vulnerabilities to private reporting. Users with write access
+# still see a maintainers-only blank option.
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/ryan-minato/skills/discussions
+    about: Ask how a skill behaves, propose an idea for discussion, or get help installing skills.
+  - name: Report a security vulnerability
+    url: https://github.com/ryan-minato/skills/security/advisories/new
+    about: Never report vulnerabilities through public issues.

@@ -1,30 +1,36 @@
-## Summary
+<!-- scripts/check_pr_policy.py reads the `## ` headings of this file from
+the base branch and requires each one in the PR body. Keep the word
+"secrets" in the security checklist line: the check keys on it. -->
 
-<!-- Explain what this PR changes and why in one or two sentences. -->
+## What and why
 
-## Related issue
-
-<!-- Use `Closes #N`, or `N/A — <reason>` when no Issue exists. -->
-
-Closes #
+<!-- The outcome or behavior this changes and why it matters. Not the diff. -->
 
 ## Changes
 
-<!-- Group bullets by atomic commit or independently reviewable change. -->
+<!-- Where and what, briefly: skill or path, then the change. -->
 
--
+## Related work
+
+<!-- `Closes #N`, or `N/A — <reason>` when no issue exists. -->
+Closes #
+
+<!-- The OpenSpec change this PR implements, or `Spec: none — <reason>`
+for changes that alter no behavior. -->
+Spec: openspec/changes/
 
 ## Validation
 
-<!-- Record every command or behavioral check and its result. -->
+<!-- Every command or behavioral test run and its result. Name the scenarios
+that passed. -->
 
 -
 
 ## Checklist
 
 - [ ] `just check` passes locally
-- [ ] Task-specific tests are recorded and pass
-- [ ] No secrets, credentials, or personal data are present
-- [ ] Commits are atomic and follow Conventional Commits
-- [ ] Documentation and paired translations are updated where required
-- [ ] Public Skill indexes and marketplace metadata are synchronized where required
+- [ ] The scenarios of the linked change, or the acceptance criteria of the linked issue, are met and recorded above
+- [ ] The change is archived (delta merged into `openspec/specs/`), or `Spec: none` is justified
+- [ ] No secrets, credentials, or personal data in the diff, description, or commits
+- [ ] Documentation and paired `README.zh.md` translations are updated where required
+- [ ] Catalog READMEs and `marketplace.json` are synchronized where a public skill changed
