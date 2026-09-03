@@ -1,6 +1,18 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
+  - repo: local
+    hooks:
+      # Runs first, on `git commit` only: needs staged content and the
+      # author email. `just check` and CI skip it with SKIP=commit-safety.
+      - id: commit-safety
+        name: staged-change safety gate (author email, credentials, layers)
+        entry: python3 scripts/check_commit_safety.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -29,18 +41,24 @@ repos:
         args: ['--config', '.gitleaks.toml']
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.2
+    rev: v0.16.4
     hooks:
-      - id: ruff
-        files: ^scripts/
+      - id: ruff-check
+        files: ^(scripts|skills/[^/]+/[^/]+/scripts)/.*\.py$
       - id: ruff-format
-        files: ^scripts/
+        files: ^(scripts|skills/[^/]+/[^/]+/scripts)/.*\.py$
 
   - repo: local
     hooks:
       - id: validate-skills
         name: validate skill layout and harness consistency
         entry: python3 scripts/validate_skills.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: validate-harness
+        name: validate harness synchronization
+        entry: python3 scripts/validate_harness.py
         language: system
         pass_filenames: false
         always_run: true
