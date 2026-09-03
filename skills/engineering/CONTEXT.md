@@ -73,7 +73,7 @@ knowledge base, or skills → `knowledge-deposition`; how the deposited
 agent-facing text is written — pointers, pruning, one source of truth — →
 `agentic-writing` in `core`; building, auditing, or restructuring a
 project's complete agent harness — entrypoints, knowledge trees, sync
-mechanisms — → the `meta` catalog's `meta-harness-architecture` (the two
+mechanisms — → the `meta` catalog's `meta-harness-building` (the two
 skills here only evolve an existing setup incrementally during normal
 work); authoring a public or substantial Agent Skill →
 `great-skill-writing` in `core`, plus the `skill-authoring` project skill

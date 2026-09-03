@@ -19,8 +19,9 @@ license: Apache-2.0
 
 Use this methodology for every harness-related action. When the task requires a
 complete project investigation, plan, build, or systematic reconstruction, this
-skill supplies the invariant method; the detailed procedure and artifacts belong
-to the harness-architecture builder in the disposable `meta` catalog. Offer to
+skill supplies the invariant method; the build procedure belongs to
+`meta-harness-building`, the entry builder of the disposable `meta` catalog,
+which routes each layer to that catalog's manual and builders. Offer to
 install that catalog as a one-off, project-scope component: load the
 `ryan-minato-skills-installing` skill and install the whole `meta` catalog at
 project scope as it directs — its builders stack and are removed together once

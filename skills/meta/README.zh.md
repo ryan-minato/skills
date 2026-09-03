@@ -7,7 +7,8 @@ catalog，将所有长期规则写入目标项目并完成验证，然后使用 
 
 | Skill | 用途 |
 |---|---|
-| [meta-harness-architecture](meta-harness-architecture/) | 调查、规划、构建、审计并维护完整 harness，包括渐进加载、反馈循环、同步与熵治理。 |
+| [meta-harness-building](meta-harness-building/) | 所有 harness 搭建、改进与修复的统一入口：先了解仓库，与用户敲定需求，计划获批后借助手头的 skill 逐层构建，在干净上下文中回读产物，审查只有构建技能才懂的词汇，让构建技能不进入任何提交，并在送审前询问是否移除它们。 |
+| [meta-harness-architecture](meta-harness-architecture/) | 入口按层加载的架构实践手册：设计轴、entrypoint、knowledge、project skill、同步、熵治理、多 agent 拓扑与高级自治，并附起始形状资产。 |
 | [meta-workflow-design](meta-workflow-design/) | 与人类开发者共同设计项目的平台无关管理模型——项目真正配得上的工作跟踪语义、贴合实际交付方式的 workflow profile、overlay 与变更传播风险——并落地 workflow 契约，供平台构建技能映射而非重新决定。 |
 | [meta-agent-authority](meta-agent-authority/) | 设计人类-Agent 治理政策——H0–H3 权限级别、review admission 与 integration 两道关口、升级上报条件，以及 agent 永不自行扩权的规则——并将其作为项目 agent 运行时遵循的持久政策落地。 |
 | [meta-github-workflow](meta-github-workflow/) | 为 GitHub.com 或 GitHub Enterprise 构建或系统修复完整的 GitHub 仓库生命周期 harness，围绕 PR 回路设计：intake 表单与 Discussions 路由、在默认集上扩展的标签、tracking issue 与 milestone、经关联分支的早期 draft PR、Actions 质量门与社区自动化、ruleset、CODEOWNERS、标签驱动发布说明的 release、注册表、可选 Projects 与 ML 实验记录，以及持久项目 agent 工作流。 |

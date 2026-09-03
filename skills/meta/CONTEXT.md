@@ -19,8 +19,17 @@ Rules for disposable builders that create durable agent harnesses.
   catalog's own instruction budget. The builders are temporary; their durable
   output belongs in the target project before disposal.
 - Preserve working project choices; scaffolding is not permission to migrate.
-- Builders investigate before editing. The complete architecture builder must
-  present its concrete harness plan and receive user approval before construction.
+- Builders investigate before editing. `meta-harness-building` is the single
+  entry to every harness build, improvement, or repair: it clarifies the
+  requirement with the user, presents its concrete harness plan, and receives
+  approval before construction; it routes each layer by the descriptions of
+  the skills at hand, so every builder's description must state which harness
+  layer it owns and when the entry should load it.
+- Disposable builders are never committed to the target repository. The
+  entry's closing step, after verification and before the work goes to
+  review, asks the user whether to delete them and runs `meta-disposal` only
+  on that decision; every other builder either returns to the entry or, when
+  run alone, asks the same question and hands off to `meta-disposal`.
 - Contract flow is one-way. Contract builders (branching model, workflow
   design, agent authority) deposit platform-neutral contracts into the target
   project; platform builders consume those contracts, never reopen a settled
@@ -54,10 +63,11 @@ Catalog prefix `meta-` on every directory and `name`, enforced by
 
 ## Scope
 
-This catalog owns generic, pluggable harness machinery: complete harness
-architecture, platform-neutral contract builders (branching, project
-workflow, agent authority) whose contracts the platform builders
-consume, platform-specific lifecycle builders whose complete output is
+This catalog owns generic, pluggable harness machinery: the harness entry
+workflow (`meta-harness-building`) and the architecture practice manual
+(`meta-harness-architecture`) it loads layer by layer, platform-neutral
+contract builders (branching, project workflow, agent authority) whose
+contracts the platform builders consume, platform-specific lifecycle builders whose complete output is
 deposited into the target project before disposal, and language-level
 convention defaults. Its skills stack alongside one another, so the catalog is
 installed whole. A builder whose topic selects the entire project shape — and

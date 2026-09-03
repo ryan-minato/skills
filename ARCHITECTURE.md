@@ -32,9 +32,10 @@ Public skills are grouped into catalogs under `skills/`:
   Templates, image prebuilds, and durable visual-design specifications)
   that do not warrant a catalog of their own.
 - `meta` — disposable, project-scoped builders for generic, pluggable harness
-  machinery: complete agent harness architecture, GitHub and GitLab lifecycle
-  workflows, GPU container environments, and Python convention defaults.
-  Install the whole catalog for a harness build. Their durable output lives
+  machinery: one entry workflow (`meta-harness-building`) that routes to an
+  architecture manual, GitHub and GitLab lifecycle workflows, GPU container
+  environments, and Python convention defaults. Install the whole catalog for
+  a harness build. Their durable output lives
   in the target project; the builders are removed after verification.
 - `scaffold` — disposable, project-scoped builders for a project of a specific
   topic (ML, data science, Colab notebooks). They are alternatives to one another: install the
