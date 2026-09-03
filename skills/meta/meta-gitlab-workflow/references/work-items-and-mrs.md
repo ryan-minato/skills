@@ -19,7 +19,10 @@ Rework the description-template assets for the selected types:
 
 Use for planned project evolution. Include content, explicit outcome, context
 and references, architecture-level solution direction and work decomposition,
-executable acceptance criteria, out-of-scope items, and optional cautions.
+executable acceptance criteria — or, under a specification contract, a link to
+the specification's scenarios instead, never both (see
+[spec-expression.md](spec-expression.md)) — out-of-scope items, and optional
+cautions.
 Do not prescribe an imagined implementation line by line; preserve the
 executor's feedback loop and technical judgment. A goal such as “improve X” is
 not executable until its observable target is stated.

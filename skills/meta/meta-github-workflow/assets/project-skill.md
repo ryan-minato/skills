@@ -19,10 +19,10 @@ commands.
 ## Take work
 
 1. Read the issue; confirm it is open and acceptance criteria are
-   executable. {{SPEC_RULE — under a specification contract: confirm the
-   linked specification is approved and treat its scenarios as the
-   acceptance criteria; delete otherwise}}. If another identity is
-   assigned, stop and ask.
+   executable. {{SPEC_RULE — under a specification contract, one sentence:
+   confirm the linked specification is approved and treat its scenarios as
+   the acceptance criteria. Delete this placeholder otherwise.}} If another
+   identity is assigned, stop and ask.
 2. Assign yourself, re-read, and confirm you are the sole assignee.
 3. `gh issue develop -c {{ISSUE_NUMBER_PLACEHOLDER}}` to create and check
    out the linked branch; push it and open a draft PR immediately with
@@ -41,9 +41,10 @@ labels and `--type` explicitly in the same call (delete the type on a
 personal account). A field value cannot be set that way at all: it needs
 `gh api repos/{{OWNER_REPO}}/issues/<number>/issue-field-values`, so
 priority is a second, separate call. {{SPEC_ISSUES — under a specification
-contract: issues for planned work derive from the change record's task
-list, each linking the specification and the scenarios it closes; never
-copy acceptance criteria into the issue; delete otherwise}}. Human-authored
+contract, one or two sentences: issues for planned work derive from the
+change record's task list, each linking the specification and the
+scenarios it closes; never copy acceptance criteria into the issue. Delete
+this placeholder otherwise.}} Human-authored
 tracking issues and milestones go through the consensus process in
 {{KNOWLEDGE_PATH}}/planning.md — never create them unilaterally.
 

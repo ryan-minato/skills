@@ -24,7 +24,10 @@ Content contracts per form:
   (name the URL or repo being imitated, not "like A"), architecture-level
   solution direction and decomposition — never line-by-line prescriptions
   that turn execution into feed-forward imagination — executable
-  acceptance criteria (no "improve X"), out-of-scope, optional cautions.
+  acceptance criteria (no "improve X") or, under a specification
+  contract, a link to the specification's scenarios instead — never both
+  (see [spec-expression.md](spec-expression.md)) — out-of-scope, optional
+  cautions.
 - **Incident** is an opt-in shape for projects with a real operational
   event stream, not a default form: confirmed facts separated from
   hypotheses, impact, a timezone-stamped timeline, response state, and
