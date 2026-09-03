@@ -15,9 +15,15 @@
 <!-- Give architectural boundaries and major work units. Leave implementation
 details to feedback from the work unless a detail is a binding constraint. -->
 
+## Specification
+
+<!-- Keep this section only under a specification contract: the path of the
+specification or change record this task implements. -->
+
 ## Acceptance criteria
 
-- [ ] <!-- One executable, observable criterion. -->
+- [ ] <!-- One executable, observable criterion, or a link to the scenarios of
+  the linked specification. Never both. -->
 
 ## Out of scope
 

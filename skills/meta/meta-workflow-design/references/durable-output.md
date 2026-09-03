@@ -52,3 +52,9 @@ inside a view.
 - Governance is adjacent, not inlined: agent authority lives in
   `.agents/knowledge/agent-authority.md`, produced by `meta-agent-authority`.
   The contract may point to it; it must not restate it.
+- Specifications are adjacent, not inlined: the specification discipline —
+  level, tool, artifact map, approval gate — lives in
+  `.agents/knowledge/spec-workflow.md`, produced by `meta-spec-workflow`.
+  The contract may point to it; it must not restate it, and a
+  specification is the content of a change request's acceptance, never a
+  semantic of its own.

@@ -64,6 +64,9 @@ config):
   `SECURITY_KEYWORD` (rewording the line without it fails every pull
   request, fail-closed and unexplained);
 - directory or module ↔ CODEOWNERS pattern ↔ area label;
+- the specification field in issue forms and the PR template ↔ the
+  artifact paths in the specification contract (a moved spec directory
+  silently orphans every template link);
 - ruleset ↔ legacy branch protection (record both layers or drift is
   invisible);
 - release tag and changelog ↔ package or deployment automation;

@@ -59,6 +59,14 @@ the underlying facts live.>
 Governed by `.agents/knowledge/agent-authority.md`. <Delete this section if
 no authority policy exists yet, and record that gap instead.>
 
+## Specifications
+
+Governed by `.agents/knowledge/spec-workflow.md`: a change request's
+acceptance is the scenarios of the specification it implements, and tracked
+work links the specification instead of restating it. <Delete this section
+if the project does not work from written specifications, and record that
+gap instead.>
+
 ## Update this file when
 
 - The collaboration scale or driver changes enough to strain the profile.

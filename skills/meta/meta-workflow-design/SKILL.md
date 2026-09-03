@@ -12,8 +12,9 @@ description: >-
   rethought; or when an issue tracker or backlog is a mess and the management
   process needs redesign ("帮我设计项目管理流程"). Not for expressing the
   contract on GitHub or GitLab (the platform builders), choosing a branching model
-  (meta-git-branching), agent permissions (meta-agent-authority), or one-off
-  issue and pull-request operations.
+  (meta-git-branching), agent permissions (meta-agent-authority), the
+  specification workflow (meta-spec-workflow), or one-off issue and
+  pull-request operations.
 license: Apache-2.0
 ---
 
@@ -94,6 +95,9 @@ upstream human decisions:
    inspection has not already proven it.
 5. Whether the team intends agents to work autonomously here — record the
    intent only; the design belongs to `meta-agent-authority`.
+6. Whether the team intends to work from written specifications — record
+   the intent only; the level, the tooling, and the specification contract
+   belong to `meta-spec-workflow`.
 
 Done when: base profile, overlays, and change propagation are settled by the
 user (or confirmed from evidence), each with its selecting fact recorded.
@@ -156,9 +160,11 @@ name the profile, the enabled and omitted semantics, and the decomposition
 rule from target-project files alone. Confirm the deposited file does not
 carry this skill's disposable marker, name, or paths.
 
-Then hand off by name, in order. Governance next: design human–agent
+Then hand off by name, in order. Specification workflow first, when
+spec-driven intent was recorded: settle the level, tool, and specification
+contract with `meta-spec-workflow`. Governance next: design human–agent
 authority with `meta-agent-authority`. Platform expression after that: run
-the lifecycle builder for the evidenced host platform. If either is not
+the lifecycle builder for the evidenced host platform. If any is not
 installed, load the `ryan-minato-skills-installing` skill and install the
 whole `meta` catalog at project scope as it directs — its builders stack and
 are disposed together; never run an install command yourself.

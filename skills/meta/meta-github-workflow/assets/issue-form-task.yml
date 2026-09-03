@@ -38,11 +38,20 @@ body:
       description: Architecture-level direction and work decomposition. Not line-by-line prescriptions.
     validations:
       required: false
+  # Keep the `spec` field only when the project has a specification
+  # contract; delete it otherwise.
+  - type: input
+    id: spec
+    attributes:
+      label: Specification
+      description: Path of the specification or change record this task implements.
+    validations:
+      required: false
   - type: textarea
     id: acceptance
     attributes:
       label: Acceptance criteria
-      description: Executable, observable criteria — commands to run, states to verify.
+      description: Executable, observable criteria — commands to run, states to verify — or the scenarios of the linked specification. Never both.
     validations:
       required: true
   - type: textarea

@@ -32,7 +32,9 @@ statement. Beyond that, match the constraint form to what the project
 exposes: code consumed by other code needs its public interface defined;
 a service needs its API behavior defined; user-facing software needs user
 stories, expected behavior, or visual references. Do not add contract forms
-for surfaces the project does not have.
+for surfaces the project does not have. When the project works from
+written specifications, those specifications are this layer's contract
+form: the harness points to them and never restates a requirement.
 
 ## Implementation constraints
 

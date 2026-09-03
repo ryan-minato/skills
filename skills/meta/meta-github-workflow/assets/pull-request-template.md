@@ -12,10 +12,13 @@ one change, not two. -->
 
 ## Related work
 
-<!-- Closes #N — the closing keyword drives the issue lifecycle. -->
+<!-- Closes #N — the closing keyword drives the issue lifecycle.
+Spec: <path or change name> — keep this line only under a specification
+contract. -->
 
 ## Checklist
 
 - [ ] {{LOCAL_CHECK_COMMAND}} passes locally
-- [ ] Acceptance criteria of the linked issue are met
+- [ ] Acceptance criteria of the linked issue, or the scenarios of the linked specification, are met
+- [ ] Specification updated or change record archived where behavior changed <!-- delete without a specification contract -->
 - [ ] No secrets, credentials, or personal data in the diff, description, or commits

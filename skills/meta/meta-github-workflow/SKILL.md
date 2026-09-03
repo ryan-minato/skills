@@ -113,7 +113,12 @@ read them before anything else and record which decisions they settle,
 because those decisions never re-enter the design tree. Read the branch
 contract deposited by `meta-git-branching` the same way —
 `.agents/knowledge/git-workflow.md` by default — and treat its settled
-naming, protection, and merge-method decisions as equally fixed.
+naming, protection, and merge-method decisions as equally fixed. Read the
+specification contract deposited by `meta-spec-workflow` the same way —
+`.agents/knowledge/spec-workflow.md` by default — and treat its
+source-of-truth table and division of labor (specifications own what, why,
+and acceptance; tracked work owns who, when, and status and links the
+specification) as fixed.
 
 The capability quadrant — owner type, plan, visibility, and any GHES
 version — plus Actions availability, the default token policy, and the
@@ -173,6 +178,7 @@ load only the references whose conditions now apply:
 | Selected capability | Read |
 |---|---|
 | The target carries a workflow or authority contract, or contract semantics (objective boundaries, timeboxes, planning surfaces, hierarchy, priority) need GitHub representations | [semantic-mapping.md](references/semantic-mapping.md) |
+| The target carries a specification contract, or a spec tool's directories sit in the repository | [spec-expression.md](references/spec-expression.md) |
 | Commit format, branch naming, merge method, squash behavior, merge queue, or commit enforcement | [commits-and-contributions.md](references/commits-and-contributions.md) |
 | Labels, milestones, tracking issues, sub-issue hierarchy, issue types, or triage states | [planning-and-goals.md](references/planning-and-goals.md) |
 | The repository is organization-owned and its issue types or issue fields need auditing or initializing | [org-configuration.md](references/org-configuration.md) |
