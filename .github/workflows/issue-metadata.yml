@@ -30,7 +30,6 @@ jobs:
               ['engineering', 'catalog/engineering'],
               ['meta', 'catalog/meta'],
               ['scaffold', 'catalog/scaffold'],
-              ['util', 'catalog/util'],
               ['writing', 'catalog/writing'],
             ]);
 
@@ -62,7 +61,7 @@ jobs:
             // strippable so an issue edited after its catalog was removed does
             // not keep the stale label beside the new one; the never-prune rule
             // means the label itself survives on the repository.
-            const retiredCatalogLabels = ['catalog/ops'];
+            const retiredCatalogLabels = ['catalog/ops', 'catalog/util'];
 
             const desired = new Set();
             const managed = new Set();

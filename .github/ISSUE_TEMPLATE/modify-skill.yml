@@ -46,7 +46,6 @@ body:
         - engineering
         - meta
         - scaffold
-        - util
         - writing
     validations:
       required: true
