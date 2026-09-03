@@ -37,7 +37,11 @@ List only skills whose bodies you actually loaded; do not load a skill merely
 to report it.
 ```
 
-Before editing the skill, write:
+Before editing the skill, derive the cases from the scenarios of the
+skill's delta spec in `openspec/changes/<slug>/specs/<skill-name>/spec.md`
+(every scenario maps to at least one case, and every case names its
+scenario; a case with no scenario means the spec is incomplete — fix the
+spec first):
 
 1. Two or three realistic prompts that should trigger the description and one
    to three near-misses that share vocabulary but should not trigger it. Scale
@@ -93,9 +97,10 @@ is an instruction failure, not a reason to escalate.
 
 ## 4. Clean up and report
 
-Record the cases, observation method, solver tier, rubric, results, scores,
-evidence, every isolation degradation, and any skipped test with its reason
-in the handoff or pull request. Remove every detached candidate test
+Record the cases with the scenario each one covers, observation method,
+solver tier, rubric, results, scores, evidence, every isolation degradation,
+and any skipped test with its reason in the pull request's Validation
+section. Remove every detached candidate test
 worktree, snapshot, harness, fixture, and evaluation output. Keep the current
 change worktree for the remaining commit and PR workflow, and confirm its
 `git status` shows only the intended repository changes.

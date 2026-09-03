@@ -76,8 +76,10 @@ be committed:
   authorship metadata, internal hostnames or URLs, customer or user data,
   anything pasted from a private conversation.
 - Content that belongs outside version control: session transcripts, eval
-  fixtures and outputs, local harness configuration (`.claude/settings.json`
-  and similar), scratch files, large generated artifacts.
+  fixtures and outputs, personal harness configuration
+  (`.claude/settings.local.json` and similar; the shared
+  `.claude/settings.json` allowlist is tracked on purpose), scratch files,
+  large generated artifacts.
 
 The pre-commit hooks (gitleaks, detect-secrets) catch known token patterns;
 this pass hunts what pattern matching misses — novel token formats, secrets
@@ -95,12 +97,18 @@ follow-up commit deletes nothing.
   else. Highest scrutiny; installed-behavior defects live only here.
 - Everything else (`.agents/`, `.github/`, `scripts/`, `justfile`, READMEs,
   `ARCHITECTURE.md`) is repository harness, not published content. Review
-  it for synchronization, not polish: the finding shape is desync — one
-  side of an `AGENTS.md` Keep In Sync pair changed without the other, a
-  documented command that no longer runs, a pointer to a moved file,
+  it for synchronization, not polish: the finding shape is desync — a pair
+  in `.agents/knowledge/harness-maintenance.md` changed on one side only,
+  a documented command that no longer runs, a pointer to a moved file,
   guidance drifted from the implementation it describes. Stale harness is
   entropy that misleads every later agent; report it, capped at
   recommended severity.
+- `openspec/` is the specification layer. A pull request that changes a
+  skill's or tool's behavior without a delta spec, or whose delta spec is
+  not archived into `openspec/specs/`, or whose Validation section names no
+  scenario, is blocking: `main` must never disagree with its specs
+  (`.agents/knowledge/spec-workflow.md`). The `openspec-*` skills are
+  generated; a hand edit there is a finding.
 
 ## Scripts: the threat model
 
@@ -124,9 +132,13 @@ their input is repository content, not adversarial traffic.
 ## Do not report what machines catch
 
 `just check` already enforces frontmatter limits, name/directory match,
-symlinks, marketplace sync, path self-containment, catalog files, and
-byte-identical script copies. Run it (or trust its CI result) and spend
-review attention only on what it cannot see. A name that departs from the
+symlinks, marketplace sync, path self-containment, catalog files, the
+`## Harness Methodology` copy between `core/meta-harness` and
+`meta-harness-architecture`, the `scripts/sync_labels.py` copy, label and
+form consistency, knowledge-file pointers, and strict OpenSpec validation
+(`scripts/validate_skills.py`, `scripts/validate_harness.py`, `just
+spec-validate`). Run it (or trust its CI result) and spend review attention
+only on what it cannot see. A name that departs from the
 recommended `[<prefix>-]<body>[-<suffix>]` shape is not a defect either: the
 shape is advisory and the chosen name stands.
 
@@ -143,7 +155,10 @@ shape is advisory and the chosen name stands.
   inside placeholder markup a header orders deleted.
 - **Contract flow is one-way.** Contract builders stay platform-neutral;
   platform builders map settled contract decisions and never re-decide or
-  re-ask them.
+  re-ask them. This applies to the published builders only: this
+  repository's own harness is GitHub-specific by decision
+  (`.agents/knowledge/harness-maintenance.md`), so GitHub vocabulary in
+  `.agents/knowledge/` is not a finding.
 - **Cross-skill references by name that hand off through
   `ryan-minato-skills-installing` are the required pattern**, not a defect.
   The defects are a hardcoded install command in a public skill; a
