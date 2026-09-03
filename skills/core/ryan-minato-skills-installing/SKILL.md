@@ -4,7 +4,9 @@ description: >
   Installs Agent Skills from the ryan-minato/skills library into a project or
   globally, and lists what the library offers. Use when installing or adding a skill
   from ryan-minato/skills — "install the git-commit skill", "add sensitivity-check
-  globally"; when a skill or document instructs running "npx skills add
+  globally"; when another skill hands off to this skill to install a skill or a
+  whole catalog ("load the ryan-minato-skills-installing skill and install X as it
+  directs"); when a skill or document instructs running "npx skills add
   ryan-minato/skills"; when asked what skills the library contains; or when an
   installed skill from this library needs updating to its latest upstream version. Not
   for npm packages, project dependencies, or any other skill library — nothing in it
@@ -30,11 +32,18 @@ Decide, before running anything:
 
 - **Which skill(s)** — the exact directory name(s) the user wants (e.g.
   `git-commit`, `sensitivity-check`). If the user named a capability rather
-  than a skill, or asked what exists, discover first (Step 2).
+  than a skill, or asked what exists, discover first (Step 2). When another
+  skill handed off here, take the name(s) from its handoff sentence.
+- **Whole catalog** — a handoff or request may name a catalog instead
+  (`meta`, `scaffold`). `meta` is installed whole: its builders stack and are
+  disposed together. `scaffold` is installed as one topic builder plus
+  `scaffold-disposal`, never every scaffold builder. Both are project-scope,
+  disposable components; discover the members (Step 2) and install them all.
 - **Scope** — **project** (default) installs into this project so the files
   commit with it; **global** installs into the user home dir for every
   project. Choose global when the user says "globally" / "for every project",
   or when installing a `core` skill (those are meant to load everywhere).
+  Disposable catalogs (`meta`, `scaffold`) are always project scope.
 
 Done when: you have a concrete skill-name list and a project-or-global scope.
 
@@ -65,7 +74,8 @@ machine — prefer modern runners, fall back to npx:
 3. `yarn dlx` — if `yarn` is installed
 4. `npx` — the fallback when only npm/npx is present
 
-Run the same subcommand with the chosen runner, once per skill:
+Run the same subcommand with the chosen runner; `--skill` repeats, one per
+skill:
 
 ```bash
 # project scope — copy real files into ./.claude/skills so they commit with the project
@@ -73,6 +83,9 @@ pnpm dlx skills add ryan-minato/skills --skill <name> --copy -y
 
 # global scope — install into the user home dir for every project
 pnpm dlx skills add ryan-minato/skills --skill <name> -g -y
+
+# whole catalog — one --skill per member from the Step 2 listing, project scope
+pnpm dlx skills add ryan-minato/skills --skill <name-1> --skill <name-2> ... --copy -y
 ```
 
 - **Project scope must pass `--copy`** so the skill lands as a real,
@@ -80,6 +93,9 @@ pnpm dlx skills add ryan-minato/skills --skill <name> -g -y
   symlink into a global cache.
 - `-g` selects global; omit it for project.
 - `-y` skips interactive prompts (agents hang on TTY input).
+- The CLI knows skills, not catalogs: for a whole catalog, pass every member
+  the listing shows under that catalog. Never use `--skill '*'` — it would
+  install every catalog of the library.
 - Swap `pnpm dlx` for `bunx` / `yarn dlx` / `npx` per the priority above.
 
 If no Node runner exists at all, go to Step 4.
@@ -96,6 +112,7 @@ the scope-appropriate location (real files, never a symlink):
 python3 scripts/install_skill.py <name> [<name> ...]   # project scope (./.claude)
 python3 scripts/install_skill.py <name> --global       # global scope (~/.claude)
 python3 scripts/install_skill.py <name> --force        # replace if already present
+python3 scripts/install_skill.py --catalog meta        # every skill of a catalog
 ```
 
 It needs `git` and Python 3.9+ only. Re-run with `--force` to update an
