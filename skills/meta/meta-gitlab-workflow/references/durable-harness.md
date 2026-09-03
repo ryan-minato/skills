@@ -58,6 +58,8 @@ Assign one owner for each relationship:
 - CI job name ↔ merge gate;
 - directory/module ↔ CODEOWNERS and area label;
 - work-item template quick action ↔ label/type taxonomy;
+- the specification section in work-item and MR templates ↔ the artifact
+  paths in the specification contract;
 - release tag/changelog ↔ package/deployment automation;
 - experiment metadata ↔ training/evaluation implementation;
 - public contribution/security statements ↔ internal workflow.

@@ -25,8 +25,12 @@ knowledge file routed for the operation before acting.
 
 ## Take and execute work
 
-1. Confirm the work item is open. If another person is assigned, stop and ask
-   whether duplicate work is intended.
+1. Confirm the work item is open. {{SPEC_RULE — under a specification
+   contract: confirm the linked specification is approved and treat its
+   scenarios as the acceptance criteria; when creating planned work, derive
+   it from the change record's task list and link the specification instead
+   of copying acceptance criteria; delete otherwise}}. If another person is
+   assigned, stop and ask whether duplicate work is intended.
 2. Otherwise assign the acting identity, announce the start, and record the
    start time using the project's verified mechanism.
 3. Create and push a compliant branch, then open a draft MR immediately. Set

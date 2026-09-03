@@ -84,7 +84,12 @@ read them before anything else and record which decisions they settle,
 because those decisions never re-enter the design tree. Read the branch
 contract deposited by `meta-git-branching` the same way —
 `.agents/knowledge/git-workflow.md` by default — and treat its settled
-naming, protection, and merge-method decisions as equally fixed.
+naming, protection, and merge-method decisions as equally fixed. Read the
+specification contract deposited by `meta-spec-workflow` the same way —
+`.agents/knowledge/spec-workflow.md` by default — and treat its
+source-of-truth table and division of labor (specifications own what, why,
+and acceptance; tracked work owns who, when, and status and links the
+specification) as fixed.
 
 Audit every existing harness artifact for its discovery path, load condition,
 source of truth, and update trigger. Classify it as keep, extend, reconnect,
@@ -121,6 +126,7 @@ Load only the references whose conditions now apply:
 | Selected capability | Read |
 |---|---|
 | The target carries a workflow or authority contract, or contract semantics (objective boundaries, timeboxes, planning surfaces, hierarchy, priority) need GitLab representations | [semantic-mapping.md](references/semantic-mapping.md) |
+| The target carries a specification contract, or a spec tool's directories sit in the project | [spec-expression.md](references/spec-expression.md) |
 | Commit format, branches, merge/squash strategy, contribution flow, or commit enforcement | [commits-and-contributions.md](references/commits-and-contributions.md) |
 | Labels, milestones, boards, Scrum/Kanban, iterations, epics, or work-item hierarchy | [planning-and-labels.md](references/planning-and-labels.md) |
 | Task, issue, incident, merge request, assignment, time tracking, or autonomous task lifecycle | [work-items-and-mrs.md](references/work-items-and-mrs.md) |

@@ -71,8 +71,11 @@ answer for what enters long-lived branches.
 Read the project's workflow contract at
 `.agents/knowledge/project-workflow.md` if present; its settled semantics —
 acceptance, ownership, objective boundaries, deliveries — are the anchors
-authority attaches to. Its absence blocks nothing: a project with no tracker
-still needs an authority policy. Then evidence the project's real
+authority attaches to. Read the specification contract at
+`.agents/knowledge/spec-workflow.md` the same way if present: its approval
+gate — who accepts a specification before planning and implementation —
+is an acceptance anchor, and the levels below attach to it. Their absence
+blocks nothing: a project with no tracker still needs an authority policy. Then evidence the project's real
 verification strength yourself — test coverage and trustworthiness, CI
 gates, rollback and revert paths, observability — because these facts price
 the higher levels, and they are inspected, never asked.
@@ -117,7 +120,9 @@ each an explicit user decision, and any accepted gap is recorded.
 Autonomous work halts and returns to a human gate when any of these fire:
 
 - Scope exceeds the authorized boundary.
-- Acceptance criteria are ambiguous or cannot be evaluated.
+- Acceptance criteria are ambiguous or cannot be evaluated — including
+  when the specification contract requires an approved specification and
+  none exists for the change.
 - A required check is unavailable or unreliable.
 - The change unexpectedly touches security-sensitive surface or public
   API/behavior.

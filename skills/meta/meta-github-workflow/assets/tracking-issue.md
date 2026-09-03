@@ -15,7 +15,8 @@ reached, and for whom it matters}}
 ## Observable completion
 
 {{EXECUTABLE_OR_OBSERVABLE_CRITERIA — how anyone can verify the goal is
-reached}}
+reached; under a specification contract, link the specifications whose
+scenarios define it instead of restating them}}
 
 ## Non-goals
 

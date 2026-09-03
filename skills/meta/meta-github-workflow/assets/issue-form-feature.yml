@@ -22,11 +22,20 @@ body:
       description: Why now — prior discussion, alternatives considered, links.
     validations:
       required: false
+  # Keep the `spec` field only when the project has a specification
+  # contract; delete it otherwise.
+  - type: input
+    id: spec
+    attributes:
+      label: Specification
+      description: Path of the specification this request extends, if one exists.
+    validations:
+      required: false
   - type: textarea
     id: acceptance
     attributes:
       label: Acceptance sketch
-      description: How we would observe that this is done. Rough is fine; triage refines it.
+      description: How we would observe that this is done. Rough is fine; triage refines it — into the specification when the project keeps one.
     validations:
       required: false
   - type: textarea

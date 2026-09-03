@@ -15,6 +15,7 @@ humans as well as agents — agent-doc style rules do not apply to them.
 | `ARCHITECTURE.md` | humans and agents | Human-readable architecture description. In an agent harness it also serves as the offload target for long architecture and stack material from the entrypoint. |
 | `AGENTS.md` (and framework entry files) | agents only | Agent-first: terse, no pleasantries, no human-readability duty. |
 | `DESIGN.md` | agents (per its public spec) | Reserved name — only the visual-design description format may use it. |
+| Spec-tool-owned files (a constitution or steering file, spec and change directories) | humans and agents, in the tool's format | Follow the tool's conventions; never rewrite agent-first. Each fact they hold has one source of truth against the entrypoint and knowledge base — point to it, do not restate it. |
 | knowledge documents | agents first | Terse, facts first, load condition at top, no flattery or filler. |
 
 ## Planning Rules
