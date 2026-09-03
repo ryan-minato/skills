@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-description: Skill lifecycle for this repository — layers repo-specific scaffolding, testing, and validation on top of generic skill authoring. Use when creating a skill here or adding one to a catalog; when modifying, moving, or removing anything under skills/ or .agents/skills/; when deciding which catalog or directory a new skill belongs in; or when this repo's agents should learn a new reusable workflow. great-skill-writer supplies the generic authoring layer and fires together with this skill; it works alone only on generic Agent-Skill questions and skills outside this repository.
+description: Skill lifecycle for this repository — layers repo-specific scaffolding, testing, and validation on top of generic skill authoring. Use when creating a skill here or adding one to a catalog; when modifying, moving, or removing anything under skills/ or .agents/skills/; when deciding which catalog or directory a new skill belongs in; or when this repo's agents should learn a new reusable workflow. great-skill-writing supplies the generic authoring layer and fires together with this skill; it works alone only on generic Agent-Skill questions and skills outside this repository.
 metadata:
   internal: true
 ---
@@ -24,7 +24,7 @@ worth building and where it belongs:
 
 ## Before writing anything
 
-1. Load the `great-skill-writer` skill when it is available — it is the
+1. Load the `great-skill-writing` skill when it is available — it is the
    generic authoring layer this workflow builds on (value definition,
    description triggers, information hierarchy, leading words, pruning).
    `.agents/knowledge/skill-quality.md` records this repository's quality

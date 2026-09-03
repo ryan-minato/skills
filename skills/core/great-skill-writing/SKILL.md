@@ -1,5 +1,5 @@
 ---
-name: great-skill-writer
+name: great-skill-writing
 description: >
   Skill authoring — create, review, and repair Agent Skills. Use when the
   request names an Agent Skill, SKILL.md, or an agent instruction package,
@@ -12,7 +12,7 @@ license: Apache-2.0
 compatibility: Validation requires uv.
 ---
 
-# Great Skill Writer
+# Great Skill Writing
 
 A skill exists to extend an agent's capability, to wrangle determinism out
 of a stochastic system, or both: supplying context the agent doesn't yet

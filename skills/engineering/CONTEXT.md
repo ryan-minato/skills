@@ -59,7 +59,7 @@ project's complete agent harness — entrypoints, knowledge trees, sync
 mechanisms — → the `meta` catalog's `meta-harness-architecture` (the two
 skills here only evolve an existing setup incrementally during normal
 work); authoring a public or substantial Agent Skill →
-`great-skill-writer` in `core`, plus the `skill-authoring` project skill
+`great-skill-writing` in `core`, plus the `skill-authoring` project skill
 for skills in this repository.
 
 ## References
