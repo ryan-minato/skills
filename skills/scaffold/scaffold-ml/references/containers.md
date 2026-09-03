@@ -11,7 +11,8 @@ live tag discovery, and GPU access wiring (docker run, Compose, dev
 containers, shared memory) are covered by the `meta-gpu-container` skill —
 make those decisions with it first, and its guidance supersedes the
 summary below. When it is absent, recommend installing the whole `meta`
-catalog (the workflow's container step carries the command), never that
+catalog (the workflow's container step hands it off through
+`ryan-minato-skills-installing`), never that
 skill alone; if the user declines, this summary is the fallback. The rest
 of this reference is what is specific to this scaffold.
 
