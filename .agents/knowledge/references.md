@@ -19,6 +19,11 @@ skill belong in that catalog's `CONTEXT.md`, not here.
 - Claude Code plugin marketplaces (`.claude-plugin/marketplace.json`): https://code.claude.com/docs/en/plugin-marketplaces
 - Claude Code memory and `@file` imports (CLAUDE.md → AGENTS.md): https://code.claude.com/docs/en/memory
 
+## Specifications
+
+- OpenSpec (spec-anchored change workflow): https://github.com/Fission-AI/OpenSpec
+- OpenSpec CLI and workflow docs: https://github.com/Fission-AI/OpenSpec/tree/main/docs
+
 ## Tooling
 
 - skills CLI (`npx skills add`): https://github.com/vercel-labs/skills
