@@ -1,7 +1,7 @@
 ---
 name: meta-git-branching
 description: >-
-  Disposable meta-skill (delete after the harness is built): selects a project's
+  Disposable builder skill (delete after the harness is built): selects a project's
   git branching model — git flow, GitHub Flow, or a GitLab Flow variant —
   settles branch and tag naming, protected refs, and merge method, then deposits
   the contract into the target project as durable, event-triggered knowledge.

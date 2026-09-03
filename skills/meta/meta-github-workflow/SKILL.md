@@ -1,7 +1,7 @@
 ---
 name: meta-github-workflow
 description: >-
-  Disposable meta-skill (delete after the harness is built): designs and builds
+  Disposable builder skill (delete after the harness is built): designs and builds
   a complete, durable lifecycle harness for repositories hosted on GitHub.com
   or GitHub Enterprise. Use only when initializing a GitHub-hosted repository,
   establishing or replacing its repository-wide lifecycle scaffolding, or

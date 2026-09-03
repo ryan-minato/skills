@@ -52,7 +52,7 @@ DEFAULT_AGENT_DIR = ".claude"
 # a safe character set: letters, digits, dot, underscore, hyphen.
 SAFE_SKILL_NAME = re.compile(r"[A-Za-z0-9._-]+")
 # Disposable builders open their description with this marker; it is the
-# only key the library's disposal skills match on, so it is stable across
+# only key the library's disposal skill matches on, so it is stable across
 # renames. Such builders are project-scope by contract.
 DISPOSABLE_MARKER = re.compile(r"^Disposable .*\(delete after the harness is built\):")
 
@@ -264,8 +264,8 @@ def cmd_install(args: argparse.Namespace) -> int:
                 raise UsageError(
                     f"--catalog {catalog} is not supported: only "
                     f"{', '.join(sorted(CATALOGS_INSTALLED_WHOLE))} is installed whole. "
-                    f"Pass the skills you want by name (for scaffold: one topic "
-                    f"builder plus scaffold-disposal); run with --list to see them."
+                    f"Pass the skills you want by name (for scaffold: the one "
+                    f"topic builder that matches); run with --list to see them."
                 )
             names.extend(n for n in catalog_skill_names(tmp, catalog) if n not in names)
         # Resolve every name up front so a bad name fails before any copy.

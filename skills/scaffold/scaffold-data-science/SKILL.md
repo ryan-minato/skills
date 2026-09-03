@@ -1,7 +1,7 @@
 ---
 name: scaffold-data-science
 description: >-
-  Disposable scaffold skill (delete after the harness is built): scaffolds an
+  Disposable builder skill (delete after the harness is built): scaffolds an
   opinionated, reproducible Python data-science project and its agent harness.
   Use when creating or hardening an empty or early repository that ingests
   datasets; validates, cleans, transforms, joins, or aggregates data; performs

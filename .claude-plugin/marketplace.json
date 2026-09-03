@@ -64,10 +64,9 @@
       "skills": [
         "./skills/scaffold/scaffold-colab",
         "./skills/scaffold/scaffold-data-science",
-        "./skills/scaffold/scaffold-disposal",
         "./skills/scaffold/scaffold-ml"
       ],
-      "description": "Disposable, project-scoped builders for a project of a specific topic (machine learning, data science, Colab notebooks), plus the disposal skill that removes them. Use whichever topic builder matches the project; remove them once the harness is verified."
+      "description": "Disposable, project-scoped builders for a project of a specific topic (machine learning, data science, Colab notebooks). Use whichever topic builder matches the project; the meta catalog's meta-disposal removes it together with the meta builders once the harness is verified."
     },
     {
       "name": "writing",

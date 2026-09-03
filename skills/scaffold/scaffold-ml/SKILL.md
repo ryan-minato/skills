@@ -1,7 +1,7 @@
 ---
 name: scaffold-ml
 description: >-
-  Disposable scaffold skill (delete after the harness is built): scaffolds an
+  Disposable builder skill (delete after the harness is built): scaffolds an
   opinionated, reproducible machine-learning project and its agent harness,
   choosing between a quick experiment and a maintainable training codebase.
   Use for empty or early repositories that train or evaluate models and need

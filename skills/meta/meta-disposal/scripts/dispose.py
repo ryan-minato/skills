@@ -9,9 +9,9 @@ belongs in the conversation between the two runs.
 
 The marker is not embedded here: it is read from this skill's own SKILL.md
 description (the prefix through the first "):"), so the script always
-matches its own catalog's marker generation and leaves another catalog's
-disposable skills to that catalog's disposal skill. --marker exists only
-to recover when this skill's own SKILL.md was damaged.
+matches the marker generation it was shipped with — the one sentence every
+disposable builder of the meta and scaffold catalogs opens with. --marker
+exists only to recover when this skill's own SKILL.md was damaged.
 """
 
 from __future__ import annotations

@@ -1,7 +1,7 @@
 ---
 name: scaffold-colab
 description: >-
-  Disposable scaffold skill (delete after the harness is built): scaffolds a
+  Disposable builder skill (delete after the harness is built): scaffolds a
   Colab-centric project — a repository whose deliverable is Google Colab
   notebooks, mirrored locally and validated in an official Colab-runtime
   devcontainer before running on real Colab. Use when creating or hardening a

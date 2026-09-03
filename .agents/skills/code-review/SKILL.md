@@ -156,7 +156,8 @@ shape is advisory and the chosen name stands.
 
 Check the constraint surface first: descriptions warn above 900 characters
 (error at 1024); bodies warn above 500 lines; all content is English;
-`meta-`/`scaffold-` descriptions open with an exact disposable marker that
+`meta-`/`scaffold-` descriptions open with the shared disposable marker
+(`Disposable builder skill (delete after the harness is built):`), which
 must not change; every `README.md` change needs its content-identical
 `README.zh.md` twin; trigger phrases in descriptions are load-bearing —
 never trade one away for style.

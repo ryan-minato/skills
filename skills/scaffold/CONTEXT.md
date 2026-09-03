@@ -6,18 +6,18 @@ Rules for disposable builders that establish a project of a specific topic.
 
 - Install this catalog per project, never globally by default.
 - Install exactly one topic builder from this catalog — the one whose topic
-  matches the project being built — together with `scaffold-disposal`. The
-  topic builders are alternatives to one another, not layers that stack;
-  `scaffold-disposal` is the catalog's own tool and accompanies whichever one
-  is chosen.
+  matches the project being built. The topic builders are alternatives to
+  one another, not layers that stack.
 - Every skill directory and `name` begins with `scaffold-`.
 - Every skill description begins exactly with:
-  `Disposable scaffold skill (delete after the harness is built):`
+  `Disposable builder skill (delete after the harness is built):`
 - The marker identifies temporary builders. No asset or generated target
   artifact may carry it.
-- These builders exist only for project initialization. Their prefix and the
-  `scaffold-disposal` skill make removal after verification explicit, so they
-  do not consume context during normal development.
+- These builders exist only for project initialization. Their marker and the
+  `meta` catalog's `meta-disposal` skill make removal after verification
+  explicit, so they do not consume context during normal development; a
+  scaffold builder names that skill in its closing step and never deletes
+  builders by hand.
 - Prefer complete, durable initialization guidance over minimizing this
   catalog's own instruction budget. The builders are temporary; their durable
   output belongs in the target project before disposal.
@@ -56,9 +56,7 @@ This catalog owns topic-specific project scaffolding methodology: what a
 project of this kind must contain, how its data, code, and outputs are
 organized, and which conventions its agents inherit. A topic builder earns a
 place here only when its topic selects the whole project shape, so that adding
-it excludes the catalog's other topic builders. The catalog also holds
-`scaffold-disposal`, which is not a topic builder: it is the tool that removes
-them, and it ships here so the catalog can be installed without `meta`.
+it excludes the catalog's other topic builders.
 
 Generic, pluggable harness machinery — complete harness architecture,
 platform-neutral contract builders (branching, project workflow, agent
@@ -67,5 +65,5 @@ convention defaults — belongs to the `meta` catalog, whose skills stack
 alongside whichever scaffold is chosen. Durable
 cross-project methodology remains in `core/meta-harness`.
 
-Both catalogs are disposable and are normally removed together once the project
-is initialized and verified, each through its own disposal skill.
+Both catalogs are disposable and are removed together once the project is
+initialized and verified, through `meta-disposal`.

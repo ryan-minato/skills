@@ -36,16 +36,19 @@ Decide, before running anything:
   skill handed off here, take the name(s) from its handoff sentence.
 - **Whole catalog** — a handoff or request may name a catalog instead
   (`meta`, `scaffold`). `meta` is installed whole: its builders stack and are
-  disposed together. `scaffold` is installed as one topic builder plus
-  `scaffold-disposal`, never every scaffold builder. Both are project-scope,
-  disposable components. Discover the members (Step 2); for `meta` install
-  every member, for `scaffold` install only the chosen topic builder plus
-  `scaffold-disposal`.
+  disposed together. `scaffold` is installed as one topic builder — the one
+  whose topic matches the project — never every scaffold builder; the `meta`
+  catalog's `meta-disposal` later removes both catalogs' builders. Both are
+  project-scope, disposable components. Discover the members (Step 2); for
+  `meta` install every member, for `scaffold` install only the chosen topic
+  builder.
 - **Scope** — **project** (default) installs into this project so the files
   commit with it; **global** installs into the user home dir for every
   project. Choose global when the user says "globally" / "for every project",
   or when installing a `core` skill (those are meant to load everywhere).
-  Disposable catalogs (`meta`, `scaffold`) are always project scope.
+  Disposable catalogs (`meta`, `scaffold`) are always project scope, and
+  unlike durable skills they are never committed: the builders keep their
+  own directories out of every commit and `meta-disposal` removes them.
 
 Done when: you have a concrete skill-name list and a project-or-global scope.
 
@@ -90,9 +93,10 @@ pnpm dlx skills add ryan-minato/skills --skill <name> -g -y
 pnpm dlx skills add ryan-minato/skills --skill <name-1> --skill <name-2> ... --copy -y
 ```
 
-- **Project scope must pass `--copy`** so the skill lands as a real,
-  committable directory like the repo's other project-level skills — not a
-  symlink into a global cache.
+- **Project scope must pass `--copy`** so the skill lands as a real
+  directory the project owns, like the repo's other project-level skills —
+  not a symlink into a global cache. Durable skills then commit with the
+  project; disposable builders do not.
 - `-g` selects global; omit it for project.
 - `-y` skips interactive prompts (agents hang on TTY input).
 - The CLI knows skills, not catalogs: for a whole catalog, pass every member
@@ -115,7 +119,7 @@ python3 scripts/install_skill.py <name> [<name> ...]   # project scope (./.claud
 python3 scripts/install_skill.py <name> --global       # global scope (~/.claude)
 python3 scripts/install_skill.py <name> --force        # replace if already present
 python3 scripts/install_skill.py --catalog meta        # only meta is installed whole
-python3 scripts/install_skill.py scaffold-ml scaffold-disposal   # scaffold: by name, one topic builder
+python3 scripts/install_skill.py scaffold-ml          # scaffold: by name, the one topic builder
 ```
 
 The script refuses `--catalog` for any other catalog and refuses `--global`
@@ -137,9 +141,9 @@ Done when: the script's JSON output reports each skill's copied destination.
 
 ## Gotchas
 
-- A project install must leave a committable real directory (`--copy` for the
-  CLI; the fallback always copies) — a default CLI symlink points into a
-  global cache and would not commit with the project.
+- A project install must leave a real directory (`--copy` for the CLI; the
+  fallback always copies) — a default CLI symlink points into a global cache,
+  would not commit with the project, and cannot be disposed of by deleting it.
 - `-g` writes to the user home agent dir, not the project.
 - The fallback resolves a bare skill name by scanning all catalogs
   (`skills/*/<name>`); an unknown or ambiguous name is an error, so discover
