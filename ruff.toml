@@ -1,0 +1,16 @@
+# Ruff configuration for repository scripts and skill-bundled scripts.
+# The explicit `select` keeps local and pre-commit runs on one rule set; the
+# line length matches .editorconfig.
+line-length = 120
+target-version = "py310"
+
+# Floors promised by each skill's SKILL.md `compatibility` field.
+[per-file-target-version]
+"skills/core/ryan-minato-skills-installing/scripts/*.py" = "py39"
+"skills/core/sensitivity-check/scripts/*.py" = "py39"
+"skills/meta/meta-git-branching/scripts/*.py" = "py39"
+"skills/meta/meta-github-workflow/scripts/*.py" = "py39"
+"skills/meta/meta-gitlab-workflow/scripts/*.py" = "py39"
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]

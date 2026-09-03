@@ -157,10 +157,7 @@ def main() -> int:
             "tooling is data, not failure), 1 = a probe crashed "
             "unexpectedly, 2 = bad arguments."
         ),
-        epilog=(
-            "Example: python3 scripts/check_tooling.py "
-            "--hostname gitlab.example.com --skip-network"
-        ),
+        epilog=("Example: python3 scripts/check_tooling.py --hostname gitlab.example.com --skip-network"),
     )
     parser.add_argument(
         "--hostname",

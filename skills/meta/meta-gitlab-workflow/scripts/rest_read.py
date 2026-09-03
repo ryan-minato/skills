@@ -123,10 +123,7 @@ def _resolve_host(value: str | None) -> str:
 def _http_error_message(err: urllib.error.HTTPError, url: str) -> str:
     if err.code == 429:
         retry_after = err.headers.get("Retry-After", "unknown")
-        return (
-            f"rate limited (HTTP 429) for {url}; retry after {retry_after}s; "
-            "set GITLAB_TOKEN to raise limits"
-        )
+        return f"rate limited (HTTP 429) for {url}; retry after {retry_after}s; set GITLAB_TOKEN to raise limits"
     if err.code == 401:
         return (
             f"HTTP 401 for {url}: authentication required or token rejected — "
@@ -308,9 +305,7 @@ def cmd_issue(args) -> None:
     item = _issue_item(raw, with_body=True)
     if args.comments:
         notes = _api_json(f"{base}/notes", {"sort": "asc", "per_page": args.limit})
-        item["comment_thread"] = [
-            _note_item(note) for note in notes if not note.get("system")
-        ]
+        item["comment_thread"] = [_note_item(note) for note in notes if not note.get("system")]
     emit(item)
 
 
@@ -345,20 +340,14 @@ def _release_item(raw: dict, *, with_body: bool) -> dict:
             {"name": link.get("name"), "type": link.get("link_type")}
             for link in ((raw.get("assets") or {}).get("links") or [])
         ]
-        item["milestones"] = [
-            m.get("title") for m in raw.get("milestones") or []
-        ]
+        item["milestones"] = [m.get("title") for m in raw.get("milestones") or []]
     return item
 
 
 def cmd_releases(args) -> None:
     base = f"{_project_path(args.project)}/releases"
     if args.latest or args.tag:
-        path = (
-            f"{base}/permalink/latest"
-            if args.latest
-            else f"{base}/{urllib.parse.quote(args.tag, safe='')}"
-        )
+        path = f"{base}/permalink/latest" if args.latest else f"{base}/{urllib.parse.quote(args.tag, safe='')}"
         raw = _api_json(path)
         emit(raw if args.raw else _release_item(raw, with_body=True))
         return
@@ -367,9 +356,7 @@ def cmd_releases(args) -> None:
 
 
 def cmd_tags(args) -> None:
-    raw = _api_json(
-        f"{_project_path(args.project)}/repository/tags", {"per_page": args.limit}
-    )
+    raw = _api_json(f"{_project_path(args.project)}/repository/tags", {"per_page": args.limit})
     if args.raw:
         emit(raw)
         return
@@ -446,10 +433,7 @@ def cmd_mr(args) -> None:
         for field in ("approvals_required", "approvals_left"):
             if raw.get(field) is not None:
                 item[field] = raw[field]
-        item["approved_by"] = [
-            (entry.get("user") or {}).get("username")
-            for entry in raw.get("approved_by") or []
-        ]
+        item["approved_by"] = [(entry.get("user") or {}).get("username") for entry in raw.get("approved_by") or []]
         emit(item)
         return
     if args.pipelines:
@@ -499,9 +483,7 @@ def cmd_jobs(args) -> None:
     params = {"per_page": 100}
     if args.scope:
         params["scope[]"] = args.scope
-    raw = _api_json(
-        f"{_project_path(args.project)}/pipelines/{args.pipeline_id}/jobs", params
-    )
+    raw = _api_json(f"{_project_path(args.project)}/pipelines/{args.pipeline_id}/jobs", params)
     emit(raw if args.raw else [_job_item(entry) for entry in raw])
 
 
@@ -573,10 +555,7 @@ def _search_item(scope: str, raw: dict) -> dict:
 
 
 def cmd_search(args) -> None:
-    if args.group:
-        path = "/groups/" + urllib.parse.quote(args.group, safe="") + "/search"
-    else:
-        path = "/search"
+    path = "/groups/" + urllib.parse.quote(args.group, safe="") + "/search" if args.group else "/search"
     raw = _api_json(
         path,
         {"scope": args.scope, "search": args.query, "per_page": args.limit},
@@ -591,8 +570,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="rest_read.py",
         description=(
-            "Read-only GitLab REST v4 reader for public-project research; "
-            "exit codes 0/1/2 per module docstring"
+            "Read-only GitLab REST v4 reader for public-project research; exit codes 0/1/2 per module docstring"
         ),
         epilog=(
             "Example: python3 scripts/rest_read.py issue --host gitlab.com "
@@ -622,9 +600,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_issues = sub.add_parser("issues", help="list issues")
     common(p_issues)
-    p_issues.add_argument(
-        "--state", default="opened", choices=["opened", "closed", "all"]
-    )
+    p_issues.add_argument("--state", default="opened", choices=["opened", "closed", "all"])
     p_issues.add_argument("--labels", help="comma-separated label names")
     p_issues.add_argument("--search", help="filter by text in title/description")
     p_issues.set_defaults(func=cmd_issues)
@@ -641,9 +617,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_mrs = sub.add_parser("mrs", help="list merge requests")
     common(p_mrs)
-    p_mrs.add_argument(
-        "--state", default="opened", choices=["opened", "closed", "merged", "all"]
-    )
+    p_mrs.add_argument("--state", default="opened", choices=["opened", "closed", "merged", "all"])
     p_mrs.add_argument("--target-branch")
     p_mrs.set_defaults(func=cmd_mrs)
 
@@ -700,9 +674,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_jobs.set_defaults(func=cmd_jobs)
 
-    p_fail = sub.add_parser(
-        "pipeline-failures", help="failed jobs with cleaned log tails"
-    )
+    p_fail = sub.add_parser("pipeline-failures", help="failed jobs with cleaned log tails")
     common(p_fail, limit=False)
     p_fail.add_argument("--pipeline-id", type=int, required=True)
     p_fail.add_argument("--tail", type=int, default=50, help="log lines per job")
@@ -746,9 +718,7 @@ def main() -> None:
     API_BASE = f"https://{host}/api/v4"
     project = getattr(args, "project", None)
     if project is not None and not re.fullmatch(r"[^/\s]+(?:/[^/\s]+)+", project):
-        parser.error(
-            f"--project must be the full GROUP[/SUBGROUP]/NAME path, got {project!r}"
-        )
+        parser.error(f"--project must be the full GROUP[/SUBGROUP]/NAME path, got {project!r}")
     if getattr(args, "limit", 1) <= 0:
         parser.error("--limit must be a positive integer")
     if getattr(args, "tail", 1) <= 0:

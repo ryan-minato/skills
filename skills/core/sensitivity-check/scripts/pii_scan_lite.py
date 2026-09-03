@@ -23,7 +23,7 @@ import re
 import string
 import sys
 from pathlib import Path
-from typing import Callable, NamedTuple, Optional
+from typing import Callable, NamedTuple
 
 CONTEXT_CHARS = 40
 DEFAULT_THRESHOLD = 0.5
@@ -69,11 +69,7 @@ _CARD_PREFIX = re.compile(
 
 def _valid_card(match: str) -> bool:
     digits = _digits(match)
-    return (
-        13 <= len(digits) <= 19
-        and bool(_CARD_PREFIX.match(digits))
-        and _luhn_ok(digits)
-    )
+    return 13 <= len(digits) <= 19 and bool(_CARD_PREFIX.match(digits)) and _luhn_ok(digits)
 
 
 def _valid_ipv4(match: str) -> bool:
@@ -112,9 +108,7 @@ def _valid_phone(match: str) -> bool:
     if any(shape.fullmatch(match) for shape in _DATE_SHAPES):
         return False
     # Leave the 3-2-4 shape to the US_SSN detector.
-    if _SSN_SHAPE.fullmatch(match):
-        return False
-    return True
+    return not _SSN_SHAPE.fullmatch(match)
 
 
 def _valid_ssn(match: str) -> bool:
@@ -135,9 +129,7 @@ def _valid_cn_resident_id(match: str) -> bool:
 
 
 # GB 32100-2015 alphabet: digits plus uppercase letters except I, O, S, V, Z.
-USCC_CHARS = "".join(
-    c for c in string.digits + string.ascii_uppercase if c not in "IOSVZ"
-)
+USCC_CHARS = "".join(c for c in string.digits + string.ascii_uppercase if c not in "IOSVZ")
 USCC_WEIGHTS = (1, 3, 9, 27, 19, 26, 16, 17, 20, 29, 25, 13, 8, 24, 10, 30, 28)
 
 
@@ -165,7 +157,7 @@ def _valid_jp_phone(match: str) -> bool:
 class Detector(NamedTuple):
     entity_type: str
     pattern: re.Pattern
-    validator: Optional[Callable[[str], bool]]
+    validator: Callable[[str], bool] | None
     score: float
 
 
@@ -226,9 +218,7 @@ DETECTORS = {
         ),
         Detector(
             "CREDIT_CARD",
-            re.compile(
-                r"(?<![0-9A-Za-z_.+-])\d(?:[ -]?\d){12,18}(?![0-9A-Za-z_-])"
-            ),
+            re.compile(r"(?<![0-9A-Za-z_.+-])\d(?:[ -]?\d){12,18}(?![0-9A-Za-z_-])"),
             _valid_card,
             0.95,
         ),
@@ -343,9 +333,7 @@ DETECTORS = {
             "JP_MY_NUMBER",
             # Digit-adjacency guards: 12 digits carved out of a longer
             # spaced digit run (a card number) must not match.
-            re.compile(
-                r"(?<![\d-])(?<!\d )\d{4}([ -]?)\d{4}\1\d{4}(?![\d-])(?! \d)"
-            ),
+            re.compile(r"(?<![\d-])(?<!\d )\d{4}([ -]?)\d{4}\1\d{4}(?![\d-])(?! \d)"),
             _valid_jp_my_number,
             0.9,
         ),
@@ -376,7 +364,7 @@ class Span(NamedTuple):
     score: float
 
 
-def _detect(text: str, locales: list) -> "tuple[list, int]":
+def _detect(text: str, locales: list) -> tuple[list, int]:
     """Return raw spans plus the count of dropped known test values."""
     spans = []
     dropped = 0
@@ -390,9 +378,7 @@ def _detect(text: str, locales: list) -> "tuple[list, int]":
                 if normalized in KNOWN_TEST_VALUES:
                     dropped += 1
                     continue
-                spans.append(
-                    Span(match.start(), match.end(), detector.entity_type, detector.score)
-                )
+                spans.append(Span(match.start(), match.end(), detector.entity_type, detector.score))
     return spans, dropped
 
 
@@ -421,13 +407,10 @@ def _excerpt(text: str, beg: int, end: int) -> str:
     right = min(len(text), end + CONTEXT_CHARS)
     prefix = "..." if left > 0 else ""
     suffix = "..." if right < len(text) else ""
-    return (
-        f"{prefix}{text[left:beg]}[{text[beg:end]}]{text[end:right]}{suffix}"
-        .replace("\n", "\\n")
-    )
+    return f"{prefix}{text[left:beg]}[{text[beg:end]}]{text[end:right]}{suffix}".replace("\n", "\\n")
 
 
-def scan_text(text: str, source: str, locales: list, threshold: float) -> "tuple[list, int]":
+def scan_text(text: str, source: str, locales: list, threshold: float) -> tuple[list, int]:
     spans, dropped = _detect(text, locales)
     findings = [
         {
@@ -453,21 +436,14 @@ def run_self_test() -> int:
     Detector correctness is covered by design-time tests maintained with
     the skill's development; this only verifies the script executes.
     """
-    sample = (
-        "Reach jane.doe@example.com or +1 (212) 555-0187, "
-        "id 110101199003071233, 〒100-0001."
-    )
+    sample = "Reach jane.doe@example.com or +1 (212) 555-0187, id 110101199003071233, 〒100-0001."
     try:
-        findings, _ = scan_text(
-            sample, "<self-test>", sorted(DETECTORS), DEFAULT_THRESHOLD
-        )
+        findings, _ = scan_text(sample, "<self-test>", sorted(DETECTORS), DEFAULT_THRESHOLD)
     except Exception as exc:  # any crash means the engine is unusable
         print(f"FAIL: pipeline raised {exc!r}", file=sys.stderr)
         print(json.dumps({"self_test": "fail"}))
         return 1
-    ok = any(
-        "EMAIL_ADDRESS" in finding["entity_type"].split("+") for finding in findings
-    )
+    ok = any("EMAIL_ADDRESS" in finding["entity_type"].split("+") for finding in findings)
     print(
         "PASS: pipeline ran across all locales and detected the sample"
         if ok
@@ -506,10 +482,7 @@ def main() -> int:
     parser.add_argument(
         "--locale",
         action="append",
-        help=(
-            "comma-separated locales to enable: all, generic, us, gb, cn, jp "
-            "(default: all; repeatable)"
-        ),
+        help=("comma-separated locales to enable: all, generic, us, gb, cn, jp (default: all; repeatable)"),
     )
     parser.add_argument(
         "--threshold",
@@ -541,10 +514,7 @@ def main() -> int:
     else:
         unknown = sorted(set(raw_locales) - set(DETECTORS))
         if unknown:
-            parser.error(
-                f"unknown locale(s): {', '.join(unknown)}. "
-                f"Choose from: all, {', '.join(sorted(DETECTORS))}"
-            )
+            parser.error(f"unknown locale(s): {', '.join(unknown)}. Choose from: all, {', '.join(sorted(DETECTORS))}")
         locales = sorted(set(raw_locales))
 
     sources = []
@@ -555,8 +525,7 @@ def main() -> int:
         path = Path(path_str)
         if not path.is_file():
             print(
-                f"error: {path_str}: not a file. Findings would be "
-                f"incomplete; fix the path and re-run.",
+                f"error: {path_str}: not a file. Findings would be incomplete; fix the path and re-run.",
                 file=sys.stderr,
             )
             had_error = True
@@ -565,8 +534,7 @@ def main() -> int:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             print(
-                f"warning: {path_str}: not valid UTF-8, skipped. Record it "
-                f"as an unscanned binary in the report.",
+                f"warning: {path_str}: not valid UTF-8, skipped. Record it as an unscanned binary in the report.",
                 file=sys.stderr,
             )
             continue
@@ -576,16 +544,13 @@ def main() -> int:
         dropped_total += dropped
     if args.text is not None:
         sources.append("<inline-text>")
-        text_findings, dropped = scan_text(
-            args.text, "<inline-text>", locales, args.threshold
-        )
+        text_findings, dropped = scan_text(args.text, "<inline-text>", locales, args.threshold)
         findings.extend(text_findings)
         dropped_total += dropped
 
     if dropped_total:
         print(
-            f"note: dropped {dropped_total} match(es) of widely published "
-            f"test/example values",
+            f"note: dropped {dropped_total} match(es) of widely published test/example values",
             file=sys.stderr,
         )
     print(

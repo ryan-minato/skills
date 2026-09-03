@@ -32,9 +32,7 @@ CREDENTIAL_RE = re.compile(
     r"(?i)\b(api[_-]?key|apikey|secret|token|passw(?:or)?d|passwd|credential)"  # pragma: allowlist secret
     r"\b\s*[:=]\s*[\"']?([^\"'\s,}]+)"  # pragma: allowlist secret
 )
-SUPPRESSION_RE = re.compile(
-    r"pragma: allowlist secret|gitleaks:allow|detect-secrets:disable|#\s*nosec\b"
-)
+SUPPRESSION_RE = re.compile(r"pragma: allowlist secret|gitleaks:allow|detect-secrets:disable|#\s*nosec\b")
 
 ALLOWED_EMAIL_DOMAINS = {
     "example.com",
@@ -75,9 +73,7 @@ def git_user_email() -> str:
         return result.stdout.strip()
     if result.returncode == 1:
         return ""
-    print(
-        result.stderr.strip() or "git config --get user.email failed", file=sys.stderr
-    )
+    print(result.stderr.strip() or "git config --get user.email failed", file=sys.stderr)
     sys.exit(2)
 
 
@@ -155,10 +151,7 @@ def check_added_lines() -> list[str]:
 
         credential = CREDENTIAL_RE.search(content)  # pragma: allowlist secret
         if credential and not looks_like_placeholder(credential.group(2)):
-            findings.append(
-                f"{current_file}: added credential-like assignment "
-                f"for `{credential.group(1)}`"
-            )
+            findings.append(f"{current_file}: added credential-like assignment for `{credential.group(1)}`")
 
         for email in EMAIL_RE.findall(content):
             domain = email.rsplit("@", 1)[1].lower()
@@ -191,9 +184,7 @@ def main(argv: list[str]) -> int:
     files = staged_files()
     errors: list[str] = []
     if not files:
-        errors.append(
-            "No staged changes. Stage one atomic logical change before committing."
-        )
+        errors.append("No staged changes. Stage one atomic logical change before committing.")
     else:
         print_layers(files)
 

@@ -45,9 +45,7 @@ def fail(code, message):
 def run_glab(argv, context, hint=None):
     """Run a glab command; return stdout, or exit 1 with glab's error."""
     try:
-        proc = subprocess.run(
-            ["glab"] + argv, capture_output=True, text=True, check=False
-        )
+        proc = subprocess.run(["glab", *argv], capture_output=True, text=True, check=False)
     except FileNotFoundError:
         fail(1, f"glab CLI not found on PATH — {TOOLING_HINT}")
     if proc.returncode != 0:
@@ -64,8 +62,7 @@ def normalize_color(raw, context):
     if not HEX_COLOR.match(color):
         fail(
             2,
-            f"{context}: color {raw!r} is not a 6-digit hex value "
-            '(use e.g. "#d73a4a" or "d73a4a")',
+            f'{context}: color {raw!r} is not a 6-digit hex value (use e.g. "#d73a4a" or "d73a4a")',
         )
     return f"#{color}"
 
@@ -174,15 +171,9 @@ def parse_paginated_json(text, context):
 def fetch_current(host, kind, encoded_path):
     """List labels; return (editable_by_key, inherited_by_key) dicts."""
     if kind == "project":
-        endpoint = (
-            f"projects/{encoded_path}/labels"
-            "?with_counts=false&per_page=100&include_ancestor_groups=true"
-        )
+        endpoint = f"projects/{encoded_path}/labels?with_counts=false&per_page=100&include_ancestor_groups=true"
     else:
-        endpoint = (
-            f"groups/{encoded_path}/labels"
-            "?with_counts=false&per_page=100&include_ancestor_groups=false"
-        )
+        endpoint = f"groups/{encoded_path}/labels?with_counts=false&per_page=100&include_ancestor_groups=false"
     context = f"listing labels on {kind} via {host}"
     stdout = run_glab(
         ["api", "--hostname", host, endpoint, "--paginate"],
@@ -236,10 +227,7 @@ def build_plan(desired, editable, inherited):
         elif key in inherited:
             existing = inherited[key]
             entry = {"name": label["name"], "group_label": existing["name"]}
-            if (
-                existing["color"] != label["color"]
-                or existing["description"] != label["description"]
-            ):
+            if existing["color"] != label["color"] or existing["description"] != label["description"]:
                 entry["warning"] = (
                     "color/description in the file differ from the inherited "
                     "group label; edit it on the ancestor group instead"
@@ -249,9 +237,7 @@ def build_plan(desired, editable, inherited):
             create.append(label)
     desired_keys = {label["name"].lower() for label in desired}
     prune = [
-        {"id": entry["id"], "name": entry["name"]}
-        for key, entry in sorted(editable.items())
-        if key not in desired_keys
+        {"id": entry["id"], "name": entry["name"]} for key, entry in sorted(editable.items()) if key not in desired_keys
     ]
     return create, update, in_sync, group_managed, prune
 
@@ -400,9 +386,7 @@ def main():
     encoded_path = urllib.parse.quote(path, safe="")
     desired = load_desired(args.file)
     editable, inherited = fetch_current(host, kind, encoded_path)
-    create, update, in_sync, group_managed, prune = build_plan(
-        desired, editable, inherited
-    )
+    create, update, in_sync, group_managed, prune = build_plan(desired, editable, inherited)
 
     plan = {
         "host": host,
@@ -415,9 +399,7 @@ def main():
         "prune": prune,
     }
     if args.apply:
-        plan["applied"] = apply_plan(
-            host, kind, encoded_path, create, update, prune, args.prune
-        )
+        plan["applied"] = apply_plan(host, kind, encoded_path, create, update, prune, args.prune)
     json.dump(plan, sys.stdout, indent=2)
     print()
 

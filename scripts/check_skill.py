@@ -57,9 +57,7 @@ def parse_frontmatter(text: str) -> tuple[dict[str, str] | None, str]:
             if value in ("|", ">", "|-", ">-", "|+", ">+"):
                 block: list[str] = []
                 i += 1
-                while i < len(lines) and (
-                    lines[i].startswith((" ", "\t")) or not lines[i].strip()
-                ):
+                while i < len(lines) and (lines[i].startswith((" ", "\t")) or not lines[i].strip()):
                     if lines[i].strip() == "---":
                         break
                     block.append(lines[i].strip())
@@ -120,10 +118,7 @@ def check_skill_dir(skill_dir: Path) -> list[Finding]:
                 f"underscores or spaces). Fix: rename to kebab-case."
             )
         if len(name) > NAME_MAX:
-            error(
-                f"{rel}/SKILL.md: name is {len(name)} chars; the spec "
-                f"maximum is {NAME_MAX}. Fix: shorten the name."
-            )
+            error(f"{rel}/SKILL.md: name is {len(name)} chars; the spec maximum is {NAME_MAX}. Fix: shorten the name.")
         dir_name = skill_dir.resolve().name
         if name != dir_name:
             error(
@@ -209,11 +204,7 @@ def repo_skill_dirs() -> list[Path]:
             dirs.extend(sorted(p for p in catalog.iterdir() if p.is_dir()))
     agents_root = REPO_ROOT / ".agents" / "skills"
     if agents_root.is_dir():
-        dirs.extend(
-            sorted(
-                p for p in agents_root.iterdir() if p.is_dir() and not p.is_symlink()
-            )
-        )
+        dirs.extend(sorted(p for p in agents_root.iterdir() if p.is_dir() and not p.is_symlink()))
     return dirs
 
 
@@ -238,9 +229,7 @@ def report(findings: list[Finding]) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("paths", nargs="*", help="skill directories to check")
     parser.add_argument(
         "--all",

@@ -62,7 +62,7 @@ def _scan_files(paths: list) -> list:
     return findings
 
 
-def _run_scan(file_paths: list, inline_text: "str | None") -> "tuple[list, list, bool]":
+def _run_scan(file_paths: list, inline_text: str | None) -> tuple[list, list, bool]:
     """Return (sources, findings, had_error) with inline text mapped back."""
     sources = []
     paths = []
@@ -70,8 +70,7 @@ def _run_scan(file_paths: list, inline_text: "str | None") -> "tuple[list, list,
     for path_str in file_paths:
         if not Path(path_str).is_file():
             print(
-                f"error: {path_str}: not a file. Findings would be "
-                f"incomplete; fix the path and re-run.",
+                f"error: {path_str}: not a file. Findings would be incomplete; fix the path and re-run.",
                 file=sys.stderr,
             )
             had_error = True

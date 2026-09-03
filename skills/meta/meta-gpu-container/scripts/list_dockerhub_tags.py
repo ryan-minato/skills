@@ -85,9 +85,7 @@ def main() -> None:
         except re.error as error:
             parser.error(f"invalid --filter regex: {error}")
 
-    repository = (
-        args.repository if "/" in args.repository else f"library/{args.repository}"
-    )
+    repository = args.repository if "/" in args.repository else f"library/{args.repository}"
 
     shown = 0
     for tag in iter_tags(repository):
@@ -97,10 +95,7 @@ def main() -> None:
         if pattern and not pattern.search(name):
             continue
         pushed = (tag.get("tag_last_pushed") or "")[:10]
-        platforms = ",".join(
-            f"{image.get('os')}/{image.get('architecture')}"
-            for image in tag.get("images", [])
-        )
+        platforms = ",".join(f"{image.get('os')}/{image.get('architecture')}" for image in tag.get("images", []))
         print(f"{name}\t{pushed}\t{platforms}")
         shown += 1
         if args.limit and shown >= args.limit:

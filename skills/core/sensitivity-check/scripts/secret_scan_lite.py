@@ -26,19 +26,15 @@ import re
 import sys
 from collections import Counter
 from pathlib import Path
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 DEFAULT_ENTROPY_BASE64 = 4.5
 DEFAULT_ENTROPY_HEX = 3.0
 DEFAULT_ENTROPY_MIXED = 3.5
 
-_SUPPRESSION = re.compile(
-    r"pragma: allowlist secret|gitleaks:allow|detect-secrets:disable|#\s*nosec\b"
-)
+_SUPPRESSION = re.compile(r"pragma: allowlist secret|gitleaks:allow|detect-secrets:disable|#\s*nosec\b")
 
-_PLACEHOLDER_SHAPES = re.compile(
-    r"^(?:\$\{[^}]*\}|\{\{[^}]*\}\}|<[^>]*>|%s|\*{3,}|[xX]{4,}|\.{3,})$"
-)
+_PLACEHOLDER_SHAPES = re.compile(r"^(?:\$\{[^}]*\}|\{\{[^}]*\}\}|<[^>]*>|%s|\*{3,}|[xX]{4,}|\.{3,})$")
 _PLACEHOLDER_WORDS = (
     "your_",
     "replace",
@@ -82,7 +78,7 @@ def _entropy_flagged(value: str, hex_limit: float, base64_limit: float) -> bool:
 class SecretDetector(NamedTuple):
     type_label: str
     pattern: re.Pattern
-    group: Optional[str]  # capture group holding the secret; None = whole match
+    group: str | None  # capture group holding the secret; None = whole match
     placeholder_check: bool
 
 
@@ -167,9 +163,7 @@ def _hash(value: str) -> str:
     return hashlib.sha1(value.encode("utf-8")).hexdigest()
 
 
-def scan_lines(
-    lines: list, source: str, hex_limit: float, base64_limit: float
-) -> "tuple[list, int]":
+def scan_lines(lines: list, source: str, hex_limit: float, base64_limit: float) -> tuple[list, int]:
     findings = []
     suppressed = 0
     for lineno, line in enumerate(lines, 1):
@@ -231,9 +225,7 @@ def run_self_test() -> int:
     aws_key = "AKIA" + "IOSFODNN7" + "EXAMPLE"
     lines = [f"aws_access_key_id = {aws_key}", 'api_key = "YOUR_API_KEY"']
     try:
-        findings, _ = scan_lines(
-            lines, "<self-test>", DEFAULT_ENTROPY_HEX, DEFAULT_ENTROPY_BASE64
-        )
+        findings, _ = scan_lines(lines, "<self-test>", DEFAULT_ENTROPY_HEX, DEFAULT_ENTROPY_BASE64)
     except Exception as exc:  # any crash means the engine is unusable
         print(f"FAIL: pipeline raised {exc!r}", file=sys.stderr)
         print(json.dumps({"self_test": "fail"}))
@@ -305,8 +297,7 @@ def main() -> int:
         path = Path(path_str)
         if not path.is_file():
             print(
-                f"error: {path_str}: not a file. Findings would be "
-                f"incomplete; fix the path and re-run.",
+                f"error: {path_str}: not a file. Findings would be incomplete; fix the path and re-run.",
                 file=sys.stderr,
             )
             had_error = True
@@ -315,15 +306,12 @@ def main() -> int:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             print(
-                f"warning: {path_str}: not valid UTF-8, skipped. Record it "
-                f"as an unscanned binary in the report.",
+                f"warning: {path_str}: not valid UTF-8, skipped. Record it as an unscanned binary in the report.",
                 file=sys.stderr,
             )
             continue
         sources.append(path_str)
-        file_findings, suppressed = scan_lines(
-            text.splitlines(), path_str, args.entropy_hex, args.entropy_base64
-        )
+        file_findings, suppressed = scan_lines(text.splitlines(), path_str, args.entropy_hex, args.entropy_base64)
         findings.extend(file_findings)
         suppressed_total += suppressed
     if args.text is not None:
@@ -336,8 +324,7 @@ def main() -> int:
 
     if suppressed_total:
         print(
-            f"note: skipped {suppressed_total} line(s) carrying scanner "
-            f"suppression comments",
+            f"note: skipped {suppressed_total} line(s) carrying scanner suppression comments",
             file=sys.stderr,
         )
     print(

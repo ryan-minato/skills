@@ -52,10 +52,7 @@ def validate(message: str, max_title: int, max_body: int) -> list[dict]:
             {
                 "line": 1,
                 "rule": "title-max-length",
-                "message": (
-                    f"Title is {len(title)} characters; must be <= {max_title}. "
-                    f'Current title: "{title}"'
-                ),
+                "message": (f'Title is {len(title)} characters; must be <= {max_title}. Current title: "{title}"'),
             }
         )
 
@@ -85,10 +82,7 @@ def validate(message: str, max_title: int, max_body: int) -> list[dict]:
             {
                 "line": 2,
                 "rule": "blank-line-after-title",
-                "message": (
-                    "Line 2 must be blank to separate the title from the body; "
-                    f'got: "{lines[1]}"'
-                ),
+                "message": (f'Line 2 must be blank to separate the title from the body; got: "{lines[1]}"'),
             }
         )
 
@@ -98,10 +92,7 @@ def validate(message: str, max_title: int, max_body: int) -> list[dict]:
                 {
                     "line": i,
                     "rule": "body-max-line-length",
-                    "message": (
-                        f"Line {i} is {len(line)} characters; body lines must "
-                        f"be <= {max_body}. Wrap the line"
-                    ),
+                    "message": (f"Line {i} is {len(line)} characters; body lines must be <= {max_body}. Wrap the line"),
                 }
             )
         match = LOWERCASE_BREAKING.match(line)

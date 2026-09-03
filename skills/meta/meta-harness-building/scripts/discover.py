@@ -63,8 +63,7 @@ class CatalogSpec:
 def _string_field(value: object, field: str) -> str:
     if not isinstance(value, str) or not value.strip():
         raise DiscoveryError(
-            f"marketplace field `{field}` must be a non-empty string. "
-            "Fix the live marketplace manifest."
+            f"marketplace field `{field}` must be a non-empty string. Fix the live marketplace manifest."
         )
     return value
 
@@ -75,13 +74,11 @@ def parse_manifest(text: str) -> tuple[CatalogSpec, ...]:
         data = json.loads(text)
     except json.JSONDecodeError as exc:
         raise DiscoveryError(
-            f"the marketplace manifest is not valid JSON ({exc}). "
-            "Fix the live manifest and retry."
+            f"the marketplace manifest is not valid JSON ({exc}). Fix the live manifest and retry."
         ) from None
     if not isinstance(data, dict) or not isinstance(data.get("plugins"), list):
         raise DiscoveryError(
-            "the marketplace manifest must contain a `plugins` array. "
-            "Fix the live manifest and retry."
+            "the marketplace manifest must contain a `plugins` array. Fix the live manifest and retry."
         )
 
     catalogs: list[CatalogSpec] = []
@@ -89,10 +86,7 @@ def parse_manifest(text: str) -> tuple[CatalogSpec, ...]:
     seen_skill_ids: set[str] = set()
     for index, raw in enumerate(data["plugins"]):
         if not isinstance(raw, dict):
-            raise DiscoveryError(
-                f"marketplace plugin #{index + 1} must be an object. "
-                "Fix the live manifest and retry."
-            )
+            raise DiscoveryError(f"marketplace plugin #{index + 1} must be an object. Fix the live manifest and retry.")
         name = _string_field(raw.get("name"), f"plugins[{index}].name")
         if not CATALOG_RE.fullmatch(name):
             raise DiscoveryError(
@@ -100,34 +94,25 @@ def parse_manifest(text: str) -> tuple[CatalogSpec, ...]:
                 "Use lowercase letters, digits, and single hyphens."
             )
         if name in seen_catalogs:
-            raise DiscoveryError(
-                f"marketplace catalog `{name}` appears more than once. "
-                "Remove the duplicate entry."
-            )
+            raise DiscoveryError(f"marketplace catalog `{name}` appears more than once. Remove the duplicate entry.")
         seen_catalogs.add(name)
 
-        description = _string_field(
-            raw.get("description"), f"plugins[{index}].description"
-        )
+        description = _string_field(raw.get("description"), f"plugins[{index}].description")
         expected_source = "./"
         source = _string_field(raw.get("source"), f"plugins[{index}].source")
         if source != expected_source:
             raise DiscoveryError(
-                f"catalog `{name}` has source `{source}`, expected "
-                f"`{expected_source}`. Fix the marketplace manifest."
+                f"catalog `{name}` has source `{source}`, expected `{expected_source}`. Fix the marketplace manifest."
             )
 
         raw_skills = raw.get("skills")
         if not isinstance(raw_skills, list):
             raise DiscoveryError(
-                f"catalog `{name}` must have an explicit `skills` array. "
-                "Fix the marketplace manifest."
+                f"catalog `{name}` must have an explicit `skills` array. Fix the marketplace manifest."
             )
         skill_names: list[str] = []
         for skill_index, raw_skill in enumerate(raw_skills):
-            skill_ref = _string_field(
-                raw_skill, f"plugins[{index}].skills[{skill_index}]"
-            )
+            skill_ref = _string_field(raw_skill, f"plugins[{index}].skills[{skill_index}]")
             expected_prefix = f"./skills/{name}/"
             if not skill_ref.startswith(expected_prefix):
                 raise DiscoveryError(
@@ -144,8 +129,7 @@ def parse_manifest(text: str) -> tuple[CatalogSpec, ...]:
             skill_id = f"{name}/{skill_name}"
             if skill_id in seen_skill_ids:
                 raise DiscoveryError(
-                    f"skill `{skill_id}` appears more than once in the marketplace. "
-                    "Remove the duplicate entry."
+                    f"skill `{skill_id}` appears more than once in the marketplace. Remove the duplicate entry."
                 )
             seen_skill_ids.add(skill_id)
             skill_names.append(skill_name)
@@ -158,16 +142,11 @@ def parse_frontmatter(text: str, source: str) -> dict[str, str]:
     """Parse the top-level string fields used by published SKILL.md files."""
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
-        raise DiscoveryError(
-            f"`{source}` has no YAML frontmatter. Fix the live skill and retry."
-        )
+        raise DiscoveryError(f"`{source}` has no YAML frontmatter. Fix the live skill and retry.")
     try:
         end = next(i for i in range(1, len(lines)) if lines[i].strip() == "---")
     except StopIteration:
-        raise DiscoveryError(
-            f"`{source}` has unterminated YAML frontmatter. "
-            "Fix the live skill and retry."
-        ) from None
+        raise DiscoveryError(f"`{source}` has unterminated YAML frontmatter. Fix the live skill and retry.") from None
 
     fields: dict[str, str] = {}
     frontmatter = lines[1:end]
@@ -180,17 +159,14 @@ def parse_frontmatter(text: str, source: str) -> dict[str, str]:
         key, separator, raw_value = line.partition(":")
         if not separator:
             raise DiscoveryError(
-                f"`{source}` has an invalid top-level frontmatter line "
-                f"`{line}`. Fix the live skill and retry."
+                f"`{source}` has an invalid top-level frontmatter line `{line}`. Fix the live skill and retry."
             )
         key = key.strip()
         raw_value = raw_value.strip()
         if key not in {"name", "description"}:
             continue
         if key in fields:
-            raise DiscoveryError(
-                f"`{source}` repeats frontmatter field `{key}`. Keep exactly one value."
-            )
+            raise DiscoveryError(f"`{source}` repeats frontmatter field `{key}`. Keep exactly one value.")
 
         if raw_value in {">", ">-", ">+", "|", "|-", "|+"}:
             body: list[str] = []
@@ -206,8 +182,7 @@ def parse_frontmatter(text: str, source: str) -> dict[str, str]:
                 decoded = json.loads(raw_value)
             except json.JSONDecodeError as exc:
                 raise DiscoveryError(
-                    f"`{source}` has an invalid quoted `{key}` value ({exc}). "
-                    "Fix the live skill and retry."
+                    f"`{source}` has an invalid quoted `{key}` value ({exc}). Fix the live skill and retry."
                 ) from None
             if not isinstance(decoded, str):
                 raise DiscoveryError(f"`{source}` field `{key}` must be a string.")
@@ -217,25 +192,19 @@ def parse_frontmatter(text: str, source: str) -> dict[str, str]:
         elif raw_value:
             fields[key] = raw_value
         else:
-            raise DiscoveryError(
-                f"`{source}` field `{key}` must be a string. "
-                "Fix the live skill and retry."
-            )
+            raise DiscoveryError(f"`{source}` field `{key}` must be a string. Fix the live skill and retry.")
 
     for required in ("name", "description"):
         if not fields.get(required):
             raise DiscoveryError(
-                f"`{source}` has no non-empty string `{required}` field. "
-                "Fix the live skill and retry."
+                f"`{source}` has no non-empty string `{required}` field. Fix the live skill and retry."
             )
     return fields
 
 
 def _parse_block_scalar(lines: list[str], folded: bool) -> str:
     nonempty = [line for line in lines if line.strip()]
-    indentation = (
-        min(len(line) - len(line.lstrip()) for line in nonempty) if nonempty else 0
-    )
+    indentation = min(len(line) - len(line.lstrip()) for line in nonempty) if nonempty else 0
     values = [line[indentation:].rstrip() if line.strip() else "" for line in lines]
     while values and not values[-1]:
         values.pop()
@@ -260,40 +229,32 @@ def _safe_local_reader(repo_root: Path) -> Callable[[str], str]:
         root = repo_root.resolve(strict=True)
     except OSError as exc:
         raise DiscoveryError(
-            f"cannot resolve local repository `{repo_root}` ({exc}). "
-            "Pass an existing repository root."
+            f"cannot resolve local repository `{repo_root}` ({exc}). Pass an existing repository root."
         ) from None
     if not root.is_dir():
-        raise DiscoveryError(
-            f"local repository `{root}` is not a directory. Pass the repository root."
-        )
+        raise DiscoveryError(f"local repository `{root}` is not a directory. Pass the repository root.")
 
     def read(relative: str) -> str:
         try:
             candidate = (root / relative).resolve(strict=True)
         except OSError as exc:
             raise DiscoveryError(
-                f"cannot read repository file `{relative}` ({exc}). "
-                "Restore the file named by the marketplace manifest."
+                f"cannot read repository file `{relative}` ({exc}). Restore the file named by the marketplace manifest."
             ) from None
         try:
             candidate.relative_to(root)
         except ValueError:
             raise DiscoveryError(
-                f"repository file `{relative}` resolves outside `{root}`. "
-                "Remove the escaping symlink or path."
+                f"repository file `{relative}` resolves outside `{root}`. Remove the escaping symlink or path."
             ) from None
         if not candidate.is_file():
             raise DiscoveryError(
-                f"repository path `{relative}` is not a file. "
-                "Restore the file named by the marketplace manifest."
+                f"repository path `{relative}` is not a file. Restore the file named by the marketplace manifest."
             )
         try:
             data = candidate.read_bytes()
         except OSError as exc:
-            raise DiscoveryError(
-                f"cannot read repository file `{relative}` ({exc})."
-            ) from None
+            raise DiscoveryError(f"cannot read repository file `{relative}` ({exc}).") from None
         return _decode_repository_file(data, relative)
 
     return read
@@ -305,9 +266,7 @@ def _download_archive() -> bytes:
         headers={"User-Agent": "meta-skill-discovery"},
     )
     try:
-        with urllib.request.urlopen(
-            request, timeout=NETWORK_TIMEOUT_SECONDS
-        ) as response:
+        with urllib.request.urlopen(request, timeout=NETWORK_TIMEOUT_SECONDS) as response:
             length = response.headers.get("Content-Length")
             if length and int(length) > MAX_ARCHIVE_BYTES:
                 raise DiscoveryError(
@@ -330,8 +289,7 @@ def _download_archive() -> bytes:
         ) from None
     if len(data) > MAX_ARCHIVE_BYTES:
         raise DiscoveryError(
-            f"the live repository archive exceeds {MAX_ARCHIVE_BYTES} bytes. "
-            "Refusing the unexpected payload."
+            f"the live repository archive exceeds {MAX_ARCHIVE_BYTES} bytes. Refusing the unexpected payload."
         )
     return data
 
@@ -348,15 +306,12 @@ def _archive_reader(data: bytes) -> tuple[Callable[[str], str], tarfile.TarFile]
 
     manifest_suffix = f"/{MANIFEST_PATH}"
     manifest_members = [
-        member
-        for member in archive.getmembers()
-        if member.isfile() and member.name.endswith(manifest_suffix)
+        member for member in archive.getmembers() if member.isfile() and member.name.endswith(manifest_suffix)
     ]
     if len(manifest_members) != 1:
         archive.close()
         raise DiscoveryError(
-            "the live repository archive must contain exactly one marketplace "
-            "manifest. Check the repository layout."
+            "the live repository archive must contain exactly one marketplace manifest. Check the repository layout."
         )
     manifest_name = manifest_members[0].name
     prefix = manifest_name[: -len(MANIFEST_PATH)]
@@ -368,13 +323,11 @@ def _archive_reader(data: bytes) -> tuple[Callable[[str], str], tarfile.TarFile]
             member = archive.getmember(member_name)
         except KeyError:
             raise DiscoveryError(
-                f"the live archive is missing `{relative}`. "
-                "Restore the file named by the marketplace manifest."
+                f"the live archive is missing `{relative}`. Restore the file named by the marketplace manifest."
             ) from None
         if not member.isfile():
             raise DiscoveryError(
-                f"live archive path `{relative}` is not a file. "
-                "Restore the file named by the marketplace manifest."
+                f"live archive path `{relative}` is not a file. Restore the file named by the marketplace manifest."
             )
         if member.size > MAX_REPOSITORY_FILE_BYTES:
             raise DiscoveryError(
@@ -391,29 +344,22 @@ def _archive_reader(data: bytes) -> tuple[Callable[[str], str], tarfile.TarFile]
 
 def _validate_relative_path(relative: str) -> None:
     path = PurePosixPath(relative)
-    if (
-        path.is_absolute()
-        or not path.parts
-        or any(part in {"", ".", ".."} for part in path.parts)
-    ):
+    if path.is_absolute() or not path.parts or any(part in {"", ".", ".."} for part in path.parts):
         raise DiscoveryError(
-            f"repository path `{relative}` is unsafe. "
-            "Only normalized repository-relative paths are allowed."
+            f"repository path `{relative}` is unsafe. Only normalized repository-relative paths are allowed."
         )
 
 
 def _decode_repository_file(data: bytes, relative: str) -> str:
     if len(data) > MAX_REPOSITORY_FILE_BYTES:
         raise DiscoveryError(
-            f"repository file `{relative}` exceeds {MAX_REPOSITORY_FILE_BYTES} "
-            "bytes. Refusing the unexpected file."
+            f"repository file `{relative}` exceeds {MAX_REPOSITORY_FILE_BYTES} bytes. Refusing the unexpected file."
         )
     try:
         return data.decode("utf-8")
     except UnicodeDecodeError:
         raise DiscoveryError(
-            f"repository file `{relative}` is not UTF-8 text. "
-            "Fix the live source and retry."
+            f"repository file `{relative}` is not UTF-8 text. Fix the live source and retry."
         ) from None
 
 
@@ -469,14 +415,9 @@ def _description_marker(description: str, relative: str) -> str:
             "Repair the marker contract before listing skills."
         )
     marker = description[: end + len(MARKER_END)]
-    if (
-        len(marker) < MIN_MARKER_LENGTH
-        or len(description) == len(marker)
-        or description[len(marker)] != " "
-    ):
+    if len(marker) < MIN_MARKER_LENGTH or len(description) == len(marker) or description[len(marker)] != " ":
         raise DiscoveryError(
-            f"`{relative}` has an invalid disposal marker prefix. "
-            "Repair the marker contract before listing skills."
+            f"`{relative}` has an invalid disposal marker prefix. Repair the marker contract before listing skills."
         )
     return marker
 
@@ -491,26 +432,18 @@ def select_inventory(
         catalog = by_name.get(catalog_name)
         if catalog is None:
             valid = ", ".join(by_name) or "(none)"
-            raise DiscoveryError(
-                f"unknown catalog `{catalog_name}`. Valid catalogs: {valid}."
-            )
+            raise DiscoveryError(f"unknown catalog `{catalog_name}`. Valid catalogs: {valid}.")
         return (catalog,)
     if skill_id is not None:
         catalog_name, skill_name = skill_id.split("/", 1)
         catalog = by_name.get(catalog_name)
         if catalog is None:
             valid = ", ".join(by_name) or "(none)"
-            raise DiscoveryError(
-                f"unknown catalog `{catalog_name}` in `{skill_id}`. "
-                f"Valid catalogs: {valid}."
-            )
+            raise DiscoveryError(f"unknown catalog `{catalog_name}` in `{skill_id}`. Valid catalogs: {valid}.")
         skill = next((item for item in catalog.skills if item.name == skill_name), None)
         if skill is None:
             valid = ", ".join(item.name for item in catalog.skills) or "(none)"
-            raise DiscoveryError(
-                f"unknown skill `{skill_id}`. Valid skills in `{catalog_name}`: "
-                f"{valid}."
-            )
+            raise DiscoveryError(f"unknown skill `{skill_id}`. Valid skills in `{catalog_name}`: {valid}.")
         return (Catalog(catalog.name, catalog.description, (skill,)),)
     return catalogs
 
@@ -527,9 +460,7 @@ def build_output(
             if full:
                 skills.append({"name": skill.name, "description": skill.description})
             else:
-                skills.append(
-                    {"name": skill.name, "summary": _summarize(skill.description)}
-                )
+                skills.append({"name": skill.name, "summary": _summarize(skill.description)})
         result_catalogs.append(
             {
                 "name": catalog.name,
@@ -559,10 +490,7 @@ def _summarize(description: str) -> str:
 def write_output(path: Path, payload: str) -> None:
     parent = path.parent
     if not parent.is_dir():
-        raise DiscoveryError(
-            f"output directory `{parent}` does not exist. "
-            "Create it or choose an existing directory."
-        )
+        raise DiscoveryError(f"output directory `{parent}` does not exist. Create it or choose an existing directory.")
     temporary_path: Path | None = None
     try:
         with tempfile.NamedTemporaryFile(
@@ -581,9 +509,7 @@ def write_output(path: Path, payload: str) -> None:
     except OSError as exc:
         if temporary_path is not None:
             temporary_path.unlink(missing_ok=True)
-        raise DiscoveryError(
-            f"cannot write output `{path}` ({exc}). Choose a writable output path."
-        ) from None
+        raise DiscoveryError(f"cannot write output `{path}` ({exc}). Choose a writable output path.") from None
 
 
 def run_self_test() -> None:
@@ -625,9 +551,7 @@ description: "{marker} Builds another useful thing. Use when two is needed."
 
         def materialize(raw_manifest: object = manifest) -> None:
             (root / ".claude-plugin").mkdir(parents=True, exist_ok=True)
-            (root / ".claude-plugin" / "marketplace.json").write_text(
-                json.dumps(raw_manifest), encoding="utf-8"
-            )
+            (root / ".claude-plugin" / "marketplace.json").write_text(json.dumps(raw_manifest), encoding="utf-8")
             for relative, content in (
                 ("skills/meta/meta-one/SKILL.md", folded_skill),
                 ("skills/meta/meta-two/SKILL.md", plain_skill),
@@ -676,9 +600,7 @@ description: "{marker} Builds another useful thing. Use when two is needed."
             raise AssertionError("escaping marketplace path was accepted")
         cases += 1
 
-        (root / ".claude-plugin" / "marketplace.json").write_text(
-            "{not json", encoding="utf-8"
-        )
+        (root / ".claude-plugin" / "marketplace.json").write_text("{not json", encoding="utf-8")
         try:
             load_inventory(root)
         except DiscoveryError as exc:
@@ -689,9 +611,7 @@ description: "{marker} Builds another useful thing. Use when two is needed."
 
         materialize()
         mismatched = plain_skill.replace(marker, "Different test marker):")
-        (root / "skills/meta/meta-two/SKILL.md").write_text(
-            mismatched, encoding="utf-8"
-        )
+        (root / "skills/meta/meta-two/SKILL.md").write_text(mismatched, encoding="utf-8")
         try:
             load_inventory(root)
         except DiscoveryError as exc:
@@ -796,9 +716,7 @@ def main() -> int:
     try:
         inventory = load_inventory(args.repo_root)
         selected = select_inventory(inventory, args.catalog, args.skill)
-        source = (
-            str(args.repo_root.resolve()) if args.repo_root is not None else ARCHIVE_URL
-        )
+        source = str(args.repo_root.resolve()) if args.repo_root is not None else ARCHIVE_URL
         output = build_output(selected, source, full=args.full or bool(args.output))
         payload = json.dumps(output, ensure_ascii=False, separators=(",", ":"))
         if args.output:

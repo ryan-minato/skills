@@ -30,9 +30,7 @@ from pathlib import Path
 
 import yaml
 
-KNOWN_FIELDS = frozenset(
-    {"name", "description", "license", "compatibility", "metadata", "allowed-tools"}
-)
+KNOWN_FIELDS = frozenset({"name", "description", "license", "compatibility", "metadata", "allowed-tools"})
 REQUIRED_FIELDS = frozenset({"name", "description"})
 ALLOWED_ROOT = frozenset({"SKILL.md", "references", "assets", "scripts"})
 BUNDLE_DIRS = ("scripts", "references", "assets")
@@ -130,75 +128,91 @@ def check_frontmatter(base: str, skill_dir: Path, fm: dict) -> list[dict]:
 
     for key in sorted(fm):
         if key not in KNOWN_FIELDS:
-            issues.append(issue(
-                f"{base}:frontmatter:{key}",
-                "warning",
-                f"Frontmatter field '{key}' is not in the Agent Skills spec.",
-                f"Spec fields: {', '.join(sorted(KNOWN_FIELDS))}. If '{key}' is a "
-                "host-specific extension, keep it but note the host it targets in the body.",
-            ))
+            issues.append(
+                issue(
+                    f"{base}:frontmatter:{key}",
+                    "warning",
+                    f"Frontmatter field '{key}' is not in the Agent Skills spec.",
+                    f"Spec fields: {', '.join(sorted(KNOWN_FIELDS))}. If '{key}' is a "
+                    "host-specific extension, keep it but note the host it targets in the body.",
+                )
+            )
 
     for key in sorted(REQUIRED_FIELDS):
         if key not in fm:
-            issues.append(issue(
-                f"{base}:frontmatter",
-                "error",
-                f"Required field '{key}' is missing.",
-                f"Add '{key}' to the frontmatter block.",
-            ))
+            issues.append(
+                issue(
+                    f"{base}:frontmatter",
+                    "error",
+                    f"Required field '{key}' is missing.",
+                    f"Add '{key}' to the frontmatter block.",
+                )
+            )
 
     name = fm.get("name")
     if name is not None:
         if not isinstance(name, str):
-            issues.append(issue(
-                f"{base}:frontmatter:name",
-                "error",
-                f"'name' must be a string, got {type(name).__name__}.",
-                "Set 'name' to a lowercase hyphenated string matching the directory name.",
-            ))
+            issues.append(
+                issue(
+                    f"{base}:frontmatter:name",
+                    "error",
+                    f"'name' must be a string, got {type(name).__name__}.",
+                    "Set 'name' to a lowercase hyphenated string matching the directory name.",
+                )
+            )
         else:
             if len(name) > 64:
-                issues.append(issue(
-                    f"{base}:frontmatter:name",
-                    "error",
-                    f"'name' is {len(name)} chars; maximum is 64.",
-                    "Shorten the skill name to 64 characters or fewer.",
-                ))
+                issues.append(
+                    issue(
+                        f"{base}:frontmatter:name",
+                        "error",
+                        f"'name' is {len(name)} chars; maximum is 64.",
+                        "Shorten the skill name to 64 characters or fewer.",
+                    )
+                )
             if not NAME_RE.fullmatch(name):
-                issues.append(issue(
-                    f"{base}:frontmatter:name",
-                    "error",
-                    f"'name' value '{name}' has invalid characters or structure.",
-                    "Use only lowercase a-z, digits 0-9, and single hyphens — no leading, "
-                    "trailing, or consecutive hyphens ('my-skill', not 'My_Skill' or 'my--skill').",
-                ))
+                issues.append(
+                    issue(
+                        f"{base}:frontmatter:name",
+                        "error",
+                        f"'name' value '{name}' has invalid characters or structure.",
+                        "Use only lowercase a-z, digits 0-9, and single hyphens — no leading, "
+                        "trailing, or consecutive hyphens ('my-skill', not 'My_Skill' or 'my--skill').",
+                    )
+                )
             if name != skill_dir.name:
-                issues.append(issue(
-                    f"{base}:frontmatter:name",
-                    "error",
-                    f"'name' is '{name}' but the directory is '{skill_dir.name}'; they must match exactly.",
-                    f"Rename the directory to '{name}' or change 'name' to '{skill_dir.name}'.",
-                ))
+                issues.append(
+                    issue(
+                        f"{base}:frontmatter:name",
+                        "error",
+                        f"'name' is '{name}' but the directory is '{skill_dir.name}'; they must match exactly.",
+                        f"Rename the directory to '{name}' or change 'name' to '{skill_dir.name}'.",
+                    )
+                )
 
     issues.extend(check_description(base, fm.get("description")))
 
     compat = fm.get("compatibility")
     if isinstance(compat, str) and len(compat) > COMPATIBILITY_MAX:
-        issues.append(issue(
-            f"{base}:frontmatter:compatibility",
-            "error",
-            f"'compatibility' is {len(compat)} chars; maximum is {COMPATIBILITY_MAX}.",
-            "Trim to 500 chars or fewer; state only real environment requirements.",
-        ))
+        issues.append(
+            issue(
+                f"{base}:frontmatter:compatibility",
+                "error",
+                f"'compatibility' is {len(compat)} chars; maximum is {COMPATIBILITY_MAX}.",
+                "Trim to 500 chars or fewer; state only real environment requirements.",
+            )
+        )
 
     meta = fm.get("metadata")
     if meta is not None and not isinstance(meta, dict):
-        issues.append(issue(
-            f"{base}:frontmatter:metadata",
-            "error",
-            f"'metadata' must be a YAML mapping, got {type(meta).__name__}.",
-            "Use a flat mapping, e.g.:\nmetadata:\n  author: my-org\n  version: '1.0'",
-        ))
+        issues.append(
+            issue(
+                f"{base}:frontmatter:metadata",
+                "error",
+                f"'metadata' must be a YAML mapping, got {type(meta).__name__}.",
+                "Use a flat mapping, e.g.:\nmetadata:\n  author: my-org\n  version: '1.0'",
+            )
+        )
 
     return issues
 
@@ -209,62 +223,76 @@ def check_description(base: str, desc: object) -> list[dict]:
     if desc is None:
         return issues
     if not isinstance(desc, str):
-        issues.append(issue(
-            loc,
-            "error",
-            f"'description' must be a string, got {type(desc).__name__}.",
-            "Use a YAML string, optionally with '>' for a folded block scalar.",
-        ))
+        issues.append(
+            issue(
+                loc,
+                "error",
+                f"'description' must be a string, got {type(desc).__name__}.",
+                "Use a YAML string, optionally with '>' for a folded block scalar.",
+            )
+        )
         return issues
 
     length = len(desc)
     if length > DESCRIPTION_MAX:
-        issues.append(issue(
-            loc,
-            "error",
-            f"'description' is {length} chars; maximum is {DESCRIPTION_MAX}.",
-            "Trim below 1024: keep the capability sentence and one trigger per branch.",
-        ))
+        issues.append(
+            issue(
+                loc,
+                "error",
+                f"'description' is {length} chars; maximum is {DESCRIPTION_MAX}.",
+                "Trim below 1024: keep the capability sentence and one trigger per branch.",
+            )
+        )
     elif length > DESCRIPTION_WARN_STRONG:
-        issues.append(issue(
-            loc,
-            "warning",
-            f"'description' is {length} chars (>{DESCRIPTION_WARN_STRONG}); it is loaded "
-            "into context on every turn.",
-            "Cut synonym triggers (keep one per branch) and identity already in the body.",
-        ))
+        issues.append(
+            issue(
+                loc,
+                "warning",
+                f"'description' is {length} chars (>{DESCRIPTION_WARN_STRONG}); it is loaded "
+                "into context on every turn.",
+                "Cut synonym triggers (keep one per branch) and identity already in the body.",
+            )
+        )
     elif length > DESCRIPTION_WARN_MILD:
-        issues.append(issue(
-            loc,
-            "warning",
-            f"'description' is {length} chars (>{DESCRIPTION_WARN_MILD}).",
-            "Consider trimming: one trigger per branch, no body identity restated.",
-        ))
+        issues.append(
+            issue(
+                loc,
+                "warning",
+                f"'description' is {length} chars (>{DESCRIPTION_WARN_MILD}).",
+                "Consider trimming: one trigger per branch, no body identity restated.",
+            )
+        )
 
     lowered = desc.lower()
     if not USE_WHEN_RE.search(lowered) and "use this" not in lowered:
-        issues.append(issue(
-            loc,
-            "warning",
-            "'description' has no 'Use when …' trigger clause.",
-            "Add trigger conditions after the capability sentence — the description is "
-            "the only text the agent reads before activating.",
-        ))
+        issues.append(
+            issue(
+                loc,
+                "warning",
+                "'description' has no 'Use when …' trigger clause.",
+                "Add trigger conditions after the capability sentence — the description is "
+                "the only text the agent reads before activating.",
+            )
+        )
     if lowered.startswith(FILLER_OPENERS):
-        issues.append(issue(
-            loc,
-            "warning",
-            f"'description' opens with filler ('{desc.split()[0]}').",
-            "Front-load the skill's leading word: start with the action verb or the "
-            "domain concept that should trigger it.",
-        ))
+        issues.append(
+            issue(
+                loc,
+                "warning",
+                f"'description' opens with filler ('{desc.split()[0]}').",
+                "Front-load the skill's leading word: start with the action verb or the "
+                "domain concept that should trigger it.",
+            )
+        )
     if re.search(r"^i\s|\si\s", desc.lower()) or " my " in lowered:
-        issues.append(issue(
-            loc,
-            "warning",
-            "'description' uses first person.",
-            "Write in third person: capability first, then triggers.",
-        ))
+        issues.append(
+            issue(
+                loc,
+                "warning",
+                "'description' uses first person.",
+                "Write in third person: capability first, then triggers.",
+            )
+        )
     return issues
 
 
@@ -273,22 +301,26 @@ def check_body_size(base: str, body: str) -> list[dict]:
     lines = len(body.splitlines())
     est_tokens = len(body) // 4
     if lines > BODY_WARN_LINES_STRONG:
-        issues.append(issue(
-            f"{base}:body",
-            "warning",
-            f"Body is {lines} lines (>{BODY_WARN_LINES_STRONG}); attention thins across the excess.",
-            "This is sprawl: disclose branch-specific content into references/ behind "
-            "conditional pointers, or split the skill by branch or sequence.",
-        ))
+        issues.append(
+            issue(
+                f"{base}:body",
+                "warning",
+                f"Body is {lines} lines (>{BODY_WARN_LINES_STRONG}); attention thins across the excess.",
+                "This is sprawl: disclose branch-specific content into references/ behind "
+                "conditional pointers, or split the skill by branch or sequence.",
+            )
+        )
     elif lines > BODY_WARN_LINES or est_tokens > BODY_WARN_TOKENS:
-        issues.append(issue(
-            f"{base}:body",
-            "warning",
-            f"Body is {lines} lines / ~{est_tokens} tokens "
-            f"(recommended <{BODY_WARN_LINES} lines and <{BODY_WARN_TOKENS} tokens).",
-            "Move content needed only on some branches to references/<file>.md with a "
-            "conditional load instruction.",
-        ))
+        issues.append(
+            issue(
+                f"{base}:body",
+                "warning",
+                f"Body is {lines} lines / ~{est_tokens} tokens "
+                f"(recommended <{BODY_WARN_LINES} lines and <{BODY_WARN_TOKENS} tokens).",
+                "Move content needed only on some branches to references/<file>.md with a "
+                "conditional load instruction.",
+            )
+        )
     return issues
 
 
@@ -301,82 +333,97 @@ def check_structure(skill_dir: Path) -> list[dict]:
             continue
         loc = f"{base}/{entry.name}"
         if entry.name == "README.md":
-            issues.append(issue(
-                loc,
-                "error",
-                "README.md found in the skill root.",
-                "SKILL.md is the skill's one entry point; the description field covers "
-                "discovery. Remove README.md.",
-            ))
+            issues.append(
+                issue(
+                    loc,
+                    "error",
+                    "README.md found in the skill root.",
+                    "SKILL.md is the skill's one entry point; the description field covers "
+                    "discovery. Remove README.md.",
+                )
+            )
         elif entry.name.startswith("."):
-            issues.append(issue(
-                loc,
-                "warning",
-                f"Hidden entry '{entry.name}' in the skill root.",
-                "Skill roots should hold only SKILL.md, scripts/, references/, assets/. "
-                "Remove it unless required at runtime.",
-            ))
+            issues.append(
+                issue(
+                    loc,
+                    "warning",
+                    f"Hidden entry '{entry.name}' in the skill root.",
+                    "Skill roots should hold only SKILL.md, scripts/, references/, assets/. "
+                    "Remove it unless required at runtime.",
+                )
+            )
         else:
-            issues.append(issue(
-                loc,
-                "warning",
-                f"Unexpected entry '{entry.name}' in the skill root.",
-                "Move it into scripts/, references/, or assets/, or remove it.",
-            ))
+            issues.append(
+                issue(
+                    loc,
+                    "warning",
+                    f"Unexpected entry '{entry.name}' in the skill root.",
+                    "Move it into scripts/, references/, or assets/, or remove it.",
+                )
+            )
 
     for sub in BUNDLE_DIRS:
         sub_dir = skill_dir / sub
         if sub_dir.is_dir() and not any(sub_dir.iterdir()):
-            issues.append(issue(
-                f"{base}/{sub}/",
-                "warning",
-                f"'{sub}/' is empty.",
-                "An empty directory misleads agents into expecting files. Delete it "
-                "until a file goes in.",
-            ))
+            issues.append(
+                issue(
+                    f"{base}/{sub}/",
+                    "warning",
+                    f"'{sub}/' is empty.",
+                    "An empty directory misleads agents into expecting files. Delete it until a file goes in.",
+                )
+            )
 
     scripts_dir = skill_dir / "scripts"
     if scripts_dir.is_dir():
         for entry in sorted(scripts_dir.iterdir()):
             loc = f"{base}/scripts/{entry.name}"
             if entry.is_dir():
-                issues.append(issue(
-                    f"{loc}/",
-                    "warning",
-                    f"Subdirectory '{entry.name}' inside scripts/.",
-                    "Keep scripts/ flat: inline shared logic into the scripts that use it.",
-                ))
+                issues.append(
+                    issue(
+                        f"{loc}/",
+                        "warning",
+                        f"Subdirectory '{entry.name}' inside scripts/.",
+                        "Keep scripts/ flat: inline shared logic into the scripts that use it.",
+                    )
+                )
                 continue
             ext = entry.suffix.lower()
             if ext == ".js":
-                issues.append(issue(
-                    loc,
-                    "warning",
-                    f"'{entry.name}' is plain JavaScript.",
-                    "Use TypeScript (.ts): Deno and Bun run it natively with type safety at no cost.",
-                ))
+                issues.append(
+                    issue(
+                        loc,
+                        "warning",
+                        f"'{entry.name}' is plain JavaScript.",
+                        "Use TypeScript (.ts): Deno and Bun run it natively with type safety at no cost.",
+                    )
+                )
             elif ext in {".sh", ".ps1"}:
-                issues.append(issue(
-                    loc,
-                    "warning",
-                    f"'{entry.name}' runs only where its shell exists; not portable across agent environments.",
-                    "Rewrite in Python (uv) or TypeScript (Deno/Bun), or document the "
-                    "requirement in the 'compatibility' field.",
-                ))
+                issues.append(
+                    issue(
+                        loc,
+                        "warning",
+                        f"'{entry.name}' runs only where its shell exists; not portable across agent environments.",
+                        "Rewrite in Python (uv) or TypeScript (Deno/Bun), or document the "
+                        "requirement in the 'compatibility' field.",
+                    )
+                )
             elif ext not in ALLOWED_SCRIPT_EXTS:
-                issues.append(issue(
-                    loc,
-                    "warning",
-                    f"Unexpected file type '{ext}' in scripts/.",
-                    "Use .py (uv) or .ts (Deno/Bun); remove or convert other files.",
-                ))
+                issues.append(
+                    issue(
+                        loc,
+                        "warning",
+                        f"Unexpected file type '{ext}' in scripts/.",
+                        "Use .py (uv) or .ts (Deno/Bun); remove or convert other files.",
+                    )
+                )
     return issues
 
 
 def check_links(skill_dir: Path) -> list[dict]:
     """Self-containment and broken-target checks over all markdown in the skill."""
     issues: list[dict] = []
-    md_files = [skill_dir / "SKILL.md"] + sorted(skill_dir.glob("references/*.md"))
+    md_files = [skill_dir / "SKILL.md", *sorted(skill_dir.glob("references/*.md"))]
     for md in md_files:
         if not md.exists():
             continue
@@ -387,22 +434,26 @@ def check_links(skill_dir: Path) -> list[dict]:
             if target.startswith(("http://", "https://", "mailto:", "#")):
                 continue
             if target.startswith(("../", "/")):
-                issues.append(issue(
-                    f"{loc}:link:{target}",
-                    "error",
-                    f"Link '{target}' escapes the skill directory.",
-                    "Skills are installed by copying the directory; outside links break. "
-                    "Bundle the material inside the skill or link a URL.",
-                ))
+                issues.append(
+                    issue(
+                        f"{loc}:link:{target}",
+                        "error",
+                        f"Link '{target}' escapes the skill directory.",
+                        "Skills are installed by copying the directory; outside links break. "
+                        "Bundle the material inside the skill or link a URL.",
+                    )
+                )
                 continue
             resolved = (md.parent / target.split("#", 1)[0]).resolve()
             if not resolved.exists():
-                issues.append(issue(
-                    f"{loc}:link:{target}",
-                    "error",
-                    f"Link target '{target}' does not exist.",
-                    "A broken pointer has zero reach. Fix the path or create the file.",
-                ))
+                issues.append(
+                    issue(
+                        f"{loc}:link:{target}",
+                        "error",
+                        f"Link target '{target}' does not exist.",
+                        "A broken pointer has zero reach. Fix the path or create the file.",
+                    )
+                )
     return issues
 
 
@@ -421,26 +472,29 @@ def check_reachability(skill_dir: Path, skill_body: str) -> list[dict]:
                 continue
             ref = f"{sub}/{entry.name}"
             if ref not in skill_body:
-                issues.append(issue(
-                    f"{base}/{ref}",
-                    "warning",
-                    f"'{ref}' is never mentioned in SKILL.md.",
-                    "Orphaned files are unreachable sediment. Link it with a relative "
-                    "markdown link at first mention, or delete it.",
-                ))
+                issues.append(
+                    issue(
+                        f"{base}/{ref}",
+                        "warning",
+                        f"'{ref}' is never mentioned in SKILL.md.",
+                        "Orphaned files are unreachable sediment. Link it with a relative "
+                        "markdown link at first mention, or delete it.",
+                    )
+                )
 
     for unit in split_prose_units(body_no_code):
         if "references/" not in unit or not MD_LINK_RE.search(unit):
             continue
         if not any(word in unit.lower() for word in CONDITION_WORDS):
             snippet = unit if len(unit) <= 100 else unit[:97] + "..."
-            issues.append(issue(
-                f"{rel(skill_dir / 'SKILL.md')}:pointer",
-                "warning",
-                f"Reference pointer without a load condition: {snippet!r}.",
-                "Pointer wording decides reach. State the condition: "
-                "'Read references/<file>.md when <condition>.'",
-            ))
+            issues.append(
+                issue(
+                    f"{rel(skill_dir / 'SKILL.md')}:pointer",
+                    "warning",
+                    f"Reference pointer without a load condition: {snippet!r}.",
+                    "Pointer wording decides reach. State the condition: 'Read references/<file>.md when <condition>.'",
+                )
+            )
     return issues
 
 
@@ -460,13 +514,14 @@ def check_script_hygiene(skill_dir: Path) -> list[dict]:
         elif entry.suffix == ".ts":
             pattern = INTERACTIVE_TS_RE
         if pattern and pattern.search(text):
-            issues.append(issue(
-                loc,
-                "warning",
-                "Script appears to call an interactive prompt builtin.",
-                "Agents run in non-interactive shells where prompts hang forever. "
-                "Accept all input via CLI flags.",
-            ))
+            issues.append(
+                issue(
+                    loc,
+                    "warning",
+                    "Script appears to call an interactive prompt builtin.",
+                    "Agents run in non-interactive shells where prompts hang forever. Accept all input via CLI flags.",
+                )
+            )
     return issues
 
 
@@ -477,13 +532,14 @@ def lint(skill_md: Path) -> list[dict]:
     try:
         fm, body = parse_frontmatter(text)
     except ValueError as exc:
-        return [issue(
-            f"{base}:frontmatter",
-            "error",
-            f"Cannot parse frontmatter: {exc}.",
-            "SKILL.md must begin with '---', contain valid YAML, and close the block "
-            "with '---' on its own line.",
-        )]
+        return [
+            issue(
+                f"{base}:frontmatter",
+                "error",
+                f"Cannot parse frontmatter: {exc}.",
+                "SKILL.md must begin with '---', contain valid YAML, and close the block with '---' on its own line.",
+            )
+        ]
 
     issues: list[dict] = []
     issues += check_frontmatter(base, skill_dir, fm)

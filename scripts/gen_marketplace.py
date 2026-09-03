@@ -35,9 +35,7 @@ def catalog_skill_paths(catalog: str) -> list[str]:
     if not cat_dir.is_dir():
         return []
     return sorted(
-        f"./skills/{catalog}/{d.name}"
-        for d in cat_dir.iterdir()
-        if d.is_dir() and (d / "SKILL.md").is_file()
+        f"./skills/{catalog}/{d.name}" for d in cat_dir.iterdir() if d.is_dir() and (d / "SKILL.md").is_file()
     )
 
 
@@ -48,8 +46,7 @@ def coverage_warnings(listed: set[str]) -> list[str]:
     for cat in sorted(p.name for p in SKILLS_DIR.iterdir() if p.is_dir()):
         if cat not in listed and catalog_skill_paths(cat):
             warnings.append(
-                f"catalog `{cat}` has skills but no plugin entry; add one with "
-                f"a name and description, then re-run."
+                f"catalog `{cat}` has skills but no plugin entry; add one with a name and description, then re-run."
             )
     return warnings
 
@@ -98,9 +95,7 @@ def main(argv: list[str]) -> int:
         print("OK: marketplace.json skills[] are in sync.")
         return 0
 
-    MARKETPLACE.write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
+    MARKETPLACE.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"Wrote {MARKETPLACE.relative_to(REPO_ROOT)}.")
     return 0
 

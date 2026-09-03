@@ -12,9 +12,7 @@ from urllib.parse import urlparse
 import tomllib
 
 PLACEHOLDER_RE = re.compile(r"__[A-Z][A-Z0-9_]*__")
-MARKER_RE = re.compile(
-    r"Disposable [a-z-]+ ?skill \(delete after the harness is built\):"
-)
+MARKER_RE = re.compile(r"Disposable [a-z-]+ ?skill \(delete after the harness is built\):")
 BACKENDS = {"local", "s3", "huggingface"}
 REQUIRED_RECIPES = {
     "setup",
@@ -104,10 +102,7 @@ def skipped(path: Path, root: Path) -> bool:
     if any(part in SKIP_PARTS for part in path.parts):
         return True
     parts = path.relative_to(root).parts
-    return any(
-        parts[i].startswith(".") and parts[i + 1] == "skills"
-        for i in range(len(parts) - 1)
-    )
+    return any(parts[i].startswith(".") and parts[i + 1] == "skills" for i in range(len(parts) - 1))
 
 
 def iter_harness_text(root: Path) -> list[Path]:
@@ -115,10 +110,7 @@ def iter_harness_text(root: Path) -> list[Path]:
     for path in root.rglob("*"):
         if not path.is_file() or skipped(path, root):
             continue
-        if (
-            path.name in {"justfile", ".gitignore", ".editorconfig", ".env.example"}
-            or path.suffix in TEXT_SUFFIXES
-        ):
+        if path.name in {"justfile", ".gitignore", ".editorconfig", ".env.example"} or path.suffix in TEXT_SUFFIXES:
             paths.append(path)
     return paths
 
@@ -176,16 +168,14 @@ def check_pyproject(root: Path, issues: list[Issue]) -> None:
             issues,
             "pyproject.project",
             path.name,
-            "Missing project metadata. Add [project] or the selected package "
-            "manager's supported project table.",
+            "Missing project metadata. Add [project] or the selected package manager's supported project table.",
         )
     if "build-system" not in data:
         add(
             issues,
             "pyproject.package",
             path.name,
-            "Missing [build-system]. Initialize a package/src layout with the "
-            "project's selected package manager.",
+            "Missing [build-system]. Initialize a package/src layout with the project's selected package manager.",
         )
     if not any((root / name).is_file() for name in LOCKFILE_NAMES):
         add(
@@ -199,11 +189,7 @@ def check_pyproject(root: Path, issues: list[Issue]) -> None:
 
 def check_settings_and_workflows(root: Path, issues: list[Issue]) -> None:
     package_dirs = (
-        [
-            path
-            for path in (root / "src").iterdir()
-            if path.is_dir() and (path / "__init__.py").is_file()
-        ]
+        [path for path in (root / "src").iterdir() if path.is_dir() and (path / "__init__.py").is_file()]
         if (root / "src").is_dir()
         else []
     )
@@ -228,9 +214,7 @@ def check_settings_and_workflows(root: Path, issues: list[Issue]) -> None:
 def source_identity_ok(source: dict[str, Any]) -> bool:
     backend = source.get("backend")
     if backend == "s3":
-        return bool(
-            source.get("version") or (source.get("etag") and source.get("checksum"))
-        )
+        return bool(source.get("version") or (source.get("etag") and source.get("checksum")))
     if backend == "huggingface":
         return bool(source.get("version"))
     return bool(source.get("version") or source.get("checksum"))
@@ -267,11 +251,7 @@ def check_storage(root: Path, config: dict[str, Any], issues: list[Issue]) -> No
     local_sources = []
     local_products = []
     package_dirs = (
-        [
-            path
-            for path in (root / "src").iterdir()
-            if path.is_dir() and (path / "__init__.py").is_file()
-        ]
+        [path for path in (root / "src").iterdir() if path.is_dir() and (path / "__init__.py").is_file()]
         if (root / "src").is_dir()
         else []
     )
@@ -282,9 +262,7 @@ def check_storage(root: Path, config: dict[str, Any], issues: list[Issue]) -> No
             if not isinstance(entry, dict):
                 add(issues, "config.entry", path, f"Each {kind} must be a TOML table.")
                 continue
-            missing = [
-                name for name in ("name", "backend", "uri") if not entry.get(name)
-            ]
+            missing = [name for name in ("name", "backend", "uri") if not entry.get(name)]
             if missing:
                 add(
                     issues,
@@ -373,11 +351,7 @@ def check_storage(root: Path, config: dict[str, Any], issues: list[Issue]) -> No
                     "Configured local source directory is missing. Create data/<source>/.",
                 )
             relative_parts = Path(str(source["uri"])).parts
-            if (
-                len(relative_parts) < 2
-                or relative_parts[0] != "data"
-                or relative_parts[1] == "raw"
-            ):
+            if len(relative_parts) < 2 or relative_parts[0] != "data" or relative_parts[1] == "raw":
                 add(
                     issues,
                     "storage.local-source-uri",
@@ -395,9 +369,7 @@ def check_storage(root: Path, config: dict[str, Any], issues: list[Issue]) -> No
         if package_dir is not None:
             for path in (package_dir / "workflows").glob("*.py"):
                 guard_text += read_text(path, issues, "storage.guard-read")
-        if not all(
-            token in guard_text for token in ("data_guard", "snapshot", "verify")
-        ):
+        if not all(token in guard_text for token in ("data_guard", "snapshot", "verify")):
             add(
                 issues,
                 "storage.data-guard-wiring",
@@ -465,9 +437,7 @@ def check_commands_and_hooks(root: Path, issues: list[Issue]) -> None:
     justfile_path = root / "justfile"
     if justfile_path.is_file():
         justfile = read_text(justfile_path, issues, "just.read")
-        recipes = set(
-            re.findall(r"^([a-zA-Z0-9_-]+)(?:\s+[^:]*)?:", justfile, re.MULTILINE)
-        )
+        recipes = set(re.findall(r"^([a-zA-Z0-9_-]+)(?:\s+[^:]*)?:", justfile, re.MULTILINE))
         for recipe in sorted(REQUIRED_RECIPES - recipes):
             add(
                 issues,
@@ -479,11 +449,7 @@ def check_commands_and_hooks(root: Path, issues: list[Issue]) -> None:
 
 def check_gitignore(root: Path, issues: list[Issue]) -> None:
     text = read_text(root / ".gitignore", issues, "gitignore.read")
-    lines = {
-        line.strip().lstrip("/")
-        for line in text.splitlines()
-        if line.strip() and not line.startswith("#")
-    }
+    lines = {line.strip().lstrip("/") for line in text.splitlines() if line.strip() and not line.startswith("#")}
     for pattern in (".env", "data/", "output/", "model/"):
         if pattern not in lines:
             add(
@@ -556,10 +522,7 @@ def render(root: Path, issues: list[Issue], output_format: str) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Validate a generated reproducible data-analysis scaffold.",
-        epilog=(
-            "Example: python3 scripts/validate_scaffold.py "
-            "--project-root /path/to/project --format json"
-        ),
+        epilog=("Example: python3 scripts/validate_scaffold.py --project-root /path/to/project --format json"),
     )
     parser.add_argument(
         "--project-root",
@@ -584,8 +547,7 @@ def main() -> int:
         issues = validate(root)
     except OSError as error:
         print(
-            f"validate_scaffold: cannot inspect {root}: {error}. "
-            "Check permissions and retry.",
+            f"validate_scaffold: cannot inspect {root}: {error}. Check permissions and retry.",
             file=sys.stderr,
         )
         return 1

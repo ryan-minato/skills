@@ -81,7 +81,7 @@ def as_list(payload, endpoint):
 def require_name(entry, context):
     name = str(entry.get("name", "")).strip()
     if not name:
-        fail(2, f"{context}: every entry needs a non-empty \"name\"")
+        fail(2, f'{context}: every entry needs a non-empty "name"')
     return name
 
 
@@ -105,8 +105,7 @@ def validate_types(raw):
         if color is not None and str(color).lower() not in COLORS:
             fail(
                 2,
-                f"{context}: color {color!r} is not one of "
-                f"{', '.join(sorted(COLORS))} (or null)",
+                f"{context}: color {color!r} is not one of {', '.join(sorted(COLORS))} (or null)",
             )
         types.append(
             {
@@ -122,7 +121,7 @@ def validate_types(raw):
 
 def validate_options(raw, context):
     if not isinstance(raw, list) or not raw:
-        fail(2, f"{context}: a select field needs a non-empty \"options\" array")
+        fail(2, f'{context}: a select field needs a non-empty "options" array')
     options = []
     for index, entry in enumerate(raw):
         item = f"{context}.options[{index}]"
@@ -133,8 +132,7 @@ def validate_options(raw, context):
         if color not in COLORS:
             fail(
                 2,
-                f"{item}: color {entry.get('color')!r} is not one of "
-                f"{', '.join(sorted(COLORS))}",
+                f"{item}: color {entry.get('color')!r} is not one of {', '.join(sorted(COLORS))}",
             )
         options.append(
             {
@@ -159,15 +157,13 @@ def validate_fields(raw):
         if data_type not in DATA_TYPES:
             fail(
                 2,
-                f"{context}: data_type {entry.get('data_type')!r} is not one "
-                f"of {', '.join(sorted(DATA_TYPES))}",
+                f"{context}: data_type {entry.get('data_type')!r} is not one of {', '.join(sorted(DATA_TYPES))}",
             )
         visibility = str(entry.get("visibility", "all")).lower()
         if visibility not in VISIBILITIES:
             fail(
                 2,
-                f"{context}: visibility {entry.get('visibility')!r} is not one "
-                f"of {', '.join(sorted(VISIBILITIES))}",
+                f"{context}: visibility {entry.get('visibility')!r} is not one of {', '.join(sorted(VISIBILITIES))}",
             )
         field = {
             "name": name,
@@ -193,24 +189,20 @@ def load_desired(path):
     if not isinstance(data, dict):
         fail(
             2,
-            f"{path} must be a JSON object with \"types\" and \"fields\" arrays",
+            f'{path} must be a JSON object with "types" and "fields" arrays',
         )
     types_raw = data.get("types", [])
     fields_raw = data.get("fields", [])
     if not isinstance(types_raw, list) or not isinstance(fields_raw, list):
-        fail(2, f"{path}: \"types\" and \"fields\" must each be an array")
+        fail(2, f'{path}: "types" and "fields" must each be an array')
     if not types_raw and not fields_raw:
-        fail(2, f"{path}: nothing to sync — both \"types\" and \"fields\" are empty")
+        fail(2, f'{path}: nothing to sync — both "types" and "fields" are empty')
     return validate_types(types_raw), validate_fields(fields_raw)
 
 
 def fetch_current(org, hostname):
-    types = as_list(
-        api_json([f"orgs/{org}/issue-types"], hostname), f"orgs/{org}/issue-types"
-    )
-    fields = as_list(
-        api_json([f"orgs/{org}/issue-fields"], hostname), f"orgs/{org}/issue-fields"
-    )
+    types = as_list(api_json([f"orgs/{org}/issue-types"], hostname), f"orgs/{org}/issue-types")
+    fields = as_list(api_json([f"orgs/{org}/issue-fields"], hostname), f"orgs/{org}/issue-fields")
     by_type = {
         str(entry["name"]).lower(): {
             "id": entry.get("id"),
@@ -309,18 +301,13 @@ def build_plan(desired_types, desired_fields, current_types, current_fields):
                 "data type. Rename the field in the file or delete it in the "
                 "organization settings by hand.",
             )
-        changed = (
-            existing["description"] != item["description"]
-            or existing["visibility"] != item["visibility"]
-        )
+        changed = existing["description"] != item["description"] or existing["visibility"] != item["visibility"]
         if "options" in item:
             changed = changed or options_differ(item["options"], existing["options"])
         if changed:
             update = dict(item, id=existing["id"])
             if "options" in item:
-                update["options"] = merge_option_ids(
-                    item["options"], existing["options"]
-                )
+                update["options"] = merge_option_ids(item["options"], existing["options"])
             plan["fields"]["update"].append(update)
         else:
             plan["fields"]["skip"].append(item["name"])
@@ -328,12 +315,10 @@ def build_plan(desired_types, desired_fields, current_types, current_fields):
     desired_type_names = {t["name"].lower() for t in desired_types}
     desired_field_names = {f["name"].lower() for f in desired_fields}
     plan["unmanaged"]["types"] = sorted(
-        entry["name"] for key, entry in current_types.items()
-        if key not in desired_type_names
+        entry["name"] for key, entry in current_types.items() if key not in desired_type_names
     )
     plan["unmanaged"]["fields"] = sorted(
-        entry["name"] for key, entry in current_fields.items()
-        if key not in desired_field_names
+        entry["name"] for key, entry in current_fields.items() if key not in desired_field_names
     )
     return plan
 
@@ -341,7 +326,7 @@ def build_plan(desired_types, desired_fields, current_types, current_fields):
 def post_json(endpoint, payload, hostname, method=None):
     argv = [endpoint, "--input", "-"]
     if method:
-        argv = ["--method", method] + argv
+        argv = ["--method", method, *argv]
     command = ["gh", "api"]
     if hostname:
         command += ["--hostname", hostname]
@@ -377,20 +362,14 @@ def apply_plan(org, plan, hostname):
     for item in plan["types"]["update"]:
         print(f"updating issue type {item['name']}", file=sys.stderr)
         payload = {k: v for k, v in item.items() if k != "id"}
-        post_json(
-            f"orgs/{org}/issue-types/{item['id']}", payload, hostname, method="PUT"
-        )
+        post_json(f"orgs/{org}/issue-types/{item['id']}", payload, hostname, method="PUT")
     for item in plan["fields"]["create"]:
         print(f"creating issue field {item['name']}", file=sys.stderr)
         post_json(f"orgs/{org}/issue-fields", item, hostname, method="POST")
     for item in plan["fields"]["update"]:
         print(f"updating issue field {item['name']}", file=sys.stderr)
-        payload = {
-            k: v for k, v in item.items() if k not in ("id", "data_type")
-        }
-        post_json(
-            f"orgs/{org}/issue-fields/{item['id']}", payload, hostname, method="PATCH"
-        )
+        payload = {k: v for k, v in item.items() if k not in ("id", "data_type")}
+        post_json(f"orgs/{org}/issue-fields/{item['id']}", payload, hostname, method="PATCH")
 
 
 def main():
@@ -410,14 +389,9 @@ def main():
     parser.add_argument(
         "--file",
         required=True,
-        help=(
-            'path to the taxonomy JSON: an object with "types" and "fields" '
-            "arrays"
-        ),
+        help=('path to the taxonomy JSON: an object with "types" and "fields" arrays'),
     )
-    parser.add_argument(
-        "--org", required=True, help="target organization login"
-    )
+    parser.add_argument("--org", required=True, help="target organization login")
     parser.add_argument(
         "--apply",
         action="store_true",

@@ -29,9 +29,7 @@ def fail(code, message):
 def run_gh(argv):
     """Run a gh command; return stdout, or exit 1 with gh's error."""
     try:
-        proc = subprocess.run(
-            ["gh"] + argv, capture_output=True, text=True, check=False
-        )
+        proc = subprocess.run(["gh", *argv], capture_output=True, text=True, check=False)
     except FileNotFoundError:
         fail(1, "gh CLI not found. Install gh and run 'gh auth login'.")
     if proc.returncode != 0:
@@ -44,8 +42,7 @@ def normalize_color(raw, context):
     if not HEX_COLOR.match(color):
         fail(
             2,
-            f"{context}: color {raw!r} is not a 6-digit hex value "
-            "(use e.g. \"d73a4a\", without '#')",
+            f"{context}: color {raw!r} is not a 6-digit hex value (use e.g. \"d73a4a\", without '#')",
         )
     return color
 
@@ -129,19 +126,12 @@ def build_plan(desired, current):
         existing = current.get(label["name"].lower())
         if existing is None:
             create.append(label)
-        elif (
-            existing["color"] != label["color"]
-            or existing["description"] != label["description"]
-        ):
+        elif existing["color"] != label["color"] or existing["description"] != label["description"]:
             update.append(label)
         else:
             skip.append(label["name"])
     desired_keys = {label["name"].lower() for label in desired}
-    prune_candidates = [
-        entry["name"]
-        for key, entry in sorted(current.items())
-        if key not in desired_keys
-    ]
+    prune_candidates = [entry["name"] for key, entry in sorted(current.items()) if key not in desired_keys]
     return create, update, skip, prune_candidates
 
 
@@ -201,14 +191,9 @@ def main():
     parser.add_argument(
         "--file",
         required=True,
-        help=(
-            "path to the labels JSON file: an array of "
-            '{"name", "color", "description"} objects'
-        ),
+        help=('path to the labels JSON file: an array of {"name", "color", "description"} objects'),
     )
-    parser.add_argument(
-        "--repo", required=True, help="target repository as OWNER/REPO"
-    )
+    parser.add_argument("--repo", required=True, help="target repository as OWNER/REPO")
     parser.add_argument(
         "--apply",
         action="store_true",
@@ -226,8 +211,7 @@ def main():
     if args.prune and not args.apply:
         fail(
             2,
-            "--prune requires --apply; the dry-run plan already reports "
-            "prune candidates",
+            "--prune requires --apply; the dry-run plan already reports prune candidates",
         )
 
     desired = load_desired(args.file)
@@ -236,9 +220,7 @@ def main():
 
     pruned = []
     if args.apply:
-        pruned = apply_plan(
-            args.repo, create, update, prune_candidates, args.prune
-        )
+        pruned = apply_plan(args.repo, create, update, prune_candidates, args.prune)
 
     plan = {
         "repo": args.repo,

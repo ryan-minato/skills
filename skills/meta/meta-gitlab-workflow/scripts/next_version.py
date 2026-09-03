@@ -63,9 +63,7 @@ def parse(tag: str):
 
 def latest_from_git() -> str | None:
     try:
-        proc = subprocess.run(
-            ["git", "tag", "--list"], capture_output=True, text=True, check=False
-        )
+        proc = subprocess.run(["git", "tag", "--list"], capture_output=True, text=True, check=False)
     except FileNotFoundError:
         print("git is not installed or not on PATH", file=sys.stderr)
         sys.exit(2)
@@ -96,9 +94,7 @@ def main() -> None:
         description="Print the next semver tag (see module docstring)",
         epilog="Example: python3 scripts/next_version.py --latest v1.2.3 --bump patch",
     )
-    parser.add_argument(
-        "--bump", required=True, choices=["major", "minor", "patch"]
-    )
+    parser.add_argument("--bump", required=True, choices=["major", "minor", "patch"])
     parser.add_argument("--latest", help="current latest tag; else read git tags")
     parser.add_argument("--prefix", help="tag prefix for the output, e.g. v")
     parser.add_argument("--pre", help="prerelease identifier, e.g. rc")

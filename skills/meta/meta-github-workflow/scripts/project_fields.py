@@ -29,9 +29,7 @@ import sys
 
 def run_gh(cli_args: list[str]) -> dict:
     try:
-        proc = subprocess.run(
-            ["gh", *cli_args], capture_output=True, text=True, check=False
-        )
+        proc = subprocess.run(["gh", *cli_args], capture_output=True, text=True, check=False)
     except FileNotFoundError:
         print("gh is not installed or not on PATH", file=sys.stderr)
         sys.exit(2)
@@ -54,19 +52,14 @@ def fail_with_candidates(kind: str, wanted: str, names: list[str]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="project_fields.py",
-        description=(
-            "Resolve Projects v2 node IDs (project, field, option, item) "
-            "for gh project item-edit"
-        ),
+        description=("Resolve Projects v2 node IDs (project, field, option, item) for gh project item-edit"),
     )
     parser.add_argument("--owner", required=True, help="user login, org, or @me")
     parser.add_argument("--number", type=int, required=True, help="project number")
     parser.add_argument("--field", help="field name, e.g. Status")
     parser.add_argument("--option", help="single-select option name; needs --field")
     parser.add_argument("--item-url", help="issue/PR URL to resolve to an item id")
-    parser.add_argument(
-        "--limit", type=int, default=500, help="items scanned for --item-url"
-    )
+    parser.add_argument("--limit", type=int, default=500, help="items scanned for --item-url")
     args = parser.parse_args()
     if args.option and not args.field:
         parser.error("--option requires --field")
@@ -83,9 +76,7 @@ def main() -> None:
     result["project_id"] = view.get("id")
 
     if args.field:
-        payload = run_gh(
-            ["project", "field-list", number, "--owner", args.owner, "--format", "json"]
-        )
+        payload = run_gh(["project", "field-list", number, "--owner", args.owner, "--format", "json"])
         fields = payload.get("fields", [])
         field = next(
             (f for f in fields if f.get("name", "").lower() == args.field.lower()),
@@ -97,17 +88,11 @@ def main() -> None:
         if args.option:
             options = field.get("options") or []
             option = next(
-                (
-                    o
-                    for o in options
-                    if o.get("name", "").lower() == args.option.lower()
-                ),
+                (o for o in options if o.get("name", "").lower() == args.option.lower()),
                 None,
             )
             if option is None:
-                fail_with_candidates(
-                    "option", args.option, [o.get("name") for o in options]
-                )
+                fail_with_candidates("option", args.option, [o.get("name") for o in options])
             result["option_id"] = option.get("id")
 
     if args.item_url:
@@ -126,17 +111,12 @@ def main() -> None:
         )
         items = payload.get("items", [])
         item = next(
-            (
-                i
-                for i in items
-                if (i.get("content") or {}).get("url") == args.item_url
-            ),
+            (i for i in items if (i.get("content") or {}).get("url") == args.item_url),
             None,
         )
         if item is None:
             print(
-                f"item with url {args.item_url} not found in the first "
-                f"{args.limit} items",
+                f"item with url {args.item_url} not found in the first {args.limit} items",
                 file=sys.stderr,
             )
             sys.exit(1)

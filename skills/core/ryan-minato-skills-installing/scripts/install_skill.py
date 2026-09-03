@@ -132,9 +132,7 @@ def run_git_clone(repo: str, ref: str, dest: Path) -> None:
             "Install git, or use the skills CLI via pnpm/npx instead."
         ) from exc
     except subprocess.CalledProcessError as exc:
-        raise RuntimeError(
-            f"git clone of {repo} (ref {ref}) failed:\n{exc.stderr.strip()}"
-        ) from exc
+        raise RuntimeError(f"git clone of {repo} (ref {ref}) failed:\n{exc.stderr.strip()}") from exc
 
 
 def discover_skills(clone: Path) -> list[dict[str, str]]:
@@ -167,8 +165,7 @@ def catalog_skill_names(clone: Path, catalog: str) -> list[str]:
     names = sorted(p.parent.name for p in catalog_dir.glob("*/SKILL.md") if p.is_file())
     if not names:
         raise RuntimeError(
-            f"catalog '{catalog}' has no skills in the library. "
-            f"Run with --list to see catalogs and their skills."
+            f"catalog '{catalog}' has no skills in the library. Run with --list to see catalogs and their skills."
         )
     return names
 
@@ -192,15 +189,10 @@ def find_skill_dir(clone: Path, name: str) -> Path:
         )
     matches = [p for p in clone.glob(f"skills/*/{name}") if (p / "SKILL.md").is_file()]
     if not matches:
-        raise RuntimeError(
-            f"skill '{name}' not found in the library. "
-            f"Run with --list to see available skills."
-        )
+        raise RuntimeError(f"skill '{name}' not found in the library. Run with --list to see available skills.")
     if len(matches) > 1:
         catalogs = ", ".join(sorted(p.parent.name for p in matches))
-        raise RuntimeError(
-            f"skill '{name}' is ambiguous (found in catalogs: {catalogs})."
-        )
+        raise RuntimeError(f"skill '{name}' is ambiguous (found in catalogs: {catalogs}).")
     return matches[0]
 
 
@@ -245,10 +237,7 @@ def cmd_list(args: argparse.Namespace) -> int:
 def cmd_install(args: argparse.Namespace) -> int:
     names: list[str] = list(dict.fromkeys(args.names + args.skill))
     if not names and not args.catalog:
-        eprint(
-            "No skill name given. Pass one or more names, --catalog NAME, "
-            "or use --list."
-        )
+        eprint("No skill name given. Pass one or more names, --catalog NAME, or use --list.")
         return 2
 
     root = dest_root(args.agent_dir, args.is_global)
@@ -271,9 +260,7 @@ def cmd_install(args: argparse.Namespace) -> int:
         # Resolve every name up front so a bad name fails before any copy.
         resolved = {name: find_skill_dir(tmp, name) for name in names}
         if args.is_global:
-            disposable = sorted(
-                name for name, src in resolved.items() if is_disposable(src)
-            )
+            disposable = sorted(name for name, src in resolved.items() if is_disposable(src))
             if disposable:
                 raise UsageError(
                     f"--global would install disposable builders "
@@ -304,9 +291,7 @@ def cmd_install(args: argparse.Namespace) -> int:
                 else:
                     shutil.rmtree(dest)
             shutil.copytree(src, dest)
-            installed.append(
-                {"name": name, "catalog": src.parent.name, "dest": str(dest)}
-            )
+            installed.append({"name": name, "catalog": src.parent.name, "dest": str(dest)})
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -385,21 +370,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=DEFAULT_REPO,
         help="source repo; only for a fork/mirror of this same library",
     )
-    p.add_argument(
-        "--ref", default=DEFAULT_REF, help=f"git ref (default: {DEFAULT_REF})"
-    )
-    p.add_argument(
-        "--force", action="store_true", help="replace an already-installed skill"
-    )
-    p.add_argument(
-        "--list", action="store_true", help="list available skills; do not install"
-    )
-    p.add_argument(
-        "--json", action="store_true", help="machine-readable output for --list"
-    )
-    p.add_argument(
-        "--self-test", action="store_true", help="check prerequisites and exit"
-    )
+    p.add_argument("--ref", default=DEFAULT_REF, help=f"git ref (default: {DEFAULT_REF})")
+    p.add_argument("--force", action="store_true", help="replace an already-installed skill")
+    p.add_argument("--list", action="store_true", help="list available skills; do not install")
+    p.add_argument("--json", action="store_true", help="machine-readable output for --list")
+    p.add_argument("--self-test", action="store_true", help="check prerequisites and exit")
     return p
 
 
