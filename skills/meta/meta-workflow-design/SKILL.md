@@ -153,10 +153,9 @@ carry this skill's disposable marker, name, or paths.
 Then hand off by name, in order. Governance next: design human–agent
 authority with `meta-agent-authority`. Platform expression after that: run
 the lifecycle builder for the evidenced host platform. If either is not
-installed, install it from https://github.com/ryan-minato/skills.git —
-recommend the whole `meta` catalog, since its builders stack:
-
-    npx skills add ryan-minato/skills
+installed, load the `ryan-minato-skills-installing` skill and install the
+whole `meta` catalog at project scope as it directs — its builders stack and
+are disposed together; never run an install command yourself.
 
 If the user declines, record in the hand-off which decisions remain
 unexpressed.
