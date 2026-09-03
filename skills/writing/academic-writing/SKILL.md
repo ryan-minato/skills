@@ -23,10 +23,9 @@ its credibility dies with a single fabricated reference.
 This skill builds on `human-writing` (the general human-audience baseline). When
 `human-writing` is installed, load it alongside this skill before drafting,
 editing, or reviewing — do not work from this skill alone. This skill leads: its rules override
-the baseline where they conflict. If `human-writing` is not installed, install it
-from https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill human-writing
+the baseline where they conflict. If `human-writing` is not installed, load the
+`ryan-minato-skills-installing` skill and install `human-writing` as it
+directs; never run an install command yourself.
 
 ## Roles
 
