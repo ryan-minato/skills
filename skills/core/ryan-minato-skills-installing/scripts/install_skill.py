@@ -8,7 +8,9 @@ symlink), so a project-scope install commits with the project.
 
 Modes:
   install (default)  Copy one or more named skills to the destination;
-                     --catalog NAME adds every skill of a catalog.
+                     --catalog NAME adds every skill of a catalog that is
+                     installed whole (meta). Disposable catalogs are refused
+                     with --global; scaffold builders are passed by name.
   --list             Discovery: print every available skill (name, catalog,
                      description) instead of installing.
   --self-test        Check prerequisites (git present, temp dir writable).
@@ -26,7 +28,7 @@ Diagnostics go to stderr.
 Exit codes:
   0  success
   1  runtime failure (git missing, skill not found/ambiguous, copy error)
-  2  invalid arguments
+  2  invalid arguments (including --catalog of a disposable catalog with --global)
 """
 
 from __future__ import annotations
@@ -47,6 +49,14 @@ DEFAULT_AGENT_DIR = ".claude"
 # A skill directory name is interpolated into a glob pattern, so restrict it to
 # a safe character set: letters, digits, dot, underscore, hyphen.
 SAFE_SKILL_NAME = re.compile(r"[A-Za-z0-9._-]+")
+# Disposable builders open their description with this marker; it is the
+# only key the library's disposal skills match on, so it is stable across
+# renames. Such builders are project-scope by contract.
+DISPOSABLE_MARKER = re.compile(r"^Disposable .*\(delete after the harness is built\):")
+
+
+class UsageError(RuntimeError):
+    """An argument combination the library's catalog contracts forbid."""
 
 
 def eprint(*args: object) -> None:
@@ -232,12 +242,33 @@ def cmd_install(args: argparse.Namespace) -> int:
     skipped: list[dict[str, str]] = []
     try:
         run_git_clone(args.repo, args.ref, tmp)
-        # A catalog expands to all of its members; the catalog contract
-        # (meta, scaffold) expects them installed together.
+        # A catalog expands to all of its members; only a catalog whose
+        # contract installs it whole (meta) belongs here.
         for catalog in args.catalog:
             names.extend(n for n in catalog_skill_names(tmp, catalog) if n not in names)
         # Resolve every name up front so a bad name fails before any copy.
         resolved = {name: find_skill_dir(tmp, name) for name in names}
+        if args.is_global and args.catalog:
+            disposable = sorted(
+                name
+                for name, src in resolved.items()
+                if DISPOSABLE_MARKER.match(
+                    " ".join(
+                        parse_frontmatter(
+                            (src / "SKILL.md").read_text(encoding="utf-8")
+                        )
+                        .get("description", "")
+                        .split()
+                    )
+                )
+            )
+            if disposable:
+                raise UsageError(
+                    f"--catalog {' '.join(args.catalog)} with --global would install "
+                    f"disposable builders ({', '.join(disposable)}) into the home agent "
+                    f"dir, where every later session loads them. Disposable catalogs are "
+                    f"project scope only: drop --global."
+                )
 
         root.mkdir(parents=True, exist_ok=True)
         for name, src in resolved.items():
@@ -320,7 +351,10 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         metavar="NAME",
-        help="install every skill of a catalog, e.g. meta (repeatable)",
+        help=(
+            "install every skill of a catalog that is installed whole, e.g. meta "
+            "(repeatable; project scope only — scaffold builders are passed by name)"
+        ),
     )
     p.add_argument(
         "-g",
@@ -365,6 +399,9 @@ def main(argv: list[str]) -> int:
         if args.list:
             return cmd_list(args)
         return cmd_install(args)
+    except UsageError as exc:
+        eprint(f"error: {exc}")
+        return 2
     except RuntimeError as exc:
         eprint(f"error: {exc}")
         return 1
