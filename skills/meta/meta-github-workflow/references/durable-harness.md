@@ -78,7 +78,7 @@ harness must never be the thing that breaks contributions.
 
 ## Disposal test
 
-Before recommending cleanup, simulate removal: search target files for this
+Before the closing step asks the user about deletion, simulate removal: search target files for this
 skill's name, path, disposable marker, and conversation-only references;
 verify every remaining link and procedure; confirm every knowledge file is
 reachable from the entrypoint and vice versa. Cleanup is a fresh, explicit

@@ -57,6 +57,12 @@ answer for what enters long-lived branches.
   specification, verification, containment, observability, rollback, and
   auditability; refuse to record a level whose price is unpaid unless the
   user explicitly accepts the recorded gap.
+- Disposable builders never enter a commit. Before the first commit of the
+  build, add every skill directory whose description opens with
+  `Disposable builder skill (delete after the harness is built):` to
+  `$(git rev-parse --git-path info/exclude)`, stage explicit paths, and read
+  `git status` before each commit; a builder tracked before the build is
+  reported, and its deletion lands with the disposal commit.
 
 ## Workflow
 
@@ -153,6 +159,14 @@ it is not installed, load the `ryan-minato-skills-installing` skill and
 install the whole `meta` catalog at project scope as it directs — its
 builders stack and are disposed together; never run an install command
 yourself.
+
+When this builder runs under `meta-harness-building`, return there for the
+closing step. When it runs alone, once the deposit is verified and before the
+work goes to review, ask the user whether to delete the disposable builders
+now — the build request is not deletion consent — and on that decision load
+`meta-disposal`, which lists, confirms, and removes them. If the user
+declines, leave the builders in place and out of every commit, and record it
+in the handoff.
 
 ## Gotchas
 

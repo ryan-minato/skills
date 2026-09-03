@@ -79,7 +79,7 @@ knows when to revisit rather than trust:
 
 ## Disposal test
 
-Before recommending cleanup, search the target project for this skill's name,
+Before the closing step asks the user about deletion, search the target project for this skill's name,
 its paths, and its disposable marker; none may appear in a deposited file. The
 same holds for every other disposable builder: an upgrade trigger reading
 "configure this with <builder>" points the next agent at a skill that was

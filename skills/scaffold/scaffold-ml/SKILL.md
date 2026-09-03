@@ -56,8 +56,8 @@ explicitly asks for migration.
    `meta-gpu-container` skill. If it is not installed, load the
    `ryan-minato-skills-installing` skill and install the whole `meta` catalog
    at project scope as it directs, never `meta-gpu-container` alone — its
-   builders stack, and its `meta-disposal` removes them all after the
-   harness is verified. Never run an install command yourself. If the user
+   builders stack, and `meta-disposal` removes both catalogs' builders in
+   the closing step. Never run an install command yourself. If the user
    declines, proceed with the reference alone.
 7. Work tracking, planning, and agent-autonomy rules are designed with the
    `meta-workflow-design` and `meta-agent-authority` skills, not improvised
@@ -68,6 +68,15 @@ explicitly asks for migration.
 8. Deposit durable project rules and when-to-read pointers into the target
    harness. Do not copy the disposable marker into any generated file.
 9. Run the selected commands and inspect the result with the user.
+10. Hand the rest of the harness — entrypoint depth, knowledge, project skills,
+    synchronization — and the closing of the build to the `meta-harness-
+    building` skill; the same `meta` catalog install from step 6 covers it when
+    it is not installed. If the user declines that handoff, close here: once
+    the deposit is verified and before the work goes to review, ask the user
+    whether to delete the disposable builders now — the build request is not
+    deletion consent — and on that decision load `meta-disposal`, which lists,
+    confirms, and removes them. If they keep the builders, leave them in place
+    and out of every commit, and record it in the handoff.
 
 ## Mode requirements
 
@@ -98,6 +107,12 @@ reproduced.
 Done when: a fresh checkout on the stated hardware can set up and run the
 documented training entrypoint, links from AGENTS.md resolve, fast checks pass,
 and immutable inputs plus output provenance are enforced.
+
+- Disposable builders never enter a commit: before the first commit, add
+  every skill directory whose description opens with
+  `Disposable builder skill (delete after the harness is built):` to
+  `$(git rev-parse --git-path info/exclude)`, stage explicit paths, and read
+  `git status` before each commit.
 
 ## Gotchas
 

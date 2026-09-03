@@ -65,6 +65,13 @@ explicit user preference always wins.
 7. Record the selected conventions where the target harness keeps durable
    implementation and quality constraints. Include the evidence for retained
    existing choices and the trigger for revisiting each new default.
+8. Close the build. When this builder runs under `meta-harness-building`,
+   return there for the closing step. When it runs alone, once the deposit is
+   verified and before the work goes to review, ask the user whether to delete
+   the disposable builders now — the build request is not deletion consent —
+   and on that decision load `meta-disposal`, which lists, confirms, and
+   removes them. If the user declines, leave the builders in place and out of
+   every commit, and record it in the handoff.
 
 Done when: every in-scope decision is either inherited from the project or
 explicitly chosen, no working choice was replaced without a request, and
@@ -96,3 +103,8 @@ constraints, and every existing working choice.
 - Marker comments without ownership or cleanup rules become permanent noise.
 - Tool names and URLs go stale; record selected categories and project
   decisions, then verify current tool details when implementing them.
+- Disposable builders never enter a commit: before the first commit, add
+  every skill directory whose description opens with
+  `Disposable builder skill (delete after the harness is built):` to
+  `$(git rev-parse --git-path info/exclude)`, stage explicit paths, and read
+  `git status` before each commit.
