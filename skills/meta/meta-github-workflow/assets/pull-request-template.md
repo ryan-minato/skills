@@ -12,13 +12,15 @@ one change, not two. -->
 
 ## Related work
 
-<!-- Closes #N — the closing keyword drives the issue lifecycle.
-Spec: <path or change name> — keep this line only under a specification
-contract. -->
+<!-- Closes #N — the closing keyword drives the issue lifecycle. -->
+{{SPEC_LINE — under a specification contract, the comment line
+"<!-- Spec: <path or change name> -->"; delete this placeholder otherwise}}
 
 ## Checklist
 
 - [ ] {{LOCAL_CHECK_COMMAND}} passes locally
 - [ ] Acceptance criteria of the linked issue, or the scenarios of the linked specification, are met
-- [ ] Specification updated or change record archived where behavior changed <!-- delete without a specification contract -->
+{{SPEC_CHECK — under a specification contract, the item
+"- [ ] Specification updated or change record archived where behavior changed";
+delete this placeholder otherwise}}
 - [ ] No secrets, credentials, or personal data in the diff, description, or commits
