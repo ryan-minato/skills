@@ -55,15 +55,17 @@ its `CONTEXT.md` `## Naming` section; the shape is advisory. What is enforced
 is the prefix the two disposable catalogs reserve for their members: every
 skill in `meta` is named `meta-*` and every skill in `scaffold` is named
 `scaffold-*`, via `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.py`.
-The prefix groups a catalog's builders and matches the marker their
-descriptions carry, which matters because installed skills are read far from
-this repository.
+The prefix groups a catalog's builders, which matters because installed skills
+are read far from this repository.
 
 The prefix is a grouping convention, not an exclusive claim on the word, and
 the check runs in one direction only: `core/meta-harness` is durable, globally
 installed, and `meta-`-prefixed. What identifies a disposable builder is the
-marker its description opens with — that is what each catalog's disposal skill
-matches on, and the only key it may use.
+marker its description opens with — the same sentence in both catalogs,
+`Disposable builder skill (delete after the harness is built):`, enforced by
+`check_disposable_markers()` in `scripts/validate_skills.py`. That marker is
+what `meta-disposal` matches on, and the only key it may use, so one disposal
+skill removes both catalogs' builders together.
 
 ## Skill Visibility (symlink mechanism)
 

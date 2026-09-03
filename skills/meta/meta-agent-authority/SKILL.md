@@ -1,7 +1,7 @@
 ---
 name: meta-agent-authority
 description: >-
-  Disposable meta-skill (delete after the harness is built): sets the project
+  Disposable builder skill (delete after the harness is built): sets the project
   policy for what agents may do on their own — whether an agent may
   mark a PR or MR ready, request review, approve, merge, or release — via the
   H0–H3 authority levels, the review-admission and integration gates,

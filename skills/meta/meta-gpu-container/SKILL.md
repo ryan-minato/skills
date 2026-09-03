@@ -1,7 +1,7 @@
 ---
 name: meta-gpu-container
 description: >-
-  Disposable meta-skill (delete after the harness is built): establishes GPU
+  Disposable builder skill (delete after the harness is built): establishes GPU
   container environments for a project — judges whether a container is
   warranted, selects and live-verifies a current CUDA or ROCm base image,
   wires GPU access into docker run, Compose, and dev containers, and deposits

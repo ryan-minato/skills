@@ -8,12 +8,13 @@ Rules for disposable builders that create durable agent harnesses.
 - Install the catalog whole: its skills stack alongside one another.
 - Every skill directory and `name` begins with `meta-`.
 - Every skill description begins exactly with:
-  `Disposable meta-skill (delete after the harness is built):`
+  `Disposable builder skill (delete after the harness is built):`
 - The marker identifies temporary builders. No asset or generated target
   artifact may carry it.
-- These builders exist only for project initialization. Their prefix and the
-  `meta-disposal` skill make removal after verification explicit, so they do
-  not consume context during normal development.
+- These builders exist only for project initialization. Their marker and the
+  `meta-disposal` skill — which removes the `scaffold` builders too, since the
+  two catalogs share the marker — make removal after verification explicit,
+  so they do not consume context during normal development.
 - Prefer complete, durable initialization guidance over minimizing this
   catalog's own instruction budget. The builders are temporary; their durable
   output belongs in the target project before disposal.

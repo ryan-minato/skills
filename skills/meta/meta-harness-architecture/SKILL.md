@@ -1,7 +1,7 @@
 ---
 name: meta-harness-architecture
 description: >-
-  Disposable meta-skill (delete after the harness is built): investigates,
+  Disposable builder skill (delete after the harness is built): investigates,
   plans, builds, audits, or systematically restructures a project's complete
   agent harness. Use together with the core meta-harness methodology when a
   concrete project needs AGENTS.md or CLAUDE.md, architecture and knowledge

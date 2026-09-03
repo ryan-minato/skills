@@ -1,7 +1,7 @@
 ---
 name: meta-workflow-design
 description: >-
-  Disposable meta-skill (delete after the harness is built): designs how a
+  Disposable builder skill (delete after the harness is built): designs how a
   project tracks, plans, and accepts work — settling with the humans
   which structures the project actually earns (work items, hierarchy,
   objectives, timeboxes, priorities, planning views) and depositing a

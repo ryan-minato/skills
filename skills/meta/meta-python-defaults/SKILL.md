@@ -1,7 +1,7 @@
 ---
 name: meta-python-defaults
 description: >-
-  Disposable meta-skill (delete after the harness is built): chooses and
+  Disposable builder skill (delete after the harness is built): chooses and
   records coherent defaults for a Python project's documentation style,
   testing approach, and development toolchain. Use during a harness build
   when a Python project lacks settled docstring, comment, test, dependency,

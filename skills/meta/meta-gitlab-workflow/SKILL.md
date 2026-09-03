@@ -1,7 +1,7 @@
 ---
 name: meta-gitlab-workflow
 description: >-
-  Disposable meta-skill (delete after the harness is built): designs and builds
+  Disposable builder skill (delete after the harness is built): designs and builds
   a complete, durable lifecycle harness for projects hosted on gitlab.com or a
   self-managed GitLab instance. Use only when initializing a GitLab-hosted
   project, establishing or replacing its platform-wide lifecycle scaffolding,

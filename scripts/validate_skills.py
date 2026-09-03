@@ -14,7 +14,8 @@ the repository and adds the repo-level checks:
      README.zh.md exists.
   5. Catalog directories match the catalog list in ARCHITECTURE.md.
   6. Catalogs that reserve a name prefix only hold skills carrying it.
-  7. The duplicated disposal script stays byte-identical across catalogs.
+  7. Every skill in a disposable catalog opens its description with the
+     shared disposable marker.
 
 Errors exit 1; warnings from check_skill.py are reported but never fail.
 Messages explain what failed, why it matters, and how to fix it.
@@ -39,17 +40,15 @@ CORE_META_HARNESS = SKILLS_DIR / "core" / "meta-harness" / "SKILL.md"
 META_ARCHITECTURE = SKILLS_DIR / "meta" / "meta-harness-architecture" / "SKILL.md"
 HARNESS_METHODOLOGY_HEADING = "## Harness Methodology"
 # Catalogs whose CONTEXT.md reserves a name prefix for their skills. The
-# prefix is what tells an installed skill's reader which catalog's disposal
-# skill and contract govern it, so drift here is not cosmetic.
+# prefix is what tells an installed skill's reader which catalog's contract
+# governs it, so drift here is not cosmetic.
 CATALOG_NAME_PREFIXES = {"meta": "meta-", "scaffold": "scaffold-"}
-# Each disposable catalog ships its own copy of the disposal script:
-# public skills may not reference files outside their own directory, so
-# the duplicate is structural, not accidental. Nothing but this check
-# keeps a fix to one copy from leaving the other behind.
-DISPOSAL_SCRIPT_COPIES = (
-    SKILLS_DIR / "meta" / "meta-disposal" / "scripts" / "dispose.py",
-    SKILLS_DIR / "scaffold" / "scaffold-disposal" / "scripts" / "dispose.py",
-)
+# Every skill in a disposable catalog opens its description with this exact
+# sentence. It is the only key the disposal skill matches on (installers
+# rename skills, so names and directories are not stable), and it is shared
+# by both catalogs so one disposal skill removes them together.
+DISPOSABLE_MARKER = "Disposable builder skill (delete after the harness is built):"
+DISPOSABLE_CATALOGS = ("meta", "scaffold")
 
 ESCAPING_LINK = re.compile(r"\]\((?:\.\./|/)[^)]*\)")
 
@@ -125,32 +124,32 @@ def check_catalog_name_prefixes() -> None:
                 f"skills/{catalog}/{skill_dir.name}: name does not start "
                 f"with `{prefix}`. The {catalog} catalog reserves that "
                 f"prefix so an installed skill announces which catalog's "
-                f"contract and disposal skill govern it (see "
+                f"contract governs it (see "
                 f"skills/{catalog}/CONTEXT.md). Fix: rename the directory "
                 f"and its `name` field to `{prefix}...`, or move the skill "
                 f"to a catalog that fits it."
             )
 
 
-def check_disposal_script_copies() -> None:
-    """Keep every catalog's copy of the disposal script byte-identical."""
-    present = [path for path in DISPOSAL_SCRIPT_COPIES if path.is_file()]
-    if len(present) < 2:
-        return
-    reference, *others = present
-    baseline = reference.read_bytes()
-    for path in others:
-        if path.read_bytes() == baseline:
-            continue
-        fail(
-            f"{path.relative_to(REPO_ROOT)} drifted from "
-            f"{reference.relative_to(REPO_ROOT)}. Public skills cannot "
-            f"reference each other, so each disposable catalog ships its own "
-            f"copy of the same disposal script; a fix applied to one copy "
-            f"leaves the other catalog disposing differently. Fix: copy the "
-            f"corrected file over the other, or record the divergence in the "
-            f"AGENTS.md Keep In Sync table and update this check."
-        )
+def check_disposable_markers() -> None:
+    """Every skill in a disposable catalog carries the shared marker."""
+    for catalog in DISPOSABLE_CATALOGS:
+        for skill_dir in sorted(catalog_skill_subdirs(SKILLS_DIR / catalog)):
+            skill_md = skill_dir / "SKILL.md"
+            fields, _body = skill_linter.parse_frontmatter(
+                skill_md.read_text(encoding="utf-8")
+            )
+            description = (fields or {}).get("description", "")
+            if description.startswith(DISPOSABLE_MARKER):
+                continue
+            fail(
+                f"{skill_md.relative_to(REPO_ROOT)}: description does not "
+                f"open with `{DISPOSABLE_MARKER}`. That sentence is how the "
+                f"disposal skill finds every temporary builder in a target "
+                f"project; a builder without it survives cleanup and keeps "
+                f"loading in normal development. Fix: start the description "
+                f"with the exact marker (see skills/{catalog}/CONTEXT.md)."
+            )
 
 
 def check_architecture_md_catalog_list() -> None:
@@ -422,7 +421,7 @@ def main() -> int:
     check_catalogs()
     check_architecture_md_catalog_list()
     check_catalog_name_prefixes()
-    check_disposal_script_copies()
+    check_disposable_markers()
     check_symlinks()
     check_marketplace_manifest()
     check_root_files()

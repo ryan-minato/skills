@@ -31,7 +31,7 @@ For each document ↔ artifacts pairing:
 - One skill per concern. A single mega-sync skill has an untriggerable
   description; per-concern skills fire exactly when their subject moves.
 - Sync skills are durable: their descriptions must never begin with the
-  marker the disposable meta-skills carry.
+  marker the disposable builders carry.
 - If a concern's document is external (an issue tracker document, a wiki
   page), the reverse section carries the extra weight: external content
   does not version with code, so every touch inspects.
