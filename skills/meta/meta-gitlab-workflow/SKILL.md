@@ -39,9 +39,9 @@ operable after this skill and the conversation are gone.
   lacks a faithful representation of a contract semantic, degrade to an
   explicit convention instead of a near-fitting object with different
   semantics. When no contract exists, offer to design one first with
-  `meta-workflow-design` (install from
-  https://github.com/ryan-minato/skills.git: `npx skills add
-  ryan-minato/skills`); if the user declines, decide here as before, and
+  `meta-workflow-design` (if it is not installed, load the
+  `ryan-minato-skills-installing` skill and install the whole `meta` catalog
+  as it directs); if the user declines, decide here as before, and
   treat agent authority as the conservative default: agents stop at draft
   merge requests and a human admits changes to review.
 - Do not act from an unapproved design. Local files, remote settings, and

@@ -149,11 +149,10 @@ this skill's disposable marker nor its name or paths.
 
 Then hand off by name: the platform lifecycle builder for the evidenced host
 enforces what the platform can enforce and maps the rest to convention. If
-it is not installed, install it from
-https://github.com/ryan-minato/skills.git — recommend the whole `meta`
-catalog, since its builders stack:
-
-    npx skills add ryan-minato/skills
+it is not installed, load the `ryan-minato-skills-installing` skill and
+install the whole `meta` catalog at project scope as it directs — its
+builders stack and are disposed together; never run an install command
+yourself.
 
 ## Gotchas
 
