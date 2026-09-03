@@ -2,17 +2,18 @@
 name: meta-harness-architecture
 description: >-
   Disposable builder skill (delete after the harness is built): the
-  architecture practice manual for agent harness layers — entrypoints and
-  architecture documents, knowledge files and external backends, project
+  architecture practice manual for agent harness layers — entrypoints,
+  knowledge files and external backends, project
   skills (warrant, design, retrofit), sync and entropy mechanisms, periodic
   reclamation, multi-agent topology, advanced autonomy, and public-convention
-  files — with the design axes and starting-shape assets for each. Use when
-  a harness build selects an artifact and needs the practice for that layer,
-  when auditing what an existing harness gets wrong, or when asked how a
-  specific harness layer should be designed. Not the build workflow itself:
-  investigation, clarification, planning, approval, build order,
-  verification, and cleanup belong to the entry builder
-  meta-harness-building.
+  files — with design axes and starting-shape assets. Use when a harness
+  build reaches one of those layers and needs its practice; when asked how
+  AGENTS.md, a knowledge file, a project skill, or a keep-in-sync rule
+  should be structured, what belongs in the entrypoint versus a reference,
+  or where a rule should live so agents find it; or when auditing what an
+  existing harness gets wrong. Not the build workflow itself —
+  investigation, clarification, planning, approval, verification, and
+  cleanup belong to the entry builder meta-harness-building.
 license: Apache-2.0
 ---
 
