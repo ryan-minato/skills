@@ -85,11 +85,6 @@
     "description": "Work affecting the scaffold skill catalog"
   },
   {
-    "name": "catalog/util",
-    "color": "006b75",
-    "description": "Work affecting the util skill catalog"
-  },
-  {
     "name": "catalog/writing",
     "color": "0e8a16",
     "description": "Work affecting the writing skill catalog"
