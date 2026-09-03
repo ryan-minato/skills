@@ -1,5 +1,5 @@
 ---
-name: clarify-thinking
+name: plan-clarification
 description: >
   Interrogates a plan, an idea, or a decision in rounds until the user and the
   agent hold one understanding of it, with nothing left silently assumed. Use
@@ -19,7 +19,7 @@ metadata:
     https://github.com/mattpocock/skills/blob/main/skills/productivity/grilling/SKILL.md
 ---
 
-# Clarify Thinking
+# Plan Clarification
 
 Interrogate the user relentlessly until the two of you hold one understanding
 of the plan, idea, or decision on the table. Build nothing and decide nothing

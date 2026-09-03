@@ -38,9 +38,11 @@ to the disposable `meta` catalog, not here.
 
 How to approach a cross-stack engineering problem → the methodology
 skills · aligning on what something should achieve and recording it as a
-goal document → `goal-alignment`; clarifying ambiguous requirements while
-already coding → `programming-guidelines` in `core`; implementation
-planning → neither (out of catalog scope) · building or systematically
+goal document → `goal-alignment`; clarifying, stress-testing, or pinning
+down a plan, idea, or decision already on the table → `plan-clarification`
+in `core`; clarifying ambiguous requirements while already coding →
+`programming-guidelines` in `core`; implementation planning → none of them
+(out of catalog scope) · building or systematically
 repairing a GitHub or GitLab project's complete lifecycle harness —
 including its conventions, community files, and day-to-day platform
 workflows — → the `meta` catalog's `meta-github-workflow` /
