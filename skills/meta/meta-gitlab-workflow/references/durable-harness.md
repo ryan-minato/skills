@@ -68,7 +68,7 @@ and unjustified harness thickness.
 
 ## Disposal test
 
-Before recommending cleanup, simulate removal by searching target files for
+Before the closing step asks the user about deletion, simulate removal by searching target files for
 this skill's name, path, disposable marker, and conversation-only references.
 Verify every remaining link and procedure. Cleanup is a fresh, explicit user
 action after the exact disposable set is shown; building the harness is not

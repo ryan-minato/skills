@@ -109,3 +109,17 @@ image or its tag, enumerate current tags from the registry's live listing
 (the repository's Docker Hub tags page, the NGC catalog) or reinstall this
 skill, never assuming a tag — recorded in AGENTS.md or the project's task
 runner. Do not copy this skill's disposable marker into any generated file.
+
+Disposable builders never enter a commit: before the first commit, add every
+skill directory whose description opens with
+`Disposable builder skill (delete after the harness is built):` to
+`$(git rev-parse --git-path info/exclude)`, stage explicit paths, and read
+`git status` before each commit.
+
+When this builder runs under `meta-harness-building`, return there for the
+closing step. When it runs alone, once the deposit is verified and before the
+work goes to review, ask the user whether to delete the disposable builders
+now — the build request is not deletion consent — and on that decision load
+`meta-disposal`, which lists, confirms, and removes them. If the user
+declines, leave the builders in place and out of every commit, and record it
+in the handoff.

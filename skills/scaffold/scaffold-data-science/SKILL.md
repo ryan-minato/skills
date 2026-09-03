@@ -110,6 +110,15 @@ a migration mandate.
     `python3 scripts/validate_scaffold.py --project-root <target>`. Fix every
     issue, run the target's `just check`, inspect the generated harness with
     the user, and repeat until clean.
+12. Hand the rest of the harness — entrypoint depth, knowledge, project skills,
+    synchronization — and the closing of the build to the `meta-harness-
+    building` skill; the same `meta` catalog install from step 10 covers it
+    when it is not installed. If the user declines that handoff, close here:
+    once the deposit is verified and before the work goes to review, ask the
+    user whether to delete the disposable builders now — the build request is
+    not deletion consent — and on that decision load `meta-disposal`, which
+    lists, confirms, and removes them. If they keep the builders, leave them in
+    place and out of every commit, and record it in the handoff.
 
 Done when: all selected storage, compute, and model branches are represented
 without unused branch material; local source data cannot be overwritten by
@@ -133,6 +142,12 @@ are resolved; fast checks pass; and the user approves the scaffold.
   training loaders, and checkpoint management belong in another project.
 - DVC, MLflow, LakeFS, containers, CI, and external orchestrators are
   opt-in, never scaffold defaults.
+
+- Disposable builders never enter a commit: before the first commit, add
+  every skill directory whose description opens with
+  `Disposable builder skill (delete after the harness is built):` to
+  `$(git rev-parse --git-path info/exclude)`, stage explicit paths, and read
+  `git status` before each commit.
 
 ## Gotchas
 

@@ -42,6 +42,12 @@ the target project so it outlives this builder and this conversation.
   templates, CI, releases, and label taxonomy belong to `meta-github-workflow`
   or `meta-gitlab-workflow`; this skill supplies the branch contract those
   builders assume.
+- Disposable builders never enter a commit. Before the first commit of the
+  build, add every skill directory whose description opens with
+  `Disposable builder skill (delete after the harness is built):` to
+  `$(git rev-parse --git-path info/exclude)`, stage explicit paths, and read
+  `git status` before each commit; a builder tracked before the build is
+  reported, and its deletion lands with the disposal commit.
 
 ## The three model families
 
@@ -149,8 +155,13 @@ disposable marker or depends on this skill's paths. Simulate removal: with this
 builder deleted, the next agent must still be able to name the model, the branch
 and tag conventions, and the merge method from target-project files alone.
 
-Then report the exact disposable set and require fresh user confirmation before
-any cleanup. Building the harness is not deletion consent.
+When this builder runs under `meta-harness-building`, return there for the
+closing step. When it runs alone, once the deposit is verified and before the
+work goes to review, ask the user whether to delete the disposable builders
+now — the build request is not deletion consent — and on that decision load
+`meta-disposal`, which lists, confirms, and removes them. If the user
+declines, leave the builders in place and out of every commit, and record it
+in the handoff.
 
 ## Gotchas
 

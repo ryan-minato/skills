@@ -24,6 +24,13 @@ Rules for disposable builders that establish a project of a specific topic.
 - Preserve working project choices; scaffolding is not permission to migrate.
 - Builders investigate before editing, and present the concrete project shape
   they intend to create before creating it.
+- A topic builder loads before the `meta` entry workflow on a project of its
+  topic — its description claims the project kind — and then names
+  `meta-harness-building` for the rest of the harness and the closing of the
+  build, the same way it names other `meta` builders.
+- Disposable builders are never committed to the target repository. Deletion
+  happens after verification and before the work goes to review, only on the
+  user's explicit decision, and only through `meta-disposal`.
 - Durable rules must land in the target repository, registered tools, or other
   reachable sources before disposal.
 - Do not ship documentation indexes, URL registries, docs-navigation tables, or

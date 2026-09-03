@@ -53,6 +53,12 @@ platform in mind and survive this builder and this conversation.
   conversation; write into the target project only after the user approves
   the complete design summary. Preserve working conventions — redesign is
   not permission to migrate a system that already serves the team.
+- Disposable builders never enter a commit. Before the first commit of the
+  build, add every skill directory whose description opens with
+  `Disposable builder skill (delete after the harness is built):` to
+  `$(git rev-parse --git-path info/exclude)`, stage explicit paths, and read
+  `git status` before each commit; a builder tracked before the build is
+  reported, and its deletion lands with the disposal commit.
 
 ## Workflow
 
@@ -159,6 +165,14 @@ are disposed together; never run an install command yourself.
 
 If the user declines, record in the hand-off which decisions remain
 unexpressed.
+
+When this builder runs under `meta-harness-building`, return there for the
+closing step. When it runs alone, once the deposit is verified and before the
+work goes to review, ask the user whether to delete the disposable builders
+now — the build request is not deletion consent — and on that decision load
+`meta-disposal`, which lists, confirms, and removes them. If the user
+declines, leave the builders in place and out of every commit, and record it
+in the handoff.
 
 ## Gotchas
 

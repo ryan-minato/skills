@@ -98,12 +98,27 @@ project.
    notebook doctrine digest, validation loop — into the target `AGENTS.md`.
    Never copy this skill's disposable marker into any generated file.
 10. Run the target repository's checks and inspect the result with the user.
+11. Hand the rest of the harness — entrypoint depth, knowledge, project skills,
+    synchronization — and the closing of the build to the `meta-harness-
+    building` skill; the same `meta` catalog install from step 8 covers it when
+    it is not installed. If the user declines that handoff, close here: once
+    the deposit is verified and before the work goes to review, ask the user
+    whether to delete the disposable builders now — the build request is not
+    deletion consent — and on that decision load `meta-disposal`, which lists,
+    confirms, and removes them. If they keep the builders, leave them in place
+    and out of every commit, and record it in the handoff.
 
 Done when: a fresh checkout opens in the devcontainer, colab-mcp is
 registered and reachable, every root notebook matches its remote Colab
 counterpart, the first notebook follows the doctrine and runs clean both in
 the local container and on real Colab, and the durable rules are recorded in
 the target AGENTS.md.
+
+- Disposable builders never enter a commit: before the first commit, add
+  every skill directory whose description opens with
+  `Disposable builder skill (delete after the harness is built):` to
+  `$(git rev-parse --git-path info/exclude)`, stage explicit paths, and read
+  `git status` before each commit.
 
 ## Gotchas
 
