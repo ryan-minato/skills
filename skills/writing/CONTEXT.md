@@ -26,10 +26,23 @@ Rules, notes, and references that apply only to skills in this catalog.
 - Restraint first: when input text is already natural and idiomatic, the
   skill must say what is good and change nothing, rather than editing to
   justify its own invocation.
-- Genre skills pair with `human-writing` (in the `core` catalog) via the
-  standard install instruction and state that the specialized skill leads
-  when both are loaded: its requirements override the general baseline
-  where they conflict.
+- Genre skills build on `human-writing` (in the `core` catalog): they state
+  that both load together, that the specialized skill leads when they
+  conflict, and hand off a missing `human-writing` through
+  `ryan-minato-skills-installing`.
+
+## Dependencies
+
+- Default range: `core` only (`human-writing`). No grant between writing
+  skills — a medium skill names "a genre writing skill" by role, never a
+  specific one — and no dependency on or recommendation of skills from
+  other repositories; no exemptions.
+
+## Naming
+
+Suffix by kind: genre skills end in `-writing` (`academic-writing`,
+`blog-writing`), source-medium skills in `-authoring` (`latex-authoring`,
+`markdown-authoring`). `copywriting` is one word and stands as is.
 
 ## References
 

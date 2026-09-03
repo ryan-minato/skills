@@ -36,12 +36,18 @@ Catalogs section of `ARCHITECTURE.md`.
   written in English. The root `README.md` and every catalog `README.md`
   have a content-identical Chinese translation in `README.zh.md` beside them.
 - **Skill self-containment**: public skills must not reference anything
-  outside their own directory — no links to repo files, no dependencies on
-  other skills, and no `README.md` inside a skill root. To build on another
-  skill in this repo, instruct installing it:
-  `npx skills add ryan-minato/skills` (repo:
-  `https://github.com/ryan-minato/skills.git`). Full standards:
-  `.agents/knowledge/skill-quality.md`.
+  outside their own directory — no links to repo files and no `README.md`
+  inside a skill root. Naming another skill is a dependency: any public
+  skill may depend on `core` skills; dependencies inside a catalog or on
+  another catalog need a grant in that catalog's `CONTEXT.md` (default:
+  none); skills from other repositories are never depended on or
+  recommended. Every handoff routes through the
+  `ryan-minato-skills-installing` skill, never an install command. Full
+  standards: `.agents/knowledge/skill-quality.md`.
+- **Skill naming**: a recommended `[<prefix>-]<body>[-<suffix>]` shape in
+  `.agents/knowledge/skill-quality.md`, refined per catalog in its
+  `CONTEXT.md`. Advisory: only reserved catalog prefixes are enforced, and a
+  name that departs from the shape is not a defect.
 - **Checks**: always run checks through justfile recipes (`just check`),
   never ad-hoc equivalents, so results are consistent everywhere.
 - **Commits**: Conventional Commits in English; scope is the modified skill
@@ -91,6 +97,9 @@ Catalogs section of `ARCHITECTURE.md`.
 | When this changes | Update |
 |---|---|
 | Public skill added/removed | Symlink in `.agents/skills/`, catalog `README.md` + `README.zh.md`, and `.claude-plugin/marketplace.json` (`just gen-marketplace`) |
+| Public skill moved or renamed | First `git grep -n <old-name>` across `skills/`, `.agents/`, `.github/`, and the root documents, and fix every reference (other skills' handoffs, catalog `CONTEXT.md` routing, project skills) in the same change; then the added/removed row above |
+| A catalog `CONTEXT.md` `## Dependencies` grant | The current-grants summary in `.agents/knowledge/skill-quality.md` and the catalog's bullet in `ARCHITECTURE.md` |
+| The handoff template in `.agents/knowledge/skill-quality.md` | The description triggers of `skills/core/ryan-minato-skills-installing` — the template's wording is what makes that skill fire when another skill hands off to it |
 | Catalog added/removed | Catalog scaffold, the Catalogs section in `ARCHITECTURE.md`, `.claude-plugin/marketplace.json` (a plugin entry once the catalog has a skill), the root `README.md` + `README.zh.md` catalog tables and plugin-install lines, `.github/labels.json`, both Issue Forms' `Catalog` options, and the `catalogLabels` map in `.github/workflows/issue-metadata.yml` |
 | Any `README.md` | The matching `README.zh.md` (and vice versa) |
 | `.github/labels.json` | After explicit authorization, dry-run `python3 scripts/sync_labels.py --file .github/labels.json --repo ryan-minato/skills`, then re-run with `--apply`; never `--prune` |

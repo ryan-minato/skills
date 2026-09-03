@@ -36,7 +36,10 @@ worth building and where it belongs:
 3. Decide where the skill lives:
    - **Public skill** (distributable): `skills/<catalog>/<skill-name>/`.
      Pick the catalog from the list in `ARCHITECTURE.md` (Catalogs section)
-     and read that catalog's `CONTEXT.md` for catalog-specific requirements.
+     and read that catalog's `CONTEXT.md` for catalog-specific requirements,
+     including which dependencies it grants (`## Dependencies`) and how it
+     names skills (`## Naming`). Name the skill by the recommended shape in
+     `.agents/knowledge/skill-quality.md` unless the catalog says otherwise.
    - **Project-only workflow skill** (serves this repo itself):
      `.agents/skills/<skill-name>/` as a real directory.
 4. Apply the subagent gate below. If it passes, read
@@ -64,7 +67,10 @@ capability in the handoff.
    the directory name) and `description` frontmatter. Add `scripts/`,
    `references/`, or `assets/` only when a file is going into them. No
    README.md in the skill root; content in English; nothing may reference
-   paths outside the skill directory. While drafting, lint the skill in
+   paths outside the skill directory, and every skill it names must be in
+   the allowed dependency range and handed off through
+   `ryan-minato-skills-installing` without an install command (see
+   `.agents/knowledge/skill-quality.md`). While drafting, lint the skill in
    isolation:
 
    ```bash
@@ -93,12 +99,18 @@ capability in the handoff.
 2. Repo path references are allowed here, but all other quality standards
    still apply.
 
-## Removing or moving a skill
+## Removing, moving, or renaming a skill
 
-Remove/update the symlink in `.agents/skills/`, the catalog README.md +
-README.zh.md entries, and run `just gen-marketplace` to resync
+First trace every reference: `git grep -n <old-name>` across `skills/`,
+`.agents/`, `.github/`, and the root documents finds other skills' handoffs,
+catalog `CONTEXT.md` routing, and project skills that name it. Fix all of
+them in the same change so no handoff points at a name that no longer
+exists. Then remove/update the symlink in `.agents/skills/`, the catalog
+README.md + README.zh.md entries, and run `just gen-marketplace` to resync
 `.claude-plugin/marketplace.json` (remove a plugin entry by hand only if its
-catalog became empty). The validator catches anything missed.
+catalog became empty; a catalog left empty follows the catalog-removal rows
+of the AGENTS.md Keep In Sync table). The validator catches the mechanical
+part; it cannot see a stale name inside prose.
 
 ## Finish
 

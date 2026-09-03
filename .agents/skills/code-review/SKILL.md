@@ -56,7 +56,9 @@ git path; every rule below applies to any reviewer, human or machine.
    default (ready/review/merge granted on green checks, a weakened
    no-self-escalation rule); platform vocabulary inside a platform-neutral
    contract layer; a contradiction between pieces that load together; a
-   path reference escaping a public skill's directory.
+   path reference escaping a public skill's directory; a hard dependency
+   outside the catalog's granted range, or a recommendation of another
+   repository's skill.
 3. **Recommended**: a latent ambiguity with a plausible failure path; a
    harness desync (see the quality gradient).
 4. **Note**: grammar, terminology, phrasing. Never marked blocking, and
@@ -124,7 +126,9 @@ their input is repository content, not adversarial traffic.
 `just check` already enforces frontmatter limits, name/directory match,
 symlinks, marketplace sync, path self-containment, catalog files, and
 byte-identical script copies. Run it (or trust its CI result) and spend
-review attention only on what it cannot see.
+review attention only on what it cannot see. A name that departs from the
+recommended `[<prefix>-]<body>[-<suffix>]` shape is not a defect either: the
+shape is advisory and the chosen name stands.
 
 ## Repository-specific checks
 
@@ -140,9 +144,13 @@ review attention only on what it cannot see.
 - **Contract flow is one-way.** Contract builders stay platform-neutral;
   platform builders map settled contract decisions and never re-decide or
   re-ask them.
-- **Cross-skill references by name plus an install command are the
-  required pattern**, not a defect. A path reference across skill roots is
-  the defect.
+- **Cross-skill references by name that hand off through
+  `ryan-minato-skills-installing` are the required pattern**, not a defect.
+  The defects are a hardcoded install command in a public skill; a
+  dependency the skill cannot work without on anything outside its allowed
+  range (`core` always; other catalogs only by the catalog `CONTEXT.md`
+  grant); a recommendation of a skill from another repository; and a path
+  reference across skill roots.
 
 ## Before suggesting an edit
 
