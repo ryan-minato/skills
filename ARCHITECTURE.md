@@ -40,10 +40,6 @@ Public skills are grouped into catalogs under `skills/`:
   topic (ML, data science, Colab notebooks). They are alternatives to one another: install the
   one matching the project, alongside whichever `meta` builders apply. Removed
   after verification, normally together with `meta`.
-- `util` — process skills that act on the collaboration itself: clarifying,
-  questioning, deciding, and organizing ideas. They are independent of domain
-  and tech stack, produce a shared understanding rather than files, and keep
-  their working material out of the user's workspace.
 - `writing` — human-audience writing skills: genre skills (academic,
   blog/opinion, promotional copy) and medium skills (LaTeX, Typst,
   Markdown source); the general baseline `human-writing` lives in `core`.
