@@ -64,12 +64,9 @@ project.
    a registry region (`us`, `europe`, `asia` serve identical images) but let
    the user decide it. Copy and rework the matching devcontainer asset. Make
    generic devcontainer decisions with the `devcontainer-setup` skill; if it
-   is not installed, recommend installing it from
-   https://github.com/ryan-minato/skills.git:
-
-       npx skills add ryan-minato/skills --skill devcontainer-setup
-
-   If the user declines, proceed with the reference alone.
+   is not installed, load the `ryan-minato-skills-installing` skill and
+   install `devcontainer-setup` as it directs — never run an install command
+   yourself. If the user declines, proceed with the reference alone.
 5. Wire the real-Colab connection: read
    [references/colab-connection.md](references/colab-connection.md). Register
    colab-mcp in the client's project-scoped MCP configuration, then ask the
@@ -91,12 +88,11 @@ project.
 8. Work tracking, planning, and agent-autonomy rules are designed with the
    `meta-workflow-design` and `meta-agent-authority` skills, not improvised
    here — do not invent an issue, review, or autonomy flow in the scaffold.
-   If they are not installed, recommend installing the whole `meta` catalog
-   from https://github.com/ryan-minato/skills.git (its builders stack):
-
-       npx skills add ryan-minato/skills
-
-   If the user declines, leave management design out and record the gap in
+   If they are not installed, load the `ryan-minato-skills-installing` skill
+   and install the whole `meta` catalog at project scope as it directs (its
+   builders stack and are disposed together); never run an install command
+   yourself. If the user declines, leave management design out and record
+   the gap in
    the handoff.
 9. Deposit the durable rules — mirror consistency, dependency baseline,
    notebook doctrine digest, validation loop — into the target `AGENTS.md`.

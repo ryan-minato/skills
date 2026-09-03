@@ -53,15 +53,12 @@ explicitly asks for migration.
    constraints first, then make the generic GPU container decisions —
    whether a container is warranted, CUDA/ROCm base-image selection with
    live tag discovery, and GPU access wiring — with the
-   `meta-gpu-container` skill. If it is not installed, recommend installing
-   the whole `meta` catalog from https://github.com/ryan-minato/skills.git,
-   never `meta-gpu-container` alone — its builders stack, and its
-   `meta-disposal` removes them all after the harness is verified:
-
-       npx skills add ryan-minato/skills
-
-   and select every `meta-*` skill. If the user declines, proceed with the
-   reference alone.
+   `meta-gpu-container` skill. If it is not installed, load the
+   `ryan-minato-skills-installing` skill and install the whole `meta` catalog
+   at project scope as it directs, never `meta-gpu-container` alone — its
+   builders stack, and its `meta-disposal` removes them all after the
+   harness is verified. Never run an install command yourself. If the user
+   declines, proceed with the reference alone.
 7. Work tracking, planning, and agent-autonomy rules are designed with the
    `meta-workflow-design` and `meta-agent-authority` skills, not improvised
    here — do not invent an issue, review, or autonomy flow in the scaffold.

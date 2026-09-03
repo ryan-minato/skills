@@ -99,12 +99,11 @@ a migration mandate.
     inventing workflow automation. Work tracking, planning, and
     agent-autonomy rules are designed with the `meta-workflow-design` and
     `meta-agent-authority` skills, not improvised here; if they are not
-    installed, recommend installing the whole `meta` catalog from
-    https://github.com/ryan-minato/skills.git (its builders stack):
-
-        npx skills add ryan-minato/skills
-
-    If the user declines, leave management design out and record the gap in
+    installed, load the `ryan-minato-skills-installing` skill and install
+    the whole `meta` catalog at project scope as it directs (its builders
+    stack and are disposed together); never run an install command
+    yourself. If the user declines, leave management design out and record
+    the gap in
     the handoff.
 11. Run
     [validate_scaffold.py](scripts/validate_scaffold.py) with
