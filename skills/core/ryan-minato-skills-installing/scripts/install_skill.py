@@ -7,7 +7,8 @@ folder(s) into the scope-appropriate location as real files (never a
 symlink), so a project-scope install commits with the project.
 
 Modes:
-  install (default)  Copy one or more named skills to the destination.
+  install (default)  Copy one or more named skills to the destination;
+                     --catalog NAME adds every skill of a catalog.
   --list             Discovery: print every available skill (name, catalog,
                      description) instead of installing.
   --self-test        Check prerequisites (git present, temp dir writable).
@@ -137,6 +138,23 @@ def discover_skills(clone: Path) -> list[dict[str, str]]:
     return found
 
 
+def catalog_skill_names(clone: Path, catalog: str) -> list[str]:
+    """Return every skill name under skills/<catalog>/; error if none."""
+    if not SAFE_SKILL_NAME.fullmatch(catalog) or catalog in (".", ".."):
+        raise RuntimeError(
+            f"invalid catalog name '{catalog}': use a bare catalog directory "
+            f"name (letters, digits, '.', '_', '-'). Run with --list to see catalogs."
+        )
+    catalog_dir = clone / "skills" / catalog
+    names = sorted(p.parent.name for p in catalog_dir.glob("*/SKILL.md") if p.is_file())
+    if not names:
+        raise RuntimeError(
+            f"catalog '{catalog}' has no skills in the library. "
+            f"Run with --list to see catalogs and their skills."
+        )
+    return names
+
+
 def find_skill_dir(clone: Path, name: str) -> Path:
     """Locate skills/<catalog>/<name>/; error if missing or ambiguous."""
     # Restrict to a bare, safe directory name. This rejects path separators,
@@ -201,8 +219,11 @@ def cmd_list(args: argparse.Namespace) -> int:
 
 def cmd_install(args: argparse.Namespace) -> int:
     names: list[str] = list(dict.fromkeys(args.names + args.skill))
-    if not names:
-        eprint("No skill name given. Pass one or more names, or use --list.")
+    if not names and not args.catalog:
+        eprint(
+            "No skill name given. Pass one or more names, --catalog NAME, "
+            "or use --list."
+        )
         return 2
 
     root = dest_root(args.agent_dir, args.is_global)
@@ -211,6 +232,10 @@ def cmd_install(args: argparse.Namespace) -> int:
     skipped: list[dict[str, str]] = []
     try:
         run_git_clone(args.repo, args.ref, tmp)
+        # A catalog expands to all of its members; the catalog contract
+        # (meta, scaffold) expects them installed together.
+        for catalog in args.catalog:
+            names.extend(n for n in catalog_skill_names(tmp, catalog) if n not in names)
         # Resolve every name up front so a bad name fails before any copy.
         resolved = {name: find_skill_dir(tmp, name) for name in names}
 
@@ -288,6 +313,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=[],
         metavar="NAME",
         help="additional skill name to install (repeatable)",
+    )
+    p.add_argument(
+        "-c",
+        "--catalog",
+        action="append",
+        default=[],
+        metavar="NAME",
+        help="install every skill of a catalog, e.g. meta (repeatable)",
     )
     p.add_argument(
         "-g",
