@@ -59,9 +59,8 @@ Review `git diff --cached` (added lines) for:
 
 On any finding, stop and show it to the user; commit only what they explicitly
 clear. This skill pairs with `sensitivity-check` for a deeper scan. If it is not
-installed, install it from https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill sensitivity-check
+installed, load the `ryan-minato-skills-installing` skill and install
+`sensitivity-check` as it directs; never run an install command yourself.
 
 Then check the committer identity: `git config user.email`. If the project's
 documentation states an email rule, apply it. Otherwise, when the address is a
@@ -90,12 +89,11 @@ rerun. Avoid `--no-verify` unless the user asks for it. If a hook rewrites files
 ## Gate 4 — Message
 
 Format comes from the resolved conventions. When the project uses Conventional
-Commits or gitmoji, this skill pairs with `conventional-commits` / `gitmoji` for
-drafting rules. If not installed, install from
-https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill conventional-commits
-    npx skills add ryan-minato/skills --skill gitmoji
+Commits, this skill pairs with `conventional-commits` for drafting rules; if it
+is not installed, load the `ryan-minato-skills-installing` skill and install
+it as that skill directs. When the project uses gitmoji, offer the `gitmoji`
+skill the same way; if the user declines, draft from the project's own
+documented emoji list and history. Never run an install command yourself.
 
 In every format, the same structural rules apply:
 

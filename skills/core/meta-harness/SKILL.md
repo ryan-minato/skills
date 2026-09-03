@@ -8,8 +8,8 @@ description: >
   approval boundaries, tests, linting, CI, observability, progressive-loading
   structure, synchronization, autonomy, or entropy management; when building a
   complete agent setup or project scaffold; or when agents keep missing conventions
-  and the harness may have drifted. For concrete full-project work, also use
-  meta-harness-architecture when it is installed. Not for ordinary application
+  and the harness may have drifted. For a concrete full-project build, offers
+  the disposable meta catalog's harness builders. Not for ordinary application
   test or CI fixes, or public skill authoring, unless the surrounding project
   harness is itself being changed.
 license: Apache-2.0
@@ -18,9 +18,14 @@ license: Apache-2.0
 # Meta-Harness
 
 Use this methodology for every harness-related action. When the task requires a
-complete project investigation, plan, build, or systematic reconstruction, also
-load `meta-harness-architecture` if available; this skill supplies the invariant
-method, while that skill supplies the detailed procedure and artifacts.
+complete project investigation, plan, build, or systematic reconstruction, this
+skill supplies the invariant method; the detailed procedure and artifacts belong
+to the harness-architecture builder in the disposable `meta` catalog. Offer to
+install that catalog as a one-off, project-scope component: load the
+`ryan-minato-skills-installing` skill and install the whole `meta` catalog at
+project scope as it directs — its builders stack and are removed together once
+the harness is verified; never run an install command yourself. If the user
+declines, work from this methodology alone.
 
 ## Harness Methodology
 
