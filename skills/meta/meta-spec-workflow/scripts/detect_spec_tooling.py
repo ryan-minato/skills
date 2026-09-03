@@ -5,7 +5,9 @@ Reports which spec tool layouts exist (Spec-Kit, OpenSpec, Kiro, plain
 committed spec directories), how many specs and change records each holds,
 the tool-owned files, every agent-entrypoint line that points at a spec
 artifact, and every markdown or template file that looks like it restates
-requirements or acceptance criteria outside the tool's own directories.
+requirements or acceptance criteria outside the tool's own directories and
+outside installed agent-skill trees (any `skills/` directory under a
+dot-directory), which hold instructions rather than project requirements.
 
 Output is JSON on stdout; diagnostics go to stderr. The script never writes
 to the checkout, so repeated runs are identical.
@@ -58,6 +60,14 @@ SPEC_WORDS = re.compile(
 REQUIREMENT_SIGNALS = (
     ("acceptance", re.compile(r"acceptance\s+criteria", re.IGNORECASE)),
     ("shall", re.compile(r"\b(?:SHALL|MUST)\b")),
+    (
+        "requirement-sentence",
+        re.compile(
+            r"\b(?:the|this)\s+(?:system|service|api|application|app|cli|library|tool)"
+            r"\s+(?:shall|must)\b",
+            re.IGNORECASE,
+        ),
+    ),
     ("user-story", re.compile(r"\buser\s+stor(?:y|ies)\b", re.IGNORECASE)),
     (
         "requirements-heading",
@@ -152,18 +162,22 @@ def detect_kiro(root: Path) -> dict | None:
     steering = base / "steering"
     hooks = base / "hooks"
     required = ("requirements.md", "design.md", "tasks.md")
+    steering_files = (
+        sorted(rel(root, p) for p in steering.glob("*.md")) if steering.is_dir() else []
+    )
+    hook_files = (
+        sorted(rel(root, p) for p in hooks.glob("*.json")) if hooks.is_dir() else []
+    )
+    if not features and not steering_files and not hook_files:
+        return None
     return {
         "tool": "kiro",
         "feature_directories": [rel(root, p) for p in features],
         "complete_specs": sum(
             1 for p in features if all((p / f).is_file() for f in required)
         ),
-        "steering_files": sorted(rel(root, p) for p in steering.glob("*.md"))
-        if steering.is_dir()
-        else [],
-        "hook_files": sorted(rel(root, p) for p in hooks.glob("*.json"))
-        if hooks.is_dir()
-        else [],
+        "steering_files": steering_files,
+        "hook_files": hook_files,
         "owned_paths": [rel(root, base)],
     }
 
@@ -232,7 +246,9 @@ def iter_markdown(root: Path, owned: set[str]):
         dirnames[:] = [
             d
             for d in dirnames
-            if d not in SKIP_DIRS and rel(root, current / d) not in owned
+            if d not in SKIP_DIRS
+            and rel(root, current / d) not in owned
+            and not (d == "skills" and current.name.startswith("."))
         ]
         for filename in filenames:
             if filename.lower().endswith(".md"):
@@ -242,7 +258,7 @@ def iter_markdown(root: Path, owned: set[str]):
 def requirement_candidates(
     root: Path, owned: set[str], limit: int
 ) -> tuple[list[dict], int]:
-    found = []
+    found: dict[str, dict] = {}
     for file in iter_markdown(root, owned):
         text = read_text(file)
         if text is None:
@@ -252,22 +268,21 @@ def requirement_candidates(
         }
         signals = {k: v for k, v in signals.items() if v}
         if signals:
-            found.append({"file": rel(root, file), "signals": signals})
+            found[rel(root, file)] = {"file": rel(root, file), "signals": signals}
     for pattern in TEMPLATE_GLOBS:
         for file in root.glob(pattern):
             if not file.is_file():
                 continue
             text = read_text(file)
-            if text is not None and re.search(r"acceptance", text, re.IGNORECASE):
-                found.append(
-                    {
-                        "file": rel(root, file),
-                        "signals": {"acceptance-field": 1},
-                        "template": True,
-                    }
-                )
-    found.sort(key=lambda item: item["file"])
-    return found[:limit], max(0, len(found) - limit)
+            if text is None or not re.search(r"acceptance", text, re.IGNORECASE):
+                continue
+            entry = found.setdefault(
+                rel(root, file), {"file": rel(root, file), "signals": {}}
+            )
+            entry["signals"]["acceptance-field"] = 1
+            entry["template"] = True
+    ordered = [found[key] for key in sorted(found)]
+    return ordered[:limit], max(0, len(ordered) - limit)
 
 
 def main(argv: list[str] | None = None) -> int:
