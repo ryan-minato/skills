@@ -1,0 +1,72 @@
+# Labels must exist in .github/labels.json (checked by
+# scripts/validate_harness.py). Final acceptance is never recorded here: it
+# lives in the OpenSpec change's scenarios once the request is accepted.
+name: Feature request
+description: Propose a new skill or a new capability for an existing skill or repository tool.
+title: "[Feature]: "
+labels:
+  - enhancement
+  - status/needs-triage
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: What becomes possible, and for whom, when this exists. For a new skill, what an agent gains that it does not reliably have already.
+    validations:
+      required: true
+  - type: textarea
+    id: triggers
+    attributes:
+      label: Trigger scenarios
+      description: For skill work, the direct and indirect requests that should load the skill. Leave empty for repository tooling.
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and references
+      description: Why now, prior discussion, alternatives considered, links.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance sketch
+      description: How we would observe that this is done. Rough is fine; the accepted version becomes scenarios in an OpenSpec change, and this field is not the source of truth.
+    validations:
+      required: false
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this request deliberately does not cover.
+    validations:
+      required: false
+  - type: dropdown
+    id: catalog
+    attributes:
+      label: Catalog
+      description: The catalog that should own the work, or `repository` for harness and tooling.
+      multiple: true
+      options:
+        - core
+        - engineering
+        - meta
+        - scaffold
+        - writing
+        - repository
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Your estimate; triage may change it.
+      options:
+        - critical
+        - high
+        - medium
+        - low
+    validations:
+      required: true

@@ -1,97 +1,25 @@
 [
-  {
-    "name": "bug",
-    "color": "d73a4a",
-    "description": "Something isn't working"
-  },
-  {
-    "name": "documentation",
-    "color": "0075ca",
-    "description": "Improvements or additions to documentation"
-  },
-  {
-    "name": "duplicate",
-    "color": "cfd3d7",
-    "description": "This issue or pull request already exists"
-  },
-  {
-    "name": "enhancement",
-    "color": "a2eeef",
-    "description": "New feature or request"
-  },
-  {
-    "name": "good first issue",
-    "color": "7057ff",
-    "description": "Good for newcomers"
-  },
-  {
-    "name": "help wanted",
-    "color": "008672",
-    "description": "Extra attention is needed"
-  },
-  {
-    "name": "invalid",
-    "color": "e4e669",
-    "description": "This doesn't seem right"
-  },
-  {
-    "name": "question",
-    "color": "d876e3",
-    "description": "Further information is requested"
-  },
-  {
-    "name": "wontfix",
-    "color": "ffffff",
-    "description": "This will not be worked on"
-  },
-  {
-    "name": "priority/critical",
-    "color": "b60205",
-    "description": "Urgent work that blocks critical repository use"
-  },
-  {
-    "name": "priority/high",
-    "color": "d93f0b",
-    "description": "Important work to address before the normal queue"
-  },
-  {
-    "name": "priority/medium",
-    "color": "fbca04",
-    "description": "Normal queue priority"
-  },
-  {
-    "name": "priority/low",
-    "color": "0e8a16",
-    "description": "Useful work with no schedule pressure"
-  },
-  {
-    "name": "catalog/core",
-    "color": "5319e7",
-    "description": "Work affecting the core skill catalog"
-  },
-  {
-    "name": "catalog/engineering",
-    "color": "0052cc",
-    "description": "Work affecting the engineering skill catalog"
-  },
-  {
-    "name": "catalog/meta",
-    "color": "1d76db",
-    "description": "Work affecting the meta skill catalog"
-  },
-  {
-    "name": "catalog/scaffold",
-    "color": "c2185b",
-    "description": "Work affecting the scaffold skill catalog"
-  },
-  {
-    "name": "catalog/writing",
-    "color": "0e8a16",
-    "description": "Work affecting the writing skill catalog"
-  },
-  {
-    "name": "catalog/repository",
-    "color": "6f42c1",
-    "description": "Work affecting repository structure or workflow"
-  }
+  {"name": "bug", "color": "d73a4a", "description": "Something isn't working", "applied_by": "form"},
+  {"name": "documentation", "color": "0075ca", "description": "Improvements or additions to documentation", "applied_by": "human"},
+  {"name": "duplicate", "color": "cfd3d7", "description": "This issue or pull request already exists", "applied_by": "human"},
+  {"name": "enhancement", "color": "a2eeef", "description": "New feature or request", "applied_by": "form"},
+  {"name": "good first issue", "color": "7057ff", "description": "Good for newcomers", "applied_by": "human"},
+  {"name": "help wanted", "color": "008672", "description": "Extra attention is needed", "applied_by": "human"},
+  {"name": "invalid", "color": "e4e669", "description": "This doesn't seem right", "applied_by": "human"},
+  {"name": "question", "color": "d876e3", "description": "Further information is requested", "applied_by": "human"},
+  {"name": "wontfix", "color": "ffffff", "description": "This will not be worked on", "applied_by": "human"},
+  {"name": "task", "color": "0e8a16", "description": "Planned work with an agreed outcome", "applied_by": "form"},
+  {"name": "priority/critical", "color": "b60205", "description": "Blocks users or leaks data; handle before anything else", "applied_by": "triage"},
+  {"name": "priority/high", "color": "d93f0b", "description": "Next in line", "applied_by": "triage"},
+  {"name": "priority/medium", "color": "fbca04", "description": "Normal queue", "applied_by": "triage"},
+  {"name": "priority/low", "color": "c2e0c6", "description": "When convenient", "applied_by": "triage"},
+  {"name": "catalog/core", "color": "1d76db", "description": "Touches the core catalog", "applied_by": "triage"},
+  {"name": "catalog/engineering", "color": "1d76db", "description": "Touches the engineering catalog", "applied_by": "triage"},
+  {"name": "catalog/meta", "color": "1d76db", "description": "Touches the meta catalog", "applied_by": "triage"},
+  {"name": "catalog/scaffold", "color": "1d76db", "description": "Touches the scaffold catalog", "applied_by": "triage"},
+  {"name": "catalog/writing", "color": "1d76db", "description": "Touches the writing catalog", "applied_by": "triage"},
+  {"name": "catalog/repository", "color": "5319e7", "description": "Touches the repository harness rather than a catalog", "applied_by": "triage"},
+  {"name": "status/needs-triage", "color": "ededed", "description": "Awaiting type and priority", "applied_by": "form"},
+  {"name": "status/blocked", "color": "000000", "description": "Cannot proceed; the body says on what", "applied_by": "human"},
+  {"name": "goal", "color": "6f42c1", "description": "Tracking issue for a theme spanning several pull requests", "applied_by": "human"}
 ]

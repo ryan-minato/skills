@@ -1,0 +1,105 @@
+# The quality gate. Every job mirrors a `just` recipe that exists and
+# passes locally; .agents/knowledge/github-checks.md maps jobs to commands.
+# Job names are what the ruleset requires (only `checks / gate`), so keep
+# them unique across all workflows and update that file when one changes.
+name: checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  OPENSPEC_NO_UPDATE_CHECK: "1"
+  DO_NOT_TRACK: "1"
+
+jobs:
+  quality:
+    name: checks / quality
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - name: Install check tools (pins match the dev container and pre-commit)
+        run: python3 -m pip install --quiet pre-commit==4.6.2 rust-just==1.58.0 ruff==0.16.4
+      - name: Install pinned repository tools
+        run: just install-tools
+      - name: Run every repository check
+        run: just check
+
+  spec:
+    # Path filtering happens inside the job so the gate below still runs on
+    # every pull request; an `on.paths` filter would skip the gate too.
+    name: checks / spec
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: changed
+        name: Decide whether spec files changed
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" != "pull_request" ] || git diff --name-only "$BASE" "$HEAD" \
+             | grep -Eq '^(openspec/|\.agents/skills/openspec-|\.agents/skills/\.openspec-target|justfile$)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No spec-related paths changed; nothing to validate."
+          fi
+      - if: steps.changed.outputs.run == 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - if: steps.changed.outputs.run == 'true'
+        name: Install just and the pinned OpenSpec CLI
+        run: |
+          python3 -m pip install --quiet rust-just==1.58.0
+          just install-tools
+      - if: steps.changed.outputs.run == 'true'
+        name: Validate specs and changes
+        run: just spec-validate
+      - if: steps.changed.outputs.run == 'true'
+        name: Generated OpenSpec skills match the pinned CLI
+        run: |
+          just spec-sync
+          if ! git diff --exit-code --quiet -- .agents/skills; then
+            git --no-pager diff --stat -- .agents/skills
+            echo "ERROR: .agents/skills/openspec-* differ from what the pinned OpenSpec CLI generates. Run 'just spec-sync' and commit the result." >&2
+            exit 1
+          fi
+
+  gate:
+    # The aggregator: the ONLY job name the ruleset requires. A skipped job
+    # reports success, so this job inspects its dependencies' results.
+    name: checks / gate
+    if: always()
+    needs: [quality, spec]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All required jobs succeeded
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS"
+          if printf '%s' "$RESULTS" | grep -Eq '"result": *"(failure|cancelled)"'; then
+            echo "ERROR: a required job failed or was cancelled. Fix that job; never weaken this gate." >&2
+            exit 1
+          fi

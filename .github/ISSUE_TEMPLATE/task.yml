@@ -1,0 +1,94 @@
+# Planned work, usually derived from an OpenSpec change's tasks.md and often
+# executed by an agent. Acceptance is either executable criteria or a link
+# to the change's scenarios, never both (.agents/knowledge/spec-workflow.md).
+# Labels must exist in .github/labels.json (checked by
+# scripts/validate_harness.py).
+name: Task
+description: Planned work with an agreed outcome, usually one task of an OpenSpec change.
+title: "[Task]: "
+labels:
+  - task
+  - status/needs-triage
+body:
+  - type: textarea
+    id: content
+    attributes:
+      label: Content
+      description: The planned change, precisely.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: The observable repository state when this task is complete.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and references
+      description: Everything the executor needs that lives outside this issue — the design conversation, the skill being imitated (link it, not "like A"), constraints.
+    validations:
+      required: true
+  - type: textarea
+    id: direction
+    attributes:
+      label: Solution direction and breakdown
+      description: Architecture-level direction and decomposition. Not line-by-line prescriptions.
+    validations:
+      required: false
+  - type: input
+    id: spec
+    attributes:
+      label: Specification
+      description: Path of the OpenSpec change this task implements, for example `openspec/changes/<slug>`.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Executable, observable criteria — commands to run, states to verify — or the names of the scenarios in the linked change. Never both.
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Adjacent work this task must not absorb.
+    validations:
+      required: true
+  - type: dropdown
+    id: catalog
+    attributes:
+      label: Catalog
+      description: The catalog the work touches, or `repository` for harness and tooling.
+      multiple: true
+      options:
+        - core
+        - engineering
+        - meta
+        - scaffold
+        - writing
+        - repository
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - critical
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+  - type: textarea
+    id: cautions
+    attributes:
+      label: Cautions
+      description: Known hazards, fragile areas, rollback notes. Leave empty if none.
+    validations:
+      required: false

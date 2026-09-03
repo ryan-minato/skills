@@ -1,0 +1,32 @@
+# Validates a pull request against .github/PULL_REQUEST_TEMPLATE.md and the
+# commit convention (scripts/check_pr_policy.py). The template and the script
+# are read from the BASE commit, so a pull request cannot ship a weakened
+# template or script to pass its own check. Read-only and fork-safe.
+name: pr-policy
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review, converted_to_draft]
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  policy:
+    name: pr / policy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+      - name: Fetch the pull request head for the commit-range check
+        if: ${{ !github.event.pull_request.head.repo.fork }}
+        run: git fetch --no-tags origin "refs/pull/${{ github.event.pull_request.number }}/head"
+      - name: Check the pull request against the template and commit convention
+        run: python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"

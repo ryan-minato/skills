@@ -1,0 +1,22 @@
+# Version updates only; Dependabot alerts are a repository setting. One block
+# per manifest that exists: the workflows (SHA-pinned actions) and the dev
+# container features. Tool pins in the justfile and pre-commit revs are
+# bumped by hand (see .agents/knowledge/harness-maintenance.md).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels: ["task"]
+    commit-message:
+      prefix: ci
+      include: scope
+  - package-ecosystem: devcontainers
+    directory: /
+    schedule:
+      interval: weekly
+    labels: ["task"]
+    commit-message:
+      prefix: chore
+      include: scope
