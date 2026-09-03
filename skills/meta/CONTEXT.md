@@ -31,7 +31,7 @@ Rules for disposable builders that create durable agent harnesses.
   on that decision; every other builder either returns to the entry or, when
   run alone, asks the same question and hands off to `meta-disposal`.
 - Contract flow is one-way. Contract builders (branching model, workflow
-  design, agent authority) deposit platform-neutral contracts into the target
+  design, specification workflow, agent authority) deposit platform-neutral contracts into the target
   project; platform builders consume those contracts, never reopen a settled
   decision, and never let a platform capability reshape the upstream model.
 - Durable rules must land in the target repository, registered tools, or other
@@ -66,7 +66,8 @@ Catalog prefix `meta-` on every directory and `name`, enforced by
 This catalog owns generic, pluggable harness machinery: the harness entry
 workflow (`meta-harness-building`) and the architecture practice manual
 (`meta-harness-architecture`) it loads layer by layer, platform-neutral
-contract builders (branching, project workflow, agent authority) whose
+contract builders (branching, project workflow, specification workflow,
+agent authority) whose
 contracts the platform builders consume, platform-specific lifecycle builders whose complete output is
 deposited into the target project before disposal, and language-level
 convention defaults. Its skills stack alongside one another, so the catalog is
