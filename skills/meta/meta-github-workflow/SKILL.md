@@ -49,7 +49,8 @@ and operable after this skill and the conversation are gone.
   When no contract exists, offer to design one first with
   `meta-workflow-design` (if it is not installed, load the
   `ryan-minato-skills-installing` skill and install the whole `meta` catalog
-  as it directs); if the user declines, decide here as before, and
+  at project scope as it directs — never run an install command yourself);
+  if the user declines, decide here as before, and
   treat agent authority as the conservative default: agents stop at draft
   pull requests and a human admits changes to review.
 - Do not act from an unapproved design. Local files, remote settings, and
