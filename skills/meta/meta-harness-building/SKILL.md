@@ -16,7 +16,7 @@ description: >-
   edit to one file, nor for the practice of each layer, which the
   architecture manual holds.
 license: Apache-2.0
-compatibility: Live catalog discovery requires Python 3.11+ and network access.
+compatibility: Live catalog discovery requires Python 3.10+ and network access.
 ---
 
 # Harness Building
