@@ -114,9 +114,13 @@ the scope-appropriate location (real files, never a symlink):
 python3 scripts/install_skill.py <name> [<name> ...]   # project scope (./.claude)
 python3 scripts/install_skill.py <name> --global       # global scope (~/.claude)
 python3 scripts/install_skill.py <name> --force        # replace if already present
-python3 scripts/install_skill.py --catalog meta        # a catalog installed whole; never with --global
+python3 scripts/install_skill.py --catalog meta        # only meta is installed whole
 python3 scripts/install_skill.py scaffold-ml scaffold-disposal   # scaffold: by name, one topic builder
 ```
+
+The script refuses `--catalog` for any other catalog and refuses `--global`
+whenever a disposable builder is in the install set, however it was named
+(exit 2 with the reason).
 
 It needs `git` and Python 3.9+ only. Re-run with `--force` to update an
 already-installed skill.

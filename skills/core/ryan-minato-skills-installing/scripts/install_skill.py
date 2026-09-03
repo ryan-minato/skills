@@ -9,8 +9,9 @@ symlink), so a project-scope install commits with the project.
 Modes:
   install (default)  Copy one or more named skills to the destination;
                      --catalog NAME adds every skill of a catalog that is
-                     installed whole (meta). Disposable catalogs are refused
-                     with --global; scaffold builders are passed by name.
+                     installed whole (meta); other catalogs are refused.
+                     Disposable builders are refused with --global however
+                     they were named; scaffold builders are passed by name.
   --list             Discovery: print every available skill (name, catalog,
                      description) instead of installing.
   --self-test        Check prerequisites (git present, temp dir writable).
@@ -28,7 +29,8 @@ Diagnostics go to stderr.
 Exit codes:
   0  success
   1  runtime failure (git missing, skill not found/ambiguous, copy error)
-  2  invalid arguments (including --catalog of a disposable catalog with --global)
+  2  invalid arguments (including --catalog of a catalog not installed whole,
+     and --global with any disposable builder)
 """
 
 from __future__ import annotations
@@ -53,6 +55,12 @@ SAFE_SKILL_NAME = re.compile(r"[A-Za-z0-9._-]+")
 # only key the library's disposal skills match on, so it is stable across
 # renames. Such builders are project-scope by contract.
 DISPOSABLE_MARKER = re.compile(r"^Disposable .*\(delete after the harness is built\):")
+
+
+# Catalogs whose CONTEXT.md contract installs them whole. Mirrors the
+# library's catalog contracts (skills/<catalog>/CONTEXT.md); scaffold is
+# deliberately absent because its topic builders are alternatives.
+CATALOGS_INSTALLED_WHOLE = frozenset({"meta"})
 
 
 class UsageError(RuntimeError):
@@ -165,6 +173,13 @@ def catalog_skill_names(clone: Path, catalog: str) -> list[str]:
     return names
 
 
+def is_disposable(skill_dir: Path) -> bool:
+    """True when the skill's description opens with the disposable marker."""
+    text = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
+    description = " ".join(parse_frontmatter(text).get("description", "").split())
+    return DISPOSABLE_MARKER.match(description) is not None
+
+
 def find_skill_dir(clone: Path, name: str) -> Path:
     """Locate skills/<catalog>/<name>/; error if missing or ambiguous."""
     # Restrict to a bare, safe directory name. This rejects path separators,
@@ -242,32 +257,29 @@ def cmd_install(args: argparse.Namespace) -> int:
     skipped: list[dict[str, str]] = []
     try:
         run_git_clone(args.repo, args.ref, tmp)
-        # A catalog expands to all of its members; only a catalog whose
-        # contract installs it whole (meta) belongs here.
+        # A catalog expands to all of its members, so only a catalog whose
+        # contract installs it whole may be named here.
         for catalog in args.catalog:
+            if catalog not in CATALOGS_INSTALLED_WHOLE:
+                raise UsageError(
+                    f"--catalog {catalog} is not supported: only "
+                    f"{', '.join(sorted(CATALOGS_INSTALLED_WHOLE))} is installed whole. "
+                    f"Pass the skills you want by name (for scaffold: one topic "
+                    f"builder plus scaffold-disposal); run with --list to see them."
+                )
             names.extend(n for n in catalog_skill_names(tmp, catalog) if n not in names)
         # Resolve every name up front so a bad name fails before any copy.
         resolved = {name: find_skill_dir(tmp, name) for name in names}
-        if args.is_global and args.catalog:
+        if args.is_global:
             disposable = sorted(
-                name
-                for name, src in resolved.items()
-                if DISPOSABLE_MARKER.match(
-                    " ".join(
-                        parse_frontmatter(
-                            (src / "SKILL.md").read_text(encoding="utf-8")
-                        )
-                        .get("description", "")
-                        .split()
-                    )
-                )
+                name for name, src in resolved.items() if is_disposable(src)
             )
             if disposable:
                 raise UsageError(
-                    f"--catalog {' '.join(args.catalog)} with --global would install "
-                    f"disposable builders ({', '.join(disposable)}) into the home agent "
-                    f"dir, where every later session loads them. Disposable catalogs are "
-                    f"project scope only: drop --global."
+                    f"--global would install disposable builders "
+                    f"({', '.join(disposable)}) into the home agent dir, where every "
+                    f"later session loads them. Disposable builders are project scope "
+                    f"only: drop --global."
                 )
 
         root.mkdir(parents=True, exist_ok=True)
@@ -352,8 +364,8 @@ def build_parser() -> argparse.ArgumentParser:
         default=[],
         metavar="NAME",
         help=(
-            "install every skill of a catalog that is installed whole, e.g. meta "
-            "(repeatable; project scope only — scaffold builders are passed by name)"
+            "install every skill of a catalog that is installed whole (meta); "
+            "other catalogs are refused — pass their skills by name"
         ),
     )
     p.add_argument(
