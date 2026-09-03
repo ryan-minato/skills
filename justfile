@@ -2,18 +2,27 @@
 # Agents and humans should run checks through these recipes (not ad-hoc
 # commands) so results stay consistent across environments.
 
+# Pinned tool versions. These variables are the single source for the pins;
+# scripts/validate_harness.py checks that generated files and CI agree.
+openspec_version := "1.12.0"
+
 # List available recipes
 default:
     @just --list
 
 # One-time environment setup (run after cloning / container creation)
-setup:
+setup: install-tools
     pre-commit install
     git config commit.template .gitmessage
 
-# Validate skill layout and harness consistency
+# Install the pinned tools `just check` needs beyond the dev container features
+install-tools:
+    npm install -g "@fission-ai/openspec@{{openspec_version}}"
+
+# Validate skill layout, harness synchronization, and catalog consistency
 validate:
     python3 scripts/validate_skills.py
+    python3 scripts/validate_harness.py
 
 # Lint specific skill directories (spec + quality checks)
 check-skill +PATHS:
@@ -23,15 +32,24 @@ check-skill +PATHS:
 gen-marketplace:
     python3 scripts/gen_marketplace.py
 
-# Lint and check formatting of repository scripts
+# Lint and check formatting of repository and skill scripts
 lint:
-    ruff check scripts/
-    ruff format --check scripts/
+    ruff check scripts skills/*/*/scripts
+    ruff format --check scripts skills/*/*/scripts
 
-# Pre-commit safety gate for staged changes
+# Validate every OpenSpec spec and change (strict)
+spec-validate:
+    @command -v openspec >/dev/null || { echo "openspec CLI missing: run 'just setup' (installs @fission-ai/openspec@{{openspec_version}})" >&2; exit 1; }
+    OPENSPEC_NO_UPDATE_CHECK=1 openspec validate --all --strict --no-interactive
+
+# Regenerate the OpenSpec-managed skills after bumping openspec_version; commit the result
+spec-sync:
+    OPENSPEC_NO_UPDATE_CHECK=1 openspec update --force
+
+# Safety gate for staged changes (also runs as the first pre-commit hook)
 commit-gate:
     python3 scripts/check_commit_safety.py
 
-# Run every check (validator, lint, pre-commit hooks)
-check: validate lint
-    pre-commit run --all-files
+# Run every check (validators, lint, spec validation, pre-commit hooks)
+check: validate lint spec-validate
+    SKIP=commit-safety pre-commit run --all-files

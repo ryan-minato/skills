@@ -1,0 +1,38 @@
+schema: spec-driven
+
+# Conventions live in the repository harness; this block points, it does
+# not restate. AGENTS.md is the entrypoint, .agents/knowledge/spec-workflow.md
+# the specification rules, .agents/knowledge/skill-quality.md the skill bar.
+context: |
+  This repository is a library of Agent Skills (skills/<catalog>/<skill>/)
+  that other projects install by copying a skill directory. Read AGENTS.md
+  first. Specification rules: .agents/knowledge/spec-workflow.md. Skill
+  quality bar: .agents/knowledge/skill-quality.md. Domains: one per public
+  skill (named after the skill) and one per repository tool
+  (skill-validation, marketplace, harness-checks). Never backfill specs
+  for skills or tools the change does not touch.
+
+rules:
+  proposal:
+    - Name the catalog and skill (or repository tool) the change touches.
+    - Link the GitHub issue when one exists; state "no issue" otherwise.
+    - Include a Non-goals section.
+  specs:
+    - One requirement per normative statement (SHALL); split compound requirements.
+    - Every requirement carries at least one scenario, and one scenario per domain covers an edge or failure path.
+    - A scenario for a skill domain must be executable as a behavioral test (a triggering prompt, or an outcome task with observable requirements) per .agents/skills/skill-authoring/references/testing.md.
+    - Describe observable agent or tool behavior, never the diff.
+  design:
+    - Keep design out of specs; name the requirement each design decision serves.
+  tasks:
+    - Every task names the scenarios it closes; every scenario has a task.
+
+operations:
+  apply:
+    guidance:
+      - Work on the change's branch (<type>/<slug>, slug = change name); see .agents/knowledge/github-workflow.md.
+      - When the implementation must deviate from the spec, stop and revise the change first.
+  archive:
+    guidance:
+      - Archive inside the same pull request, before it is marked ready; main never holds an unarchived change.
+      - Run `just spec-validate` after archiving.
