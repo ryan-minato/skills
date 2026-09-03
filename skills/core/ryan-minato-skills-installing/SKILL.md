@@ -38,7 +38,9 @@ Decide, before running anything:
   (`meta`, `scaffold`). `meta` is installed whole: its builders stack and are
   disposed together. `scaffold` is installed as one topic builder plus
   `scaffold-disposal`, never every scaffold builder. Both are project-scope,
-  disposable components; discover the members (Step 2) and install them all.
+  disposable components. Discover the members (Step 2); for `meta` install
+  every member, for `scaffold` install only the chosen topic builder plus
+  `scaffold-disposal`.
 - **Scope** — **project** (default) installs into this project so the files
   commit with it; **global** installs into the user home dir for every
   project. Choose global when the user says "globally" / "for every project",
@@ -112,7 +114,8 @@ the scope-appropriate location (real files, never a symlink):
 python3 scripts/install_skill.py <name> [<name> ...]   # project scope (./.claude)
 python3 scripts/install_skill.py <name> --global       # global scope (~/.claude)
 python3 scripts/install_skill.py <name> --force        # replace if already present
-python3 scripts/install_skill.py --catalog meta        # every skill of a catalog
+python3 scripts/install_skill.py --catalog meta        # a catalog installed whole; never with --global
+python3 scripts/install_skill.py scaffold-ml scaffold-disposal   # scaffold: by name, one topic builder
 ```
 
 It needs `git` and Python 3.9+ only. Re-run with `--force` to update an
