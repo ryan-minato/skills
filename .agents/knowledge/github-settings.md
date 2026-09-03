@@ -45,12 +45,14 @@ types, no issue fields) · visibility: public · plan: free features suffice
 
 ## Last verification
 
-2026-09-03, read-only: public personal repository; ruleset `Default`
-requiring only `scan-secrets`, no bypass actors, extra approval for
-unattributed changes on; all three merge methods enabled; branch deletion
-on merge off; Discussions off; secret scanning, push protection, and
-CodeQL default setup already on; three labels not in `labels.json`
-(`catalog/meta-harness`, `catalog/ops`, `catalog/util`, attached to no
-issue or pull request). Rows whose intended state differs from that
-snapshot are pending the authorized writes listed in the harness pull
-request; update this section after each readback.
+2026-09-03, after the authorized writes of the harness rebuild, read back
+with the commands in the table: description set; Discussions on (default
+categories including Q&A and Ideas); Projects and Wiki off; merge commits
+off, rebase and squash on; delete branch on merge on; labels exactly
+`.github/labels.json` (the three dead labels pruned after confirming no
+issue or pull request carried them); secret scanning, push protection,
+and CodeQL default setup on; no legacy branch protection. Still differing
+from the intended state until `checks / gate` is green on `main` and the
+write is authorized: ruleset `Default` (required checks still only
+`scan-secrets`, thread resolution off, extra approval for unattributed
+changes on, all merge methods listed).
