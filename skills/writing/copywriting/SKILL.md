@@ -21,10 +21,9 @@ This skill builds on `human-writing` (the general human-audience baseline). When
 editing, or reviewing — do not work from this skill alone. This skill leads: its rules override
 the baseline where they conflict — in particular, well-formed prose gives way
 where a fragment, repetition, or a broken rhythm spreads better. If
-`human-writing` is not installed, install it from
-https://github.com/ryan-minato/skills.git:
-
-    npx skills add ryan-minato/skills --skill human-writing
+`human-writing` is not installed, load the `ryan-minato-skills-installing`
+skill and install `human-writing` as it directs; never run an install
+command yourself.
 
 ## Roles
 
