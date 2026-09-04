@@ -21,17 +21,20 @@ project until a human explicitly decides otherwise.
 
 ## H1 — Autonomous Author
 
-The human supplies a complete specification up front: goal, scope,
-non-goals and constraints, acceptance criteria. The agent then owns the
-whole change-request preparation — plan, implement, self-review, test,
-evaluate the acceptance criteria, turn the draft ready, request review, and
-respond to review. The human reviews the change set as one engineering
-unit and makes the integration decision.
+A complete specification exists before implementation: goal, scope,
+non-goals and constraints, acceptance criteria — supplied by the human up
+front or, under a specification contract, written by the agent and
+approved by the human at the approval gate on the draft. The agent then
+owns the whole change-request preparation — plan, implement, self-review,
+test, evaluate the acceptance criteria, turn the draft ready, request
+review, and respond to review. The human reviews the change set as one
+engineering unit and makes the integration decision.
 
 The gate moves from review admission to integration. Price: the
 specification is genuinely complete — the later the human gate, the more
-complete the upfront specification must be. Vague goals at H1 produce
-polished changes nobody asked for.
+complete the specification must be, and the approval gate passing is what
+pays that price when the agent wrote it. The agent never approves its own
+specification. Vague goals at H1 produce polished changes nobody asked for.
 
 ## H2 — Delegated Integrator
 

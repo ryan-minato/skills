@@ -76,7 +76,11 @@ authority attaches to, and its platform is the vocabulary the policy is
 written in. Read the specification contract at
 `.agents/knowledge/spec-workflow.md` the same way if present: its approval
 gate — who accepts a specification before planning and implementation —
-is an acceptance anchor, and the levels below attach to it. Their absence
+is an acceptance anchor, and the levels below attach to it; its change
+request shape says where that gate sits on the path (on the draft itself
+under the combined shape, on a separate specification change request under
+split), and its archive mode says whether archiving is a step the agent
+runs before ready or a job that runs after merge. Their absence
 blocks nothing: a project with no tracker still needs an authority policy. Then evidence the project's real
 verification strength yourself — test coverage and trustworthiness, CI
 gates, rollback and revert paths, observability — because these facts price
@@ -98,6 +102,13 @@ default level; a rising level moves an owner downstream, never off the path:
   queue.
 - **Integration** — the final decision that the change set enters the
   long-lived branch, and with it the engineering responsibility.
+
+Under a specification contract a third gate precedes both: the
+specification's approval, exercised on the draft (combined shape) or as the
+specification change request's own review (split). It stays with its
+recorded owner at every level, and no level grants an agent the approval of
+a specification it wrote: an agent that may mark ready still waits for that
+approval first.
 
 Done when: both gates have a named owner at the settled level — a human role
 or person (never "the team"), or the agent under a delegation this policy
