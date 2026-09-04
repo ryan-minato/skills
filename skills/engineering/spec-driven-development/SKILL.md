@@ -208,11 +208,13 @@ recommendation per fact, and record them in the harness:
   integration branch, in-request otherwise.
 - **Approval record.** The gate owner records approval as a comment on the
   draft naming the approved commit. A platform's review-approval state is
-  the wrong record: both major hosts dismiss it when the implementation
-  pushes land, and drafts do not auto-request code owners, so request the
-  reviewer explicitly and keep the review-approval state for implementation
-  review. Under split, merging the specification change request is the
-  approval.
+  the wrong record: GitLab removes approvals when commits are added by
+  default, GitHub does so wherever its ruleset dismisses stale approvals,
+  and in every case the approval then points at a tip the implementation
+  pushes have replaced. Drafts do not auto-request code owners, so request
+  the reviewer explicitly and keep the review-approval state for
+  implementation review. Under split, merging the specification change
+  request is the approval.
 
 The sequence, then: the work item opens when the requirement appears,
 carrying the raw requirement, owner, and priority and no acceptance
@@ -276,9 +278,10 @@ checks, automation, or a project skill — those stay the builder's.
   a constitution or steering file may cite it, and no spec may contradict it.
 - Requirements written by observing a prototype record what the prototype
   happens to do; only the user can say which of that behavior was intended.
-- A review approval left on a draft is gone after the next push on both
-  major hosts; record specification approval as a comment naming the
-  approved commit.
+- A review approval left on a draft does not survive the implementation
+  pushes — removed by default on GitLab, by a stale-approval rule on
+  GitHub, and stale in meaning everywhere; record specification approval
+  as a comment naming the approved commit.
 - OpenSpec's own documentation defaults to archiving after merge; the
   automated archive mode is that default made mechanical, and in-request
   archiving is the alternative for a remote whose automation cannot push.
