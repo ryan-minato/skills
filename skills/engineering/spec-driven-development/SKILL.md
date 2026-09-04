@@ -4,17 +4,20 @@ description: >-
   Spec-driven development (SDD) — writes specifications before code and
   runs the specify, clarify, plan, tasks, implement, verify loop from them;
   judges whether the discipline pays and at which level (spec-first,
-  spec-anchored, spec-as-source); and converts existing code — a vibe-coded
-  or hacked-together prototype, a brownfield codebase — into a spec-driven
-  project without backfilling specs. Use when asked to adopt, introduce, or
-  start spec-driven development or SDD, or where to start making a
-  hacked-together app maintainable; to "write the spec first" or "do this
-  spec-driven"; which of Spec-Kit, OpenSpec, Kiro, or plain documents to
-  use; when a weekend prototype needs proper specs before more features;
-  when what was built drifts from what was agreed; or when issues and specs
-  disagree about acceptance. Not for defining goals, or for the harness,
-  tracker, and template setup a builder owns.
+  spec-anchored, spec-as-source); settles how specs meet tracked work —
+  when the draft opens, whether a spec needs its own PR, when to archive,
+  what issues and PRs link instead of restate; and converts existing code
+  — a prototype or brownfield codebase — into a spec-driven project
+  without backfilling specs. Use when adopting or starting spec-driven
+  development or SDD; to "write the spec first" or "do this spec-driven";
+  which of Spec-Kit, OpenSpec, Kiro, or plain documents to use; how
+  issues, PRs, and specs fit together, where a spec is reviewed, or when
+  to archive a change; when a prototype needs specs before more features;
+  when what was built drifts from what was agreed; or when issues and
+  specs disagree about acceptance. Not for defining goals, or for building
+  the platform harness a builder owns.
 license: Apache-2.0
+compatibility: The bundled archive script requires Python 3.10+ (stdlib only) and the OpenSpec CLI on PATH.
 ---
 
 # Spec-Driven Development
@@ -110,15 +113,21 @@ run step 2 from the questions in this file.
    scenario a reader who has never seen the code could judge.
 2. **Clarify.** Interrogate every ambiguity, unstated assumption, and missing
    edge case with the user; record answers in the spec, not in the chat.
-   Done when: no `[NEEDS CLARIFICATION]`-class marker remains and the user
-   has approved the spec.
-3. **Plan.** Derive the technical design from the spec and the project's
-   constraints (constitution, architecture, conventions). Keep design out of
-   the requirements file. Done when: every requirement maps to a design
-   decision and every decision names the requirement it serves.
+   Then publish: commit the change record and open the draft change request
+   (or the specification change request, under the split shape below) at
+   once, before any plan exists, so review starts on the specification.
+   Done when: no `[NEEDS CLARIFICATION]`-class marker remains, the draft is
+   published, and the approval is recorded on it.
+3. **Plan.** Only after the approval: derive the technical design from the
+   spec and the project's constraints (constitution, architecture,
+   conventions). Keep design out of the requirements file. Done when: every
+   requirement maps to a design decision and every decision names the
+   requirement it serves.
 4. **Tasks.** Break the plan into ordered, independently verifiable tasks
-   with the scenarios each one closes. Done when: no task lacks a scenario
-   and no scenario lacks a task.
+   with the scenarios each one closes. A tool that generated design and
+   task files together with the spec has produced drafts; they are the
+   implementer's to finish now, and they were never the approval gate's
+   object. Done when: no task lacks a scenario and no scenario lacks a task.
 5. **Implement.** Work task by task; when the code must deviate from the
    spec, stop and change the spec first, with the user's approval. Done
    when: every task is closed or its deviation is recorded as an approved
@@ -128,7 +137,10 @@ run step 2 from the questions in this file.
    scenario has passed or is recorded as a spec change.
 7. **Converge or archive.** Write the delivered behavior back into the
    source-of-truth spec (spec-anchored) or archive the change record
-   (spec-first). Done when: the spec and the code describe the same system.
+   (spec-first). When and by whom is the archive mode below: an automation
+   on the integration branch after merge, or the change request itself
+   before it is marked ready. Done when: the spec and the code describe the
+   same system.
 
 ## Specification quality
 
@@ -144,23 +156,79 @@ run step 2 from the questions in this file.
 - A spec describes observable behavior, never the diff: "the API returns
   409 on a duplicate email" is a requirement; "add a unique index" is not.
 
-## Specs versus tracked work
+## What specification review examines
 
-The specification owns *what* and *why* and the acceptance criteria.
-Tracked work — issues, tasks, tickets, change requests — owns *who*, *when*,
-and *status*, and links the specification it serves. Acceptance criteria
-exist in exactly one place, the spec; an issue that restates them will
-disagree with the spec within a release.
+The approval gate reviews the description of the outcome, each item as the
+project needs it: goals and scope; terminology and the domain model;
+behavior; invariants; constraints and rules; states and their transitions;
+interface contracts; data contracts; exceptions and edge cases; security
+and permissions; metrics and acceptance criteria. It never reviews tasks
+or design: those describe how the outcome is built, belong to the
+implementer after approval, and are judged by implementation review. A
+reviewer who is handed the task list is being asked to approve a method,
+not an outcome; hand them the specification instead.
 
-- Create work items from the spec's task list, each linking the scenarios it
-  closes; never write a work item whose acceptance cannot be found in a
-  spec.
-- A change request (pull or merge request) names the spec or change record
-  it implements and states whether the spec was updated.
-- Spec lifecycle (proposed, approved, implemented, archived) and work-item
-  status are different facts; neither substitutes for the other.
-- Objectives, milestones, and roadmaps are human-endorsed goals; a spec
-  serves one, it does not become one.
+## Specs and tracked work
+
+Without specifications, the work item carries part of the goal and the
+change request describes the diff and links back. With them, the flow is
+requirement (vague) → specification → specification review, held through
+the tracker → implementation → implementation review, which is close to
+mechanical because the specification is explicit and may be delegated to
+an agent where the authority policy allows. The specification owns *what*
+and *why* and the acceptance criteria; tracked work owns *who*, *when*, and
+*status*; a change request describes the diff and its phase. Every tracker
+object links the change record's path and never restates it: acceptance
+criteria exist in exactly one place, the spec, and an issue that restates
+them will disagree with it within a release.
+
+Three facts decide the timing; settle each with the user, one
+recommendation per fact, and record them in the harness:
+
+- **Change request shape.** *Combined*: one change request carries the
+  whole lifecycle — it opens as a draft the moment the change record is
+  committed, the approval gate is exercised on that draft, implementation
+  follows approval, ready means implementation review, merge closes the
+  work item. *Split*: a specification change request carries only the
+  change record, is discussed, approved, and merged, and one or more
+  implementation change requests link it afterwards. Recommend split when
+  consumers depend on a stable contract (a library, framework, shared
+  infrastructure, or service API — the dependency or inherited change
+  propagation mode, where a workflow file records one) and combined
+  otherwise; any project may take a single contract-level change through
+  split as a recorded deviation.
+- **Archive mode.** *Automated*: after merge, an automation job on the
+  integration branch archives every change whose tasks are all complete —
+  serialized so two runs never overlap, idempotent so each run rescans
+  everything completed, and failing without retry when its push is
+  rejected because the run the competing merge triggers archives the rest.
+  *In-request*: the change request archives before it is marked ready, so
+  the integration branch never holds an unarchived change. Recommend
+  automated wherever the remote runs automation that may push to the
+  integration branch, in-request otherwise.
+- **Approval record.** The gate owner records approval as a comment on the
+  draft naming the approved commit. A platform's review-approval state is
+  the wrong record: both major hosts dismiss it when the implementation
+  pushes land, and drafts do not auto-request code owners, so request the
+  reviewer explicitly and keep the review-approval state for implementation
+  review. Under split, merging the specification change request is the
+  approval.
+
+The sequence, then: the work item opens when the requirement appears,
+carrying the raw requirement, owner, and priority and no acceptance
+criteria (an acceptance sketch is marked non-authoritative); the
+implementer — or a named planning role — writes the specification and
+publishes the draft; the gate owner approves on the draft; plan and tasks
+follow; implementation; verification and ready; archive per the mode;
+merge closes the work item. Sub-items derived from the task list remain
+optional, each linking the scenarios it closes. Discussion of the
+specification in the work item's thread is deliberation, not the record;
+the record is the file at the approved commit.
+
+Read [references/tracked-work-lifecycle.md](references/tracked-work-lifecycle.md)
+when designing or repairing how tracked work, change requests, templates,
+and the archive step carry the specification — including when the harness
+builder below is declined or absent.
 
 ## Adopting existing code
 
@@ -183,10 +251,15 @@ installed, load the `ryan-minato-skills-installing` skill and install the
 whole `meta` catalog at project scope as it directs — its builders stack and
 are disposed together; never run an install command yourself. (If that
 installer skill is absent too, it lives in the `core` catalog of
-https://github.com/ryan-minato/skills.) If the user declines, record the
-level, tool, artifact paths, and source-of-truth decisions in the project's
-knowledge base by hand and list every harness file that still restates a
-requirement.
+https://github.com/ryan-minato/skills.) If the user declines, apply
+[references/tracked-work-lifecycle.md](references/tracked-work-lifecycle.md)
+yourself: record the level, tool, artifact paths, source-of-truth
+decisions, change request shape, archive mode, approval owner, and the
+link-never-restate rule in the project's knowledge base; add the named
+specification lines to the intake and change-request templates the project
+already has; and list every harness file that still restates a requirement
+and the platform harness build as remaining work. Do not build forms,
+checks, automation, or a project skill — those stay the builder's.
 
 ## Gotchas
 
@@ -203,3 +276,15 @@ requirement.
   a constitution or steering file may cite it, and no spec may contradict it.
 - Requirements written by observing a prototype record what the prototype
   happens to do; only the user can say which of that behavior was intended.
+- A review approval left on a draft is gone after the next push on both
+  major hosts; record specification approval as a comment naming the
+  approved commit.
+- OpenSpec's own documentation defaults to archiving after merge; the
+  automated archive mode is that default made mechanical, and in-request
+  archiving is the alternative for a remote whose automation cannot push.
+  The harness must say which mode the project runs.
+- Under the split shape a delta written against a domain spec that another
+  change archived later may no longer apply; re-validate the delta when
+  implementation starts.
+- An archive automation that rebases and retries on a rejected push hides
+  conflicts and can archive twice; fail and let the queued run finish.
