@@ -51,6 +51,13 @@ missing or excessive, and record both in `platform-settings.md`; any
 
 ## Designing past the baseline
 
+- Under a specification contract with automated archiving, the archive
+  workflow pushes to the default branch: its identity (the GitHub Actions
+  app, or a bot with its own token) needs a bypass entry on the default
+  branch's ruleset. Granting it is a maintainer action, recorded in
+  `platform-settings.md` with its readback; until it exists the contract's
+  in-request archiving stays in force.
+
 - The approval count is the team's decision; note the **unattributed-Copilot
   extra approval is enabled by default** and turns one required approval
   into two for agent-authored PRs — decide it explicitly.

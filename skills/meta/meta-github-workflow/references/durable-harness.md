@@ -71,6 +71,11 @@ config):
 - the specification field in issue forms and the PR template ↔ the
   artifact paths in the specification contract (a moved spec directory
   silently orphans every template link);
+- the change request shape and archive mode in the specification contract
+  ↔ the project skill's take-work and finish steps, the PR template's two
+  specification items, and the archive workflow's presence (a contract
+  that switches mode without the workflow, or the reverse, leaves the
+  branch archiving twice or never);
 - ruleset ↔ legacy branch protection (record both layers or drift is
   invisible);
 - release tag and changelog ↔ package or deployment automation;

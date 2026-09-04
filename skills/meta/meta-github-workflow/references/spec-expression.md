@@ -35,15 +35,66 @@ one thing, the spec another, and the PR a third.
 - The PR template's related-work section carries a `Spec:` line naming the
   change record or specification the PR implements.
 - The checklist reads "Acceptance criteria of the linked issue, or the
-  scenarios of the linked specification, are met" and adds
-  "Specification updated or change record archived where behavior
-  changed". Keep the security line's wording intact — the checklist
-  workflow keys on it.
+  scenarios of the linked specification, are met" and adds two items: "The
+  change record was approved by the gate owner before implementation, or
+  this pull request carries the specification only" and "The specification
+  is updated, or the change record is archived, or every task is complete
+  and archiving runs after merge". Keep the security line's wording intact
+  — the checklist workflow keys on it — and keep the word "secrets" out of
+  the new items.
 - When the tool ships a validator, add it as a job in the checks workflow
   running on pull requests that touch the spec directories, with a path
   filter and the aggregator gate the harness already uses. Its failure
   message must name the file to fix. Without a validator, the checklist is
   the only gate; say so in `checks.md`.
+
+## Change request shape and archive mode
+
+The contract records both; express them, never re-decide them.
+
+- **Combined shape.** The draft pull request opens the moment the change
+  record is committed — its first push is the proposal and the delta
+  specs, before any plan or task list. Request the gate owner's review
+  explicitly (`gh pr edit --add-reviewer`): CODEOWNERS is not auto-requested
+  on drafts. The gate owner records approval as a comment naming the
+  approved commit, never as a review approval, which a ruleset dismissing
+  stale approvals (or the next push) removes; the review-approval state is
+  reserved for implementation review after ready. The PR body's `Spec:`
+  line names the change record and a phase marker says whether the PR is
+  in its specification or implementation phase. Ready follows the
+  scenarios' verification and, under in-request archiving, the archive.
+- **Split shape.** The specification pull request uses the same template
+  with the `Spec:` line and the phase marker "specification", references
+  the issue with `Refs #N` — never `Closes`, which would close the work
+  when the spec merges — and takes its title from the project's commit
+  convention for specification changes. Its review approval and merge are
+  the gate. Implementation pull requests link the merged specification PR
+  and the record's path; the last one carries `Closes #N`.
+- **Automated archiving with OpenSpec.** Adapt the asset
+  `assets/workflow-spec-archive.yml`:
+  a workflow on `push` to the default branch, serialized by a
+  `concurrency` group with `cancel-in-progress: false`, that installs the
+  pinned OpenSpec CLI, runs the project's `scripts/archive_completed_changes.py`
+  (the script ships with the spec-driven development methodology skill —
+  if the target lacks it, load the `ryan-minato-skills-installing` skill
+  and install that skill as it directs, never run an install command
+  yourself — and is copied into the project's `scripts/`), validates
+  strictly, commits under the project's commit convention, and pushes
+  without retry. `GITHUB_TOKEN` pushes trigger no further workflows, so the
+  job validates itself. The workflow's identity needs a bypass on the
+  default branch's ruleset: record it in `platform-settings.md` as a
+  maintainer action, and state in the contract that in-request archiving
+  is in force until it is granted. Verify the CLI's non-interactive archive
+  flag from its help before shipping the asset.
+- **Automated archiving with any other tool.** Spec-Kit, Kiro, and
+  committed documents have no fixed archive operation. Do not adapt the
+  OpenSpec asset or copy its commands: take from the contract the
+  project-defined completion criterion and post-processing step (the
+  specification builder records them, and asks the user for them if
+  missing), and design the job with the user from the same skeleton —
+  push trigger, serialized, rescanning, self-validating, no retry.
+- **In-request archiving.** No workflow; the PR checklist's archive item
+  is the gate.
 
 ## Tracking issues and milestones
 
@@ -55,10 +106,13 @@ the content that serves it.
 
 ## The project workflow skill
 
-- **Take work:** before claiming, confirm the linked specification is
-  approved per the contract's approval gate and treat its scenarios as the
-  acceptance criteria. An issue whose spec is missing or unapproved is
-  escalated, not executed.
+- **Take work:** follow the contract's shape. Combined: an issue with no
+  specification yet is taken by committing the change record to the draft
+  PR first and waiting for the gate owner's approval comment; an issue
+  whose record exists but is unapproved waits the same way. Split: an
+  issue whose specification PR is not merged is escalated, not executed.
+  In both, the approved specification's scenarios are the acceptance
+  criteria.
 - **Create issues:** issues for planned work derive from the change
   record's task list, one issue per task that independently earns state,
   each linking the specification and the scenarios it closes. Keep the
@@ -66,7 +120,8 @@ the content that serves it.
   its output must obey the form's headings and the label and type rules —
   read the created issues back.
 - **Finish:** before the decision-ready report, confirm the spec-side
-  step (update, archive, or converge per the contract's lifecycle) is done
+  step per the contract's archive mode — the record archived (in-request)
+  or every task ticked so the archive job takes it (automated) — is done
   or listed as remaining work.
 
 ## Knowledge deposit

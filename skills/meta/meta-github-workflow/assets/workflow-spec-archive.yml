@@ -1,0 +1,60 @@
+# .github/workflows/spec-archive.yml — archives every completed OpenSpec
+# change after a merge to the default branch. Adapt only under a
+# specification contract that records OpenSpec and the automated archive
+# mode; other spec tools have no fixed archive operation and get a job
+# designed with the user instead. Before shipping: verify the CLI's
+# non-interactive archive flag from `openspec archive --help`, copy
+# `scripts/archive_completed_changes.py` from the spec-driven development
+# skill into the project's scripts/ (the script is stdlib Python and reads
+# tasks.md itself), point the install step at the project's version pin,
+# and record in platform-settings.md that this workflow's identity needs a
+# bypass on the default branch's ruleset — a maintainer action; until it is
+# granted, in-request archiving stays in force.
+name: spec-archive
+
+on:
+  push:
+    branches: ["{{DEFAULT_BRANCH}}"]
+
+# The archive commits to the default branch, so this is the one workflow
+# that writes contents. Everything else stays deny-by-default.
+permissions:
+  contents: write
+
+# One archive run at a time, never cancelling one in progress: a second
+# merge queues its run, which then rescans everything still completed.
+concurrency:
+  group: spec-archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "actions/checkout@{{PINNED_SHA}}"
+        with:
+          ref: "{{DEFAULT_BRANCH}}"
+      - uses: "actions/setup-node@{{PINNED_SHA}}"
+        with:
+          node-version: "{{NODE_LTS}}"
+      - name: Install the pinned OpenSpec CLI
+        run: "{{INSTALL_COMMAND — e.g. just install-tools, reading the project's single version pin}}"
+      - name: Archive completed changes
+        # Archives every change whose tasks are all ticked, then runs the
+        # strict validator itself: pushes made with GITHUB_TOKEN trigger no
+        # further workflows, so nothing else will.
+        run: python3 scripts/archive_completed_changes.py
+      - name: Commit and push
+        # Exit 0 with no diff when nothing was archived. Never rebase or
+        # retry a rejected push: the merge that moved the branch triggered
+        # the run that archives whatever remains.
+        run: |
+          if git diff --quiet; then
+            echo "nothing to archive"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add openspec
+          git commit -m "{{COMMIT_SUBJECT — per the project's commit convention, e.g. "chore(spec): archive completed changes"}}"
+          git push origin HEAD:{{DEFAULT_BRANCH}}

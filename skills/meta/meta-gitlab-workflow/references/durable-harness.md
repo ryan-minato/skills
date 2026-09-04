@@ -65,6 +65,9 @@ Assign one owner for each relationship:
 - work-item template quick action ↔ label/type taxonomy;
 - the specification section in work-item and MR templates ↔ the artifact
   paths in the specification contract;
+- the change request shape and archive mode in the specification contract
+  ↔ the project skill's take-work and finish steps, the MR template's two
+  specification items, and the archive job's presence;
 - release tag/changelog ↔ package/deployment automation;
 - experiment metadata ↔ training/evaluation implementation;
 - public contribution/security statements ↔ internal workflow.

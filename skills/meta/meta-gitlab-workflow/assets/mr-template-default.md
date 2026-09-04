@@ -9,14 +9,16 @@
 ## Related work
 
 <!-- Use the project's verified closing or related reference syntax. -->
-{{SPEC_LINE — under a specification contract, the comment line
-"<!-- Spec: <path or change name> -->"; delete this placeholder otherwise}}
+{{SPEC_LINE — under a specification contract, the lines
+"Spec: <path or change name>" and "Phase: specification | implementation";
+delete this placeholder otherwise}}
 
 ## Checklist
 
 - [ ] The change satisfies the linked acceptance criteria, or the scenarios of the linked specification.
-{{SPEC_CHECK — under a specification contract, the item
-"- [ ] The specification is updated or the change record archived where behavior changed.";
+{{SPEC_CHECK — under a specification contract, the two items
+"- [ ] The change record was approved by the gate owner before implementation, or this merge request carries the specification only." and
+"- [ ] The specification is updated, or the change record is archived, or every task is complete and archiving runs after merge.";
 delete this placeholder otherwise}}
 - [ ] The documented local checks pass.
 - [ ] User-facing or agent-facing guidance is updated where behavior changed.
