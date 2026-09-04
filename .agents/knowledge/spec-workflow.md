@@ -61,21 +61,65 @@ link; it never restates the fact.
 
 1. **Proposed** — the change directory exists with a proposal and delta
    specs (the propose skill; `plan-clarification` runs the clarify step
-   until no assumption is silent).
-2. **Approved** — the maintainer approves the proposal and delta specs: in
-   the conversation that runs the change, on the issue, or on a draft pull
-   request that already carries the proposal. An agent never approves a
-   change it wrote.
-3. **Implemented** — every task is done and every scenario passed: for a
-   skill, the behavioral tests in the `skill-authoring` project skill,
-   derived from the scenarios; for a tool, the commands the scenarios name.
-4. **Archived** — inside the same pull request, before it is marked
-   ready: the archive skill merges the delta into `openspec/specs/` and
-   moves the change under `changes/archive/`. `main` therefore never holds
-   an unarchived change.
+   until no assumption is silent), and the draft pull request is opened at
+   once with the change record as its first content and `Phase:
+   specification` in its body — before any design or task list is
+   finished.
+2. **Approved** — the maintainer approves the proposal and delta specs
+   with a comment on the draft pull request naming the approved commit
+   (`Specification approved at <sha>`). The review examines the outcome
+   description — goals and scope, terminology, behavior, invariants,
+   constraints, states, interface and data contracts, edge cases,
+   security, acceptance — never `design.md` or `tasks.md`, which the
+   author finishes after approval. A pull request review approval is not
+   the record: later pushes dismiss it. An agent never approves a change it
+   wrote.
+3. **Implemented** — design and tasks finished after approval, every task
+   done, and every scenario passed: for a skill, the behavioral tests in
+   the `skill-authoring` project skill, derived from the scenarios and
+   planned in the change's `design.md`. The body's phase becomes
+   `implementation`; ready follows.
+4. **Archived** — by the `spec-archive` workflow after the merge to `main`
+   once the Actions bypass in `.agents/knowledge/github-settings.md` is
+   granted; until then, inside the pull request before it is marked ready,
+   with the archive skill (see Archive mode).
 
 Deviation found during implementation: stop, revise the change (the
-update skill), get the revision approved, then continue.
+update skill), get the revision re-approved on the draft, then continue.
+
+## Change request shape
+
+Combined: one pull request carries the whole lifecycle. Selected because
+this repository ships skills feature by feature and no consumer depends on
+a stable contract (installed copies are never updated in place, so a
+change reaches nobody until they reinstall). The pull request opens as a
+draft when the change record is committed, the approval gate is exercised
+on that draft, design and tasks follow the approval, and marking it ready
+requests implementation review. A change that also needs harness work
+carries a companion repository change `<slug>-harness` on the same
+branch. The default specification author is the implementing agent; the
+maintainer approves.
+
+## Archive mode
+
+Automated: the `spec-archive` workflow (`.github/workflows/spec-archive.yml`)
+runs on every push to `main`, one run at a time and never cancelling a run
+in progress, and archives every change whose tasks are all ticked through
+`scripts/archive_completed_changes.py` — a mirror of the
+`spec-driven-development` skill's script — validating strictly and
+committing `docs: archive completed OpenSpec changes`. It rescans every
+completed change on each run and fails without retry when its push is
+rejected: the merge that moved `main` triggered the run that archives the
+rest. `main` therefore holds a completed, unarchived change only between
+a merge and that run. Selected because the repository already runs
+Actions on `main`.
+
+The push needs the Actions identity on the `Default` ruleset's bypass list
+— a maintainer action recorded in `.agents/knowledge/github-settings.md`.
+**Until it is granted, archive inside the pull request before marking it
+ready** (the archive skill), so `main` never holds an unarchived change;
+the pull request checklist accepts either. Never tick a task that is not
+done: a ticked task list is what the workflow archives.
 
 ## Specifications and tracked work
 
@@ -83,12 +127,19 @@ update skill), get the revision approved, then continue.
 - An issue owns who, when, and status. The Task form's Specification field
   names `openspec/changes/<slug>`; its acceptance field holds either
   executable criteria or a link to the change's scenarios, never both.
-- A pull request names its change on a `Spec:` line and ticks "change
-  archived" in its checklist. A repository change is named the same way;
-  its archive moves the record without touching `openspec/specs/`. A skill
-  change that also needs harness work carries a companion repository change
-  named `<slug>-harness` on the same branch, and the pull request names both
-  on their own `Spec:` lines.
+- A pull request names its change on a `Spec:` line, states its phase on
+  a `Phase:` line (`specification` until the approval comment,
+  `implementation` after), and ticks the two specification items in its
+  checklist. A repository change is named the same way; its archive moves
+  the record without touching `openspec/specs/`. A skill change that also
+  needs harness work carries a companion repository change named
+  `<slug>-harness` on the same branch, and the pull request names both on
+  their own `Spec:` lines.
+- An issue opens when the requirement appears, with the raw requirement,
+  owner, and priority and no acceptance criteria; it links the change
+  record once that record exists. Discussion of a specification in an
+  issue thread is deliberation; the record is the file at the approved
+  commit.
   `Spec: none — <reason>` is allowed only for a change too small to plan
   (a pin bump, a typo).
 - Bug reports carry no spec: the expected behavior is the current spec,
@@ -106,7 +157,8 @@ the committed copies differ from what the pinned CLI produces.
 - `openspec_version` in the `justfile` changes: run `just spec-sync`,
   re-verify the artifact table against `openspec --help`, and update the
   verification date above.
-- The level or the approval owner changes.
+- The level, the approval owner, the change request shape, or the archive
+  mode changes; the Actions bypass is granted or revoked.
 - A domain naming rule or the catalog layout changes.
 - The project schema gains, loses, or reshapes an artifact: update the
   artifact table, `skill-authoring`, and the pull request template together.
