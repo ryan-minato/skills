@@ -9,7 +9,7 @@ command that exists and passes locally; CI never chooses its own linters.
 | `checks / quality` | `checks.yml` | `just install-tools && just check` (Python 3.12, Node 24, pinned pre-commit, rust-just, ruff) | every pull request; push to `main` | feeds the gate | `just check` exits 0: validators, lint, spec validation, pre-commit hooks (commit-safety skipped by design). |
 | `checks / spec` | `checks.yml` | `just spec-validate`, then `just spec-sync` + `git diff --exit-code -- .agents/skills` | pull requests that touch `openspec/`, `.agents/skills/openspec-*`, `.agents/skills/.openspec-target`, or `justfile`; every push to `main` | feeds the gate | Validation exits 0 and the regenerated OpenSpec skills are identical to the committed ones. On an untouched pull request the job logs "nothing to validate" and passes. |
 | `checks / gate` | `checks.yml` | aggregates the two jobs above (`if: always()`) | every pull request; push to `main` | **required** | Green only when neither dependency failed or was cancelled; a skipped `checks / spec` is fine. |
-| `pr / policy` | `pr-policy.yml` | `python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"` (template and script from the base commit) | pull request opened, edited, synchronized, reopened, ready, converted to draft | **required** | Body carries every template heading, the `Closes`/`N/A` line, the security checkbox line; ready pull requests also pass the Validation, checklist, `Spec:`, and commit-subject checks. |
+| `pr / policy` | `pr-policy.yml` | `python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"` (template and script from the base commit) | pull request opened, edited, synchronized, reopened, ready, converted to draft | **required** | Body carries every template heading, the `Closes`/`N/A` line, and the security checkbox line, and every commit subject (the title, for a fork) follows Conventional Commits; ready pull requests also pass the Validation, checklist, and `Spec:` checks. |
 | `scan-secrets` | `secret.yml` | TruffleHog `--only-verified` over the pull request range or the pushed range | every pull request; push to `main` | **required** | No verified secret. The job id is the check name; it predates the other checks. |
 | `issues / triage` | `issue-triage.yml` | `python3 scripts/sync_issue_metadata.py --event "$GITHUB_EVENT_PATH" --apply` | issue opened or edited | automation | Prints the label plan as JSON and applies it; exit 1 means a form answer did not map to a label in `.github/labels.json`. |
 
@@ -33,10 +33,11 @@ name live on `main` before the ruleset requires it.
 ## Tool pins
 
 `checks / quality` installs the same versions the dev container and
-pre-commit use: `ruff==0.16.4` (pre-commit rev `v0.16.4`), `rust-just`,
-`pre-commit`, `pyyaml` and `@fission-ai/openspec` from the `justfile`
-variables. `scripts/validate_harness.py` checks that the ruff pins agree in
-all three places. Bump them together; see
+pre-commit use: `ruff==0.16.4` (pre-commit rev `v0.16.4`), `rust-just` and
+`pre-commit` pinned in the workflow, and `@fission-ai/openspec` at the
+`openspec_version` of the `justfile` (`just install-tools`).
+`scripts/validate_harness.py` checks that the ruff pins agree in all three
+places. Bump them together; see
 `.agents/knowledge/harness-maintenance.md`.
 
 ## Update this file when
