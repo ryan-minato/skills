@@ -68,10 +68,12 @@ answer for what enters long-lived branches.
 
 ### 1. Establish the ground
 
-Read the project's workflow contract at
-`.agents/knowledge/project-workflow.md` if present; its settled semantics —
-acceptance, ownership, objective boundaries, deliveries — are the anchors
-authority attaches to. Read the specification contract at
+Read the project's workflow file at
+`.agents/knowledge/<platform>-workflow.md` (for example
+`github-workflow.md`) if present; its settled rules — acceptance,
+ownership, milestones or their equivalent, releases — are the anchors
+authority attaches to, and its platform is the vocabulary the policy is
+written in. Read the specification contract at
 `.agents/knowledge/spec-workflow.md` the same way if present: its approval
 gate — who accepts a specification before planning and implementation —
 is an acceptance anchor, and the levels below attach to it. Their absence
@@ -148,6 +150,10 @@ answers; every placeholder and inapplicable section must be gone, and the
 deposited file must carry the may/may-not lists, both gates with owners, the
 escalation list, the acceptance-evidence report format, the policy-change
 proposal procedure, and the no-self-escalation rule verbatim in substance.
+Write the gated actions as the platform's operations — marking a pull or
+merge request ready, requesting review, approving, merging, releasing — and
+define the two gate names in the file itself, so no reader needs this
+builder to understand it.
 
 Verify by removal simulation: with this builder deleted, a future agent must
 be able to state its own limits, both gate owners, and what to do at a

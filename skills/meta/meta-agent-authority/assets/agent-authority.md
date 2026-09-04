@@ -6,6 +6,9 @@ HTML comments carry adaptation guidance to act on and delete; everything
 outside both is default text that stays unless a settled answer changes it.
 No slot, comment, or inapplicable section may survive into the written
 file. Keep the no-self-escalation section in every deposit, at every level.
+Name actions as the project's platform operations (pull or merge request
+ready, review request, approve, merge, release); the gate names below are
+defined in place and stay.
 -->
 
 # Agent Authority Policy

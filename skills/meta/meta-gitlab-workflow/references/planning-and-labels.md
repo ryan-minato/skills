@@ -9,13 +9,14 @@ as `work items`, `labels`, `milestones`, `issue boards`, `Scrum`, `Kanban`,
 
 ## Choose the planning system
 
-When the target carries a workflow contract, the planning system is not
-chosen here: the contract says which semantics exist, and
-[semantic-mapping.md](semantic-mapping.md) says what each becomes on
-GitLab — a contract without a planning surface gets no board, one without
-priority gets no `priority::*` labels, one without a timebox gets no
-iteration cadence. The choices below apply where no contract settles the
-question.
+When the target carries a workflow file (`.agents/knowledge/gitlab-workflow.md`),
+the planning system is not chosen here: the file already names the GitLab
+objects in use and the ones deliberately not used — a file without a board
+gets no board, one without `priority::*` labels gets none, one without an
+iteration cadence gets none. Add the label semantics, board conventions,
+and grooming owner this builder settles to that file. The choices below
+apply where no workflow file settles the question, and the result is
+written as that file.
 
 - **Kanban:** default for continuous flow. Start with one maintained board and
   the fewest lists that reveal backlog, in-progress work, review, blocking, and

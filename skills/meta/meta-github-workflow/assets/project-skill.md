@@ -46,7 +46,7 @@ change record's task list, each linking the specification and the
 scenarios it closes; never copy acceptance criteria into the issue. Delete
 this placeholder otherwise.}} Human-authored
 tracking issues and milestones go through the consensus process in
-{{KNOWLEDGE_PATH}}/planning.md — never create them unilaterally.
+`.agents/knowledge/github-workflow.md` — never create them unilaterally.
 
 ## Publish gate
 

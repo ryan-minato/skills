@@ -66,8 +66,8 @@ place here only when its topic selects the whole project shape, so that adding
 it excludes the catalog's other topic builders.
 
 Generic, pluggable harness machinery — complete harness architecture,
-platform-neutral contract builders (branching, project workflow, agent
-authority), platform lifecycle workflows, language-level
+contract builders (branching, project workflow, specification workflow,
+agent authority), platform lifecycle workflows, language-level
 convention defaults — belongs to the `meta` catalog, whose skills stack
 alongside whichever scaffold is chosen. Durable
 cross-project methodology remains in `core/meta-harness`.

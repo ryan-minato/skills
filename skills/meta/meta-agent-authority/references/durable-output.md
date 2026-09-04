@@ -50,6 +50,11 @@ required checks in its own favor — the deposited procedure is:
   owners, the escalation conditions, the report format, the proposal
   procedure, and the no-self-escalation rule — the runtime rules must not
   depend on this builder existing.
+- Platform vocabulary for actions: the policy names what an agent may and
+  may not do as the platform's own operations (for GitHub: `gh pr ready`,
+  requesting review, approving, merging, publishing a release), and defines
+  Review Admission and Integration in the file. A term only this builder
+  defines must not appear without its definition.
 - Platform enforcement is welcome but separate: what a platform can enforce
   is configured by the platform lifecycle builder and recorded there with
   its enforcement tier. Policy is authoritative even where enforcement is

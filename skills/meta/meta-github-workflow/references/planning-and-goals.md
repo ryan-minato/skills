@@ -6,12 +6,14 @@ plans work without GitHub Projects.
 
 ## The default planning system
 
-When the target carries a workflow contract, the planning system is not
-designed here: the contract says which semantics exist, and
-[semantic-mapping.md](semantic-mapping.md) says what each becomes on
-GitHub — a contract without a planning surface gets no board, one without
-priority gets no priority home at all. The defaults below apply where no
-contract settles the question.
+When the target carries a workflow file (`.agents/knowledge/github-workflow.md`),
+the planning system is not designed here: the file already names the
+GitHub objects in use and the ones deliberately not used — a file without
+a board gets no board, one without a priority home gets none at all. Add
+the label semantics, tracking-issue conventions, milestone policy, and
+grooming owner this builder settles to that file. The defaults below apply
+where no workflow file settles the question, and the result is written as
+that file.
 
 The native day-to-day view is issue filters and the pull-request list, not
 a board. The default cadence object is the **milestone per release**;

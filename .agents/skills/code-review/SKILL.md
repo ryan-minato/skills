@@ -54,8 +54,10 @@ git path; every rule below applies to any reviewer, human or machine.
 2. **Blocking — wrong installed behavior**: an agent following a published
    skill's text takes a wrong or unsafe action; agent authority widened by
    default (ready/review/merge granted on green checks, a weakened
-   no-self-escalation rule); platform vocabulary inside a platform-neutral
-   contract layer; a contradiction between pieces that load together; a
+   no-self-escalation rule); a builder-defined model noun inside a
+   deposited platform file, or a platform object decided during the
+   platform-neutral design stage; a contradiction between pieces that load
+   together; a
    path reference escaping a public skill's directory; a hard dependency
    outside the catalog's granted range, or a recommendation of another
    repository's skill.
@@ -153,10 +155,10 @@ shape is advisory and the chosen name stands.
   builder is deleted, so a defect in `assets/` outranks the same defect in
   SKILL.md. Check that content meant to survive adaptation never sits
   inside placeholder markup a header orders deleted.
-- **Contract flow is one-way.** Contract builders stay platform-neutral;
-  platform builders map settled contract decisions and never re-decide or
-  re-ask them. This applies to the published builders only: this
-  repository's own harness is GitHub-specific by decision
+- **Contract flow is one-way.** Contract builders design in the
+  platform-neutral model and deposit in the platform's vocabulary;
+  platform builders implement settled decisions and never re-decide or
+  re-ask them. This repository's own harness is GitHub-specific by decision
   (`.agents/knowledge/harness-maintenance.md`), so GitHub vocabulary in
   `.agents/knowledge/` is not a finding.
 - **Cross-skill references by name that hand off through

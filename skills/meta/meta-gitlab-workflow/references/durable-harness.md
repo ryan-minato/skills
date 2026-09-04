@@ -17,9 +17,14 @@ When no coherent project convention exists, use:
 
 - `.agents/skills/gitlab-project-workflow/` for recurring task, work-item, MR,
   release, wiki, pipeline, and approved platform-operation procedures;
-- `.agents/knowledge/gitlab/` for planning vocabulary, platform settings,
-  CI/local-command mapping, security/ownership, deployments/releases, Wiki,
-  and optional MLOps facts;
+- `.agents/knowledge/gitlab-workflow.md` — the workflow file the workflow
+  builder deposited (objects in use and not used, decomposition, triage,
+  planning view), to which this builder appends label semantics, board
+  conventions, and the grooming owner; created here in the same shape when
+  no builder ran;
+- `.agents/knowledge/gitlab/` for platform settings, CI/local-command
+  mapping, security/ownership, deployments/releases, Wiki, and optional
+  MLOps facts;
 - `.gitlab/issue_templates/` and `.gitlab/merge_request_templates/` for human
   and agent intake;
 - committed configuration and public policy files at their GitLab- and

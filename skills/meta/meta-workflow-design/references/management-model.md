@@ -2,10 +2,12 @@
 
 Read when deciding which semantics the project earns. This is the complete
 platform-neutral vocabulary: every concept below expresses a real management
-fact that exists whether or not any platform has an object for it. Do not
-extend the catalog for completeness — a new concept enters only with a
-management fact nothing here can express and a deletion-test answer of its
-own.
+fact that exists whether or not any platform has an object for it. It is
+the language of inspection, questions, and the design summary; the
+deposited file translates each concept into the platform's object and never
+uses these names. Do not extend the catalog for completeness — a new concept
+enters only with a management fact nothing here can express and a
+deletion-test answer of its own.
 
 For each concept: what it asserts, and the deletion test — the question to
 answer before enabling it in a given project. An entity with no concrete
@@ -34,7 +36,8 @@ answer is not enabled.
 - **Change Request** — a change to code, configuration, or specification
   that has actually begun. A **Draft Change** is one its author considers
   not yet ready for formal acceptance; it is never a placeholder for future
-  work.
+  work. A draft whose first content is a specification awaiting review is
+  work that has begun.
 - **Delivery** — a versioned or otherwise acceptable result actually handed
   to consumers.
 - **Source Marker** — a named, stable source state (a tag- or
@@ -75,7 +78,9 @@ answer is not enabled.
 - **Ownership** — who is responsible for driving, maintaining, reviewing,
   or answering for a scope.
 - **Acceptance** — under what conditions, and by whom, a change or result is
-  accepted.
+  accepted. Under a specification discipline the conditions are the
+  specification's scenarios; this semantic then records only by whom and
+  when.
 - **Automation** — what machines verify, execute, or deliver without a
   human in the loop.
 

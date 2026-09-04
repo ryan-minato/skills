@@ -51,7 +51,7 @@ deterministic. It is the only bundled script gated on this branch.
 
 A project is account-side state invisible to a checkout. Mirror the field
 schema, each view's meaning, and the grooming owner into
-`.agents/knowledge/github/planning.md`, and register the project number and
+`.agents/knowledge/github-workflow.md`, and register the project number and
 link in `platform-settings.md` with readback commands.
 
 Done when: the project link, field schema, view meanings, automation

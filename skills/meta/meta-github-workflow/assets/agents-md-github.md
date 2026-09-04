@@ -8,9 +8,10 @@ not a manual. -->
   {{ENFORCED_ADVISORY_OR_CONVENTION}}.
 - Recurring issue, pull-request, release, and platform work → the
   `github-project-workflow` skill in {{SKILL_DIR_PATH}}.
-- Issue-type and priority-field semantics, label meanings, tracking-issue
-  conventions, and milestone policy → {{KNOWLEDGE_PATH}}/planning.md before
-  creating or editing planning objects.
+- Branches, issues, pull requests, label meanings, tracking-issue
+  conventions, and milestone policy → `.agents/knowledge/github-workflow.md`
+  before creating a branch, opening or editing an issue or pull request, or
+  creating a planning object.
 - CI job ↔ command map and what a healthy run looks like →
   {{KNOWLEDGE_PATH}}/checks.md before touching workflows or diagnosing a
   red check. Never weaken or delete a check to make it pass.
