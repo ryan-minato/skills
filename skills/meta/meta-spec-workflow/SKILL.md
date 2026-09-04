@@ -104,7 +104,10 @@ and its platform is the vocabulary this contract is written in),
 must follow it, never a tool default), and the project's goal document.
 When no workflow file evidences the platform, establish it from the remote
 and the CI or template directories; if nothing does, ask in step 2 before
-anything else, because no contract is deposited without it. Sort everything into known facts with evidence, unknown facts
+anything else, because no contract is deposited without it. Record also
+whether automation exists (a workflow or pipeline directory) and whether
+its identity may push to the protected integration branch: that evidence
+decides the archive mode. Sort everything into known facts with evidence, unknown facts
 still discoverable, and decisions only a human can make.
 
 Done when: the script's summary is recorded; every existing spec artifact,
@@ -140,10 +143,34 @@ recommendation:
 4. **Division of labor** — confirm the default: specifications own what,
    why, and acceptance; tracked work owns who, when, and status and links
    the specification. Any deviation is recorded with its reason.
+5. **Change request shape** — combined (one change request carries the
+   change record from the moment it is committed, opened as a draft, and
+   the approval gate is exercised on that draft before implementation) or
+   split (a specification change request carries only the record, is
+   approved and merged, and implementation change requests follow). Derive
+   the recommendation from the change propagation the workflow file
+   records and cite that line: local, copied, or state-mutating propagation
+   → combined; dependency or inherited propagation, a standards project, or
+   any consumer that depends on a stable contract → split. Any project may
+   take a single contract-level change through split as a recorded
+   deviation.
+6. **Archive mode** — automated (a job on the integration branch archives
+   every completed change after merge, one run at a time, rescanning
+   everything, failing without retry on a rejected push) or in-request
+   (the change request archives before it is marked ready). Derive the
+   recommendation from step 1's evidence: automation that exists and may
+   push to the protected integration branch → automated; otherwise
+   in-request, naming the missing capability. Record the push authorization
+   the automation identity needs as a maintainer action.
+7. **Default specification author** — the implementer, or a named planning
+   role. Record who publishes the draft and who approves it (the approval
+   owner of question 3); the approval is a comment on the draft naming the
+   approved commit, never the platform's review-approval state, which later
+   pushes dismiss.
 
-Done when: level, approach, approval owner, and division of labor are
-settled by the user or confirmed from evidence, each with its selecting
-fact recorded.
+Done when: level, approach, approval owner, division of labor, change
+request shape, archive mode, and default author are settled by the user or
+confirmed from evidence, each with its selecting fact recorded.
 
 ### 3. Install or adopt the tool
 
@@ -217,8 +244,10 @@ and is replaced by the platform's object, never waived.
 
 Simulate removal: with this builder deleted, the next agent must be able to
 name the level, the tool, where a new specification goes, which file rules
-on a behavior, who approves a spec, and how a work item links a spec, from
-target-project files alone. Confirm the deposited file does not carry this
+on a behavior, who approves a spec and where that approval is recorded,
+when the draft opens, whether a spec needs its own change request, who
+archives and when, and how a work item links a spec, from target-project
+files alone. Confirm the deposited file does not carry this
 skill's disposable marker, name, or paths.
 
 Then hand off by name, in order. Governance next: attach the approval gate
@@ -263,3 +292,10 @@ record it in the handoff.
 - Acceptance criteria copied into an intake template are the single most
   common contradiction source; the platform builder must make the template
   link the spec's scenarios instead.
+- A specification discussed in the work item's comment thread is
+  deliberation, not the record: the record is the file at the approved
+  commit, and the approval is the comment on the draft that names it.
+- Automated archiving needs a fixed archive operation. OpenSpec has one;
+  Spec-Kit, Kiro, and committed documents do not, so for them the contract
+  records the project's own completion criterion and post-processing step
+  before any job is designed.

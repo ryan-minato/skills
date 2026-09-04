@@ -46,6 +46,19 @@ contract's artifact map with the date.
 - The tool ignores git branches; branch naming follows the branching
   contract, and the change name and branch name need a recorded mapping
   when they differ.
+- Its propose step generates the proposal, delta specs, design, and tasks
+  together. The approval gate reviews the proposal and the delta specs
+  only; design and tasks are drafts the implementer finishes after
+  approval.
+- Its documentation supports two archive timings: after merge (its
+  recommendation) or inside the pull request. The automated archive mode
+  is the former made mechanical through the tool's non-interactive archive
+  operation — verify the flag from the CLI's help — and the in-request mode
+  is the latter. Under the split shape, approved change records sit under
+  the changes directory on the integration branch until their
+  implementation lands; a delta written against a domain spec another
+  change archived later may no longer apply, so re-validate at
+  implementation start.
 
 ## Collision points with a harness
 
@@ -56,6 +69,7 @@ contract's artifact map with the date.
 | Task list of a change | tracked work status | Work items are created from the task list; status lives in tracked work, completion of the change lives in the archive step |
 | Agent command files written by the initializer | an existing project skill covering the same steps | Keep one set; merge or remove the other |
 | The optional project configuration | entrypoint statements about spec locations | The configuration rules on layout; the entrypoint points |
+| An approved, unimplemented change record on the integration branch (split shape) | tracked work that forgot it | Every such record has an open work item owning its implementation; one without is stale and is assigned or removed through a change request |
 
 ## Adopting the tool in an existing repository
 
@@ -71,4 +85,6 @@ change touches; the codebase map covers them.
 Level (spec-anchored), the verified `openspec/` layout, the rule that main
 specs change only through archived changes, the change-name-to-branch
 mapping, which agents received command files, whether the validator runs
-in the project's checks, and the verification date.
+in the project's checks, the change request shape, the archive mode (and
+for automated, the job that runs the archive script and the push
+authorization it needs), and the verification date.

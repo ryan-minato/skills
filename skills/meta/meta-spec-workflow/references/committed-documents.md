@@ -31,8 +31,11 @@ domain spec is omitted; say which in the contract.
   delta names every changed requirement" on it, and add a lightweight
   check to the project's checks when the team will maintain one.
 - **Archiving:** a written rule for who merges the delta into the domain
-  spec and when — at change acceptance, by the change's author — because
-  nothing does it automatically.
+  spec and when, per the archive mode — inside the change request before
+  it is marked ready, by the change's author; or by an automation job
+  after merge, which then needs a completion criterion the job can read (a
+  ticked task list, a status line in the record) and a merge procedure the
+  project wrote, because nothing does it automatically.
 - **Discovery:** the entrypoint pointer from the contract is the only way
   an agent finds the layout; there are no tool-installed commands.
 
@@ -55,6 +58,7 @@ user must hear that before choosing it.
 
 ## Record for the contract
 
-Level, the layout with every path, the hand-run archive rule, the
-validation substitute, the discovery pointer, and — for a custom layout —
-the constraint that justified it.
+Level, the layout with every path, the change request shape, the archive
+mode with its hand-run or project-defined automated rule, the validation
+substitute, the discovery pointer, and — for a custom layout — the
+constraint that justified it.

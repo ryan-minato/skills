@@ -38,7 +38,7 @@ and a CLI, and features differ between surfaces and releases.
 |---|---|---|
 | Principles and conventions (steering) | `AGENTS.md`, knowledge-base convention files | Because Kiro reads `AGENTS.md` too, decide once which file rules each fact; the default is steering for what Kiro applies during specs and `AGENTS.md` for what every agent must see, each pointing to the other, neither restating |
 | Feature requirements and acceptance | intake templates, work items | Work items link the spec; acceptance is never copied |
-| Task list | tracked work status | Work items are created from the task list; status lives in tracked work |
+| Task list | tracked work status | Work items are created from the task list; status lives in tracked work. Ticks in the file are status: under the split shape, tick only inside the implementing change request |
 | Hooks | harness hooks or CI checks for the same event | One owner per event; record which |
 | `.kiro/specs/<feature>/design.md` | a root `DESIGN.md` | Different files; the root name is reserved for the visual-design format and must not be created from, or renamed to, the tool's file |
 
@@ -53,5 +53,9 @@ covers the rest.
 ## Record for the contract
 
 Level, the `.kiro/` layout, which facts steering rules on versus
-`AGENTS.md`, the hook and event ownership, the portability caveat, and
+`AGENTS.md`, the hook and event ownership, the portability caveat, the
+change request shape (under split, the requirements file merges first;
+design and tasks join implementation), the archive mode — Kiro has no
+archive operation, so automated archiving needs a project-defined
+completion criterion and post-processing step recorded here first — and
 the verification date.
