@@ -15,10 +15,11 @@ the base branch and requires each one in the PR body. Keep the word
 <!-- `Closes #N`, or `N/A — <reason>` when no issue exists. -->
 Closes #
 
-<!-- The OpenSpec change this PR implements (one line per change; a
-companion repository change gets its own), or `Spec: none — <reason>` for
-a change too small to plan. -->
-Spec: openspec/changes/
+<!-- The OpenSpec change this PR implements, as a link reviewers can click
+(one line per change; a companion repository change gets its own):
+`Spec: [openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`.
+`Spec: none — <reason>` only for a change too small to plan. -->
+Spec: [openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)
 <!-- `specification` until the maintainer's approval comment names the
 approved commit; `implementation` after. -->
 Phase: specification
