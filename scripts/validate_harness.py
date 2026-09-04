@@ -74,6 +74,8 @@ OPENSPEC_CORE_SKILLS = {
     "openspec-update-change",
 }
 OPENSPEC_TARGET_VALUE = "agents"
+OPENSPEC_CONFIG = ROOT / "openspec" / "config.yaml"
+OPENSPEC_SCHEMA = "skill-change"
 LABEL_PREFIX_SKIP = ("catalog/", "priority/", "status/", "http")
 
 errors: list[str] = []
@@ -334,6 +336,19 @@ def check_openspec() -> None:
                 f"{rel(path)} hard-codes the OpenSpec version; "
                 "use `just install-tools` so the justfile pin is the only copy."
             )
+    config = read(OPENSPEC_CONFIG)
+    selected = re.search(r"^schema:\s*(\S+)\s*$", config, re.MULTILINE)
+    if not selected or selected.group(1) != OPENSPEC_SCHEMA:
+        error(f"{rel(OPENSPEC_CONFIG)} must select the project schema `schema: {OPENSPEC_SCHEMA}`.")
+    schema_dir = ROOT / "openspec" / "schemas" / OPENSPEC_SCHEMA
+    if not (schema_dir / "schema.yaml").exists():
+        error(f"{rel(schema_dir)}/schema.yaml is missing; the selected schema has no definition.")
+    else:
+        for template in re.findall(r"^\s+template:\s*(\S+)\s*$", read(schema_dir / "schema.yaml"), re.MULTILINE):
+            if not (schema_dir / "templates" / template).exists():
+                error(f"{rel(schema_dir)}/schema.yaml names template {template!r} but templates/{template} is missing.")
+    if re.search(r"^rules:", config, re.MULTILINE):
+        error(f"{rel(OPENSPEC_CONFIG)} carries a `rules:` block; artifact rules live in {rel(schema_dir)}/schema.yaml.")
 
 
 def check_ruff() -> None:

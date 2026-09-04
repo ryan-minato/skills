@@ -1,0 +1,210 @@
+name: skill-change
+version: 1
+description: This repository's change workflow for Agent Skills and repository tools - proposal → specs → design → tasks
+artifacts:
+  - id: proposal
+    generates: proposal.md
+    description: Why the change is needed, which skills or tools it touches, and how installed behavior changes
+    template: proposal.md
+    instruction: |
+      Create the proposal that establishes WHY this change is needed and WHAT
+      it touches. Keep it to one page; how it is built belongs in design.md.
+
+      Sections (keep the headings exactly; the validator requires `## Why`
+      of 50-1000 characters and a non-empty `## What Changes`):
+      - **Why**: the problem or opportunity in one or two sentences, and why now.
+      - **What Changes**: one bullet per skill or tool, stating the observable
+        change. Mark a change that breaks an installed skill's existing
+        behavior or removes a capability with **BREAKING**.
+      - **Skills touched**: one line per public skill, as
+        `<catalog>/<skill-name>`, marked *new* (no main spec exists yet) or
+        *modified* (a main spec exists under `openspec/specs/<path>/`). Each
+        line becomes a delta spec at `specs/<path>/spec.md`. Never list a
+        skill the change does not touch: specs are never backfilled. A change
+        to the repository itself - its environment, harness, tooling, checks,
+        workflows, or documentation - is a repository change: it sets
+        `skip_specs: true` in its `.openspec.yaml`, lists nothing here, and
+        states "repository change" instead.
+      - **Installed behavior**: how an agent that loads the skill from a user's
+        project behaves differently after the change - this decides the
+        commit type: `fix` corrects wrong, misleading, or wrongly restrictive
+        or permissive behavior; `feat` adds a capability; `refactor` changes
+        no behavior. Correction beats improvement. For a repository change,
+        state what agents working in this repository do differently.
+      - **Impact**: which of the synchronized surfaces move with the change -
+        the catalog `README.md` and `README.zh.md` rows, the `.agents/skills/`
+        symlink, `marketplace.json`, the catalog `CONTEXT.md`, mirrored files
+        listed in `scripts/validate_harness.py`, and any project harness file.
+      - **Non-goals**: what stays as it is, so review does not argue about it.
+      - **Tracked work**: the GitHub issue it serves, or "no issue".
+    requires: []
+
+  - id: specs
+    generates: "specs/**/*.md"
+    description: Delta specification per skill or tool domain; its scenarios are the behavioral tests
+    template: spec.md
+    instruction: |
+      Create one delta spec per line of the proposal's Skills touched, at
+      `specs/<catalog>/<skill-name>/spec.md`. Preserve an existing domain's
+      exact path; a skill that moves catalogs moves its domain in the same
+      change. A repository change (skip_specs) has no spec: this artifact is
+      reported as skipped and must not be created.
+
+      A spec states what an agent that loaded the skill observably does. It
+      never describes the diff, the file layout, or the wording of SKILL.md.
+
+      Structure (the parser reads only these headers; any other `##` heading
+      ends the section it sits in):
+      - `## Purpose` - new domains only: one or two sentences (50+ characters)
+        on what the domain governs. Omit for an existing domain.
+      - `## ADDED Requirements`, `## MODIFIED Requirements` (copy the whole
+        existing block from the main spec and edit it - a partial block loses
+        detail at archive), `## REMOVED Requirements` (with **Reason** and
+        **Migration**), `## RENAMED Requirements` (FROM:/TO:).
+      - `### Requirement: <Kind>: <name>` - one SHALL statement per
+        requirement; split compound statements.
+      - `#### Scenario: <name>` under each requirement, with **WHEN** / **THEN**
+        bullets - exactly four hashes.
+
+      Requirement kinds form a fixed skeleton, in this order, so the tests
+      and later MODIFIED deltas derive mechanically. The skeleton is fixed;
+      the Behavior content is the skill's own.
+      - `Trigger: description` - exactly one per skill, always this name:
+        when the description loads the skill and when it must not. Scenarios
+        are user prompts: WHEN the user says "..." THEN the skill loads /
+        does not load. It carries at least one near-miss scenario that shares
+        vocabulary and must not load. A later change to the description
+        MODIFIES this one block.
+      - `Behavior: <capability>` - one per capability the change adds or
+        alters, named freely: what the loaded skill produces or refuses.
+        Scenarios are outcome tasks: WHEN the user asks for ... in situation
+        ... THEN the agent's output shows ... (observable, gradable
+        requirements). At least one Behavior scenario per domain covers an
+        edge or refusal.
+      - `Handoff: <role of the target skill>` - one per pairing, named by the
+        target's role (never its skill name): how the skill routes there
+        through the installing skill and what happens when the user
+        declines. Scenarios: the handoff offered; the user declining.
+      - `Script: <file name>` - one per bundled script, named by its file:
+        the script's contract. Scenarios, always these four names: `Help`
+        (`--help` prints usage and exits 0), `Representative run` (the
+        documented success), `Repeated run` (an identical second run changes
+        nothing), `Bad arguments` (an unknown option exits 2 with a
+        diagnostic naming it).
+
+      Every scenario must be executable by a clean-context subagent or a
+      command exactly as written, because design.md's verification plan and
+      tasks.md are derived from it. A scenario nobody could run is not a
+      scenario.
+    requires:
+      - proposal
+
+  - id: design
+    generates: design.md
+    description: Where each requirement lands in the skill, the description draft, sync obligations, and the verification plan
+    template: design.md
+    instruction: |
+      Create the design: HOW the requirements land in the skill, or how a
+      repository change lands in the harness, and how either will be
+      verified. Required for every change that touches a skill's description,
+      adds or moves a reference, asset, or script, changes a dependency or
+      handoff, touches a mirrored file, or is a repository change; optional
+      only for a wording change inside one existing section.
+
+      Sections:
+      - **Context**: the current shape of the skill or harness and the
+        constraints that bind the change (catalog `CONTEXT.md` rules, the
+        dependency range, size limits, mirrored copies, the keep-in-sync
+        pairs). Point at proposal.md for motivation; do not restate it.
+      - **Placement**: a table mapping every requirement to the file and
+        section that will carry it - `SKILL.md` section, `references/<file>`
+        with the sentence that triggers loading it, `assets/<file>`,
+        `scripts/<file>`. This is where progressive disclosure is decided:
+        SKILL.md keeps what every run needs; branch material goes to a
+        reference with a precise load trigger. A repository change maps each
+        bullet of What Changes to the harness file, script, workflow, or
+        document that carries it and names the check that proves it.
+      - **Description**: for a description change, what the description must
+        contain - the capability it states, the situations and phrasings
+        (direct and indirect) that must load the skill, the neighbouring
+        requests that must not, and the size budget (1024-character limit,
+        warning above 900). Never the wording itself: the text is
+        implementation, and the agent tunes it against the Trigger scenarios
+        while implementing.
+      - **Dependencies and handoffs**: every skill named, whether it is in
+        the allowed range, how the handoff routes through the installing
+        skill, and the fallback when the user declines.
+      - **External impact**: everything outside the skill's own directory
+        that the change touches or must keep consistent - other skills whose
+        handoffs, references, or assets change with it, catalog `CONTEXT.md`
+        and README pair rows, symlinks and `marketplace.json`, mirrored files,
+        and this repository's harness (knowledge files, project skills,
+        checks) - each with the command or readback that proves it.
+      - **Decisions**: choices with rationale and the alternative rejected;
+        name the requirement each decision serves.
+      - **Risks / Trade-offs**: [Risk] → Mitigation.
+      - **Verification plan** (required whenever a spec exists): written
+        before implementation and never edited after results exist. For each
+        scenario: the case that exercises it - the exact solver prompt for a
+        Trigger scenario (plus its near-misses) or the outcome task, the
+        rubric of observable requirements with critical failures marked, the
+        aggregate score required to pass, the solver tier (the least capable
+        tier the skill claims), the observation method, and the isolation
+        (candidate worktree or the degradation accepted). For Script
+        scenarios: the harness commands. Scenarios that will be skipped are
+        listed with the reason. A repository change lists, per bullet of What
+        Changes, the command or observation that proves it (a script's
+        `--help`, dry run, success, idempotent repeat, and bad arguments
+        exiting 2; a workflow's read-through; `just check`). Results never
+        enter this file; they go to the pull request's Validation section,
+        which links this plan.
+      - **Open Questions**: only what can be settled later without changing
+        the specs, the placement, or the tasks. A question that would change
+        any of those is resolved now, with the user.
+    requires:
+      - proposal
+      - specs
+
+  - id: tasks
+    generates: tasks.md
+    description: Implementation and verification checklist grouped by skill files, catalog sync, tests, and finish
+    template: tasks.md
+    instruction: |
+      Create the task list. The apply phase parses `- [ ] X.Y ...` checkboxes;
+      anything else is not tracked. Order by dependency; keep each task
+      small enough for one session; every task states how it is verified.
+
+      Fixed groups, in this order (drop a group only when it has no task):
+      1. **Skill and repository files** - one task per file of the placement
+         table: `SKILL.md` sections, references, assets, scripts, or for a
+         repository change its scripts, workflows, knowledge files, and
+         documents. Verify with `just check-skill <dir>` or the named check.
+      2. **External impact** - one task per item of design.md's External
+         impact: other skills adjusted, README pair rows, symlink,
+         `just gen-marketplace`, catalog `CONTEXT.md`, mirrored copies
+         (`diff` them), harness files. Verify with `just validate` or the
+         named check.
+      3. **Tests** - one task per case of design.md's verification plan,
+         naming the scenario it closes (or, for a repository change, the What
+         Changes bullet it proves); script harness tasks for Script
+         scenarios; a task recording skipped cases with reasons.
+      4. **Finish** - `just check`, the results written to the pull request's
+         Validation section, and the spec-side step the specification
+         workflow requires for this change.
+
+      Every task names the scenarios it closes; every scenario has a task.
+      Before writing, check design.md for Open Questions that would change
+      what gets built and resolve them with the user first.
+    requires:
+      - specs
+      - design
+
+apply:
+  requires: [tasks]
+  tracks: tasks.md
+  instruction: |
+    Work task by task from tasks.md on the change's branch, committing each
+    independently valid group under the repository's commit rules. Mark a
+    task done only when its verification ran. When the implementation must
+    deviate from a spec, stop, revise the change, and get it re-approved
+    before continuing.
