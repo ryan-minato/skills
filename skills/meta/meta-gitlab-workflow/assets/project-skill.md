@@ -26,20 +26,32 @@ knowledge file routed for the operation before acting.
 ## Take and execute work
 
 1. Confirm the work item is open. {{SPEC_RULE — under a specification
-   contract, one or two sentences: confirm the linked specification is
-   approved and treat its scenarios as the acceptance criteria; when
-   creating planned work, derive it from the change record's task list and
-   link the specification instead of copying acceptance criteria. Delete
-   this placeholder otherwise.}} If another person is assigned, stop and
+   contract, three sentences per the contract's change request shape.
+   Combined: a work item with no specification is taken by committing the
+   change record to the draft MR first and waiting for the gate owner's
+   approval comment naming the commit; the approved scenarios are the
+   acceptance criteria. Split: a work item whose specification MR is not
+   merged is escalated, not executed. A work item opens when the
+   requirement appears with no acceptance criteria and links the record
+   once it exists; items derived from the task list are optional and link
+   the scenarios they close. Delete this placeholder otherwise.}} If another person is assigned, stop and
    ask whether duplicate work is intended.
 2. Otherwise assign the acting identity, announce the start, and record the
    start time using the project's verified mechanism.
 3. Create and push a compliant branch, then open a draft MR immediately. Set
    yourself as assignee and apply the approved labels and milestone.
+   {{SPEC_DRAFT — under a specification contract with the combined shape:
+   its first content is the change record, its phase marker says
+   "specification", and planning waits for the approval comment. Delete
+   this placeholder otherwise.}}
 4. Keep the MR's what/why, changes, links, discoveries, and checklist current.
 5. On pause, material change, completion, or abandonment, log time and status.
    On abandonment, explain the handoff and clear the assignee.
-6. When acceptance criteria and required checks pass, follow
+6. When acceptance criteria and required checks pass, {{SPEC_FINISH —
+   under a specification contract: confirm the spec-side step per the
+   archive mode — the record archived before removing the draft flag
+   (in-request) or every task ticked for the archive job (automated). Delete
+   this placeholder otherwise.}} follow
    {{AUTHORITY_POLICY_PATH — e.g. .agents/knowledge/agent-authority.md}}: a
    green pipeline is evidence, not acceptance. {{READY_POLICY — default:
    stop at the draft and hand the human a decision-ready report (goal

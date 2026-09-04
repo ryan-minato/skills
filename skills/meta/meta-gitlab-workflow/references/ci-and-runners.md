@@ -58,3 +58,10 @@ repository rules only after the referenced jobs exist and pass.
 Done when: every job has an eligible runner and local equivalent, triggers match
 the agreed contract, stale MR tests cancel, secrets remain outside untrusted
 jobs, and required merge gates reference real passing jobs.
+
+Under a specification contract with automated archiving, the archive job
+pushes to the protected default branch: it needs a project access token (or
+deploy token) with push permission on that branch, stored as a masked,
+protected CI variable. Creating it is a maintainer action recorded in the
+platform-settings knowledge with its readback; until it exists the
+contract's in-request archiving stays in force.

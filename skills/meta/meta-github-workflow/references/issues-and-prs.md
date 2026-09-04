@@ -66,12 +66,20 @@ generated release notes consume — plus milestone and reviewer per policy.
    fabricate them. On a public repository the draft's diff and commit
    messages are public from that moment; the confidentiality boundary from
    the design tree applies to every push.
-5. Keep the PR description current; add comments for major discoveries,
+5. Under a specification contract with the combined shape, the draft's
+   first content is the change record: push the proposal and delta specs,
+   set the phase marker to "specification", request the gate owner's
+   review explicitly, and start planning and implementation only after the
+   approval comment naming the commit (see
+   [spec-expression.md](spec-expression.md)). Under split, link the merged
+   specification PR instead.
+6. Keep the PR description current; add comments for major discoveries,
    changed assumptions, and decisions reviewers will need.
-6. Abandon by un-assigning, closing the draft with a comment stating the
+7. Abandon by un-assigning, closing the draft with a comment stating the
    state and remaining work, and leaving the issue open for pickup.
-7. When acceptance criteria and checks pass, update the final description
-   and complete the checklist. What happens next is set by the project's
+8. When acceptance criteria and checks pass, update the final description
+   and complete the checklist, including the spec-side step the contract's
+   archive mode requires. What happens next is set by the project's
    authority policy (`.agents/knowledge/agent-authority.md`, or the location
    the entrypoint records), not by green checks: by default `gh pr ready` and requesting review are the human's
    acceptance decision, and the agent stops at the draft with a
@@ -81,7 +89,7 @@ generated release notes consume — plus milestone and reviewer per policy.
    (`gh pr merge --auto`) may arm only where approved policy says so, and
    the unattributed-Copilot extra-approval default can demand a second
    review — check it rather than waiting on a phantom.
-8. Merge closes the linked issue via the closing keyword. Verify the
+9. Merge closes the linked issue via the closing keyword. Verify the
    closure landed; do not close by hand what the keyword already handles.
 
 Every metadata change in this machine — labels, assignees, milestone,

@@ -19,14 +19,22 @@ commands.
 ## Take work
 
 1. Read the issue; confirm it is open and acceptance criteria are
-   executable. {{SPEC_RULE — under a specification contract, one sentence:
-   confirm the linked specification is approved and treat its scenarios as
-   the acceptance criteria. Delete this placeholder otherwise.}} If another
+   executable. {{SPEC_RULE — under a specification contract, two sentences per the
+   contract's change request shape. Combined: an issue with no
+   specification is taken by committing the change record to the draft PR
+   first and waiting for the gate owner's approval comment naming the
+   commit; the approved scenarios are the acceptance criteria. Split: an
+   issue whose specification PR is not merged is escalated, not executed.
+   Delete this placeholder otherwise.}} If another
    identity is assigned, stop and ask.
 2. Assign yourself, re-read, and confirm you are the sole assignee.
 3. `gh issue develop -c {{ISSUE_NUMBER_PLACEHOLDER}}` to create and check
    out the linked branch; push it and open a draft PR immediately with
    `Closes #N` in the body. The draft PR is the claim and the work log.
+   {{SPEC_DRAFT — under a specification contract with the combined shape:
+   its first content is the change record, its phase marker says
+   "specification", and planning waits for the approval comment. Delete
+   this placeholder otherwise.}}
 4. Keep the PR description current; comment major discoveries and
    decisions. {{CONFIDENTIALITY_RULE — what must never appear in issues,
    PRs, or logs}}.
@@ -41,9 +49,11 @@ labels and `--type` explicitly in the same call (delete the type on a
 personal account). A field value cannot be set that way at all: it needs
 `gh api repos/{{OWNER_REPO}}/issues/<number>/issue-field-values`, so
 priority is a second, separate call. {{SPEC_ISSUES — under a specification
-contract, one or two sentences: issues for planned work derive from the
-change record's task list, each linking the specification and the
-scenarios it closes; never copy acceptance criteria into the issue. Delete
+contract, two or three sentences: an issue opens when the requirement
+appears, carrying the raw requirement, owner, and priority and no
+acceptance criteria, and links the change record once it exists; issues
+derived from the record's task list are optional, each linking the
+scenarios it closes; never copy acceptance criteria into an issue. Delete
 this placeholder otherwise.}} Human-authored
 tracking issues and milestones go through the consensus process in
 `.agents/knowledge/github-workflow.md` — never create them unilaterally.
@@ -84,7 +94,11 @@ this gate.
    ({{KNOWLEDGE_PATH}}/checks.md maps jobs to commands — diagnose with
    {{DIGEST_COMMAND_IF_COPIED}}; never fetch full logs, never weaken a
    check).
-2. Complete the PR checklist and update the final description. Then follow
+2. Complete the PR checklist and update the final description. {{SPEC_FINISH
+   — under a specification contract: confirm the spec-side step per the
+   archive mode — the record archived before ready (in-request) or every
+   task ticked for the archive job (automated). Delete this placeholder
+   otherwise.}} Then follow
    {{AUTHORITY_POLICY_PATH — e.g. .agents/knowledge/agent-authority.md}}:
    green checks are evidence, not acceptance. {{READY_POLICY — default:
    stop at the draft and hand the human a decision-ready report (goal
