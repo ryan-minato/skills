@@ -156,12 +156,17 @@ remote and task platform, so the rules are written in GitHub terms.
 
 ## Specifications
 
-`openspec/specs/<domain>/spec.md` is the source of truth for what each
-public skill (one domain per skill) and each repository tool does. A
+`openspec/specs/<catalog>/<skill-name>/spec.md` is the source of truth for
+what each public skill does. The repository itself has no spec domain: a
+change to its harness, tooling, or documents is a `skip_specs` change with
+a proposal, design, and tasks only. A
 behavior change goes through `openspec/changes/<slug>/` on the branch of
 the same slug, its scenarios become the behavioral tests, and the change
 is archived inside the pull request, so `main` never holds an unarchived
-change. Specs exist only for domains a change has touched. The OpenSpec CLI
+change. Specs exist only for domains a change has touched. The change artifacts
+follow the project schema in `openspec/schemas/skill-change/` (requirements
+named by kind — trigger, behavior, handoff, script, tool — and a design
+that carries the verification plan). The OpenSpec CLI
 version is pinned in the `justfile`; `just spec-validate` runs its strict
 validator and `just spec-sync` regenerates the `openspec-*` skills.
 

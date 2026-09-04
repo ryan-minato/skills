@@ -27,7 +27,8 @@ compatibility, and rollback is `git revert` on `main`.
   when an issue exists. `<type>` is the dominant Conventional Commit type
   of the change. The slug is also the OpenSpec change name: branch
   `feat/spec-driven-development` pairs with
-  `openspec/changes/spec-driven-development/` (see
+  `openspec/changes/spec-driven-development/`; a companion repository
+  change on the same branch is `<slug>-harness` (see
   `.agents/knowledge/spec-workflow.md`).
 - Cut from current `origin/main`; never commit on `main` directly.
 - Merge method: rebase merge for branches in this repository (branch
