@@ -50,7 +50,15 @@ The deposited file, adapted from the asset, must state:
 - The approval gate: who approves a specification before planning and
   implementation, and whether an agent may approve its own.
 - The division of labor with tracked work, phrased so an agent can apply it
-  to a concrete work item and change request.
+  to a concrete work item and change request, including when the work item
+  opens and what it may not carry.
+- The change request shape (combined or split) with its selecting fact, the
+  default specification author, where the approval is recorded, and what
+  the integration branch may hold.
+- The archive mode (automated or in-request) with its selecting fact and,
+  for automated, the job's name, its serialization, idempotence, and
+  no-retry rules, and the push authorization recorded as a maintainer
+  action.
 - The rule that specifications cover changed behavior only, and where the
   as-built description of untouched code lives.
 - An "Update this file when" list naming the events that reopen the design.

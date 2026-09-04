@@ -47,11 +47,17 @@ it never restates the fact.
 
 ## Lifecycle
 
-<States a specification passes through and the event that moves it, e.g.
-proposed (change record created) → approved (approval gate passed) →
-implemented (scenarios verified) → archived (delta merged into the
-source-of-truth spec, record moved to the archive). Name the tool command
-category for each move without quoting the command.>
+<States a specification passes through, the event that moves it, and where
+that event is recorded, e.g. proposed (change record committed and the
+draft <pull request | merge request> opened) → approved (the approval
+owner's comment on the draft naming the commit, or the merged
+specification <pull request | merge request>) → implemented (every task
+done and every scenario verified, recorded in the <pull request | merge
+request>'s validation section) → archived (delta merged into the
+source-of-truth spec and the record moved to the archive, by the archive
+job after merge or by the <pull request | merge request> before ready).
+Name the tool command category for each move without quoting the
+command.>
 
 ## Approval gate
 
@@ -60,16 +66,82 @@ a role or a person, never "the team" — and whether an agent may approve a
 specification it wrote. Agent authority levels are governed by
 `.agents/knowledge/agent-authority.md`; this gate is where they attach.>
 
+The gate is exercised as soon as the specification is written and
+clarified and the <draft pull request | draft merge request> carrying it
+is open — before any plan or task list exists. It reviews the outcome
+description, each item as this project needs it: goals and scope,
+terminology and domain model, behavior, invariants, constraints and rules,
+states and transitions, interface and data contracts, exceptions and edge
+cases, security and permissions, metrics and acceptance criteria. It never
+reviews design or tasks: those are the implementer's after approval and are
+judged by implementation review. The approval is recorded as a comment by
+<the approval owner> on the draft naming the approved commit; a platform
+review approval is not the record, because later pushes dismiss it.
+
+## Change request shape
+
+<Combined | Split>. Selected because <the change propagation line of
+`.agents/knowledge/<platform>-workflow.md`, or the consumer contract, that
+decided it>.
+
+<Combined: one <pull request | merge request> carries the whole lifecycle.
+It opens as a draft the moment the change record is committed; the gate
+is exercised on that draft; plan, tasks, and implementation follow the
+recorded approval; marking it ready requests implementation review; the
+merge closes the <issue | work item>. The default branch <never holds an
+unarchived change record (in-request archiving) | holds a completed record
+only between merge and the archive job (automated archiving)>.>
+
+<Split: a specification <pull request | merge request> carries only the
+change record, references the <issue | work item> without closing it, and
+is discussed, approved, and merged; implementation <pull requests | merge
+requests> link the merged record, and the last one closes the <issue |
+work item>. The default branch holds approved records awaiting
+implementation; a record with no open <issue | work item> owning its
+implementation is stale — assign it or remove it through a <pull request |
+merge request>, never by hand. A contract-level change in a combined-shape
+project may take this path as a recorded deviation.>
+
+Default specification author: <the implementer | role>. The author
+publishes the draft; <the approval owner> approves it.
+
+## Archive mode
+
+<Automated | In-request>. Selected because <the automation evidence that
+decided it>.
+
+<Automated: after each merge to <default branch>, <the workflow | the job>
+`<name>` archives every change record whose tasks are all complete —
+one run at a time (<a concurrency group | a resource group> named
+`<name>`, never cancelling a run in progress), rescanning every completed
+record on each run, validating strictly, committing under the project's
+commit convention, and failing without retry when its push is rejected
+because the run the competing merge triggered archives the rest. The
+automation identity's permission to push to <default branch> is a setting
+<the maintainer> grants and records in
+`<platform settings knowledge file>`; until it is granted, the in-request
+mode below is in force.>
+
+<In-request: the <pull request | merge request> archives its change record
+before it is marked ready, so <default branch> never holds an unarchived
+record.>
+
 ## Specifications and <issues | work items>
 
 - A specification owns what is built, why, and its acceptance scenarios.
-- An <issue | work item> owns who does it, when, and its status, and links
-  the specification or change record it serves. Acceptance criteria are
-  never copied into it.
-- <Issues | Work items> for planned work are created from the change
-  record's task list, each naming the scenarios it closes.
+- An <issue | work item> is opened when the requirement appears, carrying
+  the raw requirement, owner, and priority and no acceptance criteria; it
+  links the change record once that record exists. It owns who does it,
+  when, and its status. Acceptance criteria are never copied into it; an
+  acceptance sketch is marked non-authoritative.
+- <Issues | Work items> derived from the change record's task list are
+  optional, each naming the scenarios it closes.
 - A <pull request | merge request> names the change record it implements
-  and states whether the specification was updated or archived.
+  on a `Spec:` line, states its phase (specification or implementation),
+  and states whether the specification was updated or archived; its
+  description is the diff and never a requirement.
+- Discussion of a specification in an <issue | work item> thread is
+  deliberation; the record is the file at the approved commit.
 - <Any deviation the user chose, with its reason.>
 
 ## Scope of specifications
@@ -88,3 +160,5 @@ re-map when they differ.
   it back, do not let it stand.
 - The management model or the authority policy changes in a way that touches
   acceptance.
+- The automation identity's push authorization changes, or the archive job
+  is added, renamed, or removed.

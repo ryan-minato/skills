@@ -69,4 +69,10 @@ does the contract.
 Level (spec-first by default; spec-anchored only with a stated project
 rule), the verified constitution path, the `specs/` layout and numbering,
 the feature-directory-to-branch rule, which integration's command files
-exist, and the verification date.
+exist, the change request shape (under split, only the feature
+specification merges in the specification change request; plan and tasks
+join the implementation request), the archive mode — the kit has no
+archive operation, so automated archiving exists only if the project
+defines a completion criterion (a ticked task list, a status line) and a
+post-processing step of its own, recorded here before any job is designed
+— and the verification date.
