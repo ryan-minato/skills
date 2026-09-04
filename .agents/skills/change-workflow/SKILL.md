@@ -1,6 +1,6 @@
 ---
 name: change-workflow
-description: Runs this repository's change lifecycle on GitHub — the OpenSpec change loop, branch and atomic commits, the publish gate, the draft pull request, and review admission under the H1 authority policy. Use when tracked files are about to change; when starting or resuming repository work; when taking or creating an issue; when preparing commits, pushing, opening or readying a PR; or when diagnosing a red check. Read-only analysis does not trigger it.
+description: Runs this repository's change lifecycle on GitHub — the OpenSpec change loop, the draft pull request opened at the change record, approval on the draft, atomic commits, the publish gate, and review admission under the H1 authority policy. Use when tracked files are about to change; when starting or resuming repository work; when taking or creating an issue; when preparing commits, pushing, opening or readying a PR; or when diagnosing a red check. Read-only analysis does not trigger it.
 metadata:
   internal: true
 ---
@@ -49,9 +49,11 @@ Derive `OWNER/REPO` from `git remote get-url origin`. An issue is optional
 
 - **Taking one**: read it, confirm it is open and nobody else is assigned,
   and confirm its acceptance — the scenarios of the change its
-  Specification field names, or executable criteria. An issue whose change
-  is missing or unapproved is escalated, not executed. Assign yourself,
-  re-read, confirm you are the sole assignee.
+  Specification field names, or executable criteria. An issue with no
+  change yet is taken by proposing the change on the draft pull request
+  (step 3); an issue whose change exists but is unapproved waits for the
+  approval comment. Assign yourself, re-read, confirm you are the sole
+  assignee.
 - **Creating one**: only when the user authorized it. Build the body by
   mirroring the form's `### <label>` headings in
   `.github/ISSUE_TEMPLATE/` (non-interactive creation ignores forms) and
@@ -69,14 +71,19 @@ Record the issue number or a one-line reason there is none.
    fetch `origin` when remote reads are allowed.
 2. Choose the slug. Create the branch `<type>/<slug>` (or
    `<type>/<issue>-<slug>`) from `origin/main`; never work on `main`.
-3. If the change alters what a skill or a repository tool does, run the
-   OpenSpec loop on that branch with the `openspec-*` skills: propose (the
-   change is `openspec/changes/<slug>/`), then clarify with the
-   `plan-clarification` skill until no assumption is silent, then get the
-   maintainer's approval of the proposal and delta specs before
-   implementing. `spec-driven-development` supplies the loop's rules;
-   `spec-workflow.md` says which domains exist and that specs are never
-   backfilled.
+3. If the change alters what a skill does, run the OpenSpec loop on that
+   branch with the `openspec-*` skills: propose (the change is
+   `openspec/changes/<slug>/`), clarify with the `plan-clarification`
+   skill until no assumption is silent, commit the change record, then
+   publish at once — run the publish gate (step 6) and open the draft pull
+   request with the record as its first content and `Phase:
+   specification` in the body, before any design or task list is
+   finished. Request the maintainer's review and wait for the approval
+   comment naming the commit (`Specification approved at <sha>`); it
+   reviews the proposal and the delta specs, never `design.md` or
+   `tasks.md`. Finish design and tasks after the approval, then implement.
+   `spec-driven-development` supplies the loop's rules; `spec-workflow.md`
+   says which domains exist and that specs are never backfilled.
 4. A change to the repository itself (environment, harness, tooling,
    checks, workflows, documents) runs the same loop as a repository change:
    `openspec new change` then `skip_specs: true` in its `.openspec.yaml`,
@@ -105,14 +112,18 @@ approves a private one.
 
 ## 5. Verify the scenarios
 
-Before opening the PR, execute every scenario of the change against the
-result, not the diff: for a skill, the behavioral tests in the
-`skill-authoring` project skill, derived from the scenarios; for a tool,
-the commands the scenarios name. Then archive the change (archive skill)
-so the delta lands in `openspec/specs/`, and run `just check`. Record what
-ran and the outcome for the PR's Validation section.
+Before marking the PR ready, execute every scenario of the change against
+the result, not the diff: for a skill, the behavioral tests in the
+`skill-authoring` project skill, planned in the change's `design.md` and
+derived from the scenarios; for a repository change, the proofs its
+`design.md` names. Tick each task only when its verification ran. Then
+run `just check`. Archiving is the `spec-archive` workflow's job after the
+merge; while that workflow cannot push (`spec-workflow.md`, Archive mode),
+archive the change here with the archive skill so the delta lands in
+`openspec/specs/`. Record what ran and the outcome for the PR's Validation
+section, linking the plan in `design.md` rather than restating it.
 
-## 6. Publish gate, then the draft PR
+## 6. Publish gate, then the draft PR and every later push
 
 GitHub publication cannot be undone: bodies, comments, commit messages,
 and their notification copies survive deletion, and public content is
@@ -121,11 +132,11 @@ gate, and any edit after the verdict needs a fresh one.
 
 1. Assemble the exact payload as files in a scratch directory outside the
    repository. For a pull request: `title.txt`, `body.md` (from
-   `.github/PULL_REQUEST_TEMPLATE.md`, with `Closes #N` or `N/A — <reason>`
-   and the `Spec:` line), `commits.txt` from
+   `.github/PULL_REQUEST_TEMPLATE.md`, with `Closes #N` or `N/A — <reason>`,
+   the `Spec:` line, and the `Phase:` line), `commits.txt` from
    `git log origin/main..HEAD --format=full`, and `diff.patch` from
    `git diff origin/main...HEAD`. For an issue or comment: `title.txt` and
-   `body.md`.
+   `body.md`. For a later push, the new commits and diff.
 2. Review it independently: dispatch a clean-context subagent whose whole
    prompt is the review prompt in
    [references/publish-review.md](references/publish-review.md) with the
@@ -139,15 +150,17 @@ gate, and any edit after the verdict needs a fresh one.
    open the draft PR non-interactively, then read it back and compare with
    the reviewed payload.
 
-The draft is the public ownership signal; keep its body current as
-evidence changes. Do not publish secrets, private data, or internal
-context on any surface.
+The draft is the public ownership signal and the review surface for the
+specification; keep its body current as evidence changes, and switch
+`Phase:` to `implementation` once the approval comment exists. Do not
+publish secrets, private data, or internal context on any surface.
 
 ## 7. Review admission (H1)
 
 Mark the PR ready and request the maintainer's review yourself only when
-every condition in `agent-authority.md` holds: change approved and
-archived (or `Spec: none` justified), `just check` green locally and every
+every condition in `agent-authority.md` holds: change approved on the
+draft, every task done, archived or left for the `spec-archive` workflow
+(or `Spec: none` justified), `just check` green locally and every
 required check green (`.agents/knowledge/github-checks.md`; digest a red
 run with
 `python3 .agents/skills/change-workflow/scripts/run_log_digest.py --repo ryan-minato/skills --run-id <id>`
@@ -171,7 +184,11 @@ closes the issue through the closing keyword.
 
 - Authorization is task-scoped; a successful `gh auth status` is not
   permission to publish.
-- `main` never holds an unarchived change: archive before ready.
+- Archiving runs after merge; never tick a task that is not done, because
+  a fully ticked task list is what the workflow archives. While the
+  workflow cannot push, archive before ready.
+- The draft exists to review the specification: opening it after
+  implementation turns the approval gate into a formality.
 - A branch, issue, or PR does not authorize unrelated cleanup; report
   discovered work separately.
 - When ending with work unfinished, leave a self-contained handoff in the
