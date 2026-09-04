@@ -21,8 +21,10 @@ Spec: openspec/changes/
 
 ## Validation
 
-<!-- Every command or behavioral test run and its result. Name the scenarios
-that passed. -->
+<!-- Every command or behavioral test run and its result: scores, evidence,
+isolation degradations, skipped cases with reasons. Name the scenarios that
+passed and link the change's design.md verification plan for the cases and
+rubric instead of restating them. -->
 
 -
 

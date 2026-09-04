@@ -77,8 +77,12 @@ Record the issue number or a one-line reason there is none.
    implementing. `spec-driven-development` supplies the loop's rules;
    `spec-workflow.md` says which domains exist and that specs are never
    backfilled.
-4. A change that alters no behavior (docs, harness sync, pins) needs no
-   OpenSpec change; the PR will say `Spec: none — <reason>`.
+4. A change to the repository itself (environment, harness, tooling,
+   checks, workflows, documents) runs the same loop as a repository change:
+   `openspec new change` then `skip_specs: true` in its `.openspec.yaml`,
+   so it carries a proposal, design, and tasks and no delta spec. Only a
+   change too small to plan (a pin bump, a typo) skips the loop, and its PR
+   says `Spec: none — <reason>`.
 
 ## 4. Implement in atomic commits
 

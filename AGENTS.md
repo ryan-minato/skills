@@ -19,8 +19,10 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
   skills, and symlinks to every public skill. `.claude/skills` and
   `.github/skills` are symlinks to it.
 - `.agents/knowledge/` — the knowledge base; every file is listed below.
-- `openspec/` — specifications: `openspec/specs/` is the source of truth
-  for what skills and tools do, `openspec/changes/` holds changes in flight.
+- `openspec/` — specifications: `openspec/specs/<catalog>/<skill>/` is the
+  source of truth for what skills and tools do, `openspec/changes/` holds
+  changes in flight, `openspec/schemas/skill-change/` is the project schema
+  that shapes their artifacts.
 - `.github/` — issue forms, PR template, workflows, labels, health files.
 - `scripts/` — repository tooling; `justfile` — the canonical commands.
 - `ARCHITECTURE.md` — how the mechanisms fit together (symlinks,

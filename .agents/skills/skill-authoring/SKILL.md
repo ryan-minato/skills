@@ -53,9 +53,9 @@ worth building and where it belongs:
    means the delta spec is incomplete, not that the change is documentation.
 5. Apply the subagent gate below. If it passes, read
    [references/testing.md](references/testing.md) and derive the behavioral
-   tests from the scenarios before editing. If it fails, do not read the
-   reference; record the skipped behavioral tests and missing capability in
-   the handoff.
+   tests from the scenarios into the change's `design.md` verification plan
+   before editing. If it fails, do not read the reference; record the skipped
+   behavioral tests and missing capability in that plan and in the handoff.
 
 Done when: the target location is recorded and either the behavioral cases,
 rubric, critical failures, and passing threshold are defined or the missing
@@ -132,8 +132,9 @@ prose.
 2. Run `just check` (repo-wide validation, including symlinks, the
    marketplace manifest, and catalog consistency) and fix everything it
    reports; warnings deserve a look even though they don't fail.
-3. **Test.** If the subagent gate passed, run the candidate tests from
-   [references/testing.md](references/testing.md). First try disposable
+3. **Test.** If the subagent gate passed, run the cases of the change's
+   `design.md` verification plan as [references/testing.md](references/testing.md)
+   directs. First try disposable
    candidate worktrees and snapshots; if either is unavailable, use the best
    available environment and record the isolation degradation. Prefer
    framework-native conversation history or skill-load telemetry to observe
@@ -147,7 +148,7 @@ prose.
    On a test failure, fix the skill, then repeat steps 1–3. Otherwise confirm
    skipped behavioral tests and their missing capability are recorded.
 4. Archive the OpenSpec change (the delta lands in
-   `openspec/specs/<skill-name>/spec.md`) and run `just spec-validate`.
+   `openspec/specs/<catalog>/<skill-name>/spec.md`) and run `just spec-validate`.
 5. Commit under the rules in `AGENTS.md` (Commits): scope = the skill name,
    type by effect on installed behavior. Then return to `change-workflow`
    for the pull request.
