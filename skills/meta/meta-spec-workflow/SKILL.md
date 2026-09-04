@@ -8,7 +8,8 @@ description: >-
   the specification level and tool with the user, adopts the tool's
   layout, gives every fact one source of truth between tool-owned files
   and AGENTS.md or the knowledge base, and deposits a specification
-  contract the platform builders express. Use in a harness build when the
+  contract written in the project's platform vocabulary for the platform
+  builders to implement. Use in a harness build when the
   workflow contract records spec-driven intent, when a spec tool's
   directories sit beside an agent harness, or when asked to make the
   harness, templates, or tracker match Spec-Kit, OpenSpec, or Kiro, or to
@@ -23,8 +24,12 @@ compatibility: The bundled detection script requires Python 3.10+ (stdlib only).
 Settle with the human developers how this project writes, approves, and
 keeps its specifications, make the harness say the same thing the chosen
 tool assumes, and leave the result in the target project as a contract the
-platform lifecycle builders express. The contract must read correctly with
-no hosting platform in mind and survive this builder and this conversation.
+platform lifecycle builders implement. The questions and the design are
+settled in tool and workflow terms with no hosting platform in mind; the
+deposited contract names the platform's objects — issues or work items,
+pull or merge requests, drafts, the automation that archives — because the
+agents that read it work on that platform. It must survive this builder and
+this conversation.
 
 ## Non-negotiable boundaries
 
@@ -34,6 +39,12 @@ no hosting platform in mind and survive this builder and this conversation.
   specification is the content of a change request's acceptance, never a
   new work-item kind, objective, or timebox — and it never reopens a
   decision the workflow contract already settled.
+- The design is tool-neutral and platform-neutral; the deposit is not.
+  Questions and the design summary speak of specifications, change
+  records, tracked work, and change requests so that no platform habit
+  shapes the discipline; the deposited contract, after approval, names the
+  platform's objects and operations, because it is read on that platform
+  every day.
 - Tool-owned files are public-convention files. A constitution, a spec
   directory, a steering file, or a change record follows the tool's format
   and conventions; never rewrite one agent-first, never add harness
@@ -84,11 +95,16 @@ entrypoint and every knowledge file in full against the tool's
 source-of-truth specs and list each behavior statement they hold.
 
 Then read the upstream contracts, when present, at the paths the
-entrypoint's pointers record — `.agents/knowledge/project-workflow.md`
-(the Change Request and Acceptance semantics are the anchors this contract
-attaches to), `.agents/knowledge/git-workflow.md` (feature directories and
-branch names must follow it, never a tool default), and the project's goal
-document. Sort everything into known facts with evidence, unknown facts
+entrypoint's pointers record — the workflow file
+(`.agents/knowledge/<platform>-workflow.md`, for example
+`github-workflow.md`: its pull or merge request and acceptance rules and
+its recorded change propagation are the anchors this contract attaches to,
+and its platform is the vocabulary this contract is written in),
+`.agents/knowledge/git-workflow.md` (feature directories and branch names
+must follow it, never a tool default), and the project's goal document.
+When no workflow file evidences the platform, establish it from the remote
+and the CI or template directories; if nothing does, ask in step 2 before
+anything else, because no contract is deposited without it. Sort everything into known facts with evidence, unknown facts
 still discoverable, and decisions only a human can make.
 
 Done when: the script's summary is recorded; every existing spec artifact,
@@ -186,13 +202,16 @@ reading the contract.
 
 Done when: the contract lives in the target project; it names the level,
 tool, artifact map, source-of-truth table, lifecycle, approval gate,
-division of labor, and update triggers; and this hosting-platform
-vocabulary check over the deposited file returns nothing:
+division of labor, and update triggers, each in the platform's own
+vocabulary (issue or work item, pull or merge request, draft, the workflow
+or job that archives); and this model-vocabulary check over the deposited
+file returns nothing:
 
-    grep -inwE 'github|gitlab|jira|epics?|sprints?|boards?|labels?|milestones?|iterations?|backlog|tickets?|issues?' <file>
+    grep -inE 'tracked work|work item kind|change request|draft change|integration branch' <file>
 
-Tool names (the spec kit, the change workflow) are facts and may appear;
-hosting-platform objects may not — the platform builders express them.
+Tool names (the spec kit, the change workflow) are facts and appear as
+they are; a term only this builder defines is a design word that leaked
+and is replaced by the platform's object, never waived.
 
 ### 6. Verify and hand off
 

@@ -17,8 +17,12 @@ create a competing entrypoint beside an existing one.
   directory, probed in order `.claude/skills/`, `.agents/skills/`) — the
   recurring intake, claim, pull-request, release, and approved
   platform-operation procedures, organized around the PR loop.
-- `.agents/knowledge/github/` — `planning.md` (label semantics, tracking
-  issue conventions, milestone policy, grooming owner), `platform-settings.md`
+- `.agents/knowledge/github-workflow.md` — the workflow file the workflow
+  builder deposited (objects in use and not used, decomposition, triage,
+  planning view), to which this builder appends label semantics, tracking
+  issue conventions, milestone policy, and the grooming owner; created here
+  in the same shape when no builder ran.
+- `.agents/knowledge/github/` — `platform-settings.md`
   (the remote-settings register), `checks.md` (job-name-to-command map,
   required list, aggregator gates, and what a healthy run of each workflow
   looks like — how to tell "not running" from "passing"), plus

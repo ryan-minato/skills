@@ -2,9 +2,10 @@
 Raw shape for the specification contract deposited into the target project
 at .agents/knowledge/spec-workflow.md. Rework every line against the
 settled answers, delete every section the design does not use, and remove
-every placeholder and this comment before the file is written. The file
-must stay hosting-platform-neutral: no platform product or object names
-anywhere. Tool names are facts and may stay.
+every placeholder and this comment before the file is written. Write the file in
+the project's platform vocabulary: <angle-bracket> slots offer the GitHub
+and GitLab objects to choose from; no design word such as "tracked work"
+or "change request" may survive. Tool names are facts and stay.
 -->
 
 # Specification Workflow Contract
@@ -37,8 +38,8 @@ rely on a remembered one.
 |---|---|---|
 | Project goals | `<goal document>` | principles file, this contract |
 | Engineering principles | `<principles file>` | agent entrypoint |
-| Behavior of a domain | `<source-of-truth spec>` | knowledge base, tracked work |
-| Acceptance of a change | the scenarios in `<change record>/…` | change requests, tracked work |
+| Behavior of a domain | `<source-of-truth spec>` | knowledge base, <issues | work items> |
+| Acceptance of a change | the scenarios in `<change record>/…` | <pull requests | merge requests>, <issues | work items> |
 | Conventions and mechanics | the knowledge base | specifications never restate them |
 
 A file listed under "Points to it" may summarize in one line and must link;
@@ -59,16 +60,16 @@ a role or a person, never "the team" — and whether an agent may approve a
 specification it wrote. Agent authority levels are governed by
 `.agents/knowledge/agent-authority.md`; this gate is where they attach.>
 
-## Specifications and tracked work
+## Specifications and <issues | work items>
 
 - A specification owns what is built, why, and its acceptance scenarios.
-- Tracked work owns who does it, when, and its status, and links the
-  specification or change record it serves. Acceptance criteria are never
-  copied into tracked work.
-- Work items for planned work are created from the change record's task
-  list, each naming the scenarios it closes.
-- A change request names the change record it implements and states
-  whether the specification was updated or archived.
+- An <issue | work item> owns who does it, when, and its status, and links
+  the specification or change record it serves. Acceptance criteria are
+  never copied into it.
+- <Issues | Work items> for planned work are created from the change
+  record's task list, each naming the scenarios it closes.
+- A <pull request | merge request> names the change record it implements
+  and states whether the specification was updated or archived.
 - <Any deviation the user chose, with its reason.>
 
 ## Scope of specifications

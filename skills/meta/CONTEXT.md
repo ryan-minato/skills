@@ -31,9 +31,13 @@ Rules for disposable builders that create durable agent harnesses.
   on that decision; every other builder either returns to the entry or, when
   run alone, asks the same question and hands off to `meta-disposal`.
 - Contract flow is one-way. Contract builders (branching model, workflow
-  design, specification workflow, agent authority) deposit platform-neutral contracts into the target
-  project; platform builders consume those contracts, never reopen a settled
-  decision, and never let a platform capability reshape the upstream model.
+  design, specification workflow, agent authority) design in a
+  platform-neutral model — so that no platform habit shapes the design —
+  and deposit their decisions into the target project written in the
+  project's own platform vocabulary; platform builders implement those
+  deposits, never reopen a settled decision, and never let a platform
+  capability reshape the upstream model. Platform neutrality is a
+  design-stage discipline, never a file agents read daily.
 - Durable rules must land in the target repository, registered tools, or other
   reachable sources before disposal.
 - Do not ship documentation indexes, URL registries, docs-navigation tables, or
@@ -65,12 +69,12 @@ Catalog prefix `meta-` on every directory and `name`, enforced by
 
 This catalog owns generic, pluggable harness machinery: the harness entry
 workflow (`meta-harness-building`) and the architecture practice manual
-(`meta-harness-architecture`) it loads layer by layer, platform-neutral
-contract builders (branching, project workflow, specification workflow,
-agent authority) whose
-contracts the platform builders consume, platform-specific lifecycle builders whose complete output is
-deposited into the target project before disposal, and language-level
-convention defaults. Its skills stack alongside one another, so the catalog is
+(`meta-harness-architecture`) it loads layer by layer, contract builders
+(branching, project workflow, specification workflow, agent authority)
+that design in a platform-neutral model and deposit platform-worded
+decisions the platform builders implement, platform-specific lifecycle
+builders whose complete output is deposited into the target project before
+disposal, and language-level convention defaults. Its skills stack alongside one another, so the catalog is
 installed whole. A builder whose topic selects the entire project shape — and
 therefore excludes the catalog's other builders — belongs to `scaffold`
 instead. Durable cross-project methodology remains in `core/meta-harness`.
@@ -81,7 +85,7 @@ durable output before the builder is disposed of.
 ## Use inside this repository
 
 This repository is the published source of these builders, and it also
-runs them on its own harness. Two rules of the contract above therefore do
+runs them on its own harness. One rule of the contract above therefore does
 not apply when a builder runs here, and every builder's "when run alone"
 closing step reads as follows in this repository:
 
@@ -89,11 +93,11 @@ closing step reads as follows in this repository:
   not keep them out of commits, and never delete them: the closing step
   records "builders retained (published source)" instead of asking about
   deletion, and `meta-disposal` is never run here.
-- This repository's remote and task platform is GitHub and will not change
-  (decision recorded in `.agents/knowledge/harness-maintenance.md`). The
-  contract builders' platform-neutral layer and vocabulary check are
-  skipped; their decision content is written straight into the GitHub
-  knowledge files under `.agents/knowledge/`.
+
+This repository's remote and task platform is GitHub and will not change
+(decision recorded in `.agents/knowledge/harness-maintenance.md`); the
+contract builders deposit into the GitHub knowledge files under
+`.agents/knowledge/` exactly as they would in any target.
 
 Everything else holds: investigate before editing, present the plan, get
 approval, deposit durable output, and verify by independent reading. The

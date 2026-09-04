@@ -71,10 +71,11 @@ the content that serves it.
 
 ## Knowledge deposit
 
-Record in `planning.md`: the contract's location, which form fields and
-template lines exist because of it, the validator job if any, and the
-update trigger — "when the spec directory or tool changes, re-check every
-template link". Do not copy the contract's tables into `planning.md`.
+Record in the Specifications section of `.agents/knowledge/github-workflow.md`:
+the contract's location, which form fields and template lines exist
+because of it, the validator job if any, and the update trigger — "when the
+spec directory or tool changes, re-check every template link". Do not copy
+the contract's tables there.
 
 ## Platform-native option
 

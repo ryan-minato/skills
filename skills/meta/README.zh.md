@@ -9,8 +9,8 @@ catalog，将所有长期规则写入目标项目并完成验证，然后使用 
 |---|---|
 | [meta-harness-building](meta-harness-building/) | 所有 harness 搭建、改进与修复的统一入口：先了解仓库，与用户敲定需求，计划获批后借助手头的 skill 逐层构建，在干净上下文中回读产物，审查只有构建技能才懂的词汇，让构建技能不进入任何提交，并在送审前询问是否移除它们。 |
 | [meta-harness-architecture](meta-harness-architecture/) | 入口按层加载的架构实践手册：设计轴、entrypoint、knowledge、project skill、同步、熵治理、多 agent 拓扑与高级自治，并附起始形状资产。 |
-| [meta-workflow-design](meta-workflow-design/) | 与人类开发者共同设计项目的平台无关管理模型——项目真正配得上的工作跟踪语义、贴合实际交付方式的 workflow profile、overlay 与变更传播风险——并落地 workflow 契约，供平台构建技能映射而非重新决定。 |
-| [meta-spec-workflow](meta-spec-workflow/) | 让 harness 与工作跟踪和规格驱动开发保持一致：与用户敲定规格级别与工具（Spec-Kit、OpenSpec、Kiro 或仓库内文档），安装或接入工具布局，在工具拥有的文件与 entrypoint、知识库之间为每个事实保留唯一来源，并落地规格契约，供平台构建技能表达为模板与工作流步骤。 |
+| [meta-workflow-design](meta-workflow-design/) | 与人类开发者在平台无关的模型中共同设计项目的管理模型——项目真正配得上的工作跟踪语义、贴合实际交付方式的 workflow profile、overlay 与变更传播风险——并以项目自身平台的词汇落地为 workflow 文件，供平台构建技能实现而非重新决定。 |
+| [meta-spec-workflow](meta-spec-workflow/) | 让 harness 与工作跟踪和规格驱动开发保持一致：与用户敲定规格级别与工具（Spec-Kit、OpenSpec、Kiro 或仓库内文档），安装或接入工具布局，在工具拥有的文件与 entrypoint、知识库之间为每个事实保留唯一来源，并以项目自身平台的词汇落地规格契约——级别、工具、变更请求形态、存档方式、审批记录——供平台构建技能实现为模板与工作流步骤。 |
 | [meta-agent-authority](meta-agent-authority/) | 设计人类-Agent 治理政策——H0–H3 权限级别、review admission 与 integration 两道关口、升级上报条件，以及 agent 永不自行扩权的规则——并将其作为项目 agent 运行时遵循的持久政策落地。 |
 | [meta-github-workflow](meta-github-workflow/) | 为 GitHub.com 或 GitHub Enterprise 构建或系统修复完整的 GitHub 仓库生命周期 harness，围绕 PR 回路设计：intake 表单与 Discussions 路由、在默认集上扩展的标签、tracking issue 与 milestone、经关联分支的早期 draft PR、Actions 质量门与社区自动化、ruleset、CODEOWNERS、标签驱动发布说明的 release、注册表、可选 Projects 与 ML 实验记录，以及持久项目 agent 工作流。 |
 | [meta-gitlab-workflow](meta-gitlab-workflow/) | 为 gitlab.com 或自托管实例构建或系统修复完整的 GitLab 项目生命周期 harness：规划、work item 与早期 draft MR、社区文件、CI/CD、治理、安全、Wiki、发布、部署、注册表、可选 MLOps 及持久项目 agent 工作流。 |

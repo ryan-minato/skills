@@ -62,10 +62,11 @@ the content that serves it, and a board is a view.
 
 ## Knowledge deposit
 
-Record in the planning knowledge file: the contract's location, which
-template sections and MR lines exist because of it, the validator job if
-any, and the update trigger — "when the spec directory or tool changes,
-re-check every template link". Do not copy the contract's tables.
+Record in the Specifications section of `.agents/knowledge/gitlab-workflow.md`:
+the contract's location, which template sections and MR lines exist
+because of it, the validator job if any, and the update trigger — "when the
+spec directory or tool changes, re-check every template link". Do not copy
+the contract's tables there.
 
 ## Platform-native option
 

@@ -57,14 +57,17 @@ The deposited file, adapted from the asset, must state:
 
 ## Survival rules
 
-- Hosting-platform-neutral forever: the file must read correctly with no
-  hosting platform in mind. The mapping to intake forms, templates, and
-  platform objects is the lifecycle builder's durable output, not this
-  file's. Tool names are facts and may appear.
+- Platform vocabulary only: the file names the platform's objects and
+  operations (issues or work items, pull or merge requests, drafts, the
+  archive workflow or job) and never a term only this builder defines; the
+  step-5 check enforces it. Which intake form fields, template lines, and
+  checks exist because of this contract is still the lifecycle builder's
+  durable output, appended to the platform knowledge, not this file's. Tool
+  names are facts and appear as they are.
 - No trace of the builder: the deposited file never carries this skill's
   disposable marker, name, or paths.
 - Governance and management are adjacent, not inlined: agent authority
   lives in `.agents/knowledge/agent-authority.md` and the management model
-  in `.agents/knowledge/project-workflow.md`. The contract may point to
+  in `.agents/knowledge/<platform>-workflow.md`. The contract may point to
   them; it must not restate them.
 - No requirement in the contract: a behavior statement belongs in a spec.

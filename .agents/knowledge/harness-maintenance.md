@@ -7,10 +7,10 @@ harness true to the repository: the register of copied facts and their
 owners, and the periodic entropy review.
 
 Decision on record (2026-09-03, maintainer): GitHub is this repository's
-only remote and task platform. The harness therefore has no
-platform-neutral layer; the `meta` builders' contract-and-expression split
-and their disposal step do not apply here (see `## Use inside this
-repository` in `skills/meta/CONTEXT.md` and `skills/scaffold/CONTEXT.md`).
+only remote and task platform. The knowledge files are written in GitHub
+terms, as every `meta` contract builder deposits them; only the builders'
+disposal step does not apply here (see `## Use inside this repository` in
+`skills/meta/CONTEXT.md` and `skills/scaffold/CONTEXT.md`).
 
 ## Synchronization register
 

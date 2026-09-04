@@ -1,7 +1,11 @@
 # Contract Semantics on GitLab
 
-Read when the target carries a platform-neutral workflow or authority
-contract, or when contract semantics need GitLab representations. The
+This is the translation table between the management model the contract
+builders design in and GitLab's objects. It is read twice: by the workflow
+and specification builders at deposit time, to write their files in GitLab
+terms, and by this builder when no workflow file exists and planning
+objects must be decided here, or when a deposited line still names a
+semantic instead of an object. The
 mapping is one-directional: the contract decides *whether* a semantic
 exists; GitLab decides only *how* it is expressed — and semantics win over
 names, because GitLab has objects whose names invite wrong mappings. A
@@ -56,10 +60,14 @@ The authority contract decides who acts; GitLab only enforces what it can:
   cannot enforce a rule, the policy stands as convention with its tier
   recorded.
 
-## When there is no contract
+## When there is no workflow file
 
 Decide planning and taxonomy through the design tree as this skill always
-has, and record in the durable knowledge that the decisions were made
-platform-side — a later `meta-workflow-design` run supersedes them. Treat
+has, write the result as `.agents/knowledge/gitlab-workflow.md` in GitLab terms (the
+shape the workflow builder would have deposited: objects in use with what
+is lost without them, objects deliberately not used with their triggers,
+decomposition, triage, planning view), and record in it that the decisions
+were made platform-side — a later `meta-workflow-design` run supersedes
+them. Treat
 agent authority as the conservative default: agents stop at draft MRs with
 acceptance evidence, humans admit changes to review.
