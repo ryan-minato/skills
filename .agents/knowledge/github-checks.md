@@ -11,6 +11,7 @@ command that exists and passes locally; CI never chooses its own linters.
 | `checks / gate` | `checks.yml` | aggregates the two jobs above (`if: always()`) | every pull request; push to `main` | **required** | Green only when neither dependency failed or was cancelled; a skipped `checks / spec` is fine. |
 | `pr / policy` | `pr-policy.yml` | `python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"` (template and script from the base commit) | pull request opened, edited, synchronized, reopened, ready, converted to draft | **required** | Body carries every template heading, the `Closes`/`N/A` line, and the security checkbox line, and every commit subject (the title, for a fork) follows Conventional Commits; ready pull requests also pass the Validation, checklist, and `Spec:` checks. |
 | `scan-secrets` | `secret.yml` | TruffleHog `--only-verified` over the pull request range or the pushed range | every pull request; push to `main` | **required** | No verified secret. The job id is the check name; it predates the other checks. |
+| `spec-archive / archive` | `spec-archive.yml` | `just install-tools && just spec-archive-completed`, then a commit and push to `main` | push to `main`; one run at a time (`concurrency: spec-archive`, never cancelled) | automation | "nothing to archive" and exit 0 when no change has every task ticked; otherwise one commit `docs: archive completed OpenSpec changes` lands on `main`. A rejected push is a red run, not a retry: either the bypass in `github-settings.md` is missing or `main` moved and the next run will archive the rest. |
 | `issues / triage` | `issue-triage.yml` | `python3 scripts/sync_issue_metadata.py --event "$GITHUB_EVENT_PATH" --apply` | issue opened or edited | automation | Prints the label plan as JSON and applies it; exit 1 means a form answer did not map to a label in `.github/labels.json`. |
 
 Required-check names are a stable interface: `scripts/validate_harness.py`
@@ -32,12 +33,12 @@ name live on `main` before the ruleset requires it.
 
 ## Tool pins
 
-`checks / quality` installs the same versions the dev container and
-pre-commit use: `ruff==0.16.4` (pre-commit rev `v0.16.4`), `rust-just` and
-`pre-commit` pinned in the workflow, and `@fission-ai/openspec` at the
-`openspec_version` of the `justfile` (`just install-tools`).
-`scripts/validate_harness.py` checks that the ruff pins agree in all three
-places. Bump them together; see
+`checks / quality` and `spec-archive / archive` install the same versions
+the dev container and pre-commit use: `ruff==0.16.4` (pre-commit rev
+`v0.16.4`), `rust-just` and `pre-commit` pinned in the workflows, and
+`@fission-ai/openspec` at the `openspec_version` of the `justfile`
+(`just install-tools`). `scripts/validate_harness.py` checks that the ruff
+pins agree in all three places. Bump them together; see
 `.agents/knowledge/harness-maintenance.md`.
 
 ## Update this file when

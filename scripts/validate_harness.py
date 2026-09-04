@@ -18,7 +18,7 @@ Checks (errors unless marked warning):
   pointers   every path AGENTS.md and ARCHITECTURE.md name exists; every
              .agents/knowledge/*.md is named in AGENTS.md; every `just
              <recipe>` AGENTS.md names exists (README: warning)
-  copies     scripts/sync_labels.py is byte-identical to its origin in the
+  copies     scripts/sync_labels.py and scripts/archive_completed_changes.py are byte-identical to their origins in the
              meta-github-workflow skill unless it carries a `# DIVERGENCE:`
              line explaining why
   checks     workflow job names and the table in
@@ -61,6 +61,10 @@ SKILLS_DIR = ROOT / ".agents" / "skills"
 OPENSPEC_TARGET = SKILLS_DIR / ".openspec-target"
 SYNC_LABELS = ROOT / "scripts" / "sync_labels.py"
 SYNC_LABELS_ORIGIN = ROOT / "skills" / "meta" / "meta-github-workflow" / "scripts" / "sync_labels.py"
+ARCHIVE_SCRIPT = ROOT / "scripts" / "archive_completed_changes.py"
+ARCHIVE_SCRIPT_ORIGIN = (
+    ROOT / "skills" / "engineering" / "spec-driven-development" / "scripts" / "archive_completed_changes.py"
+)
 
 MANAGED_PREFIXES = ("priority/", "catalog/")
 NEEDS_TRIAGE = "status/needs-triage"
@@ -293,6 +297,12 @@ def check_copies() -> None:
         error(
             f"{rel(SYNC_LABELS)} differs from {rel(SYNC_LABELS_ORIGIN)}; copy the origin over it "
             "(run `ruff format` on both) or add a `# DIVERGENCE: <why>` line."
+        )
+    ours, origin = read(ARCHIVE_SCRIPT), read(ARCHIVE_SCRIPT_ORIGIN)
+    if ours != origin:
+        error(
+            f"{rel(ARCHIVE_SCRIPT)} differs from {rel(ARCHIVE_SCRIPT_ORIGIN)}; copy the origin over it "
+            "(the repository runs the skill's script, never a fork of it)."
         )
 
 
