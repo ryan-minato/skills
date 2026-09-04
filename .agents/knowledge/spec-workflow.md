@@ -59,8 +59,9 @@ link; it never restates the fact.
 1. **Proposed** — the change directory exists with a proposal and delta
    specs (the propose skill; `plan-clarification` runs the clarify step
    until no assumption is silent).
-2. **Approved** — the maintainer approves the proposal and delta specs, in
-   the issue or on the draft pull request. An agent never approves a
+2. **Approved** — the maintainer approves the proposal and delta specs: in
+   the conversation that runs the change, on the issue, or on a draft pull
+   request that already carries the proposal. An agent never approves a
    change it wrote.
 3. **Implemented** — every task is done and every scenario passed: for a
    skill, the behavioral tests in the `skill-authoring` project skill,

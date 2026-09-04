@@ -151,7 +151,10 @@ rather than reading full logs), scenarios verified and recorded, publish
 gate passed for the final body, remote writes authorized. Then:
 
 1. Complete the checklist and update the final description.
-2. `gh pr ready <number>` and `gh pr edit <number> --add-reviewer ryan-minato`.
+2. `gh pr ready <number>`. When the pull request was opened from another
+   account, also `gh pr edit <number> --add-reviewer ryan-minato`; GitHub
+   silently drops a review request for the author, so on a pull request
+   from the maintainer's own account the ready state is the request.
 3. Hand over the acceptance-evidence report from `agent-authority.md`:
    goal, tests and check state, actual scope, risks, and the maintainer's
    decisions — request fixes, reject, or merge (rebase; squash for forks).

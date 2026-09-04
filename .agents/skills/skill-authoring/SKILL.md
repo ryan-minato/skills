@@ -48,7 +48,9 @@ worth building and where it belongs:
    skill's domain (`.agents/knowledge/spec-workflow.md`). The delta spec's
    scenarios are the behavioral test cases: triggering prompts for
    description scenarios, outcome tasks and rubric items for behavior
-   scenarios. A skill change with no scenario is a documentation change.
+   scenarios. A change that alters no observable behavior needs no scenario
+   and is a documentation change; a behavior change without a scenario
+   means the delta spec is incomplete, not that the change is documentation.
 5. Apply the subagent gate below. If it passes, read
    [references/testing.md](references/testing.md) and derive the behavioral
    tests from the scenarios before editing. If it fails, do not read the
