@@ -42,7 +42,7 @@ body:
     id: spec
     attributes:
       label: Specification
-      description: Path of the OpenSpec change this task implements, for example `openspec/changes/<slug>`.
+      description: Link to the OpenSpec change this task implements, for example `https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>`, so a reader can open it in one click.
     validations:
       required: false
   - type: textarea

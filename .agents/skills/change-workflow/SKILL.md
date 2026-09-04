@@ -133,7 +133,9 @@ gate, and any edit after the verdict needs a fresh one.
 1. Assemble the exact payload as files in a scratch directory outside the
    repository. For a pull request: `title.txt`, `body.md` (from
    `.github/PULL_REQUEST_TEMPLATE.md`, with `Closes #N` or `N/A — <reason>`,
-   the `Spec:` line, and the `Phase:` line), `commits.txt` from
+   the `Spec:` line as a link to the change directory on this branch —
+   `[openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`
+   — and the `Phase:` line), `commits.txt` from
    `git log origin/main..HEAD --format=full`, and `diff.patch` from
    `git diff origin/main...HEAD`. For an issue or comment: `title.txt` and
    `body.md`. For a later push, the new commits and diff.

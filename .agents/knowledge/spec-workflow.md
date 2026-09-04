@@ -51,7 +51,7 @@ between releases and are not recorded here.
 | What the repository is for | `README.md` | this file, `openspec/config.yaml` |
 | Skill quality and conventions | `.agents/knowledge/skill-quality.md`, `AGENTS.md` | `openspec/config.yaml`, specs never restate them |
 | Behavior of a public skill | `openspec/specs/<catalog>/<skill-name>/spec.md` | issues, pull requests, behavioral tests |
-| Acceptance of a change | the scenarios in `openspec/changes/<slug>/specs/` | the Task issue form's Specification field, the pull request's `Spec:` line |
+| Acceptance of a change | the scenarios in `openspec/changes/<slug>/specs/` | the Task issue form's Specification field and the pull request's `Spec:` line, each a link to the change directory on its branch |
 | Repository mechanics | `ARCHITECTURE.md` and the knowledge files | specs never restate them |
 
 A file listed under "Points to it" may summarize in one line and must
@@ -127,10 +127,14 @@ done: a ticked task list is what the workflow archives.
 - An issue owns who, when, and status. The Task form's Specification field
   names `openspec/changes/<slug>`; its acceptance field holds either
   executable criteria or a link to the change's scenarios, never both.
-- A pull request names its change on a `Spec:` line, states its phase on
+- A pull request names its change on a `Spec:` line as a link to the
+  change directory on its branch —
+  `[openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`
+  — so a reviewer reaches the record in one click; it states its phase on
   a `Phase:` line (`specification` until the approval comment,
   `implementation` after), and ticks the two specification items in its
-  checklist. A repository change is named the same way; its archive moves
+  checklist. An issue's Specification field holds the same link. Tracker
+  objects navigate to the record; they never copy it. A repository change is named the same way; its archive moves
   the record without touching `openspec/specs/`. A skill change that also
   needs harness work carries a companion repository change named
   `<slug>-harness` on the same branch, and the pull request names both on

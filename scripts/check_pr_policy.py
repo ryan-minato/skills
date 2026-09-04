@@ -42,8 +42,13 @@ SUBJECT_RE = re.compile(rf"^({COMMIT_TYPES})(\([a-z0-9][a-z0-9, ._-]*\))?!?: [a-
 EXEMPT_SUBJECT_RE = re.compile(r"^(Merge |Revert |fixup!|squash!)")
 CLOSING_RE = re.compile(r"\b(close[sd]?|fix(e[sd])?|resolve[sd]?)\s+#\d+\b", re.IGNORECASE)
 NO_ISSUE_RE = re.compile(r"^N/A\s+[—-]\s+\S", re.IGNORECASE | re.MULTILINE)
+# A change record is named as a clickable link to its directory on the branch
+# (`[openspec/changes/<slug>](https://github.com/<owner>/<repo>/tree/<ref>/openspec/changes/<slug>)`),
+# as a bare URL, or — accepted for older pull requests — as a bare path.
+SPEC_PATH = r"openspec/changes/(archive/\d{4}-\d{2}-\d{2}-)?[a-z0-9][a-z0-9-]*/?"
+SPEC_URL = rf"https://github\.com/[\w.-]+/[\w.-]+/(tree|blob)/[^\s)]+?/{SPEC_PATH}"
 SPEC_RE = re.compile(
-    r"^Spec:\s*(openspec/changes/(archive/\d{4}-\d{2}-\d{2}-)?[a-z0-9][a-z0-9-]*/?|none\s+[—-]\s+\S.*)\s*$",
+    rf"^Spec:\s*(\[{SPEC_PATH}\]\({SPEC_URL}\)|{SPEC_URL}|{SPEC_PATH}|none\s+[—-]\s+\S.*)\s*$",
     re.MULTILINE,
 )
 COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
