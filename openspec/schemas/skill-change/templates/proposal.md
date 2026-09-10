@@ -4,7 +4,7 @@
 
 ## What Changes
 
-<!-- One bullet per skill or tool: the observable change. Mark **BREAKING** where installed behavior is removed or incompatibly changed. -->
+<!-- One bullet per skill, or per item of a repository change: the observable change. Mark **BREAKING** where installed behavior is removed or incompatibly changed. -->
 
 ## Skills touched
 
