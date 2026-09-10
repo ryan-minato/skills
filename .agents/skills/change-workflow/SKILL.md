@@ -121,8 +121,9 @@ derived from the scenarios; for a repository change, the proofs its
 `design.md` names. Tick each task only when its verification ran. Then
 run `just check`. Archiving is the `spec-archive` workflow's job after the
 merge; while that workflow cannot push (`spec-workflow.md`, Archive mode),
-archive the change here with the archive skill so the delta lands in
-`openspec/specs/`. Record what ran and the outcome for the PR's Validation
+archive the change here with the archive skill (a skill change's delta
+lands in `openspec/specs/`; a repository change's record only moves under
+`openspec/changes/archive/`). Record what ran and the outcome for the PR's Validation
 section, linking the plan in `design.md` rather than restating it; that
 section and Changes stay reserved until ready (step 7).
 
