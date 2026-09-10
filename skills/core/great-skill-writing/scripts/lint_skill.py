@@ -14,12 +14,14 @@ description quality, and script hygiene.
 Usage:
   uv run scripts/lint_skill.py --skill PATH [--json]
 
-PATH is a skill directory or its SKILL.md file.
+PATH is a skill directory or its SKILL.md file. PyYAML is imported only
+when a SKILL.md is parsed, so --help and argument errors need nothing
+beyond the standard library.
 
 Exit codes:
   0  no errors (warnings may be present)
-  1  one or more errors found
-  2  bad arguments
+  1  one or more errors found, or the skill path does not exist
+  2  bad arguments, or PyYAML missing when run without uv
 """
 
 import argparse
@@ -27,8 +29,6 @@ import json
 import re
 import sys
 from pathlib import Path
-
-import yaml
 
 KNOWN_FIELDS = frozenset({"name", "description", "license", "compatibility", "metadata", "allowed-tools"})
 REQUIRED_FIELDS = frozenset({"name", "description"})
@@ -65,8 +65,24 @@ def rel(path: Path) -> str:
         return str(path)
 
 
+def import_yaml():
+    """Import PyYAML only when a SKILL.md is parsed, so --help and argument errors need no dependency."""
+    try:
+        import yaml
+    except ImportError:
+        print(
+            "Error: PyYAML is not installed, so the SKILL.md frontmatter cannot be parsed. "
+            "Run the script with `uv run scripts/lint_skill.py ...` (uv installs the dependency "
+            "declared in the script header) or install it: pip install 'pyyaml>=6.0,<7'.",
+            file=sys.stderr,
+        )
+        sys.exit(2)
+    return yaml
+
+
 def parse_frontmatter(text: str) -> tuple[dict, str]:
     """Return (frontmatter, body). Raise ValueError on parse failure."""
+    yaml = import_yaml()
     if not text.startswith("---"):
         raise ValueError("missing opening '---'")
     lines = text.splitlines(keepends=True)
@@ -554,7 +570,13 @@ def lint(skill_md: Path) -> list[dict]:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Lint an Agent Skill: spec compliance plus quality heuristics.",
-        epilog="Example: uv run scripts/lint_skill.py --skill path/to/my-skill",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Example: uv run scripts/lint_skill.py --skill path/to/my-skill\n\n"
+            "Exit codes: 0 no errors; 1 errors found, or the skill path does not exist;\n"
+            "2 bad arguments, or PyYAML missing when run without uv (uv installs it from the\n"
+            "script header; otherwise pip install 'pyyaml>=6.0,<7')."
+        ),
     )
     parser.add_argument(
         "--skill",
