@@ -8,7 +8,7 @@
 
 ## 3. Tests
 
-- [ ] 3.1 Run the four Trigger cases as clean-context Sonnet-class subagents in the fixture project — closes "Skill authoring request", "Misbehaving skill, indirect phrasing", "Human documentation (near-miss)", "Human skills (near-miss)"
+- [ ] 3.1 Run the three Trigger cases as clean-context Sonnet-class subagents in the fixture project — closes "Skill authoring request", "Human documentation (near-miss)", "Human skills (near-miss)"
 - [ ] 3.2 Run the PyYAML-free harness (fresh venv interpreter): `--help`, `--bogus`, no `--skill`, missing SKILL.md path, real lint — closes Help, Bad arguments, Missing skill path, Missing dependency
 - [ ] 3.3 Run the `uv run --offline` harness: representative run (text, `--json`, `--help`) and the repeated run with `diff` and `git status` — closes Representative run, Repeated run
 - [ ] 3.4 Record skipped cases (expected none) and isolation degradations for the pull request's Validation section; remove the venv, fixture, and outputs
