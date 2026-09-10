@@ -16,7 +16,7 @@ types, no issue fields) · visibility: public · plan: free features suffice
 | Delete branch on merge | enabled | enforced | `gh api repos/ryan-minato/skills --jq .delete_branch_on_merge` | branch policy changes |
 | Description | "Agent Skills library: install with npx skills add ryan-minato/skills" | convention | `gh repo view --json description` | purpose changes |
 | Ruleset `Default` (id 19602018) | targets `main`; pull request required; deletion and force push blocked; required checks `checks / gate`, `pr / policy`, `scan-secrets` (strict); review threads must be resolved; 0 required approvals; extra approval for unattributed changes off; allowed merge methods squash and rebase | enforced | `gh api repos/ryan-minato/skills/rulesets/19602018` | a check is renamed; approval policy changes |
-| Ruleset bypass actors | **pending maintainer action**: the GitHub Actions app, so `spec-archive.yml` can push its archive commit to `main`; nobody else (the maintainer also goes through pull requests). Until granted, changes are archived inside the pull request (`spec-workflow.md`, Archive mode) | enforced | same readback (`bypass_actors`) | the archive workflow is added, renamed, or removed; a second maintainer joins |
+| Ruleset bypass actors | intended: the GitHub Actions app, so `spec-archive.yml` can push its archive commit to `main`; nobody else (the maintainer also goes through pull requests). **Not grantable through the REST API on this user-owned repository**: the 2026-09-10 write with `{"actor_id": 15368, "actor_type": "Integration", "bypass_mode": "always"}` was refused with "Actor GitHub Actions integration must be part of the ruleset source or owner organization". Live state: none. Candidate paths, a maintainer decision: the ruleset's bypass list in the repository settings UI, or a deploy key with write access used by the workflow. Until one is granted, changes are archived inside the pull request (`spec-workflow.md`, Archive mode) | enforced | same readback (`bypass_actors`) | the archive workflow is added, renamed, or removed; a push path is granted; a second maintainer joins |
 | Required approvals | 0 — a solo maintainer cannot approve their own pull request; the integration gate in `agent-authority.md` is the human decision | convention | same readback | a second maintainer joins |
 | Legacy branch protection | none | enforced | `gh api repos/ryan-minato/skills/branches/main/protection` (404 = none) | ruleset edits |
 | Actions | enabled; all actions allowed by policy, but every workflow pins by commit SHA and the only third-party action is TruffleHog | enforced where GitHub can | `gh api repos/ryan-minato/skills/actions/permissions` | a new action is added |
@@ -45,14 +45,21 @@ types, no issue fields) · visibility: public · plan: free features suffice
 
 ## Last verification
 
-2026-09-03, after the authorized writes of the harness rebuild, read back
-with the commands in the table: description set; Discussions on (default
-categories including Q&A and Ideas); Projects and Wiki off; merge commits
-off, rebase and squash on; delete branch on merge on; labels exactly
-`.github/labels.json` (the three dead labels pruned after confirming no
-issue or pull request carried them); secret scanning, push protection,
-and CodeQL default setup on; no legacy branch protection. Still differing
-from the intended state until `checks / gate` is green on `main` and the
-write is authorized: ruleset `Default` (required checks still only
-`scan-secrets`, thread resolution off, extra approval for unattributed
-changes on, all merge methods listed).
+2026-09-10, after the authorized ruleset write, read back with
+`gh api repos/ryan-minato/skills/rulesets/19602018`: required status
+checks exactly `checks / gate`, `pr / policy`, `scan-secrets`
+(`strict_required_status_checks_policy: true`);
+`required_review_thread_resolution: true`;
+`allowed_merge_methods: ["squash", "rebase"]`;
+`require_extra_approval_for_unattributed_changes: false`;
+`required_approving_review_count: 0`; deletion and non-fast-forward rules
+present; `bypass_actors: []` (see the bypass row for the refused write);
+`gh api repos/ryan-minato/skills/branches/main/protection` → 404, no
+legacy protection. Blocking observed on pull request #80:
+`mergeStateStatus` `BLOCKED` right after opening, `CLEAN` once the three
+required checks passed. The other rows were last read back on 2026-09-03,
+after the authorized writes of the harness rebuild: description set;
+Discussions on (default categories including Q&A and Ideas); Projects and
+Wiki off; merge commits off, rebase and squash on; delete branch on merge
+on; labels exactly `.github/labels.json`; secret scanning, push
+protection, and CodeQL default setup on.
