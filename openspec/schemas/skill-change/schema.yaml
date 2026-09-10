@@ -1,10 +1,10 @@
 name: skill-change
 version: 1
-description: This repository's change workflow for Agent Skills and repository tools - proposal → specs → design → tasks
+description: This repository's change workflow for Agent Skills and for the repository itself - proposal → specs → design → tasks
 artifacts:
   - id: proposal
     generates: proposal.md
-    description: Why the change is needed, which skills or tools it touches, and how installed behavior changes
+    description: Why the change is needed, which skills it touches (or that it is a repository change), and how installed behavior changes
     template: proposal.md
     instruction: |
       Create the proposal that establishes WHY this change is needed and WHAT
@@ -13,8 +13,8 @@ artifacts:
       Sections (keep the headings exactly; the validator requires `## Why`
       of 50-1000 characters and a non-empty `## What Changes`):
       - **Why**: the problem or opportunity in one or two sentences, and why now.
-      - **What Changes**: one bullet per skill or tool, stating the observable
-        change. Mark a change that breaks an installed skill's existing
+      - **What Changes**: one bullet per skill, or per item of a repository
+        change, stating the observable change. Mark a change that breaks an installed skill's existing
         behavior or removes a capability with **BREAKING**.
       - **Skills touched**: one line per public skill, as
         `<catalog>/<skill-name>`, marked *new* (no main spec exists yet) or
@@ -41,7 +41,7 @@ artifacts:
 
   - id: specs
     generates: "specs/**/*.md"
-    description: Delta specification per skill or tool domain; its scenarios are the behavioral tests
+    description: Delta specification per skill domain; its scenarios are the behavioral tests
     template: spec.md
     instruction: |
       Create one delta spec per line of the proposal's Skills touched, at

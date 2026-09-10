@@ -1,6 +1,6 @@
 ## Context
 
-<!-- Current shape of the skill or tool; binding constraints (catalog CONTEXT.md, dependency range, size limits, mirrors). See proposal.md for motivation. -->
+<!-- Current shape of the skill, or of the harness for a repository change; binding constraints (catalog CONTEXT.md, dependency range, size limits, mirrors). See proposal.md for motivation. -->
 
 ## Placement
 

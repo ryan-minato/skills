@@ -2,7 +2,7 @@
 # scripts/validate_harness.py checks that. The Catalog and Priority answers
 # are turned into labels by the `issues / triage` check.
 name: Bug report
-description: A skill or repository tool behaves differently from its spec or its documented intent.
+description: A skill behaves differently from its spec, or a repository tool from its documented intent.
 title: "[Bug]: "
 labels:
   - bug
