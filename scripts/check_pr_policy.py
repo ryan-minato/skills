@@ -13,9 +13,14 @@ Checks, in order:
   3. the checklist line containing the security keyword ("secrets") exists;
   4. commit subjects follow Conventional Commits — over BASE..HEAD for a
      branch in this repository, over the pull request title for a fork;
-  5. for a ready (non-draft) pull request: the validation section is not
-     empty, every checklist box is ticked, and a `Spec:` line names an
-     OpenSpec change (`openspec/changes/<slug>`) or `none — <reason>`.
+  5. for a ready (non-draft) pull request: the changes and validation
+     sections are filled in (not empty, not the template's reserved
+     placeholder), the `Phase:` line reads `implementation`, every
+     checklist box is ticked, and a `Spec:` line names an OpenSpec change
+     (`openspec/changes/<slug>`) or `none — <reason>`.
+
+Sections beyond the template's are allowed; only the template's headings
+are required.
 
 Usage:
     python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"
@@ -51,10 +56,16 @@ SPEC_RE = re.compile(
     rf"^Spec:\s*(\[{SPEC_PATH}\]\({SPEC_URL}\)|{SPEC_URL}|{SPEC_PATH}|none\s+[—-]\s+\S.*)\s*$",
     re.MULTILINE,
 )
+PHASE_RE = re.compile(r"^Phase:\s*(specification|implementation)\s*$", re.MULTILINE)
+# The template reserves the changes and validation sections until ready with
+# a line that is entirely this placeholder.
+RESERVED_RE = re.compile(r"^\s*_Reserved:.*_\s*$", re.MULTILINE)
 COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 HEADING_RE = re.compile(r"^## (.+?)\s*$", re.MULTILINE)
 CHECKBOX_RE = re.compile(r"^\s*- \[( |x|X)\]\s*(.*)$")
 BOT_AUTHORS = {"dependabot[bot]"}
+# Headings the template must carry, matched by a keyword in the heading text.
+ROLES = ("related", "changes", "validation", "checklist")
 
 
 def fail(code: int, message: str) -> None:
@@ -124,10 +135,10 @@ def template_headings(path: Path) -> tuple[list[str], dict[str, str]]:
     roles: dict[str, str] = {}
     for heading in headings:
         lower = heading.lower()
-        for role in ("related", "validation", "checklist"):
+        for role in ROLES:
             if role in lower and role not in roles:
                 roles[role] = heading
-    missing = [role for role in ("related", "validation", "checklist") if role not in roles]
+    missing = [role for role in ROLES if role not in roles]
     if missing:
         fail(2, f"{path} lacks a heading for: {', '.join(missing)}; fix the template")
     return headings, roles
@@ -195,11 +206,21 @@ def check(pr: dict, template: Path) -> list[str]:
                 f"Fix: restore it from {template} and tick it."
             )
         if ready:
-            validation = sections.get(roles["validation"], "")
-            if not re.sub(r"^\s*-\s*$", "", validation, flags=re.MULTILINE).strip():
+            for role, hint in (
+                ("changes", "list every touched file as a permalink to its commit"),
+                ("validation", "record what you ran and each scenario's result"),
+            ):
+                text = RESERVED_RE.sub("", sections.get(roles[role], ""))
+                if not re.sub(r"^\s*-\s*$", "", text, flags=re.MULTILINE).strip():
+                    findings.append(
+                        f"'## {roles[role]}' is empty or still reserved on a ready pull request. "
+                        f"Fix: {hint} in the PR description."
+                    )
+            phase = PHASE_RE.search(body)
+            if phase and phase.group(1) != "implementation":
                 findings.append(
-                    f"'## {roles['validation']}' is empty on a ready pull request. "
-                    "Fix: record what you ran in the PR description."
+                    "`Phase:` must read `implementation` on a ready pull request. "
+                    "Fix: get the specification approved on the draft, then update the line."
                 )
             unticked = [m.group(2) for m in checklist if m.group(1) == " "]
             for item in unticked:
