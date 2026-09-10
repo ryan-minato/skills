@@ -13,7 +13,6 @@ skills/<catalog>/<skill-name>/   Public, distributable skills
 .agents/
   skills/                        Skills visible to this repo's agents
   knowledge/                     Rules and registers, each with a pointer in AGENTS.md
-  mcp_config.json                agentskills MCP server (generic clients)
 openspec/                        Specifications: specs/ (source of truth), changes/, changes/archive/
 .claude/skills -> ../.agents/skills
 .claude/settings.json            Claude Code read-only command allowlist
