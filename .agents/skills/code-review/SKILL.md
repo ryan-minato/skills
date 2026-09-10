@@ -106,10 +106,14 @@ follow-up commit deletes nothing.
   entropy that misleads every later agent; report it, capped at
   recommended severity.
 - `openspec/` is the specification layer. A pull request that changes a
-  skill's or tool's behavior without a delta spec, or whose delta spec is
-  not archived into `openspec/specs/`, or whose Validation section names no
+  public skill's behavior without a delta spec, or whose delta spec is not
+  archived into `openspec/specs/`, or whose Validation section names no
   scenario, is blocking: `main` must never disagree with its specs
-  (`.agents/knowledge/spec-workflow.md`). The `openspec-*` skills are
+  (`.agents/knowledge/spec-workflow.md`). A change to the repository itself
+  (harness, tooling, checks, documents) has no spec domain: it carries a
+  `skip_specs` change record with a proposal, design, and tasks, and its
+  Validation section names the proofs of that design; a missing record is
+  the finding, a missing delta spec is not. The `openspec-*` skills are
   generated; a hand edit there is a finding.
 
 ## Scripts: the threat model

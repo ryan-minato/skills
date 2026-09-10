@@ -51,7 +51,7 @@ between releases and are not recorded here.
 | What the repository is for | `README.md` | this file, `openspec/config.yaml` |
 | Skill quality and conventions | `.agents/knowledge/skill-quality.md`, `AGENTS.md` | `openspec/config.yaml`, specs never restate them |
 | Behavior of a public skill | `openspec/specs/<catalog>/<skill-name>/spec.md` | issues, pull requests, behavioral tests |
-| Acceptance of a change | the scenarios in `openspec/changes/<slug>/specs/` | the Task issue form's Specification field and the pull request's `Spec:` line, each a link to the change directory on its branch |
+| Acceptance of a change | for a skill change, the scenarios in `openspec/changes/<slug>/specs/`; for a repository change, the verification plan in its `design.md` | the Task issue form's Specification field and the pull request's `Spec:` line, each a link to the change directory on its branch |
 | Repository mechanics | `ARCHITECTURE.md` and the knowledge files | specs never restate them |
 
 A file listed under "Points to it" may summarize in one line and must
