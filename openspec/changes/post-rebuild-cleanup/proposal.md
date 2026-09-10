@@ -53,6 +53,12 @@ specification boundary read the same everywhere.
   description of the body is a hand-kept mirror. The pilot (#80) found the
   old shape restating the change record and inviting implementation detail
   onto the specification-approval surface.
+- Approval record: the maintainer's comment on the draft reads
+  `Specification approved`, with no commit named; the timeline decides
+  what it covers — the change record as of the last push before the
+  comment — and a later push to the record needs a fresh comment.
+  `spec-workflow.md`, `change-workflow`, and the template's checklist and
+  `Phase:` comment say so instead of `Specification approved at <sha>`.
 - Remote branches: `feat/project-code-review` (merged, #68) and
   `feat/harden-github-harness` (closed unmerged, #69; its commits remain
   reachable at `refs/pull/69/head`) are deleted from `origin`, so no merged
