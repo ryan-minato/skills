@@ -12,8 +12,8 @@ Checks (errors unless marked warning):
              .github/labels.json; every label has an applier; catalog/*
              labels, the catalogs on disk, and every form's Catalog options
              agree; priority/* labels and every form's Priority options agree
-  template   the PR template carries the related / validation / checklist
-             headings, the security checklist line, and a `Spec:` line
+  template   the PR template carries the related / changes / validation /
+             checklist headings, the security checklist line, and a `Spec:` line
   intake     ISSUE_TEMPLATE/config.yml disables blank issues
   pointers   every path AGENTS.md and ARCHITECTURE.md name exists; every
              .agents/knowledge/*.md is named in AGENTS.md; every `just
@@ -243,7 +243,7 @@ def check_labels() -> None:
 def check_template() -> None:
     text = re.sub(r"<!--.*?-->", "", read(PR_TEMPLATE), flags=re.DOTALL)
     headings = [h.lower() for h in re.findall(r"^## (.+?)\s*$", text, re.MULTILINE)]
-    for role in ("related", "validation", "checklist"):
+    for role in ("related", "changes", "validation", "checklist"):
         if not any(role in h for h in headings):
             error(f"{rel(PR_TEMPLATE)}: no '## ' heading contains {role!r}; scripts/check_pr_policy.py needs one.")
     if not re.search(r"^\s*- \[ \].*secrets", text, re.MULTILINE | re.IGNORECASE):
