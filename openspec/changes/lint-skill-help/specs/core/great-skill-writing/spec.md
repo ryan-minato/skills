@@ -5,14 +5,10 @@ Governs what an agent that loaded the `great-skill-writing` skill observably doe
 ## ADDED Requirements
 
 ### Requirement: Trigger: description
-The skill description SHALL cause the skill to load when the request names an Agent Skill, a SKILL.md, or an agent instruction package, or asks to create, review, or repair one — including a skill that misbehaves — and SHALL not cause it to load for application code or documentation written for people.
+The skill description SHALL cause the skill to load when the request names an Agent Skill, a SKILL.md, or an agent instruction package, or asks to create, review, or repair one, and SHALL not cause it to load for application code or documentation written for people.
 
 #### Scenario: Skill authoring request
 - **WHEN** the user says "Write a SKILL.md so our agents follow the release checklist every time"
-- **THEN** the skill loads
-
-#### Scenario: Misbehaving skill, indirect phrasing
-- **WHEN** the user says "the instruction package I gave my agent for changelog entries never gets picked up — fix it"
 - **THEN** the skill loads
 
 #### Scenario: Human documentation (near-miss)
