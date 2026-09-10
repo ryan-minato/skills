@@ -210,17 +210,21 @@ def check(pr: dict, template: Path) -> list[str]:
                 ("changes", "list every touched file as a permalink to its commit"),
                 ("validation", "record what you ran and each scenario's result"),
             ):
-                text = RESERVED_RE.sub("", sections.get(roles[role], ""))
-                if not re.sub(r"^\s*-\s*$", "", text, flags=re.MULTILINE).strip():
+                section = sections.get(roles[role], "")
+                if RESERVED_RE.search(section):
                     findings.append(
-                        f"'## {roles[role]}' is empty or still reserved on a ready pull request. "
-                        f"Fix: {hint} in the PR description."
+                        f"'## {roles[role]}' still holds the template's reserved line on a ready pull request. "
+                        f"Fix: remove it and {hint} in the PR description."
+                    )
+                elif not re.sub(r"^\s*-\s*$", "", section, flags=re.MULTILINE).strip():
+                    findings.append(
+                        f"'## {roles[role]}' is empty on a ready pull request. Fix: {hint} in the PR description."
                     )
             phase = PHASE_RE.search(body)
-            if phase and phase.group(1) != "implementation":
+            if not phase or phase.group(1) != "implementation":
                 findings.append(
-                    "`Phase:` must read `implementation` on a ready pull request. "
-                    "Fix: get the specification approved on the draft, then update the line."
+                    "A ready pull request needs a `Phase: implementation` line. "
+                    "Fix: get the specification approved on the draft, then set the line."
                 )
             unticked = [m.group(2) for m in checklist if m.group(1) == " "]
             for item in unticked:
