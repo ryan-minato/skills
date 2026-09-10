@@ -19,7 +19,6 @@
       "extensions": [
         "editorconfig.editorconfig",
         "github.copilot",
-        "denoland.vscode-deno",
         "ms-python.python",
         "charliermarsh.ruff",
         "ms-vscode-remote.remote-containers"
