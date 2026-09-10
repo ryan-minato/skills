@@ -66,8 +66,10 @@ Escalating earlier is always allowed. Bypassing a closed gate never is.
 
 ## At a human gate, hand over this report
 
-- Goal, and how the change addresses it (link the change record).
-- Tests executed and results; the state of every required check.
+- Goal, and how the change addresses it (the pull request's Specification
+  section links the change record).
+- Tests executed and results (the pull request's Validation section); the
+  state of every required check.
 - Scope actually touched, including anything beyond the original intent.
 - Known risks and remaining limitations.
 - The decisions available to the maintainer: request fixes, reject, or

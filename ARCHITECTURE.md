@@ -13,7 +13,6 @@ skills/<catalog>/<skill-name>/   Public, distributable skills
 .agents/
   skills/                        Skills visible to this repo's agents
   knowledge/                     Rules and registers, each with a pointer in AGENTS.md
-  mcp_config.json                agentskills MCP server (generic clients)
 openspec/                        Specifications: specs/ (source of truth), changes/, changes/archive/
 .claude/skills -> ../.agents/skills
 .claude/settings.json            Claude Code read-only command allowlist
@@ -166,7 +165,7 @@ the same slug, its scenarios become the behavioral tests, and the change
 is archived inside the pull request, so `main` never holds an unarchived
 change. Specs exist only for domains a change has touched. The change artifacts
 follow the project schema in `openspec/schemas/skill-change/` (requirements
-named by kind — trigger, behavior, handoff, script, tool — and a design
+named by kind — trigger, behavior, handoff, script — and a design
 that carries the verification plan). The OpenSpec CLI
 version is pinned in the `justfile`; `just spec-validate` runs its strict
 validator and `just spec-sync` regenerates the `openspec-*` skills.

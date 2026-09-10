@@ -20,7 +20,7 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
   `.github/skills` are symlinks to it.
 - `.agents/knowledge/` — the knowledge base; every file is listed below.
 - `openspec/` — specifications: `openspec/specs/<catalog>/<skill>/` is the
-  source of truth for what skills and tools do, `openspec/changes/` holds
+  source of truth for what public skills do, `openspec/changes/` holds
   changes in flight, `openspec/schemas/skill-change/` is the project schema
   that shapes their artifacts.
 - `.github/` — issue forms, PR template, workflows, labels, health files.
@@ -47,9 +47,13 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
   only for supporting documentation that changes no installed skill.
   Correction beats improvement; file format never decides the type.
   Branch commits land by rebase, so every subject must conform.
-- **Specs before behavior**: a change to what a skill or tool does goes
-  through an OpenSpec change and is archived in the same pull request. Its
-  scenarios (the spec's given/when/then cases) are the acceptance criteria.
+- **Specs before behavior**: only public skills have spec domains. A
+  change to what a skill does goes through an OpenSpec change with a delta
+  spec, whose scenarios (given/when/then) are the acceptance criteria; a
+  change to the repository itself (harness, tooling, checks, documents) is
+  a `skip_specs` change with a proposal, design, and tasks and no spec.
+  Completed changes are archived inside the pull request until the
+  `spec-archive` workflow can push.
 - **Publishing**: nothing reaches GitHub (issue, PR, comment, setting)
   without explicit user authorization in the current conversation and a
   `SAFE TO PUBLISH: YES` review of the exact payload.
@@ -68,7 +72,7 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
   publish gate.
 - Branch names, merge method, labels, milestones, triage, what objects
   exist on GitHub → `.agents/knowledge/github-workflow.md`.
-- A change that alters skill or tool behavior, anything under `openspec/`,
+- A change to a skill's behavior or to the repository itself, anything under `openspec/`,
   creating issues from a change → `.agents/knowledge/spec-workflow.md`.
 - Marking ready, requesting review, merging, releasing, any authority
   question → `.agents/knowledge/agent-authority.md`.
