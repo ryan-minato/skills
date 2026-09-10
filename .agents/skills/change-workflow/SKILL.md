@@ -79,9 +79,11 @@ Record the issue number or a one-line reason there is none.
    request with the record as its first content and `Phase:
    specification` in the body, before any design or task list is
    finished. Request the maintainer's review and wait for the approval
-   comment naming the commit (`Specification approved at <sha>`); it
-   reviews the proposal and the delta specs, never `design.md` or
-   `tasks.md`. Finish design and tasks after the approval, then implement.
+   comment on the draft (`Specification approved`); it covers the record
+   as of the last push before it, so a later push to the record needs a
+   fresh comment. It reviews the proposal and the delta specs, never
+   `design.md` or `tasks.md`. Finish design and tasks after the approval,
+   then implement.
    `spec-driven-development` supplies the loop's rules; `spec-workflow.md`
    says which domains exist and that specs are never backfilled.
 4. A change to the repository itself (environment, harness, tooling,
@@ -121,7 +123,8 @@ run `just check`. Archiving is the `spec-archive` workflow's job after the
 merge; while that workflow cannot push (`spec-workflow.md`, Archive mode),
 archive the change here with the archive skill so the delta lands in
 `openspec/specs/`. Record what ran and the outcome for the PR's Validation
-section, linking the plan in `design.md` rather than restating it.
+section, linking the plan in `design.md` rather than restating it; that
+section and Changes stay reserved until ready (step 7).
 
 ## 6. Publish gate, then the draft PR and every later push
 
@@ -131,14 +134,19 @@ indexed within minutes. Every remote or publishable write passes this
 gate, and any edit after the verdict needs a fresh one.
 
 1. Assemble the exact payload as files in a scratch directory outside the
-   repository. For a pull request: `title.txt`, `body.md` (from
-   `.github/PULL_REQUEST_TEMPLATE.md`, with `Closes #N` or `N/A — <reason>`,
-   the `Spec:` line as a link to the change directory on this branch —
-   `[openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`
-   — and the `Phase:` line), `commits.txt` from
-   `git log origin/main..HEAD --format=full`, and `diff.patch` from
-   `git diff origin/main...HEAD`. For an issue or comment: `title.txt` and
-   `body.md`. For a later push, the new commits and diff.
+   repository. For a pull request: `title.txt`, `body.md` built from
+   `.github/PULL_REQUEST_TEMPLATE.md` — an unheaded opening paragraph
+   stating the goal (not the work), `## Why` (the value), `## Specification`
+   with the `Spec:` line as a link to the change directory on this branch
+   (`[openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`),
+   the `Phase:` line, one link per record, and the approval line with the
+   copyable comment; `## Related work` with `Closes #N` or `N/A — <reason>`;
+   `## Changes` and `## Validation` left on the template's reserved line
+   until ready; the checklist. Add or update sections beyond the template's
+   when the change needs them; they pass this gate like every other.
+   `commits.txt` from `git log origin/main..HEAD --format=full`, and
+   `diff.patch` from `git diff origin/main...HEAD`. For an issue or comment:
+   `title.txt` and `body.md`. For a later push, the new commits and diff.
 2. Review it independently: dispatch a clean-context subagent whose whole
    prompt is the review prompt in
    [references/publish-review.md](references/publish-review.md) with the
@@ -169,7 +177,12 @@ run with
 rather than reading full logs), scenarios verified and recorded, publish
 gate passed for the final body, remote writes authorized. Then:
 
-1. Complete the checklist and update the final description.
+1. Complete the final description: replace the reserved Changes line with
+   a permalink per touched file or directory to the commit that changed it
+   (`blob/<sha>/<path>#L10-L20` for a local change, the whole file or
+   directory for a broad one), fill Validation with each scenario's result
+   linking the plan in `design.md`, set `Phase: implementation`, replace
+   the approval line with the comment's date, and tick the checklist.
 2. `gh pr ready <number>`. When the pull request was opened from another
    account, also `gh pr edit <number> --add-reviewer ryan-minato`; GitHub
    silently drops a review request for the author, so on a pull request

@@ -30,6 +30,7 @@ them. The rows below are the pairs no script can check.
 | `skills/engineering/spec-driven-development/scripts/archive_completed_changes.py` | `scripts/archive_completed_changes.py` (byte-identical; `validate_harness.py` checks it) and the archive mode in `.agents/knowledge/spec-workflow.md` | the skill's script changes | author |
 | a workflow's required-check name | `.agents/knowledge/github-checks.md`, the ruleset in `.agents/knowledge/github-settings.md` (workflow first, live on `main`, then the ruleset) | a job rename | maintainer |
 | a remote setting | its row in `.agents/knowledge/github-settings.md`, read back after the write | every authorized remote write | maintainer |
+| `.github/PULL_REQUEST_TEMPLATE.md` (sections, reserved lines, approval comment) | the payload and ready steps (§6, §7) of `.agents/skills/change-workflow/SKILL.md`, the tracked-work bullet in `.agents/knowledge/spec-workflow.md` (`check_pr_policy.py` reads the template itself) | the template changes | author |
 | a catalog added or removed | catalog scaffold, `ARCHITECTURE.md` catalogs section, `marketplace.json` (`just gen-marketplace`), root `README.md` + `README.zh.md`, `.github/labels.json` `catalog/*`, every issue form's Catalog options (`validate_harness.py` catches the last two), `.github/labels.json` applied remotely with `scripts/sync_labels.py`; a removed catalog also drops its prefix from `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.py` | same pull request; label sync after merge | author, maintainer |
 
 ## Periodic entropy review
