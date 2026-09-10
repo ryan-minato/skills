@@ -47,9 +47,12 @@ specification boundary read the same everywhere.
   requires the new headings, reads `Spec:` and `Phase:` from Specification,
   and on a ready pull request rejects Changes and Validation that still
   hold the reserved placeholder; the payload step of `change-workflow`
-  builds bodies this way. The pilot (#80) found the old shape restating the
-  change record and inviting implementation detail onto the
-  specification-approval surface.
+  builds bodies this way, and the synchronization register in
+  `harness-maintenance.md` gains the row that ties the template to that
+  step, since the policy check reads the template but the skill's
+  description of the body is a hand-kept mirror. The pilot (#80) found the
+  old shape restating the change record and inviting implementation detail
+  onto the specification-approval surface.
 - Remote branches: `feat/project-code-review` (merged, #68) and
   `feat/harden-github-harness` (closed unmerged, #69; its commits remain
   reachable at `refs/pull/69/head`) are deleted from `origin`, so no merged
@@ -77,10 +80,14 @@ or a Deno toolchain.
   `openspec/schemas/skill-change/schema.yaml` and
   `templates/proposal.md`, `templates/design.md`,
   `.github/ISSUE_TEMPLATE/bug-report.yml`, `.github/PULL_REQUEST_TEMPLATE.md`,
-  `scripts/check_pr_policy.py`, `.agents/skills/change-workflow/SKILL.md`,
-  `.agents/skills/skill-authoring/references/testing.md` (where it names
-  the Validation section), `.agents/knowledge/spec-workflow.md` (the
-  `Spec:` and `Phase:` lines now live in the Specification section).
+  `scripts/check_pr_policy.py`, `.agents/skills/change-workflow/SKILL.md`
+  (steps 5 and 6), `.agents/skills/skill-authoring/references/testing.md`
+  (where it names the Validation section), `.agents/knowledge/spec-workflow.md`
+  (the `Spec:` and `Phase:` lines now live in the Specification section),
+  `.agents/knowledge/agent-authority.md` (the acceptance-evidence report
+  points at the Specification and Validation sections),
+  `.agents/knowledge/harness-maintenance.md` (the MCP row and the new
+  template-to-`change-workflow` row).
 - The template change applies from the next pull request: the policy check
   reads the template from the base branch, so #80 stays red on the old
   heading until this change lands.
@@ -94,6 +101,10 @@ or a Deno toolchain.
 - Required approvals (stays 0), CODEOWNERS, releases.
 - Granting the archive workflow a push path (UI-side bypass or a deploy
   key): a maintainer decision proposed separately.
+- Teaching the same body shape to the public skills that generate such
+  templates (`meta-github-workflow`, `meta-gitlab-workflow`,
+  `spec-driven-development`): a skill change with delta specs, after this
+  one.
 - `lint_skill.py` (#77 item 1): the skill change `lint-skill-help`.
 
 ## Tracked work
