@@ -66,8 +66,9 @@ link; it never restates the fact.
    specification` in its body — before any design or task list is
    finished.
 2. **Approved** — the maintainer approves the proposal and delta specs
-   with a comment on the draft pull request naming the approved commit
-   (`Specification approved at <sha>`). The review examines the outcome
+   with a comment on the draft pull request reading `Specification
+   approved`; it covers the record as of the last push before it, so a
+   later push to the record needs a fresh comment. The review examines the outcome
    description — goals and scope, terminology, behavior, invariants,
    constraints, states, interface and data contracts, edge cases,
    security, acceptance — never `design.md` or `tasks.md`, which the
@@ -127,14 +128,18 @@ done: a ticked task list is what the workflow archives.
 - An issue owns who, when, and status. The Task form's Specification field
   names `openspec/changes/<slug>`; its acceptance field holds either
   executable criteria or a link to the change's scenarios, never both.
-- A pull request names its change on a `Spec:` line as a link to the
-  change directory on its branch —
+- A pull request names its change in its Specification section: a
+  `Spec:` line linking the change directory on its branch —
   `[openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`
-  — so a reviewer reaches the record in one click; it states its phase on
-  a `Phase:` line (`specification` until the approval comment,
-  `implementation` after), and ticks the two specification items in its
-  checklist. An issue's Specification field holds the same link. Tracker
-  objects navigate to the record; they never copy it. A repository change is named the same way; its archive moves
+  — so a reviewer reaches the record in one click, a `Phase:` line
+  (`specification` until the approval comment, `implementation` after),
+  one link per record, and the approval state; it ticks the two
+  specification items in its checklist. The body opens with the goal and
+  states the value under `Why`; Changes (permalinks to the commits) and
+  Validation (scenario results) are filled only when the pull request is
+  marked ready, so the approval surface carries no implementation. An
+  issue's Specification field holds the same link. Tracker objects
+  navigate to the record; they never copy it. A repository change is named the same way; its archive moves
   the record without touching `openspec/specs/`. A skill change that also
   needs harness work carries a companion repository change named
   `<slug>-harness` on the same branch, and the pull request names both on
