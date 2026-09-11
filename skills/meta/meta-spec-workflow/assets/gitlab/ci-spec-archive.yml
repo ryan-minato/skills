@@ -1,0 +1,43 @@
+# .gitlab-ci.yml fragment — archives every completed OpenSpec change after a
+# merge to the default branch. Produce it only under a specification
+# contract that records OpenSpec and the automated archive mode; other spec
+# tools have no fixed archive operation and get a job designed with the
+# user instead. Before shipping: verify the CLI's non-interactive archive
+# flag from its help, copy this builder's `scripts/archive_completed_changes.py`
+# into the project's scripts/ (stdlib Python; it reads tasks.md itself and
+# honors `skip_specs: true`), point the install step at the project's
+# version pin, and record the push path in the platform-settings knowledge
+# as a maintainer action — until both parts exist, in-request archiving
+# stays in force: a project access token with write permission stored as
+# the masked, protected CI variable SPEC_ARCHIVE_TOKEN, and an
+# allowed-to-push entry for that token's user on the protected default
+# branch (a valid token without the entry is refused). A push made with the
+# token runs the default-branch pipeline again, including this job, whose
+# second run finds nothing completed and exits 0.
+spec-archive:
+  stage: "{{STAGE — after the check and test stages}}"
+  image: "{{NODE_IMAGE — a pinned Node LTS image with Python 3 available}}"
+  # One archive run at a time: a second merge queues its job, which then
+  # rescans everything still completed.
+  resource_group: spec-archive
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - "{{INSTALL_COMMAND — the pinned OpenSpec CLI, e.g. just install-tools}}"
+    # Archives every change whose tasks are all ticked (spec-less changes
+    # without touching the main specs), then runs the strict validator
+    # itself.
+    - python3 scripts/archive_completed_changes.py
+    # Exit 0 with no diff when nothing was archived. Never rebase or retry a
+    # rejected push: the merge that moved the branch triggered the pipeline
+    # that archives whatever remains.
+    - |
+      if git diff --quiet; then
+        echo "nothing to archive"
+        exit 0
+      fi
+      git config user.name "{{BOT_NAME}}"
+      git config user.email "{{BOT_NOREPLY_EMAIL}}"
+      git add openspec
+      git commit -m "{{COMMIT_SUBJECT — per the project's commit convention}}"
+      git push "https://oauth2:${SPEC_ARCHIVE_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "HEAD:${CI_DEFAULT_BRANCH}"

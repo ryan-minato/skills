@@ -29,7 +29,8 @@ domain spec is omitted; say which in the contract.
 - **Validation:** without a validator, the change-request template's
   checklist is the only gate. Put "every requirement has a scenario; the
   delta names every changed requirement" on it, and add a lightweight
-  check to the project's checks when the team will maintain one.
+  required-headings check to the local check command when the team will
+  maintain one; the contract names whichever the project adopted.
 - **Archiving:** a written rule for who merges the delta into the domain
   spec and when, per the archive mode — inside the change request before
   it is marked ready, by the change's author; or by an automation job

@@ -1,35 +1,37 @@
 ---
 name: meta-spec-workflow
 description: >-
-  Disposable builder skill (delete after the harness is built): aligns a
-  project's harness and work tracking with spec-driven development — owns
-  the target-constraints layer: specifications, their tooling, and the rule
-  that tracked work links specifications, not restating them. Settles
-  the specification level and tool with the user, adopts the tool's
-  layout, gives every fact one source of truth between tool-owned files
-  and AGENTS.md or the knowledge base, and deposits a specification
-  contract written in the project's platform vocabulary for the platform
-  builders to implement. Use in a harness build when the
-  workflow contract records spec-driven intent, when a spec tool's
-  directories sit beside an agent harness, or when asked to make the
-  harness, templates, or tracker match Spec-Kit, OpenSpec, or Kiro, or to
-  stop issues and specs contradicting each other. Not for writing specs,
-  choosing the practice, the spec loop, the tracker, or branching.
+  Disposable builder skill (delete after the harness is built): configures
+  a project's spec-driven development rules — settles level, tool, request
+  shape, approval and archive modes, and scope with the user, adopts the
+  tool's layout, gives every fact one source of truth, and deposits the
+  specification contract in the project's platform vocabulary; in a second
+  phase, once the platform base is delivered, fills its extension slots
+  (templates, forms, project skill steps, archive job, validator). Use in
+  a harness build when the workflow contract records spec-driven intent,
+  when a spec tool's directories sit beside an agent harness, when asked
+  to make the harness match the spec tool or stop issues and specs
+  contradicting each other, or when a delivered platform base awaits its
+  specification shaping. Not for writing specs, choosing the practice, the
+  spec loop, the tracker, or branching.
 license: Apache-2.0
-compatibility: The bundled detection script requires Python 3.10+ (stdlib only).
+compatibility: >-
+  The bundled scripts require Python 3.10+ (stdlib only); the archive
+  script also needs the OpenSpec CLI on PATH.
 ---
 
 # Specification Workflow Contract
 
 Settle with the human developers how this project writes, approves, and
 keeps its specifications, make the harness say the same thing the chosen
-tool assumes, and leave the result in the target project as a contract the
-platform lifecycle builders implement. The questions and the design are
-settled in tool and workflow terms with no hosting platform in mind; the
-deposited contract names the platform's objects — issues or work items,
-pull or merge requests, drafts, the automation that archives — because the
-agents that read it work on that platform. It must survive this builder and
-this conversation.
+tool assumes, and leave the result in the target project as a contract.
+Then, once the platform builder has delivered its paradigm-neutral base,
+come back and shape that base for the contract: the templates, the intake
+forms, the project skill's steps, the archive automation, the validator in
+the check command. The design is settled in tool and workflow terms with no
+hosting platform in mind; the deposited contract and the inserted slot
+text name the platform's objects, because the agents that read them work
+on that platform. Both must survive this builder and this conversation.
 
 ## Non-negotiable boundaries
 
@@ -107,8 +109,13 @@ and the CI or template directories; if nothing does, ask in step 2 before
 anything else, because no contract is deposited without it. Record also
 whether automation exists (a workflow or pipeline directory) and whether
 its identity may push to the protected integration branch: that evidence
-decides the archive mode. Sort everything into known facts with evidence, unknown facts
-still discoverable, and decisions only a human can make.
+decides the archive mode. Record whether a platform base is already
+delivered — a project workflow skill, request and intake templates, a
+mechanics section in the workflow file — and whether this contract is
+already deposited: with both present, the run is the second phase and
+starts at step 7 after this inspection. Sort everything into known facts
+with evidence, unknown facts still discoverable, and decisions only a
+human can make.
 
 Done when: the script's summary is recorded; every existing spec artifact,
 every requirement-bearing document, every entrypoint pointer, and every
@@ -137,9 +144,20 @@ recommendation:
    specification documents; custom layout only for a stated constraint none
    of these meets. A tool the project already runs is the answer unless the
    user asks to change it.
-3. **Approval gate** — who approves a specification before planning and
-   implementation start, and whether an agent may approve its own. Record
-   the owner; the authority builder attaches its levels to this gate later.
+3. **Approval gate and mode** — who approves a specification before
+   planning and implementation start, whether an agent may approve its
+   own, and how the approval is recorded. Recommend the discussion-closed
+   mode: the draft opens at the record and the agent stops; the gate owner
+   discusses on the request, directs record changes in conversation, and
+   declares the discussion closed in conversation; the agent reconciles
+   the request's threads and the record before designing. Offer the
+   blocking alternative once — a fixed-wording comment on the draft
+   covering the record as of the last push before it — and take it only
+   when the user or a project file asks for an explicit token. Both modes
+   are defined in
+   [tracked-work-lifecycle.md](references/tracked-work-lifecycle.md), read
+   before this round. Record the owner and the mode; the authority builder
+   attaches its levels to this gate later.
 4. **Division of labor** — confirm the default: specifications own what,
    why, and acceptance; tracked work owns who, when, and status and links
    the specification. Any deviation is recorded with its reason.
@@ -164,13 +182,21 @@ recommendation:
    the automation identity needs as a maintainer action.
 7. **Default specification author** — the implementer, or a named planning
    role. Record who publishes the draft and who approves it (the approval
-   owner of question 3); the approval is a comment on the draft naming the
-   approved commit, never the platform's review-approval state, which later
-   pushes dismiss.
+   owner of question 3); the record of approval is the mode's closing or
+   comment, never the platform's review-approval state, which later pushes
+   dismiss.
+8. **Specification scope** — recommend that domains cover the product the
+   project delivers and that a change to the project's own harness,
+   tooling, checks, workflows, or documents is a spec-less change carried
+   by the tool's marker (OpenSpec: `skip_specs: true` with a proposal,
+   design, and tasks and no delta spec), linked by tracked work the same
+   way and never given a domain. Name the marker; record any deviation
+   with its reason.
 
-Done when: level, approach, approval owner, division of labor, change
-request shape, archive mode, and default author are settled by the user or
-confirmed from evidence, each with its selecting fact recorded.
+Done when: level, approach, approval owner and mode, division of labor,
+change request shape, archive mode, default author, and specification
+scope are settled by the user or confirmed from evidence, each with its
+selecting fact recorded.
 
 ### 3. Install or adopt the tool
 
@@ -251,25 +277,68 @@ files alone. Confirm the deposited file does not carry this
 skill's disposable marker, name, or paths.
 
 Then hand off by name, in order. Governance next: attach the approval gate
-and authority levels with `meta-agent-authority`. Platform expression after
-that: run the lifecycle builder for the evidenced host platform, which
-consumes this contract to shape intake templates, change-request templates,
-and the project workflow skill. If either is not installed, load the
+and authority levels with `meta-agent-authority`. Platform base after
+that: `meta-github-workflow` or `meta-gitlab-workflow` for the evidenced
+host delivers a paradigm-neutral base with extension slots and knows
+nothing of this contract beyond its existence. Then return here for step
+7, which shapes that base. If either builder is not installed, load the
 `ryan-minato-skills-installing` skill and install the whole `meta` catalog
 at project scope as it directs — its builders stack and are disposed
 together; never run an install command yourself.
 
 If the user declines, record in the hand-off which decisions remain
-unexpressed on the platform. Every hand-off report ends with the order
-above and with the closing step that follows.
+unexpressed on the platform and end the run after the contract deposit,
+naming the platform builder and this builder's step 7 as the remaining
+steps. Every hand-off report ends with the order above and with the
+closing step that follows.
+
+### 7. Shape the platform base
+
+Run this step only when the base exists: the project workflow skill, the
+request and intake templates, and the mechanics section of the workflow
+file are in place. Read the expression reference for the evidenced
+platform — [github-expression.md](references/github-expression.md) or
+[gitlab-expression.md](references/gitlab-expression.md) — and the base's
+own slot register (its durable-harness reference, `## Extension slots`).
+Fill the slots in this order, each from the matching section of
+`assets/<platform>/`, under the fill contract the reference states
+(locate by structure, insert only, grep first so a second run changes
+nothing, never touch the security or sensitivity-review checklist item):
+
+1. Templates and forms: the six template slots, worded for the contract's
+   approval and archive modes.
+2. The project skill: the four step slots, worded for the shape and the
+   modes, including the reconciliation the discussion-closed mode requires.
+3. The archive automation: under automated archiving with OpenSpec,
+   produce the workflow or job from the asset and copy
+   [`scripts/archive_completed_changes.py`](scripts/archive_completed_changes.py)
+   into the project's scripts; for any other tool, design the job with the
+   user from the completion criterion and post-processing step the
+   contract records, copying no OpenSpec command.
+4. The validator: when the tool ships one, add its strict run to the local
+   check command the base already runs in CI; edit no workflow or
+   pipeline file.
+5. Knowledge: `KNOWLEDGE_SECTION` in the platform workflow file, one
+   `SYNC_ROW` per insertion, and the `MAINTAINER_ACTION` row for the push
+   path by owner type when archiving is automated.
+
+Done when: every slot the contract's shape and modes require is filled;
+`grep -rn '{{'` over the delivered paths returns nothing; a body built
+from the shaped template passes the base's checklist check; the validator
+runs inside the check command; and a clean-context read of the project
+skill can state the precondition, first content, reconciliation, and
+finish step.
+
+### 8. Close
 
 When this builder runs under `meta-harness-building`, return there for the
-closing step. When it runs alone, once the deposit is verified and before
-the work goes to review, ask the user whether to delete the disposable
-builders now — the build request is not deletion consent — and on that
-decision load `meta-disposal`, which lists, confirms, and removes them. If
-the user declines, leave the builders in place and out of every commit, and
-record it in the handoff.
+closing step. When it runs alone, once the deposit — and, in the second
+phase, the shaped base — is verified and before the work goes to review,
+ask the user whether to delete the disposable builders now — the build
+request is not deletion consent — and on that decision load
+`meta-disposal`, which lists, confirms, and removes them. If the user
+declines, leave the builders in place and out of every commit, and record
+it in the handoff.
 
 ## Gotchas
 
@@ -290,11 +359,15 @@ record it in the handoff.
   produces specs nothing keeps honest; the contract says specs cover changed
   behavior only, and the codebase map covers the rest.
 - Acceptance criteria copied into an intake template are the single most
-  common contradiction source; the platform builder must make the template
-  link the spec's scenarios instead.
+  common contradiction source; the second phase makes the template link
+  the spec's scenarios instead.
 - A specification discussed in the work item's comment thread is
-  deliberation, not the record: the record is the file at the approved
-  commit, and the approval is the comment on the draft that names it.
+  deliberation, not the record: the record is the file on the branch when
+  the discussion is closed or the comment is posted, and the platform's
+  review-approval state is never the record.
+- Filling a slot by rewording the base's sentence, or by leaving a
+  placeholder for "later", breaks the base's own delivery checks; insert
+  whole sentences at the registered structure and grep before inserting.
 - Automated archiving needs a fixed archive operation. OpenSpec has one;
   Spec-Kit, Kiro, and committed documents do not, so for them the contract
   records the project's own completion criterion and post-processing step

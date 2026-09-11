@@ -43,6 +43,17 @@ leaves; record them in the contract's artifact map with the date.
   feature directories; the capability-organized change workflow fits it
   better even with no code yet.
 
+## Commands and validation
+
+Initialization and each new feature directory come from the kit's
+commands and scripts (verified from its help; none is quoted here), never
+from a hand-made directory. The kit ships no validator of the spec's
+structure: record in the contract the structural check the project adopts
+(a required-headings lint in the local check command, or the
+change-request checklist alone) or state that none exists, and have the
+loop check the spec against the kit's template headings before
+publishing.
+
 ## Collision points with a harness
 
 | Tool-owned fact | Harness file that tends to restate it | Resolution |
