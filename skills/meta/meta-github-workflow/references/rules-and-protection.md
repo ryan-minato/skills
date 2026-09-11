@@ -51,12 +51,20 @@ missing or excessive, and record both in `platform-settings.md`; any
 
 ## Designing past the baseline
 
-- Under a specification contract with automated archiving, the archive
-  workflow pushes to the default branch: its identity (the GitHub Actions
-  app, or a bot with its own token) needs a bypass entry on the default
-  branch's ruleset. Granting it is a maintainer action, recorded in
-  `platform-settings.md` with its readback; until it exists the contract's
-  in-request archiving stays in force.
+- Any automation that pushes to the default branch — a generated-file
+  refresh, a version bump, a job a paradigm contract asks for — needs a
+  bypass entry on the default branch's ruleset for its identity. On an
+  organization-owned repository the GitHub Actions app can be that actor;
+  on a user-owned repository the API refuses it, so the push needs a
+  deploy key with write access or a GitHub App installation, and pushes
+  made with either trigger workflows (the Actions token's do not). Granting
+  it is a maintainer action, recorded in `platform-settings.md` with its
+  readback; until it exists, the automation cannot push and the harness
+  says what happens instead.
+- A required check is named in the ruleset only after its job has reported
+  at least once on the default branch: the ruleset matches reported check
+  names, and a name with no run blocks every pull request until one
+  exists. Merge the workflow, watch it report, then add the name.
 
 - The approval count is the team's decision; note the **unattributed-Copilot
   extra approval is enabled by default** and turns one required approval

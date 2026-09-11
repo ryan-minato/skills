@@ -89,12 +89,14 @@ appends the mechanics it adds to that same file — never a second planning
 file. Read the branch
 contract deposited by `meta-git-branching` the same way —
 `.agents/knowledge/git-workflow.md` by default — and treat its settled
-naming, protection, and merge-method decisions as equally fixed. Read the
-specification contract deposited by `meta-spec-workflow` the same way —
-`.agents/knowledge/spec-workflow.md` by default — and treat its
-source-of-truth table and division of labor (specifications own what, why,
-and acceptance; tracked work owns who, when, and status and links the
-specification) as fixed.
+naming, protection, and merge-method decisions as equally fixed. Any other
+contract the entrypoint points to — a development-paradigm contract, such
+as a specification workflow, kept under `.agents/knowledge/` by default —
+is a fact too: read it, record what it settles, and leave its expression
+to the builder whose description claims it. This builder delivers the
+paradigm-neutral base and its extension slots
+([durable-harness.md](references/durable-harness.md)); it neither
+implements a paradigm nor reshapes the base for one.
 
 Audit every existing harness artifact for its discovery path, load condition,
 source of truth, and update trigger. Classify it as keep, extend, reconnect,
@@ -131,7 +133,6 @@ Load only the references whose conditions now apply:
 | Selected capability | Read |
 |---|---|
 | No workflow file exists and planning objects must be decided here, or a deposited decision names a semantic rather than a GitLab object | [semantic-mapping.md](references/semantic-mapping.md) |
-| The target carries a specification contract, or a spec tool's directories sit in the project | [spec-expression.md](references/spec-expression.md) |
 | Commit format, branches, merge/squash strategy, contribution flow, or commit enforcement | [commits-and-contributions.md](references/commits-and-contributions.md) |
 | Labels, milestones, boards, Scrum/Kanban, iterations, epics, or work-item hierarchy | [planning-and-labels.md](references/planning-and-labels.md) |
 | Task, issue, incident, merge request, assignment, time tracking, or autonomous task lifecycle | [work-items-and-mrs.md](references/work-items-and-mrs.md) |
@@ -188,6 +189,9 @@ Verify local links, documented commands, templates, CI syntax against the
 target instance, selected remote settings by readback, and the reachability of
 every knowledge file from the entrypoint. Confirm that no durable target file
 contains this skill's disposable marker or depends on this skill's paths.
+Confirm every extension slot listed in
+[durable-harness.md](references/durable-harness.md) exists by its heading,
+step, or section, so a paradigm builder can fill it later without guessing.
 
 Exercise the project's task-to-early-draft-MR path without publishing secrets.
 Where a real remote exercise is unsafe, use a reviewed dry run and state the
@@ -197,7 +201,10 @@ Done when: future agents can run the agreed lifecycle using only target-project
 artifacts and reachable first-party sources, every selected feedback mechanism
 works, and removing this builder would lose no rule.
 
-When this builder runs under `meta-harness-building`, return there for the
+When the entrypoint points to a paradigm contract, the builder whose
+description claims shaping the platform for that contract runs next and
+fills the slots; name that hand-off in the report by the claim, not by
+guessing a skill. When this builder runs under `meta-harness-building`, return there for the
 closing step. When it runs alone, once the deposit is verified and before the
 work goes to review, ask the user whether to delete the disposable builders
 now — the build request is not deletion consent — and on that decision load

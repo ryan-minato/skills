@@ -1,8 +1,8 @@
 # Contract Semantics on GitLab
 
 This is the translation table between the management model the contract
-builders design in and GitLab's objects. It is read twice: by the workflow
-and specification builders at deposit time, to write their files in GitLab
+builders design in and GitLab's objects. It is read twice: by the contract
+and paradigm builders at deposit time, to write their files in GitLab
 terms, and by this builder when no workflow file exists and planning
 objects must be decided here, or when a deposited line still names a
 semantic instead of an object. The

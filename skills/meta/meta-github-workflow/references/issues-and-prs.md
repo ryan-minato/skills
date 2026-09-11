@@ -24,10 +24,7 @@ Content contracts per form:
   (name the URL or repo being imitated, not "like A"), architecture-level
   solution direction and decomposition — never line-by-line prescriptions
   that turn execution into feed-forward imagination — executable
-  acceptance criteria (no "improve X") or, under a specification
-  contract, a link to the specification's scenarios instead — never both
-  (see [spec-expression.md](spec-expression.md)) — out-of-scope, optional
-  cautions.
+  acceptance criteria (no "improve X"), out-of-scope, optional cautions.
 - **Incident** is an opt-in shape for projects with a real operational
   event stream, not a default form: confirmed facts separated from
   hypotheses, impact, a timezone-stamped timeline, response state, and
@@ -44,9 +41,11 @@ field value; elsewhere both are labels.
 A PR responds to an issue unless approved policy allows bare PRs. Its
 description holds **what and why** (the outcome, not the diff), **changes**
 (where and what, briefly — the how), **related work** (`Closes #N` — the
-closing keyword is the issue's lifecycle driver), and the project's fixed
-checklist. Local test evidence or screenshots join only where project
-policy asks. Set assignee and labels on the PR — its labels are what the
+closing keyword is the issue's lifecycle driver), **validation** (what was
+run and observed), and the project's fixed checklist. Changes and
+validation stay on the template's reserved line while the PR is a draft
+and are filled in when it is marked ready; screenshots join only where
+project policy asks. Set assignee and labels on the PR — its labels are what the
 generated release notes consume — plus milestone and reviewer per policy.
 
 ## Claim and execute (the autonomous state machine)
@@ -66,20 +65,12 @@ generated release notes consume — plus milestone and reviewer per policy.
    fabricate them. On a public repository the draft's diff and commit
    messages are public from that moment; the confidentiality boundary from
    the design tree applies to every push.
-5. Under a specification contract with the combined shape, the draft's
-   first content is the change record: push the proposal and delta specs,
-   set the phase marker to "specification", request the gate owner's
-   review explicitly, and start planning and implementation only after the
-   approval comment naming the commit (see
-   [spec-expression.md](spec-expression.md)). Under split, link the merged
-   specification PR instead.
-6. Keep the PR description current; add comments for major discoveries,
+5. Keep the PR description current; add comments for major discoveries,
    changed assumptions, and decisions reviewers will need.
-7. Abandon by un-assigning, closing the draft with a comment stating the
+6. Abandon by un-assigning, closing the draft with a comment stating the
    state and remaining work, and leaving the issue open for pickup.
-8. When acceptance criteria and checks pass, update the final description
-   and complete the checklist, including the spec-side step the contract's
-   archive mode requires. What happens next is set by the project's
+7. When acceptance criteria and checks pass, update the final description
+   and complete the checklist. What happens next is set by the project's
    authority policy (`.agents/knowledge/agent-authority.md`, or the location
    the entrypoint records), not by green checks: by default `gh pr ready` and requesting review are the human's
    acceptance decision, and the agent stops at the draft with a
@@ -89,7 +80,7 @@ generated release notes consume — plus milestone and reviewer per policy.
    (`gh pr merge --auto`) may arm only where approved policy says so, and
    the unattributed-Copilot extra-approval default can demand a second
    review — check it rather than waiting on a phantom.
-9. Merge closes the linked issue via the closing keyword. Verify the
+8. Merge closes the linked issue via the closing keyword. Verify the
    closure landed; do not close by hand what the keyword already handles.
 
 Every metadata change in this machine — labels, assignees, milestone,

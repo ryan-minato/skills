@@ -68,18 +68,49 @@ config):
   `SECURITY_KEYWORD` (rewording the line without it fails every pull
   request, fail-closed and unexplained);
 - directory or module ↔ CODEOWNERS pattern ↔ area label;
-- the specification field in issue forms and the PR template ↔ the
-  artifact paths in the specification contract (a moved spec directory
-  silently orphans every template link);
-- the change request shape and archive mode in the specification contract
-  ↔ the project skill's take-work and finish steps, the PR template's two
-  specification items, and the archive workflow's presence (a contract
-  that switches mode without the workflow, or the reverse, leaves the
-  branch archiving twice or never);
+- every filled extension slot ↔ the paradigm contract it was filled from
+  (the filling builder registers the row; a contract that changes without
+  its slot text, or the reverse, leaves the harness saying two things);
 - ruleset ↔ legacy branch protection (record both layers or drift is
   invisible);
 - release tag and changelog ↔ package or deployment automation;
 - public contribution and security statements ↔ the internal workflow.
+
+## Extension slots
+
+The base is paradigm-neutral: nothing in the templates, forms, project
+skill, or knowledge presupposes a development paradigm. A paradigm
+builder — one whose description claims the contract the entrypoint points
+to — fills these slots after this builder has delivered. A slot is a
+structural location (a heading, a step, a field id), never a surviving
+placeholder or an anchor comment, so delivered files read clean and
+`grep -rn '{{'` stays empty.
+
+| Slot | Location in the delivered base | What a fill inserts |
+|---|---|---|
+| `RELATED_WORK_LINES` | PR template, under `## Related work`, after the closing-keyword comment | lines linking the paradigm's record and its phase |
+| `ACCEPTANCE_ITEM` | PR template, the checklist item beginning "Acceptance criteria" | an alternative acceptance source, appended to the item |
+| `CHECKLIST_ITEMS` | PR template, between the acceptance item and the security item | further checklist items; the security item is never edited |
+| `INTAKE_LINK_FIELD` | task and feature forms, immediately before the field with id `acceptance` | one optional input linking the paradigm's artifact |
+| `ACCEPTANCE_SOURCE` | task and feature forms, the `acceptance` field's `description` | the alternative source of acceptance, appended |
+| `COMPLETION_SOURCE` | tracking-issue body, `## Observable completion` | what the goal's completion links instead of restating |
+| `TAKE_WORK_PRECONDITION` | project skill, `## Take work` step 1, after the executable-criteria sentence | what must exist before the issue is taken |
+| `DRAFT_FIRST_CONTENT` | project skill, `## Take work` step 3, after "the claim and the work log" | what the draft's first push carries and what the agent then waits for |
+| `CREATE_WORK_RULE` | project skill, `## Create issues`, before the tracking-issue sentence | how issues derive from the paradigm's artifacts |
+| `FINISH_STEP` | project skill, `## Finish` step 2, after "update the final description" | the paradigm's step before the authority policy applies |
+| `KNOWLEDGE_SECTION` | `.agents/knowledge/github-workflow.md`, appended as one `## <Paradigm>` section | the contract's location, the slots filled because of it, the update trigger |
+| `SYNC_ROW` | the synchronization register this build deposited | one row per filled slot ↔ its contract |
+| `MAINTAINER_ACTION` | `platform-settings.md`, one row | a setting the paradigm's automation needs, recorded as a maintainer action with its readback |
+
+Fill contract, for the paradigm builder: locate each slot by its structure,
+never by a marker; insert, never reword base text; before inserting, grep
+for the sentence about to be inserted and skip the slot when it is already
+present, so a second run changes nothing; keep the security checklist item
+byte-identical; a paradigm's own local check joins the command the checks
+workflow already runs rather than a new workflow; register one `SYNC_ROW`
+per insertion; then rerun this builder's step-5 checks — placeholders,
+links, workflow YAML, checklist parsing against the template, and a
+clean-context readback of the project skill.
 
 ## Proportionality
 

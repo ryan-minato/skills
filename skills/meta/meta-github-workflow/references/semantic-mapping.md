@@ -1,8 +1,8 @@
 # Contract Semantics on GitHub
 
 This is the translation table between the management model the contract
-builders design in and GitHub's objects. It is read twice: by the workflow
-and specification builders at deposit time, to write their files in GitHub
+builders design in and GitHub's objects. It is read twice: by the contract
+and paradigm builders at deposit time, to write their files in GitHub
 terms, and by this builder when no workflow file exists and planning
 objects must be decided here, or when a deposited line still names a
 semantic instead of an object. This

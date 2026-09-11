@@ -19,10 +19,7 @@ Rework the description-template assets for the selected types:
 
 Use for planned project evolution. Include content, explicit outcome, context
 and references, architecture-level solution direction and work decomposition,
-executable acceptance criteria — or, under a specification contract, a link to
-the specification's scenarios instead, never both (see
-[spec-expression.md](spec-expression.md)) — out-of-scope items, and optional
-cautions.
+executable acceptance criteria, out-of-scope items, and optional cautions.
 Do not prescribe an imagined implementation line by line; preserve the
 executor's feedback loop and technical judgment. A goal such as “improve X” is
 not executable until its observable target is stated.
@@ -48,9 +45,10 @@ allows a bare MR. Its description includes:
 
 - **What and why:** the behavior or outcome changed and why it matters.
 - **Changes:** concise locations/components and what changed there.
-- **Related work:** closing or related references with correct semantics —
-  a specification-only MR under a specification contract references the
-  work item without a closing pattern.
+- **Related work:** closing or related references with correct semantics.
+- **Validation:** what was run and observed. Changes and validation keep
+  the template's reserved line while the MR is a draft and are filled in
+  when the draft flag is removed.
 - **Checklist:** the project's fixed contribution and quality gates.
 
 Add local test results, screenshots, rollout evidence, or review instructions
@@ -68,13 +66,7 @@ For agent-initiated work:
    and record the start timestamp.
 3. Create a policy-compliant branch, push it, and open a draft MR as soon as the
    initial branch exists. The draft is the ownership and collaboration surface,
-   not a completion claim. Under a specification contract with the combined
-   shape, its first content is the change record: push the proposal and
-   delta specs, set the phase marker to "specification", request the gate
-   owner's review explicitly, and start planning and implementation only
-   after the approval comment naming the commit (see
-   [spec-expression.md](spec-expression.md)). Under split, link the merged
-   specification MR instead.
+   not a completion claim.
 4. Keep the MR description current. Add comments for major discoveries,
    changed assumptions, evidence, or decisions that future reviewers need.
 5. Log time to the work item or MR on completion, material change, pause, or
@@ -82,8 +74,7 @@ For agent-initiated work:
 6. If abandoning, explain the state and remaining work, remove the assignee,
    and leave the object open for pickup unless the user chooses otherwise.
 7. When acceptance criteria pass and the pipeline is green, update the exact
-   final description and complete the checklist, including the spec-side
-   step the contract's archive mode requires. What happens next is set by
+   final description and complete the checklist. What happens next is set by
    the project's authority policy (`.agents/knowledge/agent-authority.md`,
    or the location the entrypoint records), not by a green pipeline: by
    default removing draft status, requesting review, and merging are the
