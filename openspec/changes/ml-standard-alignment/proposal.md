@@ -19,9 +19,13 @@ will install tomorrow. Now, before the next ML project is scaffolded.
 
 - `scaffold-ml` — **BREAKING**: one project shape replaces the quick
   experiment / maintainable training choice: OmegaConf typed schema plus
-  YAML plus command-line overrides with a resolved dump saved per run,
-  `uv.lock` with index routing for accelerator wheels, an explicit
-  Accelerate loop with one logging seam and one stage-trace seam, a run
+  YAML plus command-line overrides with a resolved dump saved per run, a
+  dependency carrier the user chooses — a uv project (`pyproject.toml`
+  plus `uv.lock` with index routing for accelerator wheels) by default,
+  or `requirements.in` compiled by uv into a fully pinned
+  `requirements.txt` with the torch backend flag for a scripts-only
+  repository — an explicit Accelerate loop with one logging seam and one
+  stage-trace seam, a run
   manifest written at start and finish, a tracker selected by precedence
   (keep existing → the hosting platform's experiment tracking → Trackio),
   a multi-stage container recipe whose pushed digest is the environment
@@ -33,9 +37,9 @@ will install tomorrow. Now, before the next ML project is scaffolded.
   machine-learning skills, named by role. Existing Hydra, Pydantic
   Settings, or requirements-file projects are preserved under the
   existing-choice rule (Hydra: no object instantiation, a pinned output
-  directory). The Hydra reference, the requirements-compile reference,
-  and both asset trees are removed; the description no longer offers two
-  modes.
+  directory). The Hydra reference and both asset trees are removed; the
+  requirements-compile reference stays as the carrier's branch; the
+  description no longer offers two modes.
 - `meta-spec-workflow`: a research repository (the workflow contract's
   research profile) is offered the research-task protocol — OpenSpec
   with a project-local `research-task` schema whose spec carries an
@@ -72,7 +76,8 @@ will install tomorrow. Now, before the next ML project is scaffolded.
 ## Skills touched
 
 - `scaffold/scaffold-ml` (new): description triggers, the single shape,
-  the configuration surface, provenance and tracker, the image identity,
+  the dependency carrier, the configuration surface, provenance and
+  tracker, the image identity,
   tests and hooks, the deposited guidance, and the handoffs to the GPU
   container builder, the workflow and authority builders, the harness
   entry, and the durable machine-learning skills by role.
@@ -94,8 +99,8 @@ will install tomorrow. Now, before the next ML project is scaffolded.
 
 - `scaffold-ml`: a project is scaffolded in one shape with provenance, a
   tracker, an image identity, the marker and hook rules, and pointers to
-  the durable skills; the two-mode choice, Hydra by default, and the
-  requirements-compile path are gone → `feat!`.
+  the durable skills; the two-mode choice and Hydra by default are gone,
+  and the dependency carrier is the user's explicit choice → `feat!`.
 - `meta-spec-workflow`: a research repository gets a research-task
   contract and schema instead of a software-change one → `feat`.
 - `meta-python-defaults`: a tensor-heavy project no longer receives a
