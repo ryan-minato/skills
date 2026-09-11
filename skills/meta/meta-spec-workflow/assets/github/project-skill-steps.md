@@ -16,7 +16,16 @@ acceptance criteria.
 
 ## DRAFT_FIRST_CONTENT — `## Take work` step 3, after "the claim and the work log."
 
-Combined shape only: Its first push is the change record — the proposal
+Split shape: When the issue has no merged specification PR yet, the draft
+is the specification PR: its body references the issue with `Refs #N` in
+place of `Closes #N`, its only content is the change record (proposal and
+delta specs, created through the spec tool's commands and passing its
+validator), and its body reads `Phase: specification`. Stop there; the
+gate owner's approval and merge of that PR is the approval. Each
+implementation PR links the merged record; only the last one carries
+`Closes #N`.
+
+Combined shape: Its first push is the change record — the proposal
 and the delta specs, created through the spec tool's commands and passing
 its validator, with no design or tasks — and the body's `Phase:` line
 reads `specification` while Changes and Validation keep their reserved

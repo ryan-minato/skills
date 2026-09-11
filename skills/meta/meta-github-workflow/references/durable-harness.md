@@ -50,10 +50,11 @@ the plan upgrades, enable the ruleset with these exact job names").
 
 ## Synchronization ownership
 
-Register every copied pair with an owner and update trigger — and prefer
-deriving over copying wherever possible (a checklist workflow parses the PR
-template's headings; a tag check reads its pattern from one committed
-config):
+Register every copied pair with an owner and update trigger in a
+`## Synchronization` table of `.agents/knowledge/github-workflow.md` — and
+prefer deriving over copying wherever possible (a checklist workflow parses
+the PR template's headings; a tag check reads its pattern from one
+committed config):
 
 - local validation command ↔ CI job, and CI job name ↔ required-check name;
 - path filter ↔ aggregator gate job;
@@ -84,12 +85,12 @@ builder — one whose description claims the contract the entrypoint points
 to — fills these slots after this builder has delivered. A slot is a
 structural location (a heading, a step, a field id), never a surviving
 placeholder or an anchor comment, so delivered files read clean and
-`grep -rn '{{'` stays empty.
+`grep -rn '{{[A-Z]'` stays empty (Actions expressions are not placeholders).
 
 | Slot | Location in the delivered base | What a fill inserts |
 |---|---|---|
 | `RELATED_WORK_LINES` | PR template, under `## Related work`, after the closing-keyword comment | lines linking the paradigm's record and its phase |
-| `ACCEPTANCE_ITEM` | PR template, the checklist item beginning "Acceptance criteria" | an alternative acceptance source, appended to the item |
+| `ACCEPTANCE_ITEM` | PR template, the checklist item beginning "Acceptance criteria" | an alternative acceptance source, inserted before "are met" |
 | `CHECKLIST_ITEMS` | PR template, between the acceptance item and the security item | further checklist items; the security item is never edited |
 | `INTAKE_LINK_FIELD` | task and feature forms, immediately before the field with id `acceptance` | one optional input linking the paradigm's artifact |
 | `ACCEPTANCE_SOURCE` | task and feature forms, the `acceptance` field's `description` | the alternative source of acceptance, appended |
@@ -99,7 +100,7 @@ placeholder or an anchor comment, so delivered files read clean and
 | `CREATE_WORK_RULE` | project skill, `## Create issues`, before the tracking-issue sentence | how issues derive from the paradigm's artifacts |
 | `FINISH_STEP` | project skill, `## Finish` step 2, after "update the final description" | the paradigm's step before the authority policy applies |
 | `KNOWLEDGE_SECTION` | `.agents/knowledge/github-workflow.md`, appended as one `## <Paradigm>` section | the contract's location, the slots filled because of it, the update trigger |
-| `SYNC_ROW` | the synchronization register this build deposited | one row per filled slot ↔ its contract |
+| `SYNC_ROW` | `.agents/knowledge/github-workflow.md`, the `## Synchronization` table | one row per filled slot ↔ its contract |
 | `MAINTAINER_ACTION` | `platform-settings.md`, one row | a setting the paradigm's automation needs, recorded as a maintainer action with its readback |
 
 Fill contract, for the paradigm builder: locate each slot by its structure,
@@ -108,9 +109,9 @@ for the sentence about to be inserted and skip the slot when it is already
 present, so a second run changes nothing; keep the security checklist item
 byte-identical; a paradigm's own local check joins the command the checks
 workflow already runs rather than a new workflow; register one `SYNC_ROW`
-per insertion; then rerun this builder's step-5 checks — placeholders,
-links, workflow YAML, checklist parsing against the template, and a
-clean-context readback of the project skill.
+per insertion; then rerun this builder's step-5 checks — placeholders
+(`grep -rn '{{[A-Z]'`), links, workflow YAML, checklist parsing against
+the template, and a clean-context readback of the project skill.
 
 ## Proportionality
 

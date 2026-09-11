@@ -18,11 +18,12 @@ re-decide a contract fact here.
 - Before inserting, grep the target file for the first sentence of the
   text about to be inserted; when it is present, skip the slot. A second
   run on the same base changes nothing.
-- Register one `SYNC_ROW` per insertion in the synchronization register
-  the base deposited, pairing the inserted text with the contract fact it
-  came from.
-- After every slot: `grep -rn '{{'` over the delivered paths returns
-  nothing; every workflow parses; a body built from the shaped template
+- Register one `SYNC_ROW` per insertion in the `## Synchronization` table
+  of `.agents/knowledge/github-workflow.md`, pairing the inserted text with
+  the contract fact it came from.
+- After every slot: `grep -rn '{{[A-Z]'` over the delivered paths returns
+  nothing (builder placeholders are uppercase names; the archive
+  workflow's `${{ github.… }}` and `${{ secrets.… }}` expressions stay); every workflow parses; a body built from the shaped template
   passes the checklist workflow; a clean-context read of the project skill
   can state the take-work precondition, the draft's first content, the
   reconciliation, and the finish step.
@@ -38,13 +39,13 @@ re-decide a contract fact here.
 | `ACCEPTANCE_SOURCE` | task and feature forms, the `acceptance` field's `description` | the change-record alternative, "never both" | always |
 | `COMPLETION_SOURCE` | tracking-issue body, `## Observable completion` | link the specifications whose scenarios define the goal | always |
 | `TAKE_WORK_PRECONDITION` | project skill, `## Take work` step 1 | combined: record to the draft first, then stop; split: unmerged specification PR is escalated | always |
-| `DRAFT_FIRST_CONTENT` | project skill, `## Take work` step 3 | the record as first push, `Phase: specification`, reserved sections, stop; the wait and the reconciliation for the mode | combined |
+| `DRAFT_FIRST_CONTENT` | project skill, `## Take work` step 3 | combined: the record as first push, `Phase: specification`, reserved sections, stop; the wait and the reconciliation for the mode. Split: `Refs #N` in place of the base's `Closes #N` on the specification PR, the record as its only content, `Closes #N` on the last implementation PR | always |
 | `CREATE_WORK_RULE` | project skill, `## Create issues` | issues carry no acceptance criteria and link the record; task-derived issues optional; `Refs #N` for a specification PR | always |
 | `FINISH_STEP` | project skill, `## Finish` step 2 | `Phase: implementation`, the reserved lines replaced, the spec-side step for the archive mode, the validator inside the check command | always |
 | archive workflow | `.github/workflows/spec-archive.yml` from `assets/github/workflow-spec-archive.yml` | the serialized job calling the project's copy of this builder's archive script | automated archiving with OpenSpec |
 | local check command | the command the PR template's first checklist item and the checks workflow already run (`justfile`, `Makefile`, or a script) | the tool's strict validator as one more step; no workflow edit | the tool ships a validator |
 | `KNOWLEDGE_SECTION` | `.agents/knowledge/github-workflow.md`, appended `## Specifications` | the contract's location, the slots filled because of it, the validator's place, the update trigger "when the spec directory or tool changes, re-check every template link" — never the contract's tables | always |
-| `SYNC_ROW` | the synchronization register | one row per insertion above | per insertion |
+| `SYNC_ROW` | `.agents/knowledge/github-workflow.md`, the `## Synchronization` table | one row per insertion above | per insertion |
 | `MAINTAINER_ACTION` | `platform-settings.md`, one row | the push path below, with its readback | automated archiving |
 
 Do not add a "Specification" issue type or label: a spec is a document in

@@ -57,7 +57,8 @@ update trigger. Rework `assets/platform-settings.md` as that record.
 
 ## Synchronization and entropy
 
-Assign one owner for each relationship:
+Assign one owner for each relationship, recorded as a `## Synchronization`
+table in `.agents/knowledge/gitlab-workflow.md`:
 
 - local validation command ↔ CI job;
 - CI job name ↔ merge gate;
@@ -80,23 +81,23 @@ knowledge presupposes a development paradigm. A paradigm builder — one
 whose description claims the contract the entrypoint points to — fills
 these slots after this builder has delivered. A slot is a structural
 location (a heading, a step, a section), never a surviving placeholder or
-an anchor comment, so delivered files read clean and `grep -rn '{{'`
+an anchor comment, so delivered files read clean and `grep -rn '{{[A-Z]'`
 stays empty.
 
 | Slot | Location in the delivered base | What a fill inserts |
 |---|---|---|
 | `RELATED_WORK_LINES` | MR template, under `## Related work`, after the reference-syntax comment | lines linking the paradigm's record and its phase |
-| `ACCEPTANCE_ITEM` | MR template, the checklist item beginning "The change satisfies" | an alternative acceptance source, appended to the item |
+| `ACCEPTANCE_ITEM` | MR template, the checklist item beginning "The change satisfies" | an alternative acceptance source, inserted before the final period |
 | `CHECKLIST_ITEMS` | MR template, between the acceptance item and "The documented local checks pass" | further checklist items; the sensitivity-review item is never edited |
 | `INTAKE_LINK_FIELD` | task template, one section immediately before `## Acceptance criteria` | one optional section linking the paradigm's artifact |
 | `ACCEPTANCE_SOURCE` | task template, the comment under `## Acceptance criteria` | the alternative source of acceptance, appended |
-| `COMPLETION_SOURCE` | the goal's milestone or epic description, its completion statement (shaped by [planning-and-labels.md](planning-and-labels.md)) | what completion links instead of restating |
+| `COMPLETION_SOURCE` | the goal milestone's description, under `## Observable completion` ([planning-and-labels.md](planning-and-labels.md)) | what completion links instead of restating |
 | `TAKE_WORK_PRECONDITION` | project skill, `## Take and execute work` step 1, after "Confirm the work item is open." | what must exist before the item is taken |
 | `DRAFT_FIRST_CONTENT` | project skill, `## Take and execute work` step 3, after "apply the approved labels and milestone." | what the draft's first push carries and what the agent then waits for |
 | `CREATE_WORK_RULE` | project skill, one `## Create work` section inserted immediately before `## Publish gate` | how work items derive from the paradigm's artifacts |
 | `FINISH_STEP` | project skill, `## Take and execute work` step 6, after "required checks pass," | the paradigm's step before the authority policy applies |
 | `KNOWLEDGE_SECTION` | `.agents/knowledge/gitlab-workflow.md`, appended as one `## <Paradigm>` section | the contract's location, the slots filled because of it, the update trigger |
-| `SYNC_ROW` | the synchronization register this build deposited | one row per filled slot ↔ its contract |
+| `SYNC_ROW` | `.agents/knowledge/gitlab-workflow.md`, the `## Synchronization` table | one row per filled slot ↔ its contract |
 | `MAINTAINER_ACTION` | the platform-settings knowledge, one row | a setting the paradigm's automation needs, recorded as a maintainer action with its readback |
 
 Fill contract, for the paradigm builder: locate each slot by its structure,

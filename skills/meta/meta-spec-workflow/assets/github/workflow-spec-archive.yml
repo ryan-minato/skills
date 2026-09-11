@@ -8,26 +8,29 @@
 # Python; it reads tasks.md itself and honors `skip_specs: true`), point the
 # install step at the project's version pin, and record the push path in
 # platform-settings.md as a maintainer action — until it exists, in-request
-# archiving stays in force:
+# archiving stays in force. Choose exactly one push identity and delete the
+# other two before shipping:
 #   organization-owned repository: the GitHub Actions app as a bypass actor
 #     on the default branch's ruleset; keep the plain checkout below.
 #     GITHUB_TOKEN pushes trigger no further workflows, so this job runs the
 #     strict validator itself.
-#   user-owned repository: the API refuses the Actions app; check out with a
-#     deploy key that has write access (`ssh-key` on the checkout step, the
-#     private key a repository secret) or push with a GitHub App installation
-#     token minted in the job. Pushes made that way trigger workflows,
-#     including this one, whose second run finds nothing completed and exits 0.
+#   user-owned repository, deploy key: the API refuses the Actions app; pass
+#     the deploy key's private key (a repository secret) as `ssh-key` on the
+#     checkout step — the checkout action then rewrites the remote to SSH, so
+#     the plain `git push origin` below uses that key.
+#   user-owned repository, GitHub App: mint an installation token in the
+#     `app-token` step below and check out with it as `token`; the push then
+#     uses the App's identity.
+#   Pushes made with a deploy key or an App token trigger workflows,
+#   including this one, whose second run finds nothing completed and exits 0.
 name: spec-archive
 
 on:
   push:
     branches: ["{{DEFAULT_BRANCH}}"]
 
-# The archive commits to the default branch, so this is the one workflow
-# that writes contents. Everything else stays deny-by-default.
-permissions:
-  contents: write
+# Deny by default at workflow scope; only the archive job writes contents.
+permissions: {}
 
 # One archive run at a time, never cancelling one in progress: a second
 # merge queues its run, which then rescans everything still completed.
@@ -38,12 +41,22 @@ concurrency:
 jobs:
   archive:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
+      # user-owned repository, GitHub App only: uncomment this step.
+      # - id: app-token
+      #   uses: "actions/create-github-app-token@{{PINNED_SHA}}"
+      #   with:
+      #     app-id: ${{ vars.{{APP_ID_VARIABLE}} }}
+      #     private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
       - uses: "actions/checkout@{{PINNED_SHA}}"
         with:
           ref: "{{DEFAULT_BRANCH}}"
-          # user-owned repository with a deploy key: add
+          # user-owned repository, deploy key: uncomment
           #   ssh-key: ${{ secrets.{{DEPLOY_KEY_SECRET}} }}
+          # user-owned repository, GitHub App: add the checkout action's
+          # `token` input, valued `${{ steps.app-token.outputs.token }}`
       - uses: "actions/setup-node@{{PINNED_SHA}}"
         with:
           node-version: "{{NODE_LTS}}"

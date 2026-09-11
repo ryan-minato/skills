@@ -12,7 +12,7 @@ Phase: specification
 Records: <one link per record file — proposal and delta specs; design and tasks are added when they exist>
 Approval: <discussion-closed: "discussion open on this draft — the gate owner closes it in conversation; design and implementation follow the reconciled record" | blocking: "pending — the gate owner's comment on this draft, covering the record as of the last push before it; to approve, post this comment on one line:" followed by a fenced block holding exactly the text the contract fixes, for example `Specification approved`>
 
-## ACCEPTANCE_ITEM — appended to the checklist item beginning "Acceptance criteria"
+## ACCEPTANCE_ITEM — inserted into the checklist item beginning "Acceptance criteria", before "are met"
 
 , or the scenarios of the linked change record
 
@@ -20,7 +20,7 @@ Approval: <discussion-closed: "discussion open on this draft — the gate owner 
 
 ## CHECKLIST_ITEMS — between the acceptance item and the security item
 
-- [ ] <discussion-closed: "The change record's discussion was closed on this draft before implementation" | blocking: "The gate owner's `<exact text>` comment on this draft is later than the record's last push"> , or this pull request carries the specification only
+- [ ] <discussion-closed: "The change record's discussion was closed on this draft before implementation" | blocking: "The gate owner's `<exact text>` comment on this draft is later than the record's last push">, or this pull request carries the specification only
 - [ ] <in-request: "The change record is archived in this pull request, or the specification is updated" | automated: "Every task of the change record is done and it is left for the `<archive workflow name>` workflow, or the specification is updated">
 
 Keep the word "secrets" out of these items: the checklist workflow keys the

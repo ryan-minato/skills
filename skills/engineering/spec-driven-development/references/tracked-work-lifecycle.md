@@ -57,7 +57,8 @@ posted), before any design:
 1. Read every comment on the request and every review thread with its
    resolution state (on GitHub: the issue comments endpoint and the
    `reviewThreads` connection with `isResolved`; on GitLab: the merge
-   request discussions with `resolved`).
+   request discussions, where each note carries `resolvable` and
+   `resolved`).
 2. List every unresolved thread.
 3. List every adjustment requested in the discussion that the record does
    not carry; update the record or ask whether the request was withdrawn.
@@ -80,7 +81,9 @@ Follow the project's template when one exists. Absent one, the body has:
    on this draft" and what closes it, or the exact comment text on its own
    line so it can be copied.
 4. Related work: the closing reference to the work item, or the reason
-   none exists.
+   none exists. A split-shape specification request uses a non-closing
+   reference instead (`Refs #N` on GitHub, a bare `#N` on GitLab); the
+   last implementation request carries the closing one.
 5. Changes and Validation, each holding a reserved line until the request
    is marked ready. Then Changes lists every touched file as a permalink
    to the commit that changed it — the exact lines for a local change,

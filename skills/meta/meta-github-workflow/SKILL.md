@@ -212,8 +212,9 @@ anything.
 
 Rework selected [assets](assets/) against real project facts. Delete every
 placeholder and inapplicable section; templates are starting shapes, never
-finished files. `grep -rn '{{'` over every delivered path must return
-nothing.
+finished files. `grep -rn '{{[A-Z]'` over every delivered path must return
+nothing — builder placeholders are uppercase names, so the pattern skips
+the `${{ github.… }}` expressions delivered workflows legitimately keep.
 
 Use [`scripts/sync_labels.py`](scripts/sync_labels.py) only after the
 taxonomy is approved: dry-run, review the exact plan, apply only with

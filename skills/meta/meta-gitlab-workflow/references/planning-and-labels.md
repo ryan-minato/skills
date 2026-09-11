@@ -61,7 +61,10 @@ explicit approval.
 
 ## Milestones and hierarchy
 
-Use milestones for a coherent future state or long-range goal. Use iterations
+Use milestones for a coherent future state or long-range goal; a goal
+milestone's description carries `## Vision`, `## Observable completion`,
+and `## Non-goals`, so completion is linked from there rather than
+restated elsewhere. Use iterations
 for recurring timeboxes when supported and actually practiced. Use epics or
 parent work items only when they clarify cross-milestone or cross-project
 structure. The Free-tier fallback is labels, linked/child work items where

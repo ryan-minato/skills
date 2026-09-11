@@ -12,7 +12,8 @@ serialize the job on the host, rescan on every run, and let a rejected
 push fail without retry.
 
 Exit codes: 0 archived or nothing to archive; 1 the CLI or validator
-failed; 2 bad arguments or an unusable changes directory.
+failed or could not be run; 2 bad arguments or an unusable changes
+directory.
 """
 
 from __future__ import annotations
@@ -53,7 +54,10 @@ def skips_specs(change: Path) -> bool:
 
 def run(cmd: list[str], cwd: Path) -> None:
     env = {**os.environ, "OPENSPEC_NO_UPDATE_CHECK": "1"}
-    result = subprocess.run(cmd, cwd=cwd, env=env)
+    try:
+        result = subprocess.run(cmd, cwd=cwd, env=env)
+    except OSError as exc:
+        fail(f"cannot run `{cmd[0]}`: {exc}", 1)
     if result.returncode != 0:
         fail(f"`{' '.join(cmd)}` exited {result.returncode}", 1)
 
