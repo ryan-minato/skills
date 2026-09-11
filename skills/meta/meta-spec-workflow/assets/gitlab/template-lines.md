@@ -12,7 +12,7 @@ Phase: specification
 Records: <one link per record file — proposal and delta specs; design and tasks are added when they exist>
 Approval: <discussion-closed: "discussion open on this draft — the gate owner closes it in conversation; design and implementation follow the reconciled record" | blocking: "pending — the gate owner's comment on this draft, covering the record as of the last push before it; to approve, post this comment on one line:" followed by a fenced block holding exactly the text the contract fixes, for example `Specification approved`>
 
-## ACCEPTANCE_ITEM — appended to the checklist item beginning "The change satisfies"
+## ACCEPTANCE_ITEM — inserted into the checklist item beginning "The change satisfies", before the final period
 
 , or the scenarios of the linked change record
 
@@ -33,6 +33,6 @@ Approval: <discussion-closed: "discussion open on this draft — the gate owner 
 
 , or a link to the scenarios of the linked change record. Never both.
 
-## COMPLETION_SOURCE — the goal's milestone or epic description
+## COMPLETION_SOURCE — the goal milestone's description, under `## Observable completion`
 
 Link the specifications whose scenarios define the goal; do not restate them.

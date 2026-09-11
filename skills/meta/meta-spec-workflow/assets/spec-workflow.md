@@ -11,8 +11,8 @@ or "change request" may survive. Tool names are facts and stay.
 # Specification Workflow Contract
 
 Read this before starting a change that alters behavior, before creating
-tracked work from a specification, and before editing any file under
-`<spec tool directory>`.
+<an issue | a work item> from a specification, and before editing any file
+under `<spec tool directory>`.
 
 Level: <spec-first | spec-anchored | spec-as-source>. Selected because <one
 sentence naming the project fact that decided it>. Obligation: <what must
@@ -28,13 +28,13 @@ Every operation the tool has a command for — initializing, creating a
 change or feature record, validating, archiving — runs through that
 command, verified from the tool's help first; the tool's directory tree
 and generated files are never created by hand. Hand edits stop at the
-requirement text itself. <The validator: `<name>`, run in strict mode as
-part of `<local check command>`, after every artifact edit, before the
+requirement text itself. Validation: <the tool's validator `<name>` runs
+in strict mode as part of `<local check command>` | the tool ships no
+validator; a required-headings lint in `<local check command>` stands in
+| the tool ships no validator and no programmatic check exists; the
+checklist is the gate>. It runs after every artifact edit, before the
 draft is published, before the <pull request | merge request> is marked
-ready, and after archiving; a red validator is a red check. | No
-validator: the tool ships none; <the structural check the project adopts
-— a lint of the required headings — and where it runs | "no programmatic
-check exists; the checklist is the gate">.>
+ready, and after archiving; a red check is a red check.
 
 ## Artifact map
 
@@ -63,8 +63,10 @@ it never restates the fact.
 
 <States a specification passes through, the event that moves it, and where
 that event is recorded, e.g. proposed (change record committed and the
-draft <pull request | merge request> opened) → approved (the approval
-owner's comment on the draft naming the commit, or the merged
+draft <pull request | merge request> opened) → approved (<the approval
+owner closing the discussion on the draft in conversation, reconciled
+with nothing open | the approval owner's `<exact text>` comment on the
+draft, covering the record as of the last push before it>, or the merged
 specification <pull request | merge request>) → implemented (every task
 done and every scenario verified, recorded in the <pull request | merge
 request>'s validation section) → archived (delta merged into the
@@ -109,7 +111,7 @@ and review <threads | discussions> runs before design.> A platform review
 approval is not the record in either mode, because later pushes dismiss
 it.
 
-## Change request shape
+## <Pull request | Merge request> shape
 
 <Combined | Split>. Selected because <the change propagation line of
 `.agents/knowledge/<platform>-workflow.md`, or the consumer contract, that
@@ -181,8 +183,12 @@ a push path exists.>
   the goal, a section stating the value, the specification block (`Spec:`
   linking the record on the branch, `Phase:` specification or
   implementation, one link per record file, `Approval:` in the mode
-  above), related work with the closing reference, and Changes and
-  Validation on their reserved line until the request is marked ready —
+  above), related work with the closing reference (<a split-shape
+  specification <pull request | merge request> references the <issue |
+  work item> with <`Refs #N` | a bare `#N`> and never closes it; the last
+  implementation request does | delete under the combined shape>), and
+  Changes and Validation on their reserved line until the request is marked
+  ready —
   then Changes as permalinks to the commits (the exact lines for a local
   change, the whole file or directory for a broad one) and Validation
   naming each scenario with its result and linking the plan. Further

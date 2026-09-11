@@ -323,7 +323,8 @@ nothing, never touch the security or sensitivity-review checklist item):
    path by owner type when archiving is automated.
 
 Done when: every slot the contract's shape and modes require is filled;
-`grep -rn '{{'` over the delivered paths returns nothing; a body built
+`grep -rn '{{[A-Z]'` over the delivered paths returns nothing (the
+uppercase form is the builders' placeholder; Actions expressions stay); a body built
 from the shaped template passes the base's checklist check; the validator
 runs inside the check command; and a clean-context read of the project
 skill can state the precondition, first content, reconciliation, and

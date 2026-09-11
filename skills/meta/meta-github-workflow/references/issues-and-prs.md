@@ -41,7 +41,9 @@ field value; elsewhere both are labels.
 A PR responds to an issue unless approved policy allows bare PRs. Its
 description holds **what and why** (the outcome, not the diff), **changes**
 (where and what, briefly — the how), **related work** (`Closes #N` — the
-closing keyword is the issue's lifecycle driver), **validation** (what was
+closing keyword is the issue's lifecycle driver; a paradigm's request that
+must not close the issue uses `Refs #N` instead, as its contract says),
+**validation** (what was
 run and observed), and the project's fixed checklist. Changes and
 validation stay on the template's reserved line while the PR is a draft
 and are filled in when it is marked ready; screenshots join only where

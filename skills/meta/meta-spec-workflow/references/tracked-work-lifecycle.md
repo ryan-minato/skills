@@ -73,7 +73,9 @@ the value; a specification block — the record's path as a link on the
 branch, the phase (specification or implementation), one link per record
 file, and the approval line in the contract's mode (what closes it, or the
 exact comment text on its own line so it can be copied); related work with
-the closing reference; changes and validation reserved until ready —
+the closing reference — a non-closing reference on a split-shape
+specification request, whose last implementation request closes; changes
+and validation reserved until ready —
 changes as permalinks to the commits (the exact lines for a local change,
 the whole file or directory for a broad one), validation naming each
 scenario with its result and linking the plan. Further sections are

@@ -17,16 +17,26 @@ acceptance criteria.
 
 ## DRAFT_FIRST_CONTENT — `## Take and execute work` step 3, after "apply the approved labels and milestone."
 
-Combined shape only: Its first push is the change record — the proposal
+Split shape: When the work item has no merged specification MR yet, the
+draft is the specification MR: its description references the work item
+with a non-closing reference in place of the closing pattern, its only
+content is the change record (proposal and delta specs, created through
+the spec tool's commands and passing its validator), and its description
+reads `Phase: specification`. Stop there; the gate owner's approval and
+merge of that MR is the approval. Each implementation MR links the merged
+record; only the last one carries the closing pattern.
+
+Combined shape: Its first push is the change record — the proposal
 and the delta specs, created through the spec tool's commands and passing
 its validator, with no design or tasks — and the description's `Phase:`
 line reads `specification` while Changes and Validation keep their
 reserved line. Then stop. <discussion-closed: "The gate owner discusses on
 the MR and directs record changes in conversation; push each through the
 publish gate. When the gate owner says in conversation that the discussion
-is closed, read the MR's notes and discussions with their resolved state
-(the merge request discussions API, field `resolved` per discussion); list
-every unresolved discussion, every adjustment requested that the record
+is closed, read the MR's discussions and their notes (the merge request
+discussions API: resolution lives on each note, `resolvable: true` with
+`resolved: false` is an open one); list every discussion with an open
+note, every adjustment requested that the record
 does not carry, and every pair of conclusions that contradict each other;
 ask the gate owner to confirm them; and start design, tasks, and
 implementation only when nothing is open or the open items are confirmed.
