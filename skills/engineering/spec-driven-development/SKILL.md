@@ -114,14 +114,22 @@ run step 2 from the questions in this file.
    spec, not in the chat. Then commit the change record and open the draft
    change request (or the specification change request, under the split
    shape) at once, before any plan exists, so review starts on the
-   specification — and stop there. Done when: no
+   specification — and stop there: no design, tasks, or code until the
+   contract's approval mode is satisfied (the gate owner closes the
+   discussion in conversation, or posts the fixed comment). Done when: no
    `[NEEDS CLARIFICATION]`-class marker remains, the draft is published,
-   and the approval is recorded on it as the contract says.
-3. **Plan.** Only after the approval: derive the technical design from the
-   spec and the project's constraints (constitution, architecture,
-   conventions). Keep design out of the requirements file. Done when: every
-   requirement maps to a design decision and every decision names the
-   requirement it serves.
+   and the agent is waiting.
+3. **Reconcile, then plan.** When the gate owner closes the discussion,
+   read the request's comments and review threads with their resolution
+   state; list every unresolved thread, every adjustment requested in the
+   discussion that the record does not carry, and every pair of
+   conclusions that contradict each other; ask the gate owner to confirm
+   the open items; record the closing on the request. Only then derive the
+   technical design from the spec and the project's constraints
+   (constitution, architecture, conventions), keeping design out of the
+   requirements file. Done when: nothing is open or the open items are
+   confirmed, every requirement maps to a design decision, and every
+   decision names the requirement it serves.
 4. **Tasks.** Break the plan into ordered, independently verifiable tasks
    with the scenarios each one closes. A tool that generated design and
    task files together with the spec has produced drafts; they are the
@@ -188,9 +196,13 @@ questioning round of your own:
 - **Shape**: combined — one change request carries the record from the
   moment it is committed, opens as a draft, and the gate is exercised on
   that draft; split only where consumers depend on a stable contract.
-- **Approval**: the gate owner's comment on the draft naming the approved
-  commit; a platform review approval is not the record, because later
-  pushes dismiss it.
+- **Approval**: discussion-closed — the gate owner discusses on the
+  draft, directs record changes in conversation, and declares the
+  discussion closed in conversation; the record of approval is that
+  closing plus the request's discussion state, and the reconciliation
+  above precedes any design. A blocking comment is the alternative only
+  where the contract or the user asks for one. A platform review approval
+  is never the record, because later pushes dismiss it.
 - **Archive mode**: in-request — the request archives its record before
   it is marked ready; automated archiving needs a push path the harness
   builder records.
@@ -241,8 +253,11 @@ builder's.
   happens to do; only the user can say which of that behavior was intended.
 - A review approval left on a draft does not survive the implementation
   pushes — removed by default on GitLab, by a stale-approval rule on
-  GitHub, and stale in meaning everywhere; record specification approval
-  as a comment naming the approved commit.
+  GitHub, and stale in meaning everywhere; the record of approval is the
+  closing of the discussion or the fixed comment, as the contract says.
+- Closing the discussion without reading the threads implements the
+  record as the author remembers it, not as the discussion left it; the
+  reconciliation is what makes the closing an approval.
 - Under the split shape a delta written against a domain spec that another
   change archived later may no longer apply; re-validate the delta when
   implementation starts.

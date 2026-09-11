@@ -24,7 +24,9 @@ project until a human explicitly decides otherwise.
 A complete specification exists before implementation: goal, scope,
 non-goals and constraints, acceptance criteria — supplied by the human up
 front or, under a specification contract, written by the agent and
-approved by the human at the approval gate on the draft. The agent then
+accepted by the human at the contract's gate on the draft: the discussion
+closed and reconciled with nothing open, or the fixed comment posted,
+whichever mode the contract records. The agent then
 owns the whole change-request preparation — plan, implement, self-review,
 test, evaluate the acceptance criteria, turn the draft ready, request
 review, and respond to review. The human reviews the change set as one
