@@ -35,7 +35,7 @@ The builder SHALL ask the change request shape, the archive mode, the default sp
 - **THEN** the builder recommends product-only domains and a spec-less change kind for the rest, naming the tool's marker
 
 ### Requirement: Behavior: The deposited contract carries the new facts in platform vocabulary
-The deposited specification contract SHALL state the change request shape, the archive mode with its serialization and push-rejection rules and the freeze that in-request archiving implies, the default specification author, the approval mode with its record (the closing of the discussion plus the reconciliation the agent performs, or the blocking comment's fixed text and what it covers), the specification scope with the spec-less change kind, the specification lines the change request body carries and the sections it reserves until ready, and what the integration branch may hold, and SHALL use the project's platform vocabulary for work items, change requests, and automation, with no builder-only model noun appearing without its definition.
+The deposited specification contract SHALL state the change request shape, the archive mode with its serialization and push-rejection rules and the freeze that in-request archiving implies, the default specification author, the approval mode with its record (the closing of the discussion plus the reconciliation the agent performs, or the blocking comment's fixed text and what it covers), the specification scope with the spec-less change kind, the specification lines the change request body carries and the sections it reserves until ready, what the integration branch may hold, and the artifact operations — the categories of operation performed through the tool's commands (verified from its help, none quoted), the rule that hand edits are limited to requirement text, the validator with its strict mode, its place in the project's local check command, and when it runs (after each artifact edit, before publishing the draft, before ready, after archiving), or the structural check the project adopts when the tool has no validator — and SHALL use the project's platform vocabulary for work items, change requests, and automation, with no builder-only model noun appearing without its definition.
 
 #### Scenario: GitHub project deposit
 - **WHEN** the builder deposits the contract for a project hosted on GitHub
@@ -45,8 +45,16 @@ The deposited specification contract SHALL state the change request shape, the a
 - **WHEN** a clean-context agent reads only the deposited contract and is asked whether a change to the CI configuration needs a delta spec
 - **THEN** it answers no and names the spec-less change kind and its record
 
+#### Scenario: Tool without a validator
+- **WHEN** the approach is Spec-Kit, Kiro, or committed documents and the builder deposits the contract
+- **THEN** the artifact operations section names the structural check the project adopts for its spec files or states that none exists, and quotes no command
+
 ### Requirement: Behavior: Tool references distinguish fixed and project-defined archive operations
-The OpenSpec reference SHALL record both archive timings the tool supports, the tool's marker for a spec-less change and that the archive operation and the bundled script honor it (verified from the CLI's help, never quoted as a command), and that the split shape leaves approved change records on the integration branch; the Spec-Kit, Kiro, and committed-documents references SHALL state that automated archiving needs a project-defined completion criterion and post-processing step.
+The OpenSpec reference SHALL record both archive timings the tool supports, the tool's marker for a spec-less change and that the archive operation and the bundled script honor it (verified from the CLI's help, never quoted as a command), and that the split shape leaves approved change records on the integration branch; the Spec-Kit, Kiro, and committed-documents references SHALL state that automated archiving needs a project-defined completion criterion and post-processing step; every tool reference SHALL record which artifacts the tool creates by command (so they are never scaffolded by hand) and whether the tool ships a validator and a strict mode, naming a structural check for the project to adopt when it ships none.
+
+#### Scenario: Scaffolding by command
+- **WHEN** the approach is OpenSpec and a clean-context agent reads the tool reference
+- **THEN** it can say that initialization and new change records come from the tool's commands, that a strict validator exists, and that both are verified from the CLI's help rather than quoted
 
 #### Scenario: Spec-Kit with automated archiving
 - **WHEN** the selected approach is Spec-Kit and the user wants automated archiving
@@ -59,7 +67,7 @@ The OpenSpec reference SHALL record both archive timings the tool supports, the 
 ## ADDED Requirements
 
 ### Requirement: Behavior: The platform base is shaped for the contract in a second phase
-After the platform builder has delivered its paradigm-neutral base, the builder SHALL fill the base's extension slots for the evidenced platform from its own references and assets — the request template's specification block and checklist items, the intake template's specification field, the project skill's take-work precondition, draft content, reconciliation, and finish steps, the archive workflow or job when the contract records automated archiving with OpenSpec, the knowledge section, the sync rows, and the maintainer action for the push path — locating each slot by heading, step, or field id, inserting without rewording base text, skipping a slot whose text is already present, and re-running the base's delivery checks; when no base exists the builder SHALL end its run after depositing the contract and say what remains.
+After the platform builder has delivered its paradigm-neutral base, the builder SHALL fill the base's extension slots for the evidenced platform from its own references and assets — the request template's specification block and checklist items, the intake template's specification field, the project skill's take-work precondition, draft content, reconciliation, and finish steps, the archive workflow or job when the contract records automated archiving with OpenSpec, the tool's validator added to the project's existing local check command that the base's checks run, the knowledge section, the sync rows, and the maintainer action for the push path — locating each slot by heading, step, or field id, inserting without rewording base text, skipping a slot whose text is already present, and re-running the base's delivery checks; when no base exists the builder SHALL end its run after depositing the contract and say what remains.
 
 #### Scenario: Base delivered on GitHub
 - **WHEN** the contract is deposited, the GitHub base exists, and the builder runs
@@ -72,6 +80,10 @@ After the platform builder has delivered its paradigm-neutral base, the builder 
 #### Scenario: No base yet
 - **WHEN** the project has a contract but no platform base
 - **THEN** the builder ends after the contract deposit and names the platform builder and its own second phase as the remaining steps
+
+#### Scenario: Validator joins the check command
+- **WHEN** the contract records OpenSpec and the base delivered a local check command with a checks workflow that runs it
+- **THEN** the builder adds the strict validator to that check command, edits no workflow file, and the project skill's finish step runs the check command before ready
 
 ### Requirement: Behavior: Take-work and the draft follow the change request shape on the platform
 The project skill steps the builder inserts SHALL, under the combined shape, take a work item that has no specification by committing the change record to a draft request first, stopping, and waiting for the closed discussion or the approval comment per the contract's mode, and SHALL, under the split shape, escalate a work item whose specification request is not merged; a specification-only request SHALL reference the work item without closing it.

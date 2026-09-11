@@ -39,16 +39,25 @@ Now, before the next project is built from these builders.
   request's specification block and checklist items, the intake field, the
   project skill's take-work, draft, reconcile, and finish steps, the
   archive workflow or job, the knowledge section, sync rows, and the
-  maintainer action for the push path by owner type. It ships
-  `scripts/archive_completed_changes.py`. Its description claims the second
-  phase.
+  maintainer action for the push path by owner type, and wires the tool's
+  validator into the project's local check command so the base's checks
+  run it. The contract gains an artifact-operations section: spec
+  artifacts are created and advanced through the tool's own commands
+  (verified from its help, never quoted), hand edits are limited to
+  requirement text, and the validator runs after every artifact edit,
+  before publishing the draft, before ready, and after archiving; tools
+  without a validator record the structural check the project adopts. It
+  ships `scripts/archive_completed_changes.py`. Its description claims the
+  second phase.
 - `spec-driven-development` — **BREAKING**: keeps the methodology only —
   levels, when it pays, the approach families, the loop under the
   project's contract (publish the draft, stop, reconcile when the
   discussion closes, verify, converge or archive per the contract),
   specification quality, review scope, adopting existing code, the
-  defaults it applies when no contract exists, and the rule that failing
-  baseline scenarios for untouched behavior are filed as defects. Project
+  defaults it applies when no contract exists, the rule that failing
+  baseline scenarios for untouched behavior are filed as defects, and the
+  rule that spec artifacts are created through the tool's commands and
+  validated programmatically rather than maintained by hand. Project
   rule-setting, the template lines, and the archive script leave it; it
   names the spec workflow builder of the `meta` catalog as the way to
   initialize or improve a project's rules.
@@ -72,9 +81,11 @@ Now, before the next project is built from these builders.
 - `engineering/spec-driven-development` (modified): review and approval
   modes, publication then stop, archive per contract, reconciliation,
   request body, specification scope, baseline defects, contract-or-default
-  reading, the handoff's fallback; the script requirement is removed.
+  reading, tool commands and programmatic validation, the handoff's
+  fallback; the script requirement is removed.
 - `meta/meta-spec-workflow` (modified): description, the questioning
-  round, the deposited contract, tool references, the second phase, the
+  round, the deposited contract (including artifact operations and the
+  validator's place in the check command), tool references, the second phase, the
   four behaviors moved from the platform builders, reconciliation, the
   archive script.
 - `meta/meta-github-workflow` (modified): four specification requirements
@@ -96,7 +107,8 @@ Now, before the next project is built from these builders.
 - `spec-driven-development`: an agent following it applies the project's
   contract or the documented defaults and never sets project rules or
   edits harness files → `refactor!` for the boundary; the approval rule
-  (no longer "a comment naming the commit") is a `fix`.
+  (no longer "a comment naming the commit") is a `fix`; creating and
+  validating artifacts through the tool is a `feat`.
 - `meta-agent-authority`, `meta-workflow-design`: corrected gate semantics
   and hand-off order → `fix`; the report pointers → `feat`.
 
