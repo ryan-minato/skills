@@ -105,10 +105,14 @@ default level; a rising level moves an owner downstream, never off the path:
 
 Under a specification contract a third gate precedes both: the
 specification's approval, exercised on the draft (combined shape) or as the
-specification change request's own review (split). It stays with its
-recorded owner at every level, and no level grants an agent the approval of
-a specification it wrote: an agent that may mark ready still waits for that
-approval first.
+specification change request's own review (split). It passes as the
+contract's mode says — under discussion-closed, when the gate owner
+closes the discussion in conversation and the agent's reconciliation of
+the request's threads and record finds nothing open or has the open items
+confirmed; under blocking, when the fixed comment is later than the
+record's last push. It stays with its recorded owner at every level, and
+no level grants an agent the approval of a specification it wrote: an
+agent that may mark ready still waits for that approval first.
 
 Done when: both gates have a named owner at the settled level — a human role
 or person (never "the team"), or the agent under a delegation this policy
