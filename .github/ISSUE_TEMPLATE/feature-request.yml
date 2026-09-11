@@ -52,6 +52,7 @@ body:
       options:
         - core
         - engineering
+        - machine-learning
         - meta
         - scaffold
         - writing

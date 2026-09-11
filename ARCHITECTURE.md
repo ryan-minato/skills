@@ -57,6 +57,11 @@ Public skills are grouped into catalogs under `skills/`:
   topic (ML, data science, Colab notebooks). They are alternatives to one another: install the
   one matching the project, alongside whichever `meta` builders apply. Removed
   after verification, normally together with `meta`.
+- `machine-learning` — durable, per-project skills for the daily work of
+  a project that trains or evaluates models: run provenance, the research
+  task workflow, experiment code conventions, training instrumentation,
+  and training diagnosis. Installed one at a time; siblings are handoffs by
+  role. Initialization stays with `scaffold-ml`.
 - `writing` — human-audience writing skills: genre skills (academic,
   blog/opinion, promotional copy) and medium skills (LaTeX, Typst,
   Markdown source); the general baseline `human-writing` lives in `core`.
