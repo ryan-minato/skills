@@ -109,17 +109,24 @@ the specification phase.
 ## Per-tool loop notes
 
 - **OpenSpec.** A change is a directory (proposal, delta specs, optional
-  design, tasks). Propose generates design and task files with the
-  specification; the gate reviews the proposal and the delta specs only.
-  The tool archives after merge or inside the pull request; the automated
-  mode is the former made mechanical.
-- **Spec-Kit.** Under split, the feature directory's specification merges
-  in the specification change request; plan and tasks join the
-  implementation request. There is no archive operation: a spec-first
-  feature is complete when delivered, and a spec-anchored project's rule
-  is what updates the living spec.
-- **Kiro.** Under split, the requirements file merges first; design and
-  tasks join implementation. Ticks in the tasks file are status: tick
-  only inside the implementing change request.
-- **Committed documents.** The contract names who merges the delta into
-  the domain spec and when, because nothing does it automatically.
+  design, tasks) created by the tool's new-change command. Propose
+  generates design and task files with the specification; the gate
+  reviews the proposal and the delta specs only. The strict validator runs
+  after every artifact edit, before publishing, before ready, and after
+  the tool's archive command, which archives after merge or inside the
+  pull request; the automated mode is the former made mechanical. A
+  spec-less change is marked in its change configuration and carries no
+  delta spec.
+- **Spec-Kit.** The feature directory comes from the kit's command or
+  script. Under split, its specification merges in the specification
+  change request; plan and tasks join the implementation request. There
+  is no archive operation and no validator: check the spec against the
+  kit's template headings, and say so.
+- **Kiro.** The three files are written through the IDE. Under split, the
+  requirements file merges first; design and tasks join implementation.
+  Ticks in the tasks file are status: tick only inside the implementing
+  change request. No CLI validator: check the EARS shape of the
+  requirements by hand.
+- **Committed documents.** No commands and no validator: the contract
+  names who merges the delta into the domain spec and when, and any
+  required-headings check the project adopted.
