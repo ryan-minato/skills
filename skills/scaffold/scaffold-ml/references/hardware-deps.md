@@ -1,9 +1,9 @@
 # Hardware-Matched Dependencies with uv
 
-Read when adding torch or any hardware-bound dependency, and again when
-the project's hardware changes. Mechanics below are uv's; verify current
-syntax and index URLs against uv's official first-party PyTorch guidance
-before committing.
+Read when the carrier is a uv project and torch or another
+accelerator-bound package is added, or the hardware changes. Mechanics
+below are uv's; verify current syntax and index URLs against uv's
+official first-party PyTorch guidance before committing.
 
 ## Declare the indexes
 
@@ -55,11 +55,20 @@ Probe the machine: `nvidia-smi` (CUDA driver version → supported CUDA
 generation), `rocminfo` for AMD. Match the index to what the driver
 supports, not to the newest number.
 
+## Development and runtime dependencies
+
+Runtime dependencies live in `[project] dependencies`; the development
+tools (ruff, pytest, pre-commit) live in a `dev` dependency group, so
+the container's environment stage syncs with `--no-dev` and a
+development machine syncs everything. `uv.lock` covers both and is the
+environment identity.
+
 ## Boundaries
 
 - `--torch-backend` / `UV_TORCH_BACKEND` belong to uv's pip interface
-  and do not apply to `uv sync` / `uv add` — in this project the answer
-  is always indexes plus sources.
+  and do not apply to `uv sync` / `uv add` — in a uv project the answer
+  is always indexes plus sources; the requirements carrier is where the
+  flag applies.
 - Packages that compile against the local CUDA toolchain
   (flash-attention and similar) follow their own docs, not the index
   routing.

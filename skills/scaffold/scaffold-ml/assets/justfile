@@ -1,0 +1,57 @@
+# Dependency carrier: uv project (default). For the requirements carrier,
+# replace `setup`, `setup-train`, and `lock` with the commented variants and
+# set the backend per machine class (see references/requirements-lock.md).
+# torch_backend := "<cpu|cu130|rocm7.2>"
+
+# Create the development environment from the committed lock and install hooks.
+setup:
+    uv sync
+    uv run pre-commit install
+    # requirements carrier:
+    # uv venv && uv pip sync requirements.dev.txt --torch-backend {{torch_backend}} && uv run pre-commit install
+
+# Training-box install: runtime dependencies only.
+setup-train:
+    uv sync --frozen --no-dev
+    # requirements carrier:
+    # uv venv && uv pip sync requirements.txt --torch-backend {{torch_backend}}
+
+# Refresh the lock after editing dependencies.
+lock:
+    uv lock
+    # requirements carrier:
+    # uv pip compile requirements.in -o requirements.txt --torch-backend {{torch_backend}}
+    # uv pip compile requirements.dev.in -o requirements.dev.txt --torch-backend {{torch_backend}}
+
+train *args:
+    uv run python train.py {{args}}
+
+# Multi-device runs: `uv run accelerate launch train.py {{args}}`.
+
+eval run_dir:
+    uv run python eval.py {{run_dir}}
+
+lint:
+    uv run ruff format .
+    uv run ruff check --fix .
+
+# Fast, CPU-compatible contract tests; the default suite.
+test:
+    uv run pytest -m "not gpu and not slow"
+
+# The accelerator suite: fails without hardware — a skip would hide a broken test.
+test-gpu:
+    uv run pytest -m gpu
+
+# Heavy validation; by hand only, never from hooks or CI.
+test-slow:
+    uv run pytest -m slow
+
+# Container recipes (only when containers were opted in).
+docker-build target="runtime":
+    docker build --target {{target}} --iidfile .image-id -t <project name>:{{target}} .
+
+# The image digest is the run's environment identity: export it as IMAGE_DIGEST
+# before launching, or read the pushed image's repository digest instead.
+docker-digest:
+    @cat .image-id

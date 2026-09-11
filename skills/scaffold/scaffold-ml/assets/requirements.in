@@ -1,0 +1,6 @@
+# Runtime dependencies only; write torch plainly — the wheel variant comes
+# from --torch-backend at compile/sync time (see the justfile).
+torch
+accelerate
+omegaconf
+<the model and data libraries the project uses>

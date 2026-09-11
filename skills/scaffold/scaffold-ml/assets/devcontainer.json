@@ -4,10 +4,11 @@
   "hostRequirements": {
     "gpu": "optional"
   },
+  "runArgs": ["--gpus", "all", "--shm-size", "<e.g. 8gb>"],
   "features": {
     "ghcr.io/stacit-ai/devcontainer-features/uv:1": {}
   },
-  "postCreateCommand": "uv venv && uv pip sync requirements.dev.txt --torch-backend <backend> && uv run pre-commit install",
+  "postCreateCommand": "just setup",
   "containerEnv": {
     "HF_HOME": "/workspaces/<project name>/.hf-cache"
   },
