@@ -108,12 +108,14 @@ For every document inventoried in step 1:
 Done when: no two files claim to be the source of truth for the same
 behavior, and every open work item's acceptance can be found in a spec.
 
-## 6. Hand the friction log to harness alignment
+## 6. Hand the friction log to the harness builder
 
 The harness must now state where specs live, which file rules on behavior,
-and that work items link specs. Follow the harness-alignment section in
-SKILL.md; if the user declines the builder, write those facts into the
-project's knowledge base by hand from the friction log.
+and that work items link specs. Follow the section on setting up or
+improving the project's rules in SKILL.md: the spec workflow builder of
+the `meta` catalog takes the friction log as input. If the user declines
+the builder, write the defaults and the departures the friction log
+revealed into the project's knowledge base, and edit no harness file.
 
 Done when: the hand-off was offered, and either the builder ran or the
 plan file records the harness files that still restate a requirement and
