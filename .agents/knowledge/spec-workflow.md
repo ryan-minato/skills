@@ -94,7 +94,7 @@ Deviation found during implementation: stop, revise the change (the
 update skill), have the maintainer discuss and close the revision on the
 draft, then continue.
 
-## Change request shape
+## Pull request shape
 
 Combined: one pull request carries the whole lifecycle. Selected because
 this repository ships skills feature by feature and no consumer depends on
