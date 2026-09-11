@@ -59,9 +59,12 @@ Done when: every job has an eligible runner and local equivalent, triggers match
 the agreed contract, stale MR tests cancel, secrets remain outside untrusted
 jobs, and required merge gates reference real passing jobs.
 
-Under a specification contract with automated archiving, the archive job
-pushes to the protected default branch: it needs a project access token (or
-deploy token) with push permission on that branch, stored as a masked,
-protected CI variable. Creating it is a maintainer action recorded in the
-platform-settings knowledge with its readback; until it exists the
-contract's in-request archiving stays in force.
+Any job that pushes to the protected default branch — a generated-file
+refresh, a version bump, a job a paradigm contract asks for — needs a
+project access token with write permission stored as a masked, protected
+CI variable, plus an allowed-to-push entry for that token on the protected
+branch; without the entry the push is refused even with a valid token, and
+a push made with the token runs the default-branch pipeline again.
+Creating both is a maintainer action recorded in the platform-settings
+knowledge with its readback; until they exist the job cannot push and the
+harness says what happens instead.

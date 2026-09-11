@@ -8,21 +8,23 @@ one change, not two. -->
 
 ## Changes
 
-<!-- Where and what, briefly: component or path, then the change. -->
+<!-- Filled in when the PR is marked ready: where and what, briefly —
+component or path, then the change. A draft opened at claim time keeps the
+reserved line until then. -->
+_Reserved: filled in when the pull request is marked ready._
 
 ## Related work
 
 <!-- Closes #N — the closing keyword drives the issue lifecycle. -->
-{{SPEC_LINE — under a specification contract, the lines
-"Spec: <path or change name>" and "Phase: specification | implementation";
-delete this placeholder otherwise}}
+
+## Validation
+
+<!-- Filled in when the PR is marked ready: what was run and what was
+observed — commands, tests, manual checks — and where the evidence is. -->
+_Reserved: filled in when the pull request is marked ready._
 
 ## Checklist
 
 - [ ] {{LOCAL_CHECK_COMMAND}} passes locally
-- [ ] Acceptance criteria of the linked issue, or the scenarios of the linked specification, are met
-{{SPEC_CHECK — under a specification contract, the two items
-"- [ ] The change record was approved by the gate owner before implementation, or this pull request carries the specification only" and
-"- [ ] The specification is updated, or the change record is archived, or every task is complete and archiving runs after merge";
-delete this placeholder otherwise}}
+- [ ] Acceptance criteria of the linked issue are met
 - [ ] No secrets, credentials, or personal data in the diff, description, or commits

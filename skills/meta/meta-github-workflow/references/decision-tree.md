@@ -27,17 +27,16 @@ consensus it is a working model, not an agreed source of truth.
 
 ## First frontier
 
-A decision the target's workflow file, authority policy, or specification
-contract (`.agents/knowledge/github-workflow.md`,
-`.agents/knowledge/agent-authority.md`, and
-`.agents/knowledge/spec-workflow.md` by default; the entrypoint's pointers
-are authoritative on location) already settles — planning method,
-cadence objects, hierarchy, priority or status axes, agent autonomy, where
-specifications live and who approves them — is a fact, not a frontier
-item: implement it as written (it already names the platform object; use
+A decision the target's workflow file, authority policy, or any paradigm
+contract the entrypoint points to (`.agents/knowledge/github-workflow.md`
+and `.agents/knowledge/agent-authority.md` by default; the entrypoint's
+pointers are authoritative on location) already settles — planning method,
+cadence objects, hierarchy, priority or status axes, agent autonomy, a
+paradigm's artifacts and gates — is a fact, not a frontier item: implement
+what names a GitHub object as written (use
 [semantic-mapping.md](semantic-mapping.md) only where a line still names a
-semantic) or per [spec-expression.md](spec-expression.md), and never re-ask
-it.
+semantic), leave a paradigm's expression to the builder that claims its
+contract, and never re-ask it.
 
 After facts are gathered, the first user-owned frontier normally includes:
 

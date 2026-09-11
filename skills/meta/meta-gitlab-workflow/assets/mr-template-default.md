@@ -4,22 +4,23 @@
 
 ## Changes
 
-- <!-- Component/path: concise change. -->
+<!-- Filled in when the draft flag is removed: component or path, then the
+concise change. A draft opened at claim time keeps the reserved line. -->
+_Reserved: filled in when the merge request is marked ready._
 
 ## Related work
 
 <!-- Use the project's verified closing or related reference syntax. -->
-{{SPEC_LINE — under a specification contract, the lines
-"Spec: <path or change name>" and "Phase: specification | implementation";
-delete this placeholder otherwise}}
+
+## Validation
+
+<!-- Filled in when the draft flag is removed: what was run and observed —
+commands, tests, manual checks — and where the evidence is. -->
+_Reserved: filled in when the merge request is marked ready._
 
 ## Checklist
 
-- [ ] The change satisfies the linked acceptance criteria, or the scenarios of the linked specification.
-{{SPEC_CHECK — under a specification contract, the two items
-"- [ ] The change record was approved by the gate owner before implementation, or this merge request carries the specification only." and
-"- [ ] The specification is updated, or the change record is archived, or every task is complete and archiving runs after merge.";
-delete this placeholder otherwise}}
+- [ ] The change satisfies the linked acceptance criteria.
 - [ ] The documented local checks pass.
 - [ ] User-facing or agent-facing guidance is updated where behavior changed.
 - [ ] The exact outgoing content and diff passed the project's sensitivity review.

@@ -18,9 +18,10 @@ read GitLab's parsed result because invalid lines can be ignored.
 
 Agree who may push and merge protected branches, create protected tags, approve
 MRs, dismiss approvals, and deploy. Configure the smallest rules that enforce
-the approved model. Require passing pipelines only after those pipelines are
-working; key approval or status rules to stable job names and record the
-coupling.
+the approved model. The protected-branch baseline requires all threads
+resolved before merge and a passing pipeline — the latter only after those
+pipelines are working on the default branch; key approval or status rules
+to stable job names and record the coupling.
 
 ## Security feedback
 
