@@ -50,6 +50,11 @@ Rules for disposable builders that establish a project of a specific topic.
   never one builder alone.
 - No grant between scaffold builders (they are alternatives), and no
   dependency on or recommendation of skills from other repositories.
+- Durable topic skills of another catalog (the `machine-learning` skills
+  a project keeps after the build) are outside the range: a scaffold
+  names them by role as an optional handoff through
+  `ryan-minato-skills-installing`, and its deposit carries the fallback
+  that stands when the user declines (`.agents/knowledge/skill-quality.md`).
 
 ## Naming
 
