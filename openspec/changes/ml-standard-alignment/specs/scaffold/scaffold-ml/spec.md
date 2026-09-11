@@ -23,7 +23,7 @@ The builder description SHALL open with the disposable-builder marker and SHALL 
 - **THEN** the builder does not load
 
 ### Requirement: Behavior: One project shape, with existing choices preserved
-The builder SHALL establish one shape — a package or flat module chosen by the extraction rule, `configs/` with a typed schema and YAML states, a committed dependency lock from the carrier the user chose, an explicit training loop on an acceleration library with one logging seam and one stage-trace seam, `data/raw/` as the local cache of immutable inputs whose identities the manifest records, `outputs/<run_id>/` for run artifacts, focused tests, and an agent entrypoint — SHALL not offer a quick-experiment versus maintainable-project choice, and SHALL keep a working configuration framework, settings library, or requirements workflow the repository already uses, adding only the missing provenance, tracker, and marker rules.
+The builder SHALL establish one shape — a package or flat module chosen by the extraction rule, `configs/` with a typed schema and YAML states, a committed dependency lock from the carrier the user chose, a training entry point that is an explicit loop on an acceleration library with seeding, gradient accumulation, checkpoint save and resume, an evaluation cadence, one logging seam and one stage-trace seam, an evaluation entry point bound to the project's recorded benchmark or evaluation-set identity, a launch command for multi-device runs, `data/raw/` as the local cache of immutable inputs whose identities the manifest records and which no transformation writes into, `outputs/<run_id>/` for run artifacts, focused tests, and an agent entrypoint — SHALL default the framework to PyTorch for an otherwise empty project and use JAX only when the user asks or the project already depends on that ecosystem, SHALL not offer a quick-experiment versus maintainable-project choice, and SHALL keep a working configuration framework, settings library, or requirements workflow the repository already uses, adding only the missing provenance, tracker, and marker rules.
 
 #### Scenario: Empty repository
 - **WHEN** the repository has no training code and the user asks for the scaffold
@@ -32,6 +32,14 @@ The builder SHALL establish one shape — a package or flat module chosen by the
 #### Scenario: Existing Hydra project
 - **WHEN** the repository already runs a Hydra `configs/` tree and the user asks the builder to harden it
 - **THEN** the builder keeps Hydra, records the two rules (no object instantiation from configuration; a pinned output directory), adds the manifest, tracker, and marker rules, and does not migrate to OmegaConf alone
+
+#### Scenario: Evaluation before the first experiment
+- **WHEN** the project has a training goal but no stated way to judge "better"
+- **THEN** the builder asks for the benchmark or evaluation set, records its identity and the metric definitions with the evaluation entry point, and does not leave evaluation as a later task
+
+#### Scenario: Transformation targets the raw cache
+- **WHEN** a scaffolded workflow would write derived data under `data/raw/`
+- **THEN** the deposited rule directs it elsewhere and the builder writes no code that modifies the raw cache
 
 ### Requirement: Behavior: The dependency carrier is the user's choice, a uv project by default
 The builder SHALL ask the user which dependency carrier the project uses and SHALL recommend a uv project — `pyproject.toml` with a `dev` dependency group and `uv.lock`, accelerator wheels routed through explicit indexes and sources — as the default, SHALL accept the four-file requirements workflow as the alternative — `requirements.in` for the runtime dependencies and `requirements.dev.in` that includes it plus the development tools, each compiled by uv into a fully pinned `requirements.txt` and `requirements.dev.txt` with the torch backend flag, all four committed together, the training machine syncing the runtime file and a development machine the dev file — SHALL treat the committed runtime lock of either carrier (`uv.lock`, or `requirements.txt`) as the environment identity the manifest records (a requirements file with ranges is not a lock), SHALL keep the carrier an existing repository already uses, and SHALL write the environment stage of the container recipe and the setup and lock commands for the chosen carrier only.
@@ -51,6 +59,10 @@ The builder SHALL ask the user which dependency carrier the project uses and SHA
 #### Scenario: Existing requirements project
 - **WHEN** the repository already runs a compiled requirements workflow
 - **THEN** the builder keeps it and does not ask the carrier question
+
+#### Scenario: Development machine differs from the training box
+- **WHEN** developers work on a machine without the training accelerator (a macOS laptop) and train on a Linux GPU host
+- **THEN** the uv project gates the accelerator routing with environment markers, or the requirements carrier records one backend per machine in the task runner, and the guidance names which machine uses which
 
 ### Requirement: Behavior: The configuration surface is typed values with a resolved dump
 The builder SHALL default an unsettled project to a typed schema (dataclasses) merged with YAML states and command-line overrides into one resolved configuration that the training entry point saves under the run's output directory before training starts, SHALL expose only values a run may choose (named choices, never import paths, registries, control flow, or deep inheritance), and SHALL name searched values that are not hyperparameters search variables.
@@ -79,7 +91,7 @@ The scaffolded entry point SHALL write a run manifest at start (status running) 
 - **THEN** it instructs a snapshot commit on the experiment branch first and names the retention rule that keeps cited snapshots reachable
 
 ### Requirement: Behavior: The container recipe yields a recorded image identity
-When the user opts into containers, the builder SHALL provide a multi-stage recipe — an environment stage installed from the committed lock, a runtime target, and a sealed target that adds the source — SHALL record the pushed image's digest (or the local image id when never pushed) as the run's environment identity by injecting it into the run, SHALL keep the Dockerfile and any tag out of the identity, and SHALL still record the host facts a container cannot pin; containers SHALL stay opt-in.
+When the user opts into containers, the builder SHALL provide a multi-stage recipe — an environment stage installed from the committed lock on a bare CUDA or ROCm base image, a runtime target, and a sealed target that adds the source — SHALL record the pushed image's digest (or the local image id when never pushed) as the run's environment identity by injecting it into the run, SHALL keep the Dockerfile and any tag out of the identity, SHALL still record the host facts a container cannot pin, SHALL mount `data/`, `outputs/`, and the model-hub cache as volumes with the container-path mapping recorded and raise the container's shared memory for data-loader workers, and, when a preinstalled-stack image is chosen instead, SHALL make the image's framework authoritative by removing it from the project's dependencies and recording that rule; containers SHALL stay opt-in.
 
 #### Scenario: Container requested
 - **WHEN** the user asks for a training image
@@ -88,6 +100,10 @@ When the user opts into containers, the builder SHALL provide a multi-stage reci
 #### Scenario: No container requested
 - **WHEN** the user does not ask for a container
 - **THEN** the builder scaffolds no Dockerfile, Compose file, or dev container and records the lock digest as the environment identity
+
+#### Scenario: Preinstalled-stack image chosen
+- **WHEN** the user chooses a vendor image with the framework preinstalled
+- **THEN** the builder removes the framework from the project's dependencies, records that the image's stack is authoritative, and still records the image digest as the identity
 
 ### Requirement: Behavior: Tests, hooks, and style follow the experiment standard
 The builder SHALL configure pytest with `slow` and `gpu` markers, a default suite that is light and CPU-compatible, a `test-gpu` command whose tests fail when hardware is absent, and heavy validation behind an explicit command; SHALL configure Ruff near its defaults with line length 120 and docstring code formatting; SHALL not install a static type checker as a gate over model code and SHALL say where static checking may apply (configuration and control-plane modules); SHALL set docstring conventions that carry shape, dtype, device, and mask semantics; and SHALL configure git hooks that run the formatter and linter only, never tests; each of these SHALL be deposited with its reason so the Python defaults builder that runs later inventories it as a settled choice.
@@ -120,7 +136,7 @@ The builder SHALL deposit the research-task convention — a research spec with 
 - **THEN** it finds the research-task schema and convention as a spec tool and layout the project already runs and keeps them
 
 ### Requirement: Behavior: The deposited guidance makes the project discoverable
-The deposited agent entrypoint SHALL name how to run the standard experiment, where configuration enters and how it is overridden, how tests run and which suites exist, where the research spec of the current task lives (the project's specification contract when one exists, else `research/<task>/`), which tracker holds runs, the provenance rules, and a when-to-read table; it SHALL keep one authoritative source per fact; and it SHALL not carry the disposable marker.
+The deposited agent entrypoint SHALL name how to run the standard experiment and its evaluation, where configuration enters and how it is overridden, how tests run and which suites exist, where the research spec of the current task lives (the project's specification contract when one exists, else `research/<task>/`), which tracker holds runs, the provenance rules, the error-handling convention (catch only expected data or environment failures; fail early with context for everything else), the rule that data, weights, checkpoints, and credentials are never committed, and a when-to-read table; it SHALL keep one authoritative source per fact; and it SHALL not carry the disposable marker.
 
 #### Scenario: Entrypoint read after disposal
 - **WHEN** a fresh agent reads the deposited entrypoint with the builder deleted
@@ -129,6 +145,17 @@ The deposited agent entrypoint SHALL name how to run the standard experiment, wh
 #### Scenario: Marker leak
 - **WHEN** the builder copies an asset into the project
 - **THEN** no generated file carries the disposable-builder marker
+
+### Requirement: Behavior: The scaffold is verified before the handoff
+Before handing off, the builder SHALL run the deposited commands — environment setup, lint, the default test suite, and a smoke run of the training and evaluation entry points on a tiny input — confirm that every link in the deposited entrypoint resolves and that no generated file carries the disposable marker, and inspect the result with the user; it SHALL report any command that could not run on the current machine (no accelerator, no network) instead of skipping it silently.
+
+#### Scenario: Fresh checkout
+- **WHEN** the deposit is complete
+- **THEN** the builder runs setup, lint, tests, and the smoke run and shows the user the outcome of each before naming the next builder
+
+#### Scenario: No accelerator on the build machine
+- **WHEN** the machine has no accelerator and the GPU suite cannot run
+- **THEN** the builder reports the GPU suite as not run here, records the command to run it on the training host, and does not mark the scaffold verified for that suite
 
 ### Requirement: Handoff: GPU container environments
 When containers are requested, the builder SHALL make the base-image, tag-discovery, and GPU-wiring decisions with the GPU container builder of the harness catalog, installing the whole catalog through the installing skill when it is absent and never running an install command, and SHALL, when the user declines, proceed with its own container reference alone.

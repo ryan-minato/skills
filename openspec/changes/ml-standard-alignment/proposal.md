@@ -41,7 +41,15 @@ decisions settled. Now, before the next ML project is scaffolded.
   AGENTS.md deposit that points at the research-spec location, the
   tracker, the configuration directory, the run-record convention, and —
   when installed — the durable machine-learning skills, named by role.
-  Every deposited decision carries its reason so the `meta` builders that
+  Retained from the current builder and carried into the single shape:
+  PyTorch as the default framework (JAX only on request or by ecosystem),
+  the loop template's seeding, accumulation, checkpoint save and resume,
+  and multi-device launch, an evaluation entry point bound to a recorded
+  benchmark identity, the immutable `data/raw/` rule, the hardware-deps
+  routing for development machines that differ from the training box,
+  the container rules for preinstalled-stack images, volumes, and shared
+  memory, the let-it-crash error convention, and the verification run
+  before handoff. Every deposited decision carries its reason so the `meta` builders that
   run afterwards (Python defaults, workflow design, specification
   workflow, GPU containers, platform lifecycle) keep it as a settled
   project choice. Existing Hydra, Pydantic Settings, or requirements-file
