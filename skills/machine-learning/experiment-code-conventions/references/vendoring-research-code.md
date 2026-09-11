@@ -1,7 +1,7 @@
 # Vendoring Research Code
 
-Read when copying code from a paper's or another project's repository
-into this one.
+Read when deciding whether to depend on or copy code from a paper's or
+another project's repository, and when copying it.
 
 ## When to vendor rather than depend
 

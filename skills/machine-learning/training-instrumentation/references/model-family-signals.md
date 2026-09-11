@@ -38,8 +38,9 @@ separate monitoring system.
 
 ## Reinforcement learning (policy optimization)
 
-Episode return, policy entropy, divergence between the new and the old
-policy, the clipped fraction of probability ratios, value loss,
+Episode return is the outcome-layer signal — there is no supervised
+validation loss to propose — plus policy entropy, divergence between the
+new and the old policy, the clipped fraction of probability ratios, value loss,
 advantage mean and std, reward statistics. Divergence ceilings used to
 stop an update early are implementation experience (small values such
 as 0.01–0.05 in common implementations), not universal thresholds.

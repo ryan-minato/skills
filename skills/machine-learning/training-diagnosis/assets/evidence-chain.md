@@ -1,6 +1,6 @@
 # Evidence chain: <incident short name>
 
-- Run: <run_id> · T0: <step / timestamp> · reported: <date>
+- Run: <run_id> · T0: <step / timestamp, rank when one rank led> · reported: <date>
 - Symptom: <what was observed, with the alert or the baseline comparison>
 - Signals consulted:
   - <signal>: <value at T0 vs baseline> (<source>)

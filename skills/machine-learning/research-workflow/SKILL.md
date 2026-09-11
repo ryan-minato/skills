@@ -105,7 +105,8 @@ research spec
 - Snapshot before every run so the executed source is the recorded
   source; a dirty tree launches nothing.
 - Keep a hypothesis log — [`assets/hypothesis-log.md`](assets/hypothesis-log.md)
-  is the shape: id, hypothesis, snapshot commit, runs, verdict, evidence.
+  is the shape: id, hypothesis, spec version, snapshot commit, runs,
+  verdict, evidence.
   It lives with the spec and is the source of the request's summary.
 - Read [references/branching-and-pr.md](references/branching-and-pr.md)
   when opening the research worktree or branch, making snapshot commits,

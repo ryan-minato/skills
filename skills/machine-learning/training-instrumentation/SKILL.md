@@ -82,7 +82,12 @@ answerable.
 | P2 — regressions locatable | where? | stage-level trace; per-layer gradient view; update-to-weight ratio; optimizer second-moment health; data pipeline breakdown (fetch, decode, collate, queue depth); host CPU and RSS; transfer time; scheduled profiler windows |
 | P3 — automated correlation | what caused it? | incident-triggered profiles and snapshots; tail sampling of slow ranks; ring buffer of the window before a trigger; baseline comparison across runs |
 
-Read [references/cluster-telemetry.md](references/cluster-telemetry.md)
+For a single-device experiment the smallest useful set is P0's run
+identity, exit reason, and non-finite events plus P1's loss, learning
+rate, step time, throughput, global gradient norm, device memory, and
+data-wait fraction at the catalog frequencies; per-rank, communication,
+storage, and platform telemetry wait until the run spans more than one
+node. Read [references/cluster-telemetry.md](references/cluster-telemetry.md)
 when training spans more than one node, or when designing collection,
 storage, sampling, retention, or capacity for training telemetry.
 
@@ -147,8 +152,8 @@ Alert design:
   the baseline percentile, or a robust z-score against a rolling median
   with median absolute deviation, plus a **persistence** rule (k of the
   last m windows) before paging. Absolute thresholds are starting values
-  only: a gradient norm of 1.0 is normal for one model and alarming for
-  another.
+  only: a gradient norm of 1.0 is normal for one model and optimizer and
+  alarming for another.
 - **Composite for instability**: a loss spike alone is a warning; a loss
   spike together with a gradient, update, or non-finite anomaly is an
   incident. Non-finite values in parameters or the loss need no

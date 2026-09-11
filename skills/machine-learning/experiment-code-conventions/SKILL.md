@@ -1,18 +1,19 @@
 ---
 name: experiment-code-conventions
 description: >-
-  Shapes machine-learning experiment code — when to share or duplicate, an
-  explicit training loop over a Trainer, vendoring research repositories,
-  a configuration surface that stays values rather than a language, tests
-  as behavior contracts with a light CPU default suite and GPU-only tests
-  that fail without hardware, hooks that never run tests, near-default
-  lint with no global type gate over tensor code, and hot-path performance
-  kept over readability. Use when writing, reviewing, or restructuring
-  training or experiment code: "should these two scripts share a Trainer",
-  "the config names classes by import path", "add mypy to the model
-  code?", "depend on this paper's repo or copy it?", "skip GPU tests when
-  there is no GPU?". Not for application code with no training or tensor
-  concern, or a refactoring request that names no machine-learning code.
+  Conventions for machine-learning experiment code: sharing versus
+  duplicating, an explicit training loop versus a Trainer, vendoring
+  research repositories, what a configuration file may contain, tests,
+  hooks, lint, typing, docstrings, and hot-path performance. Use when
+  writing, reviewing, or restructuring training or experiment code, or
+  when asked a design question about it: "two training scripts are mostly
+  the same — share a Trainer or a base class?", "deduplicate these
+  scripts", "the config names classes by import path", "add mypy to the
+  model code?", "depend on this paper's repo or copy it?", "skip GPU tests
+  when there is no GPU?", "this fused kernel is unreadable". Not for
+  planning or organizing experiments, for one run's record, for
+  application code with no training or tensor concern, or for a
+  refactoring request that names no machine-learning code.
 license: Apache-2.0
 ---
 
@@ -52,10 +53,12 @@ Abstract **semantic coupling**, never accidental similarity:
   framework's ecosystem).
 - An individual's or a lab's research repository, or code nobody has
   maintained for a long time, is not a runtime dependency: vendor the
-  part that is needed. Read
+  part that is needed, recording its origin URL, exact commit, and
+  license, and stating whether the copy is a replication (minimal
+  semantic difference) or an innovation (research semantics only). Read
   [references/vendoring-research-code.md](references/vendoring-research-code.md)
-  when copying code from a paper's or another project's repository into
-  this one.
+  when deciding whether to depend on or copy code from a paper's or
+  another project's repository, and when copying it.
 
 ## The training loop
 
@@ -113,8 +116,9 @@ for, not a coverage target.
   CPU fallbacks hides broken tests.
 - Expensive validation (full training, large data, equivalence against a
   reference at scale) runs by hand, never in the default suite or hooks.
-- Git hooks run the formatter and the linter at most. Commits are
-  experiment snapshots, and a hook that runs tests taxes every snapshot.
+- Git hooks run the formatter and the linter at most; tests run from the
+  task runner and in CI. Commits are experiment snapshots, and a hook
+  that runs tests taxes every snapshot.
   Read [references/tensor-tests-and-docs.md](references/tensor-tests-and-docs.md)
   when writing tests or docstrings for tensor code, or when a type
   checker is proposed for it.
@@ -158,7 +162,8 @@ path.
   an install command yourself. (If that installer skill is absent too, it
   lives in the `core` catalog of https://github.com/ryan-minato/skills.)
   If the user declines, keep the single logging seam and the single
-  stage-trace seam in the loop and leave the metric design to the user.
+  stage-trace seam in the loop, leave the metric design to the user, and
+  say that it was not covered.
 
 ## Gotchas
 
