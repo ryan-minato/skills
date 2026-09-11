@@ -51,5 +51,8 @@ that a systematic search costs less than the human time it replaces.
   a sweep is rarely affordable. Plan a handful of hypotheses chosen by
   reasoning, state that a search was considered and why it was not run,
   and record it in the spec.
+- **Objective**: the search optimizes the spec's Evaluation, not a proxy
+  the tool finds convenient; a search judged by a different metric answers
+  a different question.
 - **Record**: every search run is a run like any other, with its own
   identity, and the search's objective and space are part of the spec.

@@ -98,9 +98,11 @@ save the offending batch, model state, optimizer state, scaler state
 → split into micro-batches and per-example losses
 ```
 
-Reproduces everywhere → data or model and optimizer state; isolate the
-micro-batch or layer. Reproduces only on the original device → quarantine
-that device for a health test and recompute the affected steps elsewhere.
+Reproduces everywhere → data or model and optimizer state, and hardware
+is ruled out (a hardware cause is plausible only when the anomaly follows
+the device); isolate the micro-batch or layer. Reproduces only on the
+original device → quarantine that device for a health test and recompute
+the affected steps elsewhere.
 Do not lower the learning rate and restart before the replay: it hides
 the cause and the same spike returns later.
 
@@ -122,8 +124,8 @@ and why; the root cause; the fix; the verification that confirmed it;
 the signal that was missing. Keep the chain to what the evidence
 supports; when two causes remain, report both with the deciding signal to
 capture next, and do not pick one. Run a sensitivity check on any log
-excerpt before it leaves the machine — this skill pairs with
-`sensitivity-check`; if it is not installed, load the
+excerpt before it leaves the machine. This skill pairs with
+`sensitivity-check` for it. If it is not installed, load the
 `ryan-minato-skills-installing` skill and install `sensitivity-check` as
 it directs; never run an install command yourself. (If that installer
 skill is absent too, it lives in the `core` catalog of
@@ -141,10 +143,13 @@ say so.
   lives in the `core` catalog of https://github.com/ryan-minato/skills.)
   If the user declines, name the missing signal and its frequency in the
   evidence chain and add nothing else.
-- Comparing two runs to see what differed is the run-identity role
-  (`experiment-provenance`, same routing); without it, compare the
-  commit, the resolved configuration, the environment identity, and the
-  input identities by hand.
+- Comparing two runs to see what differed is the run-identity role. This
+  skill pairs with `experiment-provenance` for it. If it is not installed,
+  load the `ryan-minato-skills-installing` skill and install
+  `experiment-provenance` as it directs; never run an install command
+  yourself. If the user declines, compare the commit, the resolved
+  configuration, the environment identity, and the input identities by
+  hand.
 
 ## Gotchas
 

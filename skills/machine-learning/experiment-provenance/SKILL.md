@@ -1,18 +1,19 @@
 ---
 name: experiment-provenance
 description: >-
-  Records and judges the identity of a machine-learning run — the executed
-  source snapshot, the resolved configuration, the environment identity,
-  the input identities, and a run id distinct from the commit — and wires
-  the tracker that holds them. Use when a training or evaluation run must
-  be reproducible or comparable: "results differ between runs and I can't
-  tell what changed", "what should every run record", "which run produced
-  this checkpoint"; when adding, choosing, or wiring an experiment tracker;
-  when a run record names a branch, `latest`, or a Dockerfile as an
-  identity; or when someone wants to edit a past run's record. Not for
-  organizing a series of hypotheses into a research task, for scaffolding
-  a new project, or for build provenance of software artifacts outside
-  machine learning.
+  Records and judges the identity of one machine-learning run — the
+  executed source snapshot, the resolved configuration, the environment
+  identity, the input identities, and a run id distinct from the commit —
+  and wires the tracker that holds them. Use when the question is what a
+  run must record or whether it can be reproduced: "results differ between
+  runs and I can't tell what changed", "what should every run record",
+  "which run produced this checkpoint"; when adding, choosing, or wiring an
+  experiment tracker; when a run record names a branch, `latest`, or a
+  Dockerfile as an identity; or when someone wants to edit a past run's
+  record. Not for planning or organizing a series of experiments,
+  hypotheses, or the pull request that carries them (the research-task
+  role), for scaffolding a new project, or for build provenance of
+  software artifacts outside machine learning.
 license: Apache-2.0
 ---
 
@@ -78,7 +79,9 @@ defaults + project config + experiment config + CLI overrides
 ```
 
 - The command line, a partial override, or the raw YAML is not the record;
-  the merged document is.
+  the merged document is. Save it beside the manifest in the run's output
+  directory and log it to the tracker as a parameter set or an attached
+  file; the manifest carries its path and hash.
 - Once training starts the resolved configuration is immutable input.
   State that changes during training under the configuration's own rules —
   a scheduled learning rate, a curriculum stage — is training state, not a
@@ -142,7 +145,8 @@ copy it into the project and call it from the training entry point.
 
 Read [references/run-record.md](references/run-record.md) when a run is
 cited as evidence in a pull or merge request, a report, or a promotion, or
-when a committed run record is required.
+when a committed run record is required; the committed record's shape is
+[`assets/run-record.md`](assets/run-record.md).
 
 ## Where the facts live
 

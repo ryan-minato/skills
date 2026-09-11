@@ -18,9 +18,9 @@ Drop this module into the project and call it from the training entry point:
 The manifest is a plain JSON document. It records the executed commit and
 whether the tree was dirty, the resolved configuration's hash, the image
 digest (from IMAGE_DIGEST) or the lock file's hash, interpreter and host
-facts, GPU facts when nvidia-smi is available, seeds, inputs, and lineage.
+facts, GPU and runtime facts when available, seeds, inputs, and lineage.
 Every value is an identity or a hash; the module never records secrets,
-environment variables, or data.
+environment variables, command lines, or data.
 """
 
 from __future__ import annotations
@@ -32,7 +32,6 @@ import platform
 import shutil
 import socket
 import subprocess
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -93,13 +92,28 @@ def environment_identity(repo_root: Path | None = None) -> dict[str, Any]:
     }
 
 
+def runtime_facts() -> dict[str, Any]:
+    """Framework and accelerator runtime versions when the framework is importable."""
+    try:
+        import torch  # optional: only when the project uses it
+    except ImportError:
+        return {}
+    return {
+        "torch": torch.__version__,
+        "cuda": getattr(torch.version, "cuda", None),
+        "hip": getattr(torch.version, "hip", None),
+        "nccl": ".".join(str(x) for x in torch.cuda.nccl.version()) if torch.cuda.is_available() else None,
+    }
+
+
 def host_facts() -> dict[str, Any]:
-    """Hostname, platform, and GPU facts when a query tool is available."""
+    """Hostname, platform, GPU facts when a query tool is available, and runtime versions."""
     facts: dict[str, Any] = {
         "hostname": socket.gethostname(),
         "platform": platform.platform(),
         "gpus": [],
         "driver": None,
+        "runtime": runtime_facts(),
     }
     if shutil.which("nvidia-smi"):
         out = _run(["nvidia-smi", "--query-gpu=name,driver_version", "--format=csv,noheader"])
@@ -137,7 +151,6 @@ def start_manifest(
         "inputs": inputs,
         "randomness": {"seed": seed, "deterministic": deterministic},
         "parent_run_id": parent_run_id,
-        "argv": sys.argv,
     }
     path = output_dir / "manifest.json"
     path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
