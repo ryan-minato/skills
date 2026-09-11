@@ -46,6 +46,7 @@
       "source": "./",
       "strict": false,
       "skills": [
+        "./skills/machine-learning/experiment-code-conventions",
         "./skills/machine-learning/experiment-provenance",
         "./skills/machine-learning/research-workflow"
       ],
