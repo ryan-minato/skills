@@ -106,14 +106,16 @@ the interrogation the clarify step needs. If it is not installed, load the
 it directs; never run an install command yourself. If the user declines,
 run step 2 from the questions in this file.
 
-1. **Specify.** Write the requirements and their scenarios for this change
-   only, plus non-goals. Done when: every requirement has at least one
-   scenario a reader who has never seen the code could judge.
+1. **Specify.** Create the change record with the tool's command, then
+   write the requirements and their scenarios for this change only, plus
+   non-goals. Done when: every requirement has at least one scenario a
+   reader who has never seen the code could judge, and the validator
+   passes.
 2. **Clarify, then publish.** Interrogate every ambiguity, unstated
    assumption, and missing edge case with the user; record answers in the
-   spec, not in the chat. Then commit the change record and open the draft
-   change request (or the specification change request, under the split
-   shape) at once, before any plan exists, so review starts on the
+   spec, not in the chat. Then validate, commit the change record, and
+   open the draft change request (or the specification change request,
+   under the split shape) at once, before any plan exists, so review starts on the
    specification — and stop there: no design, tasks, or code until the
    contract's approval mode is satisfied (the gate owner closes the
    discussion in conversation, or posts the fixed comment). Done when: no
@@ -149,13 +151,34 @@ run step 2 from the questions in this file.
    passed, is recorded as a spec change, or is filed as a defect.
 7. **Converge or archive.** Write the delivered behavior back into the
    source-of-truth spec (spec-anchored) or archive the change record
-   (spec-first), when and by whom the contract's archive mode says. Done
-   when: the spec and the code describe the same system.
+   (spec-first) through the tool's archive command, when and by whom the
+   contract's archive mode says, and validate afterwards. Done when: the
+   spec and the code describe the same system.
 
 Read [references/tracked-work-lifecycle.md](references/tracked-work-lifecycle.md)
 when a step meets the project's tracked work — publishing the draft,
 waiting for the approval, drafting the request body, archiving — for what
 the agent does under each shape and mode.
+
+## Tool commands first, then the validator
+
+When the project uses a specification tool, every operation the tool has
+a command for — initializing, creating a change or feature record,
+validating, archiving — runs through that command, verified from the
+tool's `--help` and current documentation first. Never create the tool's
+directory tree or its generated files by hand, even when asked because it
+is faster: a hand-made record lacks the metadata the tool's later steps
+read, and the validator or the archive fails on it long after the
+shortcut was taken. Hand edits stop at the requirement text itself.
+
+Run the tool's validator — strict mode where it exists — after each
+artifact edit, before publishing the draft, before marking the request
+ready, and after archiving; fix what it reports before proceeding. The
+contract says where the validator runs in the project's checks. When the
+tool ships no validator, check the artifacts against the tool's
+documented structure and say that no programmatic check exists. A
+passing validation proves structure, not content; it never replaces the
+specification review.
 
 ## Specification quality
 
@@ -254,6 +277,9 @@ builder's.
 
 - Tools rename their commands between releases; a command remembered from a
   blog post is the most common way an SDD setup fails on day one.
+- A change directory written by hand usually lacks the tool's metadata
+  file or a required heading; the validator or the archive step fails on
+  it later, when the shortcut is forgotten.
 - Spec-Kit's feature script creates a numbered spec directory, not a git
   branch; branch creation follows the project's branching contract.
 - A tool's lowercase `design.md` is a technical design file. `DESIGN.md` at
