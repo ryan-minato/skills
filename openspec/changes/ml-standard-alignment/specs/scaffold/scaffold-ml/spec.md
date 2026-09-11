@@ -1,5 +1,5 @@
 ## Purpose
-Governs what an agent that loaded the `scaffold-ml` builder observably does when it initializes a machine-learning project: the single project shape it establishes, the configuration, provenance, tracker, image, test, and hook rules it deposits, and the builders and durable skills it hands off to.
+Governs what an agent that loaded the `scaffold-ml` builder observably does when it initializes a machine-learning project: the single project shape it establishes, the configuration, provenance, tracker, image, test, hook, and research-task rules it deposits so the generic harness builders keep them, and the builders and durable skills it hands off to.
 
 ## ADDED Requirements
 
@@ -86,7 +86,7 @@ When the user opts into containers, the builder SHALL provide a multi-stage reci
 - **THEN** the builder scaffolds no Dockerfile, Compose file, or dev container and records the lock digest as the environment identity
 
 ### Requirement: Behavior: Tests, hooks, and style follow the experiment standard
-The builder SHALL configure pytest with `slow` and `gpu` markers, a default suite that is light and CPU-compatible, a `test-gpu` command whose tests fail when hardware is absent, and heavy validation behind an explicit command; SHALL configure Ruff near its defaults with line length 120 and docstring code formatting; SHALL not install a static type checker as a gate over model code; and SHALL configure git hooks that run the formatter and linter only, never tests.
+The builder SHALL configure pytest with `slow` and `gpu` markers, a default suite that is light and CPU-compatible, a `test-gpu` command whose tests fail when hardware is absent, and heavy validation behind an explicit command; SHALL configure Ruff near its defaults with line length 120 and docstring code formatting; SHALL not install a static type checker as a gate over model code and SHALL say where static checking may apply (configuration and control-plane modules); SHALL set docstring conventions that carry shape, dtype, device, and mask semantics; and SHALL configure git hooks that run the formatter and linter only, never tests; each of these SHALL be deposited with its reason so the Python defaults builder that runs later inventories it as a settled choice.
 
 #### Scenario: GPU tests requested to skip
 - **WHEN** the user asks that GPU tests skip automatically when no GPU is present
@@ -95,6 +95,25 @@ The builder SHALL configure pytest with `slow` and `gpu` markers, a default suit
 #### Scenario: Hook runs tests
 - **WHEN** the repository's existing pre-commit hook runs pytest
 - **THEN** the builder proposes limiting the hook to the formatter and linter, names snapshot-commit latency as the reason, and follows the user's decision
+
+#### Scenario: Python defaults builder runs afterwards
+- **WHEN** the Python defaults builder inventories the project after the scaffold's deposit
+- **THEN** it finds the typing, test-suite, and hook decisions recorded with their reasons and treats them as settled rather than proposing its baseline
+
+### Requirement: Behavior: The research-task convention is deposited for the project's spec tooling
+The builder SHALL deposit the research-task convention — a research spec with an Objective and an Evaluation (Context, Search Scope, Constraints, Completion Condition, Hypotheses as needed), one research task per pull or merge request carrying its hypotheses and runs, the spec evolving while run history stays immutable, completion on the completion condition with negative results as valid outcomes — into the project's agent guidance, SHALL place the spec inside the project's specification contract when one exists and otherwise under `research/<task>/`, SHALL, when the project's spec tool is OpenSpec, copy the bundled `research-task` schema into the tool's schema directory and record how a change selects it, and SHALL record the research task as the project's unit of research work so the workflow-design and specification-workflow builders that run later keep it.
+
+#### Scenario: OpenSpec project
+- **WHEN** the repository runs OpenSpec and the user asks for the scaffold
+- **THEN** the builder deposits the `research-task` schema at the tool's schema path, the selection rule in the agent guidance, and the research section with the spec's fields
+
+#### Scenario: No spec tool
+- **WHEN** the repository runs no spec tool
+- **THEN** the builder deposits the research section pointing at `research/<task>/spec.md` and the skeleton, and installs no tool
+
+#### Scenario: Specification workflow builder runs afterwards
+- **WHEN** the specification workflow builder inspects the project after the scaffold's deposit
+- **THEN** it finds the research-task schema and convention as a spec tool and layout the project already runs and keeps them
 
 ### Requirement: Behavior: The deposited guidance makes the project discoverable
 The deposited agent entrypoint SHALL name how to run the standard experiment, where configuration enters and how it is overridden, how tests run and which suites exist, where the research spec of the current task lives (the project's specification contract when one exists, else `research/<task>/`), which tracker holds runs, the provenance rules, and a when-to-read table; it SHALL keep one authoritative source per fact; and it SHALL not carry the disposable marker.
