@@ -15,6 +15,8 @@ terms; the project's contract and templates use the platform's own words
 | Approval owner and mode | the contract's approval gate | discussion-closed: the gate owner closes the discussion in conversation and the agent reconciles before designing |
 | Archive mode | the contract's archive section | in-request |
 | What tracked work links | the contract's tracked-work section | the record's path; acceptance criteria never copied |
+| Specification scope | the contract's scope section | product domains; the project's own harness, tooling, checks, workflows, and documents are spec-less changes under the tool's marker |
+| Request body | the project's request template | the default body below |
 
 ## The two shapes at run time
 
@@ -63,6 +65,34 @@ posted), before any design:
 5. Ask the gate owner to confirm the open items; proceed only when nothing
    is open or the open items are confirmed.
 6. Record the closing state on the request's approval line.
+
+## Default request body
+
+Follow the project's template when one exists. Absent one, the body has:
+
+1. An opening paragraph, no heading, stating the goal — what is true once
+   the request merges, not the work done.
+2. A section stating the value: why this is worth merging now.
+3. A specification block: `Spec:` as a link to the change record on the
+   branch; `Phase: specification` until the approval, `implementation`
+   after; one link per record file (design and tasks appear when they
+   exist); an `Approval:` line stating the mode's state — "discussion open
+   on this draft" and what closes it, or the exact comment text on its own
+   line so it can be copied.
+4. Related work: the closing reference to the work item, or the reason
+   none exists.
+5. Changes and Validation, each holding a reserved line until the request
+   is marked ready. Then Changes lists every touched file as a permalink
+   to the commit that changed it — the exact lines for a local change,
+   the whole file or directory for a broad one — and Validation names
+   each scenario with its result and links the plan for the cases and
+   rubric instead of restating them.
+6. The project's checklist.
+
+Sections beyond these may be added when the change needs them; every
+section, added or default, passes the project's publish gate before it is
+published. Never paste the task list or a diff summary into a draft in
+the specification phase.
 
 ## Archive modes at run time
 
