@@ -12,7 +12,9 @@ the next change touches, and nothing else. Specs for untouched code have no
 change to keep them honest; they drift the day they are written and then
 mislead every agent that trusts them. The substitute for a full spec set is
 the codebase map below, which is cheap to refresh and never claims to be
-normative.
+normative. Specifications describe the product: the project's own build
+scripts, checks, workflows, and documents are changed through spec-less
+changes and never get a domain.
 
 ## 1. Assess what exists
 
@@ -84,7 +86,10 @@ converge. The pilot exists to expose friction cheaply:
 - a scenario that cannot be executed reveals missing test infrastructure;
 - a requirement that contradicts the harness or the goal document reveals a
   conflict to resolve before scale;
-- a step the tool's command does not fit reveals a convention to record.
+- a step the tool's command does not fit reveals a convention to record;
+- a baseline scenario the schema required for the new domain that fails
+  for behavior the pilot does not touch is a defect to file separately,
+  with the record narrowed to what the pilot verified.
 
 Log every friction point; it is the input to harness alignment.
 

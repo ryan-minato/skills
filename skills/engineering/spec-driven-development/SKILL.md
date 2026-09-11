@@ -140,8 +140,13 @@ run step 2 from the questions in this file.
    when: every task is closed or its deviation is recorded as an approved
    spec change.
 6. **Verify.** Execute the scenarios — tests, commands, observed states —
-   against the running result, not against the diff. Done when: every
-   scenario has passed or is recorded as a spec change.
+   against the running result, not against the diff. When the change
+   first creates a domain and the project's schema requires a baseline
+   block, verify its scenarios like any other; a baseline scenario that
+   fails for behavior the change does not touch is filed as a separate
+   defect with the evidence, and the record is narrowed to what is
+   verified — never widened silently. Done when: every scenario has
+   passed, is recorded as a spec change, or is filed as a defect.
 7. **Converge or archive.** Write the delivered behavior back into the
    source-of-truth spec (spec-anchored) or archive the change record
    (spec-first), when and by whom the contract's archive mode says. Done
@@ -206,6 +211,15 @@ questioning round of your own:
 - **Archive mode**: in-request — the request archives its record before
   it is marked ready; automated archiving needs a push path the harness
   builder records.
+- **Scope**: specification domains cover the product the project
+  delivers; a change to the project's own harness, tooling, checks,
+  workflows, or documents is a spec-less change carried by the tool's
+  marker (OpenSpec: `skip_specs: true` with a proposal, design, and tasks
+  and no delta spec), linked by tracked work the same way. Refuse to
+  create a domain for tooling.
+- **Request body**: it navigates to the record and carries no
+  implementation until ready — the default shape is in
+  [references/tracked-work-lifecycle.md](references/tracked-work-lifecycle.md).
 
 ## Adopting existing code
 
