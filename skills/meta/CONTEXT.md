@@ -31,13 +31,20 @@ Rules for disposable builders that create durable agent harnesses.
   on that decision; every other builder either returns to the entry or, when
   run alone, asks the same question and hands off to `meta-disposal`.
 - Contract flow is one-way. Contract builders (branching model, workflow
-  design, specification workflow, agent authority) design in a
-  platform-neutral model — so that no platform habit shapes the design —
-  and deposit their decisions into the target project written in the
-  project's own platform vocabulary; platform builders implement those
-  deposits, never reopen a settled decision, and never let a platform
-  capability reshape the upstream model. Platform neutrality is a
-  design-stage discipline, never a file agents read daily.
+  design, agent authority) design in a platform-neutral model — so that
+  no platform habit shapes the design — and deposit their decisions into
+  the target project written in the project's own platform vocabulary;
+  platform builders implement those deposits, never reopen a settled
+  decision, and never let a platform capability reshape the upstream
+  model. Paradigm builders (the specification workflow) are a third kind
+  that runs twice: a first phase deposits a contract like any contract
+  builder, and a second phase, after the platform base is delivered,
+  fills the base's registered extension slots for that contract. Platform
+  builders stay paradigm-neutral — no paradigm's vocabulary, artifacts, or
+  gates in their references, assets, or templates — and hand off to the
+  builder whose description claims the contract the entrypoint points to.
+  Platform neutrality is a design-stage discipline, never a file agents
+  read daily.
 - Durable rules must land in the target repository, registered tools, or other
   reachable sources before disposal.
 - Do not ship documentation indexes, URL registries, docs-navigation tables, or
@@ -70,11 +77,13 @@ Catalog prefix `meta-` on every directory and `name`, enforced by
 This catalog owns generic, pluggable harness machinery: the harness entry
 workflow (`meta-harness-building`) and the architecture practice manual
 (`meta-harness-architecture`) it loads layer by layer, contract builders
-(branching, project workflow, specification workflow, agent authority)
-that design in a platform-neutral model and deposit platform-worded
-decisions the platform builders implement, platform-specific lifecycle
-builders whose complete output is deposited into the target project before
-disposal, and language-level convention defaults. Its skills stack alongside one another, so the catalog is
+(branching, project workflow, agent authority) that design in a
+platform-neutral model and deposit platform-worded decisions the platform
+builders implement, paradigm builders (specification workflow) that
+deposit a contract and later shape the platform base for it,
+platform-specific lifecycle builders whose paradigm-neutral output is
+deposited into the target project before disposal, and language-level
+convention defaults. Its skills stack alongside one another, so the catalog is
 installed whole. A builder whose topic selects the entire project shape — and
 therefore excludes the catalog's other builders — belongs to `scaffold`
 instead. Durable cross-project methodology remains in `core/meta-harness`.

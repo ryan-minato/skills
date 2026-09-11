@@ -79,8 +79,11 @@ from it must match it.
 ## Build List
 
 > Ordered. One row per artifact. "Form" is skill / entrypoint-or-doc where
-> the artifact could take either shape. The removal meta-skill runs last,
-> after the user verifies the harness.
+> the artifact could take either shape. A builder that runs in two phases
+> occupies one row per phase: a paradigm builder's contract row precedes
+> the authority and platform rows, and its shaping row follows the
+> platform row. The removal meta-skill runs last, after the user verifies
+> the harness.
 
 | # | Artifact | Builder skill to install and run | Form | Done when |
 |---|---|---|---|---|

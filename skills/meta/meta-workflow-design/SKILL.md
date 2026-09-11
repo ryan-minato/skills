@@ -186,9 +186,12 @@ file does not carry this skill's disposable marker, name, or paths.
 
 Then hand off by name, in order. Specification workflow first, when
 spec-driven intent was recorded: settle the level, tool, and specification
-contract with `meta-spec-workflow`. Governance next: design human–agent
-authority with `meta-agent-authority`. Platform expression after that: run
-the lifecycle builder for the evidenced host platform. If any is not
+contract with `meta-spec-workflow` (its first phase). Governance next:
+design human–agent authority with `meta-agent-authority`. Platform base
+after that: run the lifecycle builder for the evidenced host platform,
+which delivers a paradigm-neutral base with extension slots. Last, when a
+paradigm contract exists, its builder's second phase — `meta-spec-workflow`
+step 7 for a specification contract — shapes that base. If any is not
 installed, load the `ryan-minato-skills-installing` skill and install the
 whole `meta` catalog at project scope as it directs — its builders stack and
 are disposed together; never run an install command yourself.

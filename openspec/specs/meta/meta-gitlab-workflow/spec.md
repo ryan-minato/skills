@@ -1,7 +1,7 @@
 # meta/meta-gitlab-workflow Specification
 
 ## Purpose
-Governs what an agent that loaded the `meta-gitlab-workflow` builder observably does when it consumes platform-worded deposits, expresses the change request shape and archive mode on GitLab, and ships or designs the archive automation.
+Governs what an agent that loaded the `meta-gitlab-workflow` builder observably does when it consumes platform-worded deposits and delivers a paradigm-neutral GitLab lifecycle base whose templates and project skill carry registered extension slots for a paradigm builder to fill.
 
 ## Requirements
 
