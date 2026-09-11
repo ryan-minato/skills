@@ -60,6 +60,21 @@ contract's artifact map with the date.
   change archived later may no longer apply, so re-validate at
   implementation start.
 
+## Commands and validation
+
+Initialization and every new change record come from the tool's commands
+(verified from the CLI's help; none is quoted here) — never from a
+hand-made directory, which lacks the metadata the archive step later
+needs. The CLI ships a validator with a strict mode: the contract records
+it, the second phase adds its strict run to the project's local check
+command, and the loop runs it after every artifact edit, before
+publishing the draft, before ready, and after archiving. A change to the
+project's own harness, tooling, or documents is marked spec-less in its
+change configuration (`skip_specs: true`); the archive operation and this
+builder's archive script honor the marker — verify the flag from the
+CLI's help — and such a change carries a proposal, design, and tasks and
+no delta spec.
+
 ## Collision points with a harness
 
 | Tool-owned fact | Harness file that tends to restate it | Resolution |

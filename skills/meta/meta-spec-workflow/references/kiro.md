@@ -32,6 +32,14 @@ and a CLI, and features differ between surfaces and releases.
 - Steering files are the tool-owned home for principles and conventions —
   the same role a constitution plays elsewhere.
 
+## Commands and validation
+
+The IDE generates the three files and the steering files; write them
+through the tool, not by hand, so their structure matches what it reads
+back. There is no CLI validator: record in the contract the structural
+check the project adopts (the EARS shape of the requirements, a
+required-sections lint) or state that none exists.
+
 ## Collision points with a harness
 
 | Tool-owned fact | Harness file that tends to restate it | Resolution |
