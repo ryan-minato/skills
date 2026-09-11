@@ -116,7 +116,8 @@ defaults + project config + experiment config + CLI overrides
   pushed, and inject it into the run (`IMAGE_DIGEST`) so the manifest can
   record it.
 - Without a container, the environment identity is the dependency lock
-  digest plus the interpreter version.
+  digest plus the interpreter version. A requirements file with ranges
+  is not a lock: it identifies nothing, and the record says so.
 - A container does not pin the host. For a quality claim the image digest
   and lock digest suffice; for a performance claim also record the GPU
   model and count, the driver, the runtime versions (CUDA or ROCm, the
@@ -125,7 +126,11 @@ defaults + project config + experiment config + CLI overrides
 ## The manifest
 
 Write the manifest when the run starts (status running) and finalize it
-when the run ends (status and end time); keep both versions. Emit it to
+when the run ends (status and end time); keep both versions (the module
+keeps the start-time record as `manifest.running.json`). A manifest that
+lacks an identity — a dirty tree, no resolved configuration, no image or
+lock digest — carries the reason in `degraded` and is cited as degraded,
+never as complete. Emit it to
 the tracker as parameters and tags and to the run's output directory as a
 file. [`assets/run_manifest.py`](assets/run_manifest.py) is a drop-in
 standard-library module that collects the fields below and writes them;
@@ -133,10 +138,10 @@ copy it into the project and call it from the training entry point.
 
 | Field | Source |
 |---|---|
-| `run_id`, `started_at`, `ended_at`, `status` | the run |
-| `source.commit`, `source.dirty`, `source.patch_sha256` (dirty only), `source.remote` | git |
+| `run_id`, `started_at`, `ended_at`, `status`, `degraded[]` | the run |
+| `source.commit`, `source.dirty`, `source.patch_sha256` (dirty only: tracked diff plus untracked files), `source.remote` | git |
 | `config.resolved_path`, `config.sha256` | the resolved configuration dump |
-| `environment.image_digest` or `environment.lock_sha256`, `environment.python` | image, lock file, interpreter |
+| `environment.image_digest` or `environment.lock_sha256` (a real lock file, or a fully pinned requirements file), `environment.python` | image, lock file, interpreter |
 | `host.hostname`, `host.platform`, `host.gpus` (model, count), `host.driver`, `host.runtime` | the machine |
 | `inputs[]` — `name`, `kind`, `identity` | resolved before the run |
 | `randomness.seed`, `randomness.deterministic` | the run |
