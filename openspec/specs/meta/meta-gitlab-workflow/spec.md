@@ -12,34 +12,24 @@ The builder SHALL read the workflow deposit at `.agents/knowledge/gitlab-workflo
 - **WHEN** the target carries `.agents/knowledge/gitlab-workflow.md` naming its objects
 - **THEN** the builder creates no separate planning knowledge file and records its additions in the existing one
 
-### Requirement: Behavior: Take-work follows the change request shape
-The generated project skill SHALL, under the combined shape, take a work item that has no specification by committing the change record to a draft merge request first and waiting for the gate owner's recorded approval, and SHALL, under the split shape, escalate a work item whose specification merge request is not merged.
+### Requirement: Behavior: Templates and the project skill carry paradigm-neutral extension slots
+The delivered merge request template, work-item templates, and project skill SHALL contain no paradigm-specific line, field, or step, SHALL keep the headings, step positions, and field ids the builder's slot list names so that a paradigm builder can insert its lines by structure alone, SHALL contain no placeholder or anchor comment once delivered, and the builder SHALL hand off to the builder whose description claims the contract the entrypoint points to.
 
-#### Scenario: Combined shape, no specification yet
-- **WHEN** the contract records the combined shape and an agent takes a work item with an empty specification field
-- **THEN** the generated skill directs it to publish the change record on a draft merge request and wait for the approval comment rather than escalating
+#### Scenario: Specification contract present at build time
+- **WHEN** the target carries a specification contract and the builder delivers the base
+- **THEN** the delivered template and project skill contain no specification line or step, every slot heading and field id is present, and the hand-off names the paradigm shaping as the next step
 
-### Requirement: Behavior: Templates carry two specification checklist items
-The merge request template SHALL carry one item confirming the change record was approved before implementation (or that the request carries the specification only) and one confirming the specification was updated or the change record archived or completed for automated archiving, without changing the security item's wording.
+#### Scenario: No paradigm contract
+- **WHEN** the target carries no paradigm contract
+- **THEN** the delivered files contain no placeholder and no anchor comment, and the slot structures are still present
 
-#### Scenario: Checklist check still passes
-- **WHEN** a merge request body is built from the adapted template and every item is ticked
-- **THEN** the project's checklist check passes
+#### Scenario: Security line survives a slot fill
+- **WHEN** a paradigm builder later inserts items into the checklist slot
+- **THEN** the security item's wording is unchanged and the checklist check passes
 
-### Requirement: Behavior: A specification-only change request references its work item
-Under the split shape, the specification merge request SHALL reference the work item without closing it, and the final implementation merge request SHALL close it.
+### Requirement: Behavior: The protected branch baseline includes thread resolution and pre-existing pipeline jobs
+The builder SHALL propose, as the whole protected-branch baseline, merging only through a merge request, "pipelines must succeed" enabled only after the referenced jobs exist and pass, and "all threads must be resolved", and SHALL let the user subtract from it with a recorded reason.
 
-#### Scenario: Split shape
-- **WHEN** the contract records the split shape and the generated skill opens the specification merge request
-- **THEN** its body references the work item with a non-closing reference
-
-### Requirement: Behavior: OpenSpec projects get a runnable archive job; other tools get design guidance
-Under automated archiving with OpenSpec, the builder SHALL produce a CI job from its asset that runs after merge to the default branch, serialized by a resource group, calls the project's archive script (the one the spec-driven development skill ships, copied into the project's scripts directory), fails without retry on a rejected push, and SHALL record the push authorization the automation identity needs as a maintainer action; for Spec-Kit, Kiro, and committed documents it SHALL design the job with the user from the same skeleton and copy no OpenSpec command.
-
-#### Scenario: OpenSpec with automation
-- **WHEN** the contract records OpenSpec and automated archiving
-- **THEN** the produced CI job declares a resource group, calls the project's archive script, and its documentation records the maintainer action
-
-#### Scenario: Spec-Kit with automation
-- **WHEN** the contract records Spec-Kit and automated archiving
-- **THEN** the builder asks for the completion criterion and post-processing step and produces no OpenSpec command
+#### Scenario: Baseline proposed
+- **WHEN** the builder reaches protected-branch settings for a project with a pipeline
+- **THEN** it proposes the three items together, orders the pipeline-success rule after the jobs have run, and records any subtraction with its reason
