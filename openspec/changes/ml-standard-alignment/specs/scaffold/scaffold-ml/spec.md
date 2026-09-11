@@ -34,7 +34,7 @@ The builder SHALL establish one shape — a package or flat module chosen by the
 - **THEN** the builder keeps Hydra, records the two rules (no object instantiation from configuration; a pinned output directory), adds the manifest, tracker, and marker rules, and does not migrate to OmegaConf alone
 
 ### Requirement: Behavior: The dependency carrier is the user's choice, a uv project by default
-The builder SHALL ask the user which dependency carrier the project uses and SHALL recommend a uv project — `pyproject.toml` with `uv.lock`, accelerator wheels routed through explicit indexes and sources — as the default, SHALL accept `requirements.in` compiled by uv into a fully pinned `requirements.txt` with the torch backend flag as the alternative, SHALL treat the committed lock of either carrier as the environment identity the manifest records (a `requirements.txt` with ranges is not a lock), SHALL keep the carrier an existing repository already uses, and SHALL write the environment stage of the container recipe and the setup and lock commands for the chosen carrier only.
+The builder SHALL ask the user which dependency carrier the project uses and SHALL recommend a uv project — `pyproject.toml` with a `dev` dependency group and `uv.lock`, accelerator wheels routed through explicit indexes and sources — as the default, SHALL accept the four-file requirements workflow as the alternative — `requirements.in` for the runtime dependencies and `requirements.dev.in` that includes it plus the development tools, each compiled by uv into a fully pinned `requirements.txt` and `requirements.dev.txt` with the torch backend flag, all four committed together, the training machine syncing the runtime file and a development machine the dev file — SHALL treat the committed runtime lock of either carrier (`uv.lock`, or `requirements.txt`) as the environment identity the manifest records (a requirements file with ranges is not a lock), SHALL keep the carrier an existing repository already uses, and SHALL write the environment stage of the container recipe and the setup and lock commands for the chosen carrier only.
 
 #### Scenario: No preference stated
 - **WHEN** the user asks for the scaffold and says nothing about dependencies
@@ -42,7 +42,11 @@ The builder SHALL ask the user which dependency carrier the project uses and SHA
 
 #### Scenario: Requirements carrier chosen
 - **WHEN** the user chooses the requirements carrier
-- **THEN** the builder writes `requirements.in` and the compile and sync commands with the backend flag, the container's environment stage installs from the compiled file, and the deposited guidance says the compiled file is the lock and is never edited by hand
+- **THEN** the builder writes `requirements.in` and `requirements.dev.in`, the compile commands that produce both pinned files and the sync commands that select the runtime or the dev file per machine with the backend flag, the container's environment stage installs from the runtime file, and the deposited guidance says the compiled files are the locks, are committed with their sources, and are never edited by hand
+
+#### Scenario: uv project chosen
+- **WHEN** the user confirms the uv project
+- **THEN** the builder writes `pyproject.toml` with the runtime dependencies, a `dev` dependency group for the development tools, the accelerator index and source routing, and commits `uv.lock`; the container's environment stage installs with a frozen sync without the dev group
 
 #### Scenario: Existing requirements project
 - **WHEN** the repository already runs a compiled requirements workflow

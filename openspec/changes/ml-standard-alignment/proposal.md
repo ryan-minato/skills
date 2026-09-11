@@ -19,10 +19,14 @@ decisions settled. Now, before the next ML project is scaffolded.
   experiment / maintainable training choice: OmegaConf typed schema plus
   YAML plus command-line overrides with a resolved dump saved per run, a
   dependency carrier the user chooses — a uv project (`pyproject.toml`
-  plus `uv.lock` with index routing for accelerator wheels) by default,
-  or `requirements.in` compiled by uv into a fully pinned
-  `requirements.txt` with the torch backend flag for a scripts-only
-  repository — an explicit Accelerate loop with one logging seam and one
+  with a `dev` dependency group plus `uv.lock` with index routing for
+  accelerator wheels) by default, or the four-file requirements workflow
+  (`requirements.in` and `requirements.dev.in`, the latter including the
+  former plus the development tools, each compiled by uv into a fully
+  pinned `.txt` with the torch backend flag; the training machine syncs
+  the runtime file, a development machine the dev file) for a
+  scripts-only repository — in either carrier the runtime lock is the
+  environment identity — an explicit Accelerate loop with one logging seam and one
   stage-trace seam, a run manifest written at start and finish, a tracker
   selected by precedence (keep existing → the hosting platform's
   experiment tracking → Trackio), a multi-stage container recipe whose
