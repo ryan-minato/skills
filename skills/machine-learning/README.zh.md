@@ -21,3 +21,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 | Skill | 说明 |
 |---|---|
 | [experiment-provenance](experiment-provenance/) | 记录并判定一次 run 的身份——实际执行的源码快照、解析后的完整配置、环境身份（镜像或 lock 摘要加主机事实）、输入身份，以及与 commit 区分的 run id——保持 run 历史不可改写，并接入 tracker（已有 → 平台自带 → Trackio）来保存不含密钥的 manifest。 |
+| [research-workflow](research-workflow/) | 端到端运行一个 research task：带 objective 与 evaluation 的研究 spec、一个 task 对应一个 PR/MR 并容纳多个假设、在隔离分支上带快照 commit 的假设循环、与声明相匹配的证据、在搜索空间与算力允许时的自动搜索，以及包含负结果在内的收尾结论。 |
