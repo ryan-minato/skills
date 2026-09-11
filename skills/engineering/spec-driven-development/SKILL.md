@@ -217,9 +217,10 @@ again; the specification owns *what*, *why*, and the acceptance criteria,
 tracked work owns *who*, *when*, and *status* and links the record, and
 acceptance criteria exist in exactly one place.
 
-When no contract exists, apply these defaults, say so, and name the
-harness builder below as the way to settle and record them — never run a
-questioning round of your own:
+When no contract exists, apply these defaults and say so in the reply,
+naming the spec workflow builder of the `meta` catalog (offered through
+the installing skill, as the last section says) as the way to settle and
+record them — never run a questioning round of your own:
 
 - **Shape**: combined — one change request carries the record from the
   moment it is committed, opens as a draft, and the gate is exercised on
