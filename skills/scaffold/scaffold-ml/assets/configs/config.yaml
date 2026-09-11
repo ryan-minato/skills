@@ -1,0 +1,16 @@
+# One named state of the configuration surface (schema: config.py).
+# Override single values on the command line: `just train optim.lr=1e-4`.
+data:
+  train: "<immutable identity>"
+  eval: "<evaluation set identity>"
+  batch_size: 32
+model:
+  name: "<named choice>"
+optim:
+  name: adamw
+  lr: 3.0e-4
+run:
+  seed: 42
+  steps: 1000
+  mixed_precision: bf16
+  tracker: null   # set when the tracker is wired (see AGENTS.md)

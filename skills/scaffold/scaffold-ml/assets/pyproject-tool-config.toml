@@ -1,0 +1,41 @@
+# Merge into pyproject.toml. For a uv project also declare the runtime
+# dependencies under [project], the tools under [dependency-groups] dev,
+# and the accelerator index and source routing (references/hardware-deps.md).
+
+[dependency-groups]
+dev = ["ruff", "pytest", "pre-commit"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 80
+
+[tool.ruff.lint]
+extend-select = [
+    "I",    # isort: Import sorting
+    "N",    # pep8-naming: Check PEP 8 naming conventions
+    "TID",  # flake8-tidy-imports: Import policy checks
+    "W",    # pycodestyle warning: PEP 8 styling warnings
+]
+unfixable = [
+    "F401", # unused-import: Unused import
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = [
+    "TID252",   # relative-imports: Relative imports ban
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
+markers = [
+    "gpu: tests that exist only on the accelerator path; run through `just test-gpu` and fail without hardware",
+    "slow: manual-only tests that need downloads, large data, or long runs",
+]
