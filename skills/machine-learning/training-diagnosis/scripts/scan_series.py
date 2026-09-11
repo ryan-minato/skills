@@ -5,7 +5,10 @@ a trailing window's median and median absolute deviation, and reports the
 first row at which the score stays beyond a threshold for K of the last M
 rows. With --group-by, rows are grouped (for example by rank) and the
 ratio of the slowest to the median group is reported per step in
-addition, using --step to align groups.
+addition, using --step to align groups. Non-finite values (NaN, inf)
+are never fed into the statistics: the first one is reported as the
+anomaly when it precedes the first sustained deviation, and their rows
+are counted under "non_finite_rows".
 
 Usage:
     python3 scan_series.py --input series.csv --column loss
@@ -16,7 +19,8 @@ Output: one JSON object on stdout. Diagnostics go to stderr.
 Exit codes:
     0  success (an anomaly may or may not have been found; see "first_anomaly")
     1  the input has no usable rows, or a named column is absent or non-numeric throughout
-    2  bad arguments (unknown option, missing --input/--column, unreadable file, invalid numbers)
+    2  bad arguments (unknown option, missing --input/--column, an unreadable or undecodable
+       file, invalid numbers)
 """
 
 from __future__ import annotations
@@ -24,6 +28,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import statistics
 import sys
 from collections import defaultdict
@@ -68,15 +73,31 @@ def read_rows(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
-def to_float(rows: list[dict[str, str]], column: str) -> list[float | None]:
+def to_float(rows: list[dict[str, str]], column: str) -> tuple[list[float | None], list[int]]:
+    """Finite values (None where absent or non-numeric) and the row indexes holding NaN or inf."""
     values: list[float | None] = []
-    for row in rows:
+    non_finite: list[int] = []
+    for i, row in enumerate(rows):
         raw = (row.get(column) or "").strip()
         try:
-            values.append(float(raw))
+            value = float(raw)
         except ValueError:
             values.append(None)
-    return values
+            continue
+        if math.isfinite(value):
+            values.append(value)
+        else:
+            values.append(None)
+            non_finite.append(i)
+    return values, non_finite
+
+
+def first_row_of_step(rows: list[dict[str, str]], step_column: str, step: str) -> int | None:
+    """The input row index at which `step` first appears in `step_column`."""
+    for i, row in enumerate(rows):
+        if row.get(step_column, str(i)) == step:
+            return i
+    return None
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -106,7 +127,11 @@ def main(argv: list[str] | None = None) -> int:
     if not path.is_file():
         parser.error(f"--input {path} is not a readable file")
 
-    rows = read_rows(path)
+    try:
+        rows = read_rows(path)
+    except (OSError, UnicodeDecodeError, csv.Error) as exc:
+        print(f"Error: cannot read {path} as UTF-8 CSV ({exc}); pass a readable UTF-8 CSV file.", file=sys.stderr)
+        return 2
     if not rows:
         print(f"Error: {path} has no data rows; nothing to scan.", file=sys.stderr)
         return 1
@@ -127,20 +152,30 @@ def main(argv: list[str] | None = None) -> int:
         "k": args.k,
         "m": args.m,
         "first_anomaly": None,
+        "non_finite_rows": 0,
     }
 
+    values, non_finite = to_float(rows, args.column)
+    result["non_finite_rows"] = len(non_finite)
+    first_non_finite = non_finite[0] if non_finite else None
+
     if args.group_by:
-        if args.group_by not in rows[0]:
-            print(f"Error: --group-by column '{args.group_by}' is not in {path}.", file=sys.stderr)
-            return 1
+        for name in (args.group_by, args.step):
+            if name not in rows[0]:
+                print(
+                    f"Error: column '{name}' is not in {path}; --group-by needs both the group and the "
+                    f"--step column (columns: {', '.join(rows[0].keys())}).",
+                    file=sys.stderr,
+                )
+                return 1
         groups: dict[str, list[tuple[str, float]]] = defaultdict(list)
         by_step: dict[str, list[float]] = defaultdict(list)
-        for row, value in zip(rows, to_float(rows, args.column), strict=True):
+        for row, value in zip(rows, values, strict=True):
             if value is None:
                 continue
             groups[row[args.group_by]].append((row.get(args.step, ""), value))
             by_step[row.get(args.step, "")].append(value)
-        if not by_step:
+        if not by_step and first_non_finite is None:
             print(f"Error: column '{args.column}' has no numeric values.", file=sys.stderr)
             return 1
         skew = []
@@ -155,10 +190,9 @@ def main(argv: list[str] | None = None) -> int:
         series = [statistics.median(v) for v in by_step.values()]
         steps = list(by_step.keys())
     else:
-        values = to_float(rows, args.column)
         indexed = enumerate(zip(rows, values, strict=True))
         pairs = [(row.get(args.step, str(i)), v) for i, (row, v) in indexed if v is not None]
-        if not pairs:
+        if not pairs and first_non_finite is None:
             print(f"Error: column '{args.column}' has no numeric values.", file=sys.stderr)
             return 1
         steps = [p[0] for p in pairs]
@@ -166,8 +200,20 @@ def main(argv: list[str] | None = None) -> int:
 
     scores = robust_z(series, args.window)
     idx = first_sustained(scores, args.z, args.k, args.m)
-    if idx is not None:
+    z_row = first_row_of_step(rows, args.step, steps[idx]) if idx is not None else None
+    # A non-finite value is the anomaly whenever it comes first: the run's
+    # numbers stopped being numbers there, whatever the statistics say later.
+    if first_non_finite is not None and (z_row is None or first_non_finite <= z_row):
+        row = rows[first_non_finite]
         result["first_anomaly"] = {
+            "kind": "non_finite",
+            "row_index": first_non_finite,
+            "step": row.get(args.step, str(first_non_finite)),
+            "value": (row.get(args.column) or "").strip(),
+        }
+    elif idx is not None:
+        result["first_anomaly"] = {
+            "kind": "robust_z",
             "row_index": idx,
             "step": steps[idx],
             "value": series[idx],

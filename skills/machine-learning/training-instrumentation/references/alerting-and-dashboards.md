@@ -12,7 +12,7 @@ non-finite or hard-failure event.
 | Alert | Level | Condition (starting values) |
 |---|---|---|
 | TrainingNoProgress | CRITICAL | no step completed for max(3× p99 step time, the business tolerance window) |
-| TrainingNumericalFailure | CRITICAL | non-finite loss, parameter, or gradient that the run does not recover from automatically |
+| TrainingNumericalFailure | CRITICAL | first non-finite loss, parameter, or gradient — no statistics, no wait for recovery; a scaler back-off that skips a step is not this alert (persistent skips are ERROR) |
 | DeviceOOM | CRITICAL | unrecovered accelerator out-of-memory |
 | DistributedTimeout | CRITICAL | collective or heartbeat timeout |
 | CheckpointUnavailable | CRITICAL | no valid restore point can be written and the risk window is unacceptable |
@@ -70,10 +70,13 @@ window (exemplars), so a p99 spike opens the evidence in one step.
 
 ## Model-health alert levels
 
+The same five severities; the last row is the CRITICAL case whose action
+is device quarantine rather than a stop.
+
 | Level | Example condition | Action |
 |---|---|---|
 | INFO | validation plateau; clipping rate slightly up | record |
 | WARNING | loss `z > 4` persistent; throughput −15%; a layer's update ratio above its p99 | raise sampling; save a checkpoint |
 | ERROR | loss and gradient spike together; clipping rate high for long; consecutive scaler skips | save the offending batch and state; consider pausing |
 | CRITICAL | any non-finite parameter or loss; unrecovered OOM; divergence; worker correctness mismatch | stop updates; roll back to the last healthy checkpoint |
-| HARDWARE | the anomaly reproduces only on one device with the same batch and checkpoint | quarantine the node; replay elsewhere |
+| CRITICAL (device-local) | the anomaly reproduces only on one device with the same batch and checkpoint | quarantine the node; replay elsewhere; recompute the affected steps |

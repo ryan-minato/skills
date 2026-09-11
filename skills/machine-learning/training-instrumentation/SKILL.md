@@ -182,6 +182,8 @@ that performs these measurements behind one function; the loop's single
 logging seam receives its dictionary.
 
 ```python
+health = TrainingHealth(model, max_norm=max_norm)  # once, before the loop
+...
 scaler.scale(loss).backward()
 scaler.unscale_(optimizer)                      # measure real gradients
 grad_norm = clip_grad_norm_(model.parameters(), max_norm)  # returns the pre-clip norm
@@ -190,8 +192,12 @@ metrics = health.after_step(model, optimizer, loss_vec, grad_norm, scaler)
 log_metrics(step, metrics)                      # the one seam
 ```
 
-`max_norm` is a project value, not a recommendation. Histograms and
-per-layer views run at their low frequencies inside `after_step`.
+`max_norm` is a project value, not a recommendation; pass the same value
+to the helper or the clipping indicator stays at zero. Per-layer views,
+the update-to-weight ratio, and bounded histograms run at their low
+frequencies inside `after_step`; every step it reports the loss
+quantiles, the gradient norm, finiteness of loss, gradients, and
+parameters, and the scaler's scale and skipped steps.
 
 ## Privacy
 
