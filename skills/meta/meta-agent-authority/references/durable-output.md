@@ -21,8 +21,11 @@ contract may point to it; nothing restates it.
 At a human gate the agent hands over a decision-ready report instead of
 asking what to do next. It contains, briefly and verifiably:
 
-- What the goal was and how the change addresses it.
-- Tests executed and their results; CI state.
+- What the goal was and how the change addresses it — by pointing at the
+  change request's specification block (record, phase, approval state)
+  where a contract keeps one, never by restating the goal.
+- Tests executed and their results; CI state — by pointing at the change
+  request's Validation section, which names each scenario with its result.
 - Scope actually touched, including anything beyond the original intent.
 - Known risks and remaining limitations.
 - The decisions now available to the human (for the default level: request

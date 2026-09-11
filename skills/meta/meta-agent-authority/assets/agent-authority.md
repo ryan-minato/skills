@@ -36,6 +36,7 @@ release; deploy; move or weaken any gate in this file.
 
 | Gate | Meaning | Owner |
 |---|---|---|
+| <Contract-defined gate, if any — e.g. Specification approval> | <what passes it, per the contract that defines it — e.g. the maintainer closes the discussion on the draft in conversation and the agent's reconciliation finds nothing open; delete the row when no contract defines a gate> | <the contract's recorded owner; never the agent for its own artifact> |
 | Review Admission | accepting the implementation and admitting it to formal review — includes draft-to-ready and requesting review | <owner at the settled level> |
 | Integration | the change set enters a long-lived branch; engineering responsibility transfers | <owner at the settled level> |
 
@@ -84,8 +85,11 @@ Escalating earlier is always allowed. Bypassing a closed gate never is.
 
 ## At a human gate, hand over this report
 
-- Goal and how the change addresses it.
-- Tests executed and results; CI state.
+- Goal and how the change addresses it — pointing at the change request's
+  specification block (the record, its phase, its approval state) where a
+  contract keeps one, rather than restating the goal.
+- Tests executed and results; CI state — pointing at the change request's
+  Validation section, which names each scenario with its result.
 - Scope actually touched, including anything beyond the original intent.
 - Known risks and remaining limitations.
 - Close the report by naming every decision available to the human, not

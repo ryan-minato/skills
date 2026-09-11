@@ -58,7 +58,7 @@
         "./skills/meta/meta-spec-workflow",
         "./skills/meta/meta-workflow-design"
       ],
-      "description": "Disposable, project-scoped builders for generic harness machinery: complete agent harness architecture, workflow, specification-workflow, and agent-authority contracts designed platform-neutrally and deposited in the project's platform vocabulary, git branching contracts, GitHub and GitLab lifecycle workflows, GPU container environments, and Python convention defaults."
+      "description": "Disposable, project-scoped builders for generic harness machinery: complete agent harness architecture, workflow and agent-authority contracts designed platform-neutrally and deposited in the project's platform vocabulary, a specification-workflow paradigm builder that deposits its contract and later shapes the platform base for it, git branching contracts, paradigm-neutral GitHub and GitLab lifecycle bases with extension slots, GPU container environments, and Python convention defaults."
     },
     {
       "name": "scaffold",

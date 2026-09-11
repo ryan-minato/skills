@@ -34,9 +34,10 @@ engineering unit and makes the integration decision.
 
 The gate moves from review admission to integration. Price: the
 specification is genuinely complete — the later the human gate, the more
-complete the specification must be, and the approval gate passing is what
-pays that price when the agent wrote it. The agent never approves its own
-specification. Vague goals at H1 produce polished changes nobody asked for.
+complete the specification must be, and the contract-defined gate passing
+is what pays that price when the agent wrote it. The agent never passes a
+gate on its own artifact. Vague goals at H1 produce polished changes
+nobody asked for.
 
 ## H2 — Delegated Integrator
 

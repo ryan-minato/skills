@@ -73,15 +73,17 @@ Read the project's workflow file at
 `github-workflow.md`) if present; its settled rules — acceptance,
 ownership, milestones or their equivalent, releases — are the anchors
 authority attaches to, and its platform is the vocabulary the policy is
-written in. Read the specification contract at
-`.agents/knowledge/spec-workflow.md` the same way if present: its approval
-gate — who accepts a specification before planning and implementation —
-is an acceptance anchor, and the levels below attach to it; its change
-request shape says where that gate sits on the path (on the draft itself
-under the combined shape, on a separate specification change request under
-split), and its archive mode says whether archiving is a step the agent
-runs before ready or a job that runs after merge. Their absence
-blocks nothing: a project with no tracker still needs an authority policy. Then evidence the project's real
+written in. Read any paradigm contract the entrypoint points to the same
+way — a specification contract at `.agents/knowledge/spec-workflow.md` is
+the common case: a contract may define a gate of its own that precedes
+review admission (for a specification contract, who accepts the
+specification before planning and implementation, and in which mode it
+passes), and the levels below attach to it; its change request shape says
+where that gate sits on the path (on the draft itself under the combined
+shape, on a separate specification change request under split), and its
+archive mode says whether archiving is a step the agent runs before ready
+or a job that runs after merge. Their absence blocks nothing: a project
+with no tracker still needs an authority policy. Then evidence the project's real
 verification strength yourself — test coverage and trustworthiness, CI
 gates, rollback and revert paths, observability — because these facts price
 the higher levels, and they are inspected, never asked.
@@ -103,16 +105,18 @@ default level; a rising level moves an owner downstream, never off the path:
 - **Integration** — the final decision that the change set enters the
   long-lived branch, and with it the engineering responsibility.
 
-Under a specification contract a third gate precedes both: the
-specification's approval, exercised on the draft (combined shape) or as the
-specification change request's own review (split). It passes as the
-contract's mode says — under discussion-closed, when the gate owner
+A contract may define a third gate that precedes both — the
+contract-defined gate. Under a specification contract it is the
+specification's approval, exercised on the draft (combined shape) or as
+the specification change request's own review (split), and it passes as
+the contract's mode says: under discussion-closed, when the gate owner
 closes the discussion in conversation and the agent's reconciliation of
 the request's threads and record finds nothing open or has the open items
 confirmed; under blocking, when the fixed comment is later than the
-record's last push. It stays with its recorded owner at every level, and
-no level grants an agent the approval of a specification it wrote: an
-agent that may mark ready still waits for that approval first.
+record's last push. A contract-defined gate stays with its recorded owner
+at every level, and no level grants an agent the passing of a gate on an
+artifact it wrote: an agent that may mark ready still waits for that gate
+first.
 
 Done when: both gates have a named owner at the settled level — a human role
 or person (never "the team"), or the agent under a delegation this policy
@@ -138,8 +142,8 @@ Autonomous work halts and returns to a human gate when any of these fire:
 
 - Scope exceeds the authorized boundary.
 - Acceptance criteria are ambiguous or cannot be evaluated — including
-  when the specification contract requires an approved specification and
-  none exists for the change.
+  when a contract-defined gate has not passed for the change (a
+  specification contract's approval, for instance).
 - A required check is unavailable or unreliable.
 - The change unexpectedly touches security-sensitive surface or public
   API/behavior.

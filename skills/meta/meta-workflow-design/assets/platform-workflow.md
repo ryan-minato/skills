@@ -70,14 +70,16 @@ live — on the item, the pull or merge request, or the specification.>
 Governed by `.agents/knowledge/agent-authority.md`. <Delete this section if
 no authority policy exists yet, and record that gap instead.>
 
-## Specifications
+## Other contracts
 
-Governed by `.agents/knowledge/spec-workflow.md`: a <pull request | merge
-request>'s acceptance is the scenarios of the specification it implements,
-and <issues | work items> link the specification instead of restating it;
-the change request shape and archive mode are settled there, and the rules
-here must not contradict them. <Delete this section if no specification
-contract exists yet, and record that gap instead.>
+<One line per contract this file must not contradict, each as a pointer:
+the branching contract (`.agents/knowledge/git-workflow.md`) and any
+paradigm contract the entrypoint points to — for a specification
+contract, `.agents/knowledge/spec-workflow.md`, where acceptance, the
+change request shape, the approval mode, and the archive mode are settled
+and where the <pull request | merge request>'s acceptance is the scenarios
+of the record it implements. Never restate their content. Delete a line
+whose contract does not exist yet, and record that gap instead.>
 
 ## Update this file when
 
