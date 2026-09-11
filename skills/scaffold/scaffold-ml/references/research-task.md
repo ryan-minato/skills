@@ -39,8 +39,10 @@ tool's project schema directory (`openspec/schemas/research-task/` in
 the pinned version; confirm the path and whether the tool's schema
 commands can install it by running `openspec --help` and the schema
 subcommand's help, never from memory). A research change selects the
-schema in its `.openspec.yaml` (`schema: research-task`) and marks
-itself spec-less (`skip_specs: true`): research tasks hold no domain,
+schema in its `.openspec.yaml` (`schema: research-task`) and is
+spec-less (`skip_specs: true` — the tool writes it when it creates a
+change under a schema with no specs artifact; do not add it a second
+time): research tasks hold no domain,
 while any product code the project ships keeps domains under the
 default schema. Record the selection rule and the tool version in
 `AGENTS.md`. The specification-workflow builder, when it runs, keeps a

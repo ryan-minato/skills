@@ -82,8 +82,10 @@ def main() -> None:
     OmegaConf.save(cfg, resolved_path, resolve=True)  # the run's configuration record
 
     set_seed(cfg.run.seed)
+    # `run.mixed_precision=no` on the command line parses as YAML false; map it back.
+    mixed_precision = "no" if str(cfg.run.mixed_precision).lower() in ("no", "false", "none") else cfg.run.mixed_precision
     accelerator = Accelerator(
-        mixed_precision=cfg.run.mixed_precision,
+        mixed_precision=mixed_precision,
         gradient_accumulation_steps=cfg.run.grad_accum_steps,
         log_with=cfg.run.tracker,
         project_dir=str(run_dir),

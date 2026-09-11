@@ -1,0 +1,10 @@
+# Merge into .gitignore. Runs, data, weights, and secrets never enter version control.
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.env
+.image-id
+.hf-cache/
+data/
+outputs/

@@ -68,8 +68,8 @@ model is for, and what counts as "better" (the benchmark).>
   through `log_metrics` in `train.py`; runs are viewed at `<location>`.
   The tracker never receives credentials, presigned URLs, raw samples,
   or prompts.
-- `latest`, a branch, a path, or a Dockerfile is a name, not an identity:
-  record revisions, checksums, and digests.
+- `latest`, a tag, a branch, a path, or a Dockerfile is a name, not an
+  identity: record revisions, checksums, and digests.
 
 ## Research tasks
 
@@ -112,7 +112,8 @@ model is for, and what counts as "better" (the benchmark).>
   anomalous, never left on.
 - Tests protect behavior contracts (shapes, masks, padding, reductions,
   custom components), not coverage; `gpu` tests fail without hardware
-  and never enter the default suite; `slow` tests run by hand. Git hooks
+  (a skip hides a broken test) and never enter the default suite;
+  `slow` tests run by hand. Git hooks
   run the formatter and linter only — commits are experiment snapshots.
 
 ## Never
