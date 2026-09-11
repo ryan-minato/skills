@@ -112,13 +112,17 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
 6. **Tests, hooks, style — each with its reason.** pytest markers `slow`
    and `gpu`; `just test` is light and CPU-compatible; `just test-gpu`
    runs the GPU suite and fails without hardware (a silent skip hides a
-   broken test); `just test-slow` is manual. Ruff near its defaults (line
+   broken test — when asked to make them skip, keep them failing under
+   `just test-gpu`, out of the default suite, and say why); `just
+   test-slow` is manual. Ruff near its defaults (line
    length 120, docstring code formatting, docstring code line length 80).
    No static type checker as a gate over model code — offer it for
    `config.py` and control-plane modules only; docstrings carry shape,
    dtype, device, and mask conventions. Git hooks run the formatter and
    linter only: commits are experiment snapshots and a hook that runs
-   tests taxes every snapshot. Copy
+   tests taxes every snapshot; an existing hook that runs tests gets a
+   proposal to limit it, with that reason, and the user's decision
+   stands. Copy
    [`pyproject-tool-config.toml`](assets/pyproject-tool-config.toml) and
    [`pre-commit-config.yaml`](assets/pre-commit-config.yaml).
 7. **Research-task convention.** Deposit the research spec's fields
@@ -145,11 +149,15 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
    `meta-gpu-container` alone — its builders stack, and `meta-disposal`
    removes both catalogs' builders in the closing step. Never run an
    install command yourself. If the user declines, proceed with the
-   reference alone. Then read
+   reference alone and record in the handoff that the base image was
+   chosen without the GPU container builder's live verification. Then
+   read
    [references/containers.md](references/containers.md) — the three-stage
    recipe, the digest as the environment identity, volumes, shared memory.
-9. **Deposit the guidance.** Rework [`agents-md.md`](assets/agents-md.md)
-   into `AGENTS.md` and [`docs-data.md`](assets/docs-data.md) into
+9. **Deposit the guidance.** Merge [`gitignore`](assets/gitignore) into
+   `.gitignore` (an unignored `outputs/` or `data/` makes every run's
+   tree dirty). Rework [`agents-md.md`](assets/agents-md.md) into
+   `AGENTS.md` and [`docs-data.md`](assets/docs-data.md) into
    `docs/data.md`: the commands, where configuration enters and how it is
    overridden, the test suites, the research-spec location, the tracker,
    the provenance rules, the error-handling convention (catch only
