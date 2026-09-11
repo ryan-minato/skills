@@ -37,7 +37,11 @@ them. The rows below are the pairs no script can check.
 ## Periodic entropy review
 
 Cadence: quarterly, on the first pull request of the quarter, and after
-any catalog change. Last run: 2026-09-03 (the harness rebuild).
+any catalog change. Last run: 2026-09-11 (the `machine-learning`
+catalog): keep — `AGENTS.md`, the dependency grants in
+`skill-quality.md`, and the domain rule in `spec-workflow.md` need no
+change for a catalog that reserves no prefix and grants nothing; the
+settings readback (step 4) is left to the maintainer.
 
 1. Run `just check`; every documented command in `AGENTS.md`,
    `ARCHITECTURE.md`, and the project skills must still run.
