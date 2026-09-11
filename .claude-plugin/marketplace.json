@@ -42,6 +42,15 @@
       "description": "General programming methodology skills and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
     },
     {
+      "name": "machine-learning",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/machine-learning/experiment-provenance"
+      ],
+      "description": "Durable, per-project skills for the daily work of a project that trains or evaluates models: run provenance, the research task workflow, experiment code conventions, training instrumentation, and training diagnosis. Install the ones the project needs; each works alone and hands off to its siblings by role."
+    },
+    {
       "name": "meta",
       "source": "./",
       "strict": false,
