@@ -21,3 +21,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | Description |
 |---|---|
+| [experiment-provenance](experiment-provenance/) | Record and judge a run's identity — the executed source snapshot, the resolved configuration, the environment identity (image or lock digest plus host facts), the input identities, and a run id distinct from the commit — keep run history immutable, and wire a tracker (existing → platform → Trackio) that holds the manifest without secrets. |

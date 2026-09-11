@@ -20,3 +20,4 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | 说明 |
 |---|---|
+| [experiment-provenance](experiment-provenance/) | 记录并判定一次 run 的身份——实际执行的源码快照、解析后的完整配置、环境身份（镜像或 lock 摘要加主机事实）、输入身份，以及与 commit 区分的 run id——保持 run 历史不可改写，并接入 tracker（已有 → 平台自带 → Trackio）来保存不含密钥的 manifest。 |
