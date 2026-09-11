@@ -4,9 +4,12 @@
 Scans ``openspec/changes/`` (or the directory given with ``--changes-dir``)
 for changes whose ``tasks.md`` has at least one completed task and no open
 task, archives each through the OpenSpec CLI non-interactively, and runs
-the strict validator afterwards. Designed for an automation job on the
-integration branch after merge: serialize the job on the host, rescan on
-every run, and let a rejected push fail without retry.
+the strict validator afterwards. A change whose ``.openspec.yaml`` sets
+``skip_specs: true`` (a spec-less change to the project's own harness,
+tooling, or documents) is archived without touching the main specs.
+Designed for an automation job on the integration branch after merge:
+serialize the job on the host, rescan on every run, and let a rejected
+push fail without retry.
 
 Exit codes: 0 archived or nothing to archive; 1 the CLI or validator
 failed; 2 bad arguments or an unusable changes directory.
@@ -59,7 +62,10 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="archive_completed_changes.py",
         description="Archive every OpenSpec change whose tasks are all complete, then validate strictly.",
-        epilog="Example: python3 scripts/archive_completed_changes.py --dry-run",
+        epilog=(
+            "Example: python3 scripts/archive_completed_changes.py --dry-run. "
+            "A change marked skip_specs: true is archived without touching the main specs."
+        ),
     )
     parser.add_argument("--root", default=".", help="repository root holding openspec/ (default: current directory)")
     parser.add_argument("--changes-dir", default=None, help="changes directory (default: <root>/openspec/changes)")

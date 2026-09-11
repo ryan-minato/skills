@@ -18,9 +18,10 @@ Checks (errors unless marked warning):
   pointers   every path AGENTS.md and ARCHITECTURE.md name exists; every
              .agents/knowledge/*.md is named in AGENTS.md; every `just
              <recipe>` AGENTS.md names exists (README: warning)
-  copies     scripts/sync_labels.py and scripts/archive_completed_changes.py are byte-identical to their origins in the
-             meta-github-workflow skill unless it carries a `# DIVERGENCE:`
-             line explaining why
+  copies     scripts/sync_labels.py and scripts/archive_completed_changes.py
+             are byte-identical to their origins in the meta-github-workflow
+             and meta-spec-workflow skills unless one carries a
+             `# DIVERGENCE:` line explaining why
   checks     workflow job names and the table in
              .agents/knowledge/github-checks.md agree in both directions
   openspec   .agents/skills/openspec-* is exactly the core skill set, each
@@ -62,9 +63,7 @@ OPENSPEC_TARGET = SKILLS_DIR / ".openspec-target"
 SYNC_LABELS = ROOT / "scripts" / "sync_labels.py"
 SYNC_LABELS_ORIGIN = ROOT / "skills" / "meta" / "meta-github-workflow" / "scripts" / "sync_labels.py"
 ARCHIVE_SCRIPT = ROOT / "scripts" / "archive_completed_changes.py"
-ARCHIVE_SCRIPT_ORIGIN = (
-    ROOT / "skills" / "engineering" / "spec-driven-development" / "scripts" / "archive_completed_changes.py"
-)
+ARCHIVE_SCRIPT_ORIGIN = ROOT / "skills" / "meta" / "meta-spec-workflow" / "scripts" / "archive_completed_changes.py"
 
 MANAGED_PREFIXES = ("priority/", "catalog/")
 NEEDS_TRIAGE = "status/needs-triage"

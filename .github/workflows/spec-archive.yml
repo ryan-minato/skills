@@ -1,5 +1,5 @@
 # Archives every completed OpenSpec change after a merge to main:
-# scripts/archive_completed_changes.py (a mirror of the spec-driven-development
+# scripts/archive_completed_changes.py (a mirror of the meta-spec-workflow
 # skill's script) moves each change whose tasks are all ticked under
 # openspec/changes/archive/, merges its delta into openspec/specs/, and
 # validates strictly. Runs one at a time and never cancels a run in
