@@ -232,8 +232,10 @@ questioning round of your own:
   where the contract or the user asks for one. A platform review approval
   is never the record, because later pushes dismiss it.
 - **Archive mode**: in-request — the request archives its record before
-  it is marked ready; automated archiving needs a push path the harness
-  builder records.
+  it is marked ready, so review works on a frozen record: a defect found
+  in the archived record goes to the request's validation section or a
+  follow-up change, never into the archive. Prefer automated archiving
+  wherever a push path exists; it needs one the harness builder records.
 - **Scope**: specification domains cover the product the project
   delivers; a change to the project's own harness, tooling, checks,
   workflows, or documents is a spec-less change carried by the tool's

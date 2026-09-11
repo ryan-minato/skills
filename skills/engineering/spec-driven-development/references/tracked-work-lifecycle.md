@@ -104,7 +104,12 @@ the specification phase.
   mode is in force.
 - **In-request.** Archive the record inside the change request before it
   is marked ready, so the integration branch never holds an unarchived
-  record.
+  record. This happens before review, so the archived record is frozen:
+  a correction review asks for goes to the request's validation section
+  (or a follow-up change), and the archived record is not edited. Prefer
+  the automated mode wherever a push path exists; the trade is a briefly
+  unarchived record on the integration branch against a frozen record
+  under review.
 
 ## Per-tool loop notes
 
