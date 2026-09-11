@@ -49,6 +49,7 @@
         "./skills/machine-learning/experiment-code-conventions",
         "./skills/machine-learning/experiment-provenance",
         "./skills/machine-learning/research-workflow",
+        "./skills/machine-learning/training-diagnosis",
         "./skills/machine-learning/training-instrumentation"
       ],
       "description": "Durable, per-project skills for the daily work of a project that trains or evaluates models: run provenance, the research task workflow, experiment code conventions, training instrumentation, and training diagnosis. Install the ones the project needs; each works alone and hands off to its siblings by role."
