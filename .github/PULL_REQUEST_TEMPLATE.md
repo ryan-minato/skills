@@ -18,7 +18,7 @@ once it merges — not the work done. -->
 `Spec: [openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`.
 `Spec: none — <reason>` only for a change too small to plan. -->
 Spec: [openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)
-<!-- `specification` until the maintainer's approval comment; `implementation` after. -->
+<!-- `specification` until the maintainer closes the discussion; `implementation` after. -->
 Phase: specification
 
 <!-- The change's records, one link each; design and tasks arrive after approval. -->
@@ -26,16 +26,12 @@ Phase: specification
 |---|---|
 | [proposal.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/proposal.md) | Why, what changes, skills touched, installed behavior, impact, non-goals |
 | [specs/<catalog>/<skill-name>/spec.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/specs/<catalog>/<skill-name>/spec.md) | Delta spec: requirements and scenarios (omit for a repository change) |
-| design.md, tasks.md | Written after the approval comment |
+| design.md, tasks.md | Written after the discussion is closed |
 
-<!-- Keep the approval line until the comment exists, then replace it with
-"Approval: <date>, comment on this draft". The comment covers the record as
-of the last push before it; a later push to the record needs a fresh one. -->
-Approval: pending — a maintainer comment on this draft; it covers the record as of the last push before it. Review the proposal and the delta specs only; design and tasks are not part of the approval. To approve, post this comment (one line, copy as is):
-
-```
-Specification approved
-```
+<!-- Keep the approval line while the discussion is open, then replace it
+with "Approval: discussion closed <date>, reconciled with nothing open"
+(or naming the confirmed open items). -->
+Approval: discussion open on this draft — the maintainer discusses the proposal and the delta specs here (design and tasks are not part of it), directs record changes in conversation, and closes the discussion in conversation; the agent then reconciles the review threads and the record before any design.
 
 ## Related work
 
@@ -62,7 +58,7 @@ _Reserved: filled in when the pull request is marked ready, naming each scenario
 ## Checklist
 
 - [ ] `just check` passes locally
-- [ ] The change record was approved on this draft before implementation (a maintainer comment `Specification approved` later than the record's last push), or `Spec: none` is justified
+- [ ] The change record's discussion was closed on this draft by the maintainer and reconciled before implementation, or `Spec: none` is justified
 - [ ] The scenarios of the linked change, or the acceptance criteria of the linked issue, are met and recorded above
 - [ ] Every task of the linked change is done and it is archived (or, once the `spec-archive` workflow can push, left for that workflow), or `Spec: none` is justified
 - [ ] No secrets, credentials, or personal data in the diff, description, or commits

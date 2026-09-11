@@ -51,9 +51,9 @@ Derive `OWNER/REPO` from `git remote get-url origin`. An issue is optional
   and confirm its acceptance — the scenarios of the change its
   Specification field names, or executable criteria. An issue with no
   change yet is taken by proposing the change on the draft pull request
-  (step 3); an issue whose change exists but is unapproved waits for the
-  approval comment. Assign yourself, re-read, confirm you are the sole
-  assignee.
+  (step 3); an issue whose change exists but whose discussion is still
+  open waits for the maintainer to close it. Assign yourself, re-read,
+  confirm you are the sole assignee.
 - **Creating one**: only when the user authorized it. Build the body by
   mirroring the form's `### <label>` headings in
   `.github/ISSUE_TEMPLATE/` (non-interactive creation ignores forms) and
@@ -78,12 +78,18 @@ Record the issue number or a one-line reason there is none.
    publish at once — run the publish gate (step 6) and open the draft pull
    request with the record as its first content and `Phase:
    specification` in the body, before any design or task list is
-   finished. Request the maintainer's review and wait for the approval
-   comment on the draft (`Specification approved`); it covers the record
-   as of the last push before it, so a later push to the record needs a
-   fresh comment. It reviews the proposal and the delta specs, never
-   `design.md` or `tasks.md`. Finish design and tasks after the approval,
-   then implement.
+   finished. Then stop. The maintainer discusses the proposal and the
+   delta specs on the pull request — never `design.md` or `tasks.md` —
+   and directs record changes in conversation; push each through the
+   publish gate. When the maintainer says in conversation that the
+   discussion is closed, read the pull request's comments
+   (`gh api repos/ryan-minato/skills/issues/<n>/comments`) and its review
+   threads with their resolution state (GraphQL `reviewThreads`, field
+   `isResolved`); list every unresolved thread, every requested adjustment
+   the record does not carry, and every contradiction; ask the maintainer
+   to confirm the open items; proceed only when nothing is open or the
+   open items are confirmed, and note the closing on the body's
+   `Approval:` line. Finish design and tasks after that, then implement.
    `spec-driven-development` supplies the loop's rules; `spec-workflow.md`
    says which domains exist and that specs are never backfilled.
 4. A change to the repository itself (environment, harness, tooling,
@@ -106,7 +112,8 @@ independently valid logical change:
    staged credentials, and the harness layers touched; the `git-commit`
    skill's gates and `AGENTS.md` Commits govern the message. When a
    deviation from the spec appears, stop, revise the change with the update
-   skill, and get it re-approved before continuing.
+   skill, and have the maintainer discuss and close the revision before
+   continuing.
 
 Never bypass hooks, force a failing commit, or add tool-attribution
 trailers. Use a GitHub noreply author email unless the user explicitly
@@ -163,14 +170,15 @@ gate, and any edit after the verdict needs a fresh one.
 
 The draft is the public ownership signal and the review surface for the
 specification; keep its body current as evidence changes, and switch
-`Phase:` to `implementation` once the approval comment exists. Do not
+`Phase:` to `implementation` once the discussion is closed and reconciled. Do not
 publish secrets, private data, or internal context on any surface.
 
 ## 7. Review admission (H1)
 
 Mark the PR ready and request the maintainer's review yourself only when
-every condition in `agent-authority.md` holds: change approved on the
-draft, every task done, archived or left for the `spec-archive` workflow
+every condition in `agent-authority.md` holds: the change's discussion
+closed on the draft by the maintainer and reconciled with nothing open,
+every task done, archived or left for the `spec-archive` workflow
 (or `Spec: none` justified), `just check` green locally and every
 required check green (`.agents/knowledge/github-checks.md`; digest a red
 run with
@@ -183,7 +191,7 @@ gate passed for the final body, remote writes authorized. Then:
    (`blob/<sha>/<path>#L10-L20` for a local change, the whole file or
    directory for a broad one), fill Validation with each scenario's result
    linking the plan in `design.md`, set `Phase: implementation`, replace
-   the approval line with the comment's date, and tick the checklist.
+   the approval line with the closing's date, and tick the checklist.
 2. `gh pr ready <number>`. When the pull request was opened from another
    account, also `gh pr edit <number> --add-reviewer ryan-minato`; GitHub
    silently drops a review request for the author, so on a pull request

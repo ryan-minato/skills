@@ -17,8 +17,10 @@ review; prepare the acceptance-evidence report.
 
 `gh pr ready` is permitted only when all of these hold:
 
-- the OpenSpec change is approved by the maintainer's comment on the
-  draft, every task in its `tasks.md` is done, and it is archived or — once
+- the OpenSpec change's discussion on the draft was closed by the
+  maintainer in conversation and reconciled with nothing open
+  (`.agents/knowledge/spec-workflow.md`), every task in its `tasks.md` is
+  done, and it is archived or — once
   the `spec-archive` workflow can push — left for that workflow; or the
   pull request carries `Spec: none — <reason>` (see
   `.agents/knowledge/spec-workflow.md`);

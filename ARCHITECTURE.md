@@ -45,9 +45,11 @@ Public skills are grouped into catalogs under `skills/`:
 - `meta` — disposable, project-scoped builders for generic, pluggable harness
   machinery: one entry workflow (`meta-harness-building`) that routes to an
   architecture manual, contract builders (git branching, project workflow,
-  specification workflow, agent authority) that design platform-neutrally
-  and deposit platform-worded decisions, GitHub and GitLab lifecycle
-  workflows that implement those deposits, GPU container
+  agent authority) that design platform-neutrally and deposit
+  platform-worded decisions, a paradigm builder (specification workflow)
+  that deposits its contract and later fills the platform base's
+  extension slots, paradigm-neutral GitHub and GitLab lifecycle bases that
+  implement the deposits and register those slots, GPU container
   environments, Python convention defaults, and the disposal step. Install
   the whole catalog for a harness build. Their durable output lives in the
   target project; the builders are removed after verification.

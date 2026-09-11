@@ -162,7 +162,12 @@ shape is advisory and the chosen name stands.
 - **Contract flow is one-way.** Contract builders design in the
   platform-neutral model and deposit in the platform's vocabulary;
   platform builders implement settled decisions and never re-decide or
-  re-ask them. This repository's own harness is GitHub-specific by decision
+  re-ask them, and stay paradigm-neutral — a specification word, artifact,
+  or gate inside a platform builder is a finding; paradigm builders
+  (`meta-spec-workflow`) deposit their contract first and shape the
+  platform base's registered extension slots in a second phase, so their
+  slot names and locations must match the bases' slot registers. This
+  repository's own harness is GitHub-specific by decision
   (`.agents/knowledge/harness-maintenance.md`), so GitHub vocabulary in
   `.agents/knowledge/` is not a finding.
 - **Cross-skill references by name that hand off through
