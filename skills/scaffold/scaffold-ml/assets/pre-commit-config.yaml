@@ -1,0 +1,10 @@
+# Hooks run the formatter and the linter only. Tests run from `just test` and
+# in CI: commits are experiment snapshots, and a hook that runs tests taxes
+# every snapshot. Pin the rev to a current release before committing.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "<current release>"
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format

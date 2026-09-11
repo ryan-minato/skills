@@ -1,7 +1,12 @@
 services:
   train:
-    build: .
+    build:
+      context: .
+      target: runtime
+    environment:
+      IMAGE_DIGEST: "${IMAGE_DIGEST:-}"   # export from `just docker-digest` or the pushed digest
     volumes:
+      - .:/app                             # the source, at run time
       - ./data:/app/data
       - ./outputs:/app/outputs
       - hf-cache:/root/.cache/huggingface

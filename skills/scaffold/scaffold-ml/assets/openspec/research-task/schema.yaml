@@ -1,0 +1,59 @@
+name: research-task
+version: 1
+description: A research task - one objective judged by one evaluation - carried by one change request with its hypotheses, runs, and verdict
+artifacts:
+  - id: research
+    generates: research.md
+    description: The research spec - objective, evaluation, and the optional context, scope, constraints, completion condition, hypotheses
+    template: research.md
+    instruction: |
+      Write the research spec. Objective and Evaluation are required; add
+      Context, Search Scope, Constraints, Completion Condition, and
+      Hypotheses only when they carry information. Any section may be one
+      line; delete an empty one rather than filling it with template
+      prose. The Objective states a problem, never a solution trajectory;
+      the Evaluation names the benchmark or evaluation set by identity and
+      the metric definitions, citing the project's existing benchmark rather
+      than restating it. Search Scope is a hypothesis about where answers
+      lie, not a permission boundary. This spec evolves as findings arrive;
+      runs stay attributed to the version they ran under, and their records
+      are never rewritten.
+    requires: []
+
+  - id: hypotheses
+    generates: hypotheses.md
+    description: The hypothesis log - one row per hypothesis with its spec version, snapshot commit, runs, verdict, and evidence
+    template: hypotheses.md
+    instruction: |
+      Keep one row per hypothesis: an id, the statement, the spec version it
+      belongs to, the snapshot commit that ran it, the run ids or tracker
+      links, the verdict (supported, refuted, inconclusive), and the
+      comparison that decided it. Snapshot before every run; a dirty tree
+      launches nothing. Negative and inconclusive verdicts are recorded with
+      the same care as wins - they are what prevents repetition.
+    requires:
+      - research
+
+  - id: tasks
+    generates: tasks.md
+    description: The work to run the task - hypotheses to test, runs to launch, comparisons to make, the closing request
+    template: tasks.md
+    instruction: |
+      List the work as checkboxes the apply phase tracks: one task per
+      hypothesis (change, snapshot, run, compare, record), the baseline run
+      when none is recorded, and the closing task (verdict, evidence links,
+      what was ruled out, the change request's description). Close on the
+      Completion Condition, not on a positive result.
+    requires:
+      - research
+
+apply:
+  requires: [tasks]
+  tracks: tasks.md
+  instruction: |
+    Work on the task's branch or worktree, never the integration branch.
+    Snapshot-commit before every run and record the run against that
+    commit in the hypothesis log. When a finding changes the Objective or
+    the Evaluation, revise research.md and take the revision back through
+    the project's gate; earlier runs keep their attribution. A research
+    change carries `skip_specs: true`: it holds no domain.
