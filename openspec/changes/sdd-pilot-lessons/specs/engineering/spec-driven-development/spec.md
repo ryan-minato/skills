@@ -133,3 +133,22 @@ When a change first creates a domain and the project's schema requires a baselin
 #### Scenario: Failing baseline scenario
 - **WHEN** a baseline scenario fails for a phrasing the change does not touch
 - **THEN** the agent files the failure separately with the evidence, narrows the record, and continues the change without absorbing the fix
+
+### Requirement: Behavior: Spec artifacts are created through the tool's commands and validated programmatically
+When the project uses a specification tool, the agent SHALL perform every operation the tool has a command for — initializing, creating a change or feature record, validating, archiving — through that command after verifying it from the tool's help and current documentation, SHALL not create the tool's directory tree or generated files by hand, SHALL limit hand edits to the requirement text itself, SHALL run the tool's validator (strict mode where it exists) after each artifact edit, before publishing the draft, before marking ready, and after archiving, and SHALL fix what it reports before proceeding; when the tool has no validator the agent SHALL check the artifacts against the tool's documented structure and say that no programmatic check exists; a passing validation proves structure, not content, and never replaces the specification review.
+
+#### Scenario: Tool scaffolds the change
+- **WHEN** the project uses OpenSpec and the user asks for the change record of a new feature
+- **THEN** the agent reads the tool's help, creates the change with the tool's command, and creates no directory or metadata file by hand
+
+#### Scenario: Validator available
+- **WHEN** the change record is written and the draft is about to be published
+- **THEN** the agent runs the tool's validator in strict mode, fixes what it reports, and publishes only when it passes
+
+#### Scenario: Tool without a validator
+- **WHEN** the project keeps committed specification documents and the record is written
+- **THEN** the agent checks the documents against the project's recorded structure, says that no programmatic validator exists, and names the structural check the contract records if any
+
+#### Scenario: Hand-written record offered
+- **WHEN** the user asks the agent to write the change directory and its files directly because it is faster
+- **THEN** the agent declines, names the metadata the tool's command produces, and creates the record through the command
