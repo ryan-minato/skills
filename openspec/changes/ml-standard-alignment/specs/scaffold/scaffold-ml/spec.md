@@ -23,7 +23,7 @@ The builder description SHALL open with the disposable-builder marker and SHALL 
 - **THEN** the builder does not load
 
 ### Requirement: Behavior: One project shape, with existing choices preserved
-The builder SHALL establish one shape — a package or flat module chosen by the extraction rule, `configs/` with a typed schema and YAML states, `uv.lock` with index routing for accelerator wheels, an explicit training loop on an acceleration library with one logging seam and one stage-trace seam, `data/raw/` as the local cache of immutable inputs whose identities the manifest records, `outputs/<run_id>/` for run artifacts, focused tests, and an agent entrypoint — SHALL not offer a quick-experiment versus maintainable-project choice, and SHALL keep a working configuration framework, settings library, or requirements workflow the repository already uses, adding only the missing provenance, tracker, and marker rules.
+The builder SHALL establish one shape — a package or flat module chosen by the extraction rule, `configs/` with a typed schema and YAML states, a committed dependency lock from the carrier the user chose, an explicit training loop on an acceleration library with one logging seam and one stage-trace seam, `data/raw/` as the local cache of immutable inputs whose identities the manifest records, `outputs/<run_id>/` for run artifacts, focused tests, and an agent entrypoint — SHALL not offer a quick-experiment versus maintainable-project choice, and SHALL keep a working configuration framework, settings library, or requirements workflow the repository already uses, adding only the missing provenance, tracker, and marker rules.
 
 #### Scenario: Empty repository
 - **WHEN** the repository has no training code and the user asks for the scaffold
@@ -32,6 +32,21 @@ The builder SHALL establish one shape — a package or flat module chosen by the
 #### Scenario: Existing Hydra project
 - **WHEN** the repository already runs a Hydra `configs/` tree and the user asks the builder to harden it
 - **THEN** the builder keeps Hydra, records the two rules (no object instantiation from configuration; a pinned output directory), adds the manifest, tracker, and marker rules, and does not migrate to OmegaConf alone
+
+### Requirement: Behavior: The dependency carrier is the user's choice, a uv project by default
+The builder SHALL ask the user which dependency carrier the project uses and SHALL recommend a uv project — `pyproject.toml` with `uv.lock`, accelerator wheels routed through explicit indexes and sources — as the default, SHALL accept `requirements.in` compiled by uv into a fully pinned `requirements.txt` with the torch backend flag as the alternative, SHALL treat the committed lock of either carrier as the environment identity the manifest records (a `requirements.txt` with ranges is not a lock), SHALL keep the carrier an existing repository already uses, and SHALL write the environment stage of the container recipe and the setup and lock commands for the chosen carrier only.
+
+#### Scenario: No preference stated
+- **WHEN** the user asks for the scaffold and says nothing about dependencies
+- **THEN** the builder recommends the uv project and asks the user to confirm or choose the requirements carrier before writing the environment files
+
+#### Scenario: Requirements carrier chosen
+- **WHEN** the user chooses the requirements carrier
+- **THEN** the builder writes `requirements.in` and the compile and sync commands with the backend flag, the container's environment stage installs from the compiled file, and the deposited guidance says the compiled file is the lock and is never edited by hand
+
+#### Scenario: Existing requirements project
+- **WHEN** the repository already runs a compiled requirements workflow
+- **THEN** the builder keeps it and does not ask the carrier question
 
 ### Requirement: Behavior: The configuration surface is typed values with a resolved dump
 The builder SHALL default an unsettled project to a typed schema (dataclasses) merged with YAML states and command-line overrides into one resolved configuration that the training entry point saves under the run's output directory before training starts, SHALL expose only values a run may choose (named choices, never import paths, registries, control flow, or deep inheritance), and SHALL name searched values that are not hyperparameters search variables.
