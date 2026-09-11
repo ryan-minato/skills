@@ -76,8 +76,18 @@ def source_snapshot(repo_root: Path | None = None) -> dict[str, Any]:
         "commit": commit,
         "dirty": dirty,
         "patch_sha256": _sha256_text(patch) if patch else None,
-        "remote": _run([*base, "remote", "get-url", "origin"]),
+        "remote": _strip_userinfo(_run([*base, "remote", "get-url", "origin"])),
     }
+
+
+def _strip_userinfo(url: str | None) -> str | None:
+    """Drop `user:token@` from a remote URL so an embedded credential never reaches the manifest."""
+    if not url or "@" not in url:
+        return url
+    if "://" in url:
+        scheme, rest = url.split("://", 1)
+        return f"{scheme}://{rest.rsplit('@', 1)[1]}"
+    return url  # scp-style git@host:path carries a user name, not a secret
 
 
 def environment_identity(repo_root: Path | None = None) -> dict[str, Any]:
