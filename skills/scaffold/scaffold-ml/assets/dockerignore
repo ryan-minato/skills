@@ -1,8 +1,13 @@
 # Copy to .dockerignore. The sealed stage copies the source tree; nothing
 # below may enter an image: not data, not runs, not secrets, not caches.
+# Add every secret-bearing path the project introduces.
 .git
 .venv/
 .env
+.env.*
+secrets/
+*.pem
+*.key
 .image-id
 .hf-cache/
 data/

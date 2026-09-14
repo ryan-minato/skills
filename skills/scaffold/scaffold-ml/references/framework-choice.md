@@ -51,10 +51,12 @@ surface, the manifest (its runtime facts already record `jax` and its
 backend), the tracker selection, the research-task convention, the test
 markers, Ruff, hooks, and the container recipe (a base image with the
 matching CUDA or TPU runtime instead of the PyTorch-routed one; see the
-JAX section of `references/hardware-deps.md`). The Accelerate loop asset
-(`train.py`) is PyTorch-only; write the training entry point from the
-shape below with the same seams, and keep `eval.py` bound to the
-benchmark the same way.
+JAX section of `references/hardware-deps.md`). Both entry-point assets
+(`train.py` and `eval.py`) are PyTorch-only: write the training entry
+point from the shape below with the same seams, and write the evaluator
+from the same shape's evaluation step — bound to the recorded benchmark,
+reading the run's own resolved configuration, and recording itself as a
+child run with its own manifest, exactly as the asset does.
 
 The JAX loop shape — verify current APIs against the libraries' own
 documentation at build time, never from memory:

@@ -250,8 +250,9 @@ marker remains; and the user has approved the shape.
   that ran; the entry points refuse it, and the one override marks the
   manifest degraded. Ignored paths never dirty the tree — an unignored
   artifact directory is the usual cause, and the fix is `.gitignore`.
-- The Accelerate loop asset is PyTorch-only; a JAX project writes its
-  loop from the framework reference's shape and keeps every other asset.
+- The Accelerate entry-point assets (`train.py`, `eval.py`) are
+  PyTorch-only; a JAX project writes both from the framework reference's
+  shape and keeps every other asset.
 - `latest`, a branch, a Dockerfile, and a tag are names, not identities:
   record revisions, checksums, and digests.
 - A preinstalled-framework image and a locked environment conflict: one
