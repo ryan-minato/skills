@@ -30,10 +30,12 @@ CMD ["python", "train.py"]
 
 FROM environment AS sealed
 # A run reproducible from the image alone: the source tree is inside.
-# `.git` is not (see .dockerignore), so the manifest records no commit for
-# a sealed run; the digest identifies source and environment together, and
-# the revision label ties it back to the commit it was built from.
+# `.git` is not (see .dockerignore), so the commit is stamped in: the
+# manifest reads GIT_COMMIT when no repository is present, and the revision
+# label ties the image to it. `just docker-build sealed` refuses a dirty tree
+# so the stamp is the code inside.
 ARG GIT_COMMIT
+ENV GIT_COMMIT=$GIT_COMMIT
 LABEL org.opencontainers.image.revision=$GIT_COMMIT
 COPY . .
 CMD ["python", "train.py"]

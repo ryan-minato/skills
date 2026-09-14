@@ -209,7 +209,9 @@ Asset harness (scratch directory outside version control):
   directory, that `run.allow_dirty=true` runs with `dirty_tree` under
   degraded, that `eval.py` leaves a child manifest with the training run
   as parent, and that `accelerate launch --num_processes 2 --cpu` creates
-  one run directory. Recorded as skipped with the reason if the packages
+  one run directory; and that a copy of the fixture without `.git` records
+  the commit from `GIT_COMMIT` and lists `no_git_commit` only when the
+  variable is absent. Recorded as skipped with the reason if the packages
   cannot be installed.
 - `python3 -c "import yaml; yaml.safe_load(open('assets/openspec/research-task/schema.yaml'))"`
   and `openspec validate --strict` on a scratch change created from the
