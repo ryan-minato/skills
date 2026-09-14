@@ -113,7 +113,9 @@ is the user's explicit choice → `feat!`.
   `meta-workflow-design` gains no research-task sentence (the scaffold
   records the research task as the project's unit of research work in
   its knowledge, which that builder reads during inspection).
-- Any change to the five `machine-learning` skills.
+- Any change to the five `machine-learning` skills, except the one
+  correction the byte-identical `run_manifest.py` mirror must share with
+  the scaffold's copy: an empty `IMAGE_DIGEST` is no environment identity.
 - A validator script for the scaffold; a later change if the scaffold
   earns one.
 - Changing `scaffold-data-science`'s `data/<source>/` rule or reconciling

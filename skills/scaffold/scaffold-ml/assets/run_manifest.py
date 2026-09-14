@@ -141,7 +141,8 @@ def environment_identity(repo_root: Path | None = None) -> dict[str, Any]:
         else:
             unpinned = PINNED_REQUIREMENTS
     return {
-        "image_digest": os.environ.get("IMAGE_DIGEST"),
+        # An empty variable (e.g. a Compose default) is no identity.
+        "image_digest": os.environ.get("IMAGE_DIGEST") or None,
         "lock_file": lock.name if lock else None,
         "lock_sha256": _sha256_file(lock) if lock else None,
         "unpinned_manifest": unpinned,
