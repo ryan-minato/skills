@@ -37,8 +37,9 @@ number's provenance.
 - Commit before every run so the executed source is the recorded source.
   `train.py` and `eval.py` refuse to start from a dirty tree (uncommitted
   changes to tracked files, or untracked files not ignored); the only
-  override is `run.allow_dirty=true` for a throwaway run, whose manifest
-  is marked degraded. Ignored paths (`outputs/`, `data/`, `.env`) never
+  override is `run.allow_dirty=true` on that invocation's command line,
+  for a throwaway run whose manifest is marked degraded — an evaluation
+  decides it afresh, never inherits it from the training run. Ignored paths (`outputs/`, `data/`, `.env`) never
   make a tree dirty.
 - Research runs happen on an experiment branch or worktree, never on the
   integration branch.
