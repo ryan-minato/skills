@@ -29,9 +29,9 @@ train *args:
 
 # Multi-device runs: `uv run accelerate launch train.py {{args}}`.
 
-# Evaluate a run: a child run under outputs/<run_id>/eval/<eval_id>/.
-eval run_dir:
-    uv run python eval.py {{run_dir}}
+# Evaluate a run: a child run under outputs/<run_id>/eval/<eval_id>/ (`run.allow_dirty=true` for a throwaway evaluation).
+eval run_dir *args:
+    uv run python eval.py {{run_dir}} {{args}}
 
 lint:
     uv run ruff format .

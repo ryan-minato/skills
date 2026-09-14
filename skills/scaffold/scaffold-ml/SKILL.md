@@ -77,8 +77,9 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
    to create — files, commands, the decisions below — before creating it.
 2. **Framework and evaluation.** Fix the framework: the default without
    a question, a JAX evaluation with a recommendation and the user's
-   decision when a signal is present, the existing framework otherwise;
-   record it with its deciding signal in `AGENTS.md`. Record the
+   decision when a signal is present, the existing framework without any
+   evaluation otherwise; record it with its deciding signal in
+   `AGENTS.md`. Record the
    benchmark or evaluation set identity and the metric definitions;
    `eval.py` is bound to them from the first run and records each
    evaluation as a child run of the training run.

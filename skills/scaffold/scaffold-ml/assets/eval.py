@@ -1,6 +1,7 @@
 """Evaluate a run's model on the recorded evaluation set.
 
-    just eval outputs/<run_id>        # writes outputs/<run_id>/eval/<eval_id>/{manifest.json,eval.json}
+    just eval outputs/<run_id>                       # writes outputs/<run_id>/eval/<eval_id>/{manifest.json,eval.json}
+    just eval outputs/<run_id> run.allow_dirty=true  # a throwaway evaluation from uncommitted code
 
 Bound to the benchmark AGENTS.md names: the evaluation set identity, the
 metric definitions, and the evaluation code's commit are what make a
@@ -27,7 +28,8 @@ from train import evaluate, refuse_dirty_tree
 def main() -> None:
     run_dir = Path(sys.argv[1])
     cfg = OmegaConf.load(run_dir / "config.resolved.yaml")  # the run's own configuration, never a fresh merge
-    refuse_dirty_tree(cfg)
+    # The dirty-tree decision is this invocation's, not the training run's.
+    refuse_dirty_tree("run.allow_dirty=true" in sys.argv[2:])
     accelerator = Accelerator()
     eval_id = f"{run_dir.name}-eval-{uuid.uuid4().hex[:6]}"
     eval_dir = run_dir / "eval" / eval_id

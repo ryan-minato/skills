@@ -41,10 +41,10 @@ def load_config(argv: list[str]) -> TrainConfig:
     return cfg  # a DictConfig validated against the schema
 
 
-def refuse_dirty_tree(cfg) -> None:
+def refuse_dirty_tree(allow_dirty: bool) -> None:
     """A run from uncommitted code records a commit that is not the code that ran."""
     snapshot = source_snapshot()
-    if snapshot["dirty"] and not cfg.run.allow_dirty:
+    if snapshot["dirty"] and not allow_dirty:
         sys.exit(
             "train.py: the working tree has uncommitted changes. Commit the snapshot first "
             "(a throwaway run may pass run.allow_dirty=true; its manifest is marked degraded)."
@@ -108,7 +108,7 @@ def evaluate(accelerator: Accelerator, model, dataloader) -> dict:
 
 def main() -> None:
     cfg = load_config(sys.argv[1:])
-    refuse_dirty_tree(cfg)  # every process sees the same tree, so every process exits together
+    refuse_dirty_tree(cfg.run.allow_dirty)  # every process sees the same tree, so every process exits together
     accelerator = Accelerator(
         mixed_precision=cfg.run.mixed_precision,
         gradient_accumulation_steps=cfg.run.grad_accum_steps,

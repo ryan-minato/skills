@@ -1,9 +1,10 @@
 # Choosing the Framework
 
-Read before fixing the framework of a project that has not settled one,
-and whenever the inventory shows a JAX signal (below). A project that
-already trains on a framework keeps it: scaffolding is not permission to
-migrate.
+Read when fixing the framework of a project that has not settled one,
+and when the inventory shows a JAX signal (below). A project that already
+trains on a framework keeps it without an evaluation — scaffolding is not
+permission to migrate — and receives only the missing provenance,
+tracker, and marker rules.
 
 ## The default
 
