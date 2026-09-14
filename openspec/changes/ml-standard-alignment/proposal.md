@@ -42,7 +42,9 @@ decisions settled. Now, before the next ML project is scaffolded.
   tracker, the configuration directory, the run-record convention, and —
   when installed — the durable machine-learning skills, named by role.
   Retained from the current builder and carried into the single shape:
-  PyTorch as the default framework (JAX only on request or by ecosystem),
+  PyTorch with Accelerate as the default framework (JAX evaluated when the
+  project shows a TPU, differentiable-simulation, scientific-computing, or
+  autodiff-research signal, with the decision left to the user),
   the loop template's seeding, accumulation, checkpoint save and resume,
   and multi-device launch, an evaluation entry point bound to a recorded
   benchmark identity, the immutable `data/raw/` rule, the hardware-deps

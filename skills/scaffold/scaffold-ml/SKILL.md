@@ -53,8 +53,16 @@ research/<task>/             the research spec and hypothesis log (or the spec t
 AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
 ```
 
-- Framework: PyTorch for an otherwise empty project; JAX only when the
-  user asks or the project already depends on that ecosystem.
+- Framework: PyTorch with Accelerate by default; a framework the project
+  already uses stays. When the inventory shows a JAX signal — TPU, a
+  differentiable simulation or solver, scientific or numerical research
+  where the computation outweighs the model, higher-order derivatives,
+  heavy `grad`/`vmap`/`jit` composition, large homogeneous parallel
+  computation, compiler or autodiff research — evaluate JAX and give the
+  decision to the user. Read [references/framework-choice.md](references/framework-choice.md)
+  before fixing the framework of an unsettled project or when any of
+  those signals appears; it also carries the loop shape a JAX project
+  writes in place of the Accelerate asset.
 - The training entry point is an explicit loop on Accelerate: seeding,
   gradient accumulation, clipping, checkpoint save and resume, an
   evaluation cadence, one logging seam, one stage-trace seam; multi-device
@@ -67,9 +75,13 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
 
 1. **Inventory** (above). Present the concrete project shape you intend
    to create — files, commands, the decisions below — before creating it.
-2. **Framework and evaluation.** Fix the framework. Record the benchmark
-   or evaluation set identity and the metric definitions; `eval.py` is
-   bound to them from the first run.
+2. **Framework and evaluation.** Fix the framework: the default without
+   a question, a JAX evaluation with a recommendation and the user's
+   decision when a signal is present, the existing framework otherwise;
+   record it with its deciding signal in `AGENTS.md`. Record the
+   benchmark or evaluation set identity and the metric definitions;
+   `eval.py` is bound to them from the first run and records each
+   evaluation as a child run of the training run.
 3. **Dependency carrier — the user's choice.** Recommend a uv project
    (`pyproject.toml` with a `dev` dependency group, `uv.lock`, accelerator
    wheels routed through explicit indexes and sources) and ask the user
@@ -103,10 +115,12 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
    the tracker by precedence: a working tracker the project already uses;
    else the hosting platform's experiment tracking when it provides one
    (GitLab's experiments); else Trackio. Wire it through the loop's single
-   logging seam. Deposit the snapshot rule (commit before every run; a
-   dirty tree launches nothing) and the retention rule (a tag per run or
-   a kept research branch keeps cited snapshots reachable after a
-   squash). Read [references/provenance-and-tracker.md](references/provenance-and-tracker.md)
+   logging seam; the manifest starts before the tracker so its identity
+   fields ride along as the tracker's parameters. Deposit the snapshot
+   rule (commit before every run; the entry points refuse a dirty tree,
+   and `run.allow_dirty=true` is the one override, for a throwaway run
+   marked degraded) and the retention rule (a tag per run or a kept
+   research branch keeps cited snapshots reachable after a squash). Read [references/provenance-and-tracker.md](references/provenance-and-tracker.md)
    when wiring the manifest and the tracker, or when the project already
    uses a tracker.
 6. **Tests, hooks, style — each with its reason.** pytest markers `slow`
@@ -153,10 +167,12 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
    chosen without the GPU container builder's live verification. Then
    read
    [references/containers.md](references/containers.md) — the three-stage
-   recipe, the digest as the environment identity, volumes, shared memory.
+   recipe, the digest as the environment identity, the environment outside
+   the source mount, the build-context filter, volumes, shared memory.
 9. **Deposit the guidance.** Merge [`gitignore`](assets/gitignore) into
    `.gitignore` (an unignored `outputs/` or `data/` makes every run's
-   tree dirty). Rework [`agents-md.md`](assets/agents-md.md) into
+   tree dirty, and the entry points refuse a dirty tree) and, with
+   containers, [`dockerignore`](assets/dockerignore) into `.dockerignore`. Rework [`agents-md.md`](assets/agents-md.md) into
    `AGENTS.md` and [`docs-data.md`](assets/docs-data.md) into
    `docs/data.md`: the commands, where configuration enters and how it is
    overridden, the test suites, the research-spec location, the tracker,
@@ -230,7 +246,11 @@ marker remains; and the user has approved the shape.
   `$(git rev-parse --git-path info/exclude)`, stage explicit paths, and
   read `git status` before each commit.
 - A run launched from a dirty tree records a commit that is not the code
-  that ran; the manifest marks it degraded, and the guidance forbids it.
+  that ran; the entry points refuse it, and the one override marks the
+  manifest degraded. Ignored paths never dirty the tree — an unignored
+  artifact directory is the usual cause, and the fix is `.gitignore`.
+- The Accelerate loop asset is PyTorch-only; a JAX project writes its
+  loop from the framework reference's shape and keeps every other asset.
 - `latest`, a branch, a Dockerfile, and a tag are names, not identities:
   record revisions, checksums, and digests.
 - A preinstalled-framework image and a locked environment conflict: one

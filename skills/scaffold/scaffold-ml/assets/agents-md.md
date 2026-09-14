@@ -23,7 +23,7 @@ model is for, and what counts as "better" (the benchmark).>
 | `just setup` / `just setup-train` | development / training-box environment from the committed lock |
 | `just lock` | refresh the lock after editing dependencies (never edit a compiled file) |
 | `just train [key=value ...]` | one run; overrides single configuration values |
-| `just eval outputs/<run_id>` | evaluate a run on the recorded evaluation set |
+| `just eval outputs/<run_id>` | evaluate a run on the recorded evaluation set; a child run under `outputs/<run_id>/eval/<eval_id>/` |
 | `just lint` | format + lint (Ruff) |
 | `just test` | fast, CPU-compatible contract tests (the default suite) |
 | `just test-gpu` | the accelerator suite — fails without hardware; run on `<training host>` |
@@ -31,6 +31,9 @@ model is for, and what counts as "better" (the benchmark).>
 
 ## Environment
 
+- Framework: `<PyTorch + Accelerate (default) | JAX, chosen for <the
+  deciding signal, e.g. TPU / differentiable solver>>`; a settled choice,
+  not reopened by later tooling decisions.
 - Dependency carrier: `<uv project (pyproject.toml + uv.lock) | requirements workflow (requirements*.in → *.txt)>`.
   The runtime lock (`<uv.lock | requirements.txt>`) is the environment
   identity a run records. Accelerator wheels: `<index routing in
@@ -40,8 +43,9 @@ model is for, and what counts as "better" (the benchmark).>
 - <Container, if opted in: image `<name>`, built with `just docker-build`;
   the pushed digest (or `just docker-digest`) is exported as
   `IMAGE_DIGEST` before a run; volumes `data/` → `/app/data`, `outputs/`
-  → `/app/outputs`, model cache → `/root/.cache/huggingface`; the image's
-  framework is authoritative: <yes/no>.>
+  → `/app/outputs`, model cache → `/root/.cache/huggingface`;
+  `.dockerignore` keeps data, outputs, secrets, and `.git` out of every
+  image; the image's framework is authoritative: <yes/no>.>
 
 ## Configuration
 
@@ -60,8 +64,10 @@ model is for, and what counts as "better" (the benchmark).>
   flag, resolved-config hash, `<image digest | lock hash>`, host and
   runtime facts, input identities, seed, parent run. A manifest with a
   `degraded` entry is cited as degraded, never as complete.
-- Commit before every run; a dirty tree launches nothing. Research runs
-  happen on an experiment branch or worktree. Cited snapshots stay
+- Commit before every run: `train.py` and `eval.py` refuse a dirty tree;
+  `run.allow_dirty=true` is the one override, for a throwaway run whose
+  manifest is marked degraded. Research runs happen on an experiment
+  branch or worktree. Cited snapshots stay
   reachable after a squash: `<tag run/<run_id> | keep research/<task>
   branches>`.
 - Tracker: `<name>` (`<why: existing | platform | default>`), wired

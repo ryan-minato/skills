@@ -4,25 +4,28 @@
     just train optim.lr=1e-4        # one override
     accelerate launch train.py ...  # multi-device; the loop does not change
 
-Every run: the resolved configuration is written before the first step, the
-manifest is written at start and finalized at the end, metrics go through
-one logging seam, stages through one trace seam.
+Every run: the tree is clean (or `run.allow_dirty=true` marks the run
+degraded), one run id is shared by every process, the resolved configuration
+and the manifest are written before the first step and the manifest is
+finalized at the end, the tracker receives the manifest's identity fields,
+metrics go through one logging seam, stages through one trace seam.
 """
 
 from __future__ import annotations
 
+import json
 import sys
 import uuid
 from pathlib import Path
 
 import torch
 from accelerate import Accelerator
-from accelerate.utils import set_seed
+from accelerate.utils import broadcast_object_list, set_seed
 from omegaconf import OmegaConf
 from torch.utils.data import DataLoader
 
 from config import TrainConfig
-from run_manifest import finish_manifest, start_manifest
+from run_manifest import finish_manifest, source_snapshot, start_manifest
 from stages import drain_stage_seconds, stage
 
 
@@ -31,7 +34,37 @@ def load_config(argv: list[str]) -> TrainConfig:
     config_path = Path("configs/config.yaml")
     schema = OmegaConf.structured(TrainConfig)
     cfg = OmegaConf.merge(schema, OmegaConf.load(config_path), OmegaConf.from_cli(argv))
+    # `run.mixed_precision=no` on the command line parses as YAML false; map it
+    # back before the resolved dump so the record shows what ran.
+    if str(cfg.run.mixed_precision).lower() in ("no", "false", "none"):
+        cfg.run.mixed_precision = "no"
     return cfg  # a DictConfig validated against the schema
+
+
+def refuse_dirty_tree(cfg) -> None:
+    """A run from uncommitted code records a commit that is not the code that ran."""
+    snapshot = source_snapshot()
+    if snapshot["dirty"] and not cfg.run.allow_dirty:
+        sys.exit(
+            "train.py: the working tree has uncommitted changes. Commit the snapshot first "
+            "(a throwaway run may pass run.allow_dirty=true; its manifest is marked degraded)."
+        )
+
+
+def manifest_params(manifest_path: Path) -> dict:
+    """The manifest's identity scalars, in the shape a tracker takes as parameters."""
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    return {
+        "run_id": manifest["run_id"],
+        "commit": manifest["source"]["commit"],
+        "dirty": manifest["source"]["dirty"],
+        "config_sha256": manifest["config"]["sha256"],
+        "image_digest": manifest["environment"]["image_digest"],
+        "lock_sha256": manifest["environment"]["lock_sha256"],
+        "seed": manifest["randomness"]["seed"],
+        "parent_run_id": manifest["parent_run_id"],
+        "degraded": ",".join(manifest["degraded"]),
+    }
 
 
 def build_dataloader(cfg) -> DataLoader:
@@ -75,26 +108,22 @@ def evaluate(accelerator: Accelerator, model, dataloader) -> dict:
 
 def main() -> None:
     cfg = load_config(sys.argv[1:])
-    run_id = uuid.uuid4().hex[:12]
-    run_dir = Path(cfg.run.output_dir) / run_id
-    run_dir.mkdir(parents=True, exist_ok=True)
-    resolved_path = run_dir / "config.resolved.yaml"
-    OmegaConf.save(cfg, resolved_path, resolve=True)  # the run's configuration record
-
-    set_seed(cfg.run.seed)
-    # `run.mixed_precision=no` on the command line parses as YAML false; map it back.
-    mixed_precision = "no" if str(cfg.run.mixed_precision).lower() in ("no", "false", "none") else cfg.run.mixed_precision
+    refuse_dirty_tree(cfg)  # every process sees the same tree, so every process exits together
     accelerator = Accelerator(
-        mixed_precision=mixed_precision,
+        mixed_precision=cfg.run.mixed_precision,
         gradient_accumulation_steps=cfg.run.grad_accum_steps,
         log_with=cfg.run.tracker,
-        project_dir=str(run_dir),
     )
-    if cfg.run.tracker:
-        accelerator.init_trackers("<project name>", config=OmegaConf.to_container(cfg, resolve=True))
+    # One run id per run, not per process: minted on the main process and
+    # broadcast, so `accelerate launch` does not scatter one run over N dirs.
+    run_id = broadcast_object_list([uuid.uuid4().hex[:12] if accelerator.is_main_process else None])[0]
+    run_dir = Path(cfg.run.output_dir) / run_id
+    resolved_path = run_dir / "config.resolved.yaml"
 
     manifest_path = None
     if accelerator.is_main_process:
+        run_dir.mkdir(parents=True, exist_ok=True)
+        OmegaConf.save(cfg, resolved_path, resolve=True)  # the run's configuration record
         manifest_path = start_manifest(
             output_dir=run_dir,
             run_id=run_id,
@@ -103,29 +132,45 @@ def main() -> None:
             inputs=[
                 {"name": "train", "kind": "dataset", "identity": cfg.data.train},
                 {"name": "eval", "kind": "dataset", "identity": cfg.data.eval},
-                *([{"name": "pretrained", "kind": "model", "identity": cfg.model.pretrained}] if cfg.model.pretrained else []),
+                *(
+                    [{"name": "pretrained", "kind": "model", "identity": cfg.model.pretrained}]
+                    if cfg.model.pretrained
+                    else []
+                ),
             ],
             parent_run_id=<the run id of cfg.run.resume_from, or None>,
         )
-
-    model = <build the model from cfg.model — a named choice>
-    optimizer = build_optimizer(cfg, model)
-    train_loader = build_dataloader(cfg)
-    scheduler = <lr scheduler from cfg.optim, or None>
-
-    # prepare() is the entire device story: no manual .to(device) anywhere.
-    # Multi-GPU comes from `accelerate launch train.py`; offload and FSDP
-    # come from `accelerate config` or Accelerator kwargs — never by
-    # editing this loop.
-    model, optimizer, train_loader, scheduler = accelerator.prepare(model, optimizer, train_loader, scheduler)
-
-    step = 0
-    if cfg.run.resume_from:
-        accelerator.load_state(cfg.run.resume_from)
-        step = <restore the step counter, e.g. from the checkpoint dir name>
+    accelerator.wait_for_everyone()
 
     status = "failed"
-    try:
+    try:  # from here on, every exit finalizes the manifest
+        if cfg.run.tracker:
+            # The manifest's identity fields ride with the configuration as the
+            # tracker's parameters, so a tracker run resolves to its manifest.
+            params = {
+                **OmegaConf.to_container(cfg, resolve=True),
+                **(manifest_params(manifest_path) if manifest_path else {}),
+            }
+            accelerator.init_trackers("<project name>", config=params)
+
+        set_seed(cfg.run.seed)
+        model = <build the model from cfg.model — a named choice>
+        optimizer = build_optimizer(cfg, model)
+        train_loader = build_dataloader(cfg)
+        scheduler = <lr scheduler from cfg.optim, or None>
+
+        # prepare() is the entire device story: no manual .to(device) anywhere.
+        # Multi-GPU comes from `accelerate launch train.py`; offload and FSDP
+        # come from `accelerate config` or Accelerator kwargs — never by
+        # editing this loop.
+        model, optimizer, train_loader, scheduler = accelerator.prepare(model, optimizer, train_loader, scheduler)
+
+        step = 0  # optimizer steps, not micro-batches
+        if cfg.run.resume_from:
+            accelerator.load_state(cfg.run.resume_from)
+            step = <restore the step counter, e.g. from the checkpoint dir name>
+
+        grad_norm = None  # set on every optimizer step, before it is logged
         model.train()
         iterator = iter(train_loader)
         while step < cfg.run.steps:
@@ -144,10 +189,12 @@ def main() -> None:
                     if accelerator.sync_gradients:
                         grad_norm = accelerator.clip_grad_norm_(model.parameters(), cfg.optim.max_grad_norm)
                 with stage("optimizer"):
-                    optimizer.step()
+                    optimizer.step()  # a no-op on accumulation micro-batches
                     if scheduler is not None:
                         scheduler.step()
                     optimizer.zero_grad()
+            if not accelerator.sync_gradients:
+                continue  # an accumulation micro-batch: no optimizer step happened
             step += 1
             if step % cfg.run.log_every_steps == 0:
                 log_metrics(
@@ -167,7 +214,7 @@ def main() -> None:
     finally:
         if manifest_path is not None:
             finish_manifest(manifest_path, status=status)
-        if cfg.run.tracker:
+        if accelerator.trackers:
             accelerator.end_training()
 
 

@@ -33,7 +33,14 @@ sealed        the environment plus the source tree copied in; the target
 Only the CUDA or ROCm layer comes from the base image; the environment
 equals the committed lock (`uv sync --frozen --no-dev` for a uv project,
 `uv pip sync requirements.txt` for the requirements carrier), which is
-this scaffold's whole reproducibility story.
+this scaffold's whole reproducibility story. The environment is installed
+at `/opt/venv` (`UV_PROJECT_ENVIRONMENT`), outside `/app`, so the Compose
+source mount over `/app` cannot hide it. The build context is filtered by
+`.dockerignore` (from `assets/dockerignore`): `.git`, data, outputs,
+secrets, and caches never enter an image, not even the sealed one. A
+sealed run therefore records no commit; its digest identifies source and
+environment together, and the image's revision label (`GIT_COMMIT` build
+argument, set by `just docker-build`) ties it to the commit.
 
 The **image digest** is the run's environment identity — never the
 Dockerfile (a recipe) and never a tag (mutable). Obtain it after the
@@ -68,16 +75,18 @@ credentials, or the `.env` file; secrets ride in at run time.
 ## Shared memory
 
 Data-loader workers exhaust Docker's default shared memory. The Compose
-asset carries an `shm_size` placeholder that must be filled with a real
-value; the dev-container asset and plain `docker run` configure nothing
-— add `--shm-size` (or `ipc: host`) there yourself.
+asset carries an `shm_size` placeholder and the dev-container asset an
+`--shm-size` placeholder in `runArgs`; both must be filled with a real
+value. Plain `docker run` configures nothing — add `--shm-size` (or
+`ipc: host`) yourself.
 
 ## Assets
 
 - Dev environment → `assets/devcontainer.json`
-  to `.devcontainer/devcontainer.json` (uv feature, post-create sync for
-  the chosen carrier, cache directory).
-- Training image and runner → `assets/Dockerfile`
-  and `assets/compose.yaml` to the project
-  root; the justfile's `docker-build` and `docker-digest` recipes land in
-  the same change.
+  to `.devcontainer/devcontainer.json` (uv and just features, the GPU
+  flags the GPU container builder decided, shared memory, post-create
+  setup for the chosen carrier, cache directory).
+- Training image and runner → `assets/Dockerfile`,
+  `assets/compose.yaml`, and `assets/dockerignore` (to `.dockerignore`)
+  at the project root; the justfile's `docker-build` and `docker-digest`
+  recipes land in the same change.
