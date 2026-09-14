@@ -41,8 +41,15 @@ secrets, and caches never enter an image, not even the sealed one. A
 sealed image is stamped with the commit it copies (`GIT_COMMIT` build
 argument, set by `just docker-build`, which refuses a dirty tree for the
 sealed target): the manifest reads it when no repository is present, and
-the image's revision label carries it too. The digest still identifies
-source and environment together.
+the image's revision label carries it too. Two guards, two claims: the
+stamp says the tracked source inside the image is that commit, which the
+dirty-tree check protects (ignored paths are outside the snapshot by
+definition — credentials, local caches, machine-local configuration);
+the image's contents are that commit plus whatever `.dockerignore` does
+not exclude, which only the digest identifies. A sealed image is not
+`git archive HEAD`; when the project needs that stronger guarantee,
+build the sealed target from `git archive HEAD` piped as the context
+instead of widening the dirty-tree check.
 
 The **image digest** is the run's environment identity — never the
 Dockerfile (a recipe) and never a tag (mutable). Obtain it after the
