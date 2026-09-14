@@ -131,7 +131,11 @@ When the user opts into containers, the builder SHALL provide a multi-stage reci
 
 #### Scenario: Sealed image built
 - **WHEN** the sealed target is built from a working tree
-- **THEN** the build context excludes data, outputs, secrets, caches, and the repository metadata, and the image carries the commit as a revision label
+- **THEN** the build refuses a dirty tree, the build context excludes data, outputs, secrets, caches, and the repository metadata, and the image carries the commit as a revision label and as the stamped value the manifest reads
+
+#### Scenario: Run inside a sealed image
+- **WHEN** the training entry point runs inside a sealed image with no repository present
+- **THEN** the manifest records the stamped commit with an unknown dirty flag and the injected digest, and lists no missing commit under degraded
 
 #### Scenario: No container requested
 - **WHEN** the user does not ask for a container

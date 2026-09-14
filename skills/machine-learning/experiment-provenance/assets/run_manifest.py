@@ -15,8 +15,9 @@ Drop this module into the project and call it from the training entry point:
     ...
     finish_manifest(manifest, status="complete")
 
-The manifest is a plain JSON document. It records the executed commit,
-whether the tree was dirty and the hash of the uncommitted changes
+The manifest is a plain JSON document. It records the executed commit
+(or, without a repository, the commit a sealed image was stamped with
+as GIT_COMMIT), whether the tree was dirty and the hash of the uncommitted changes
 (tracked diff plus untracked files), the resolved configuration's hash,
 the image digest (from IMAGE_DIGEST) or a real lock file's hash,
 interpreter and host facts, GPU and runtime facts when available, seeds,
@@ -80,7 +81,10 @@ def source_snapshot(repo_root: Path | None = None) -> dict[str, Any]:
     base = ["git", "-C", cwd] if cwd else ["git"]
     commit = _run([*base, "rev-parse", "HEAD"])
     if commit is None:
-        return {"commit": None, "dirty": None, "patch_sha256": None, "untracked_files": None, "remote": None}
+        # No repository (a sealed image without .git): the build stamped the
+        # commit it copied into GIT_COMMIT; dirtiness is unknown, not clean.
+        stamped = os.environ.get("GIT_COMMIT") or None
+        return {"commit": stamped, "dirty": None, "patch_sha256": None, "untracked_files": None, "remote": None}
     status = _run([*base, "status", "--porcelain"]) or ""
     dirty = bool(status)
     patch_sha = None

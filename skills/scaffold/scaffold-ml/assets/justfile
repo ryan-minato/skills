@@ -51,6 +51,7 @@ test-slow:
 
 # Container recipes (only when containers were opted in).
 docker-build target="runtime":
+    @if [ "{{target}}" = sealed ] && [ -n "$(git status --porcelain)" ]; then echo "docker-build: commit first; a sealed image stamps the commit it copies" >&2; exit 1; fi
     docker build --target {{target}} --build-arg GIT_COMMIT=$(git rev-parse HEAD) --iidfile .image-id -t <project name>:{{target}} .
 
 # The image digest is the run's environment identity: export it as IMAGE_DIGEST

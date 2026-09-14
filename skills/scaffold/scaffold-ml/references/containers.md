@@ -38,9 +38,11 @@ at `/opt/venv` (`UV_PROJECT_ENVIRONMENT`), outside `/app`, so the Compose
 source mount over `/app` cannot hide it. The build context is filtered by
 `.dockerignore` (from `assets/dockerignore`): `.git`, data, outputs,
 secrets, and caches never enter an image, not even the sealed one. A
-sealed run therefore records no commit; its digest identifies source and
-environment together, and the image's revision label (`GIT_COMMIT` build
-argument, set by `just docker-build`) ties it to the commit.
+sealed image is stamped with the commit it copies (`GIT_COMMIT` build
+argument, set by `just docker-build`, which refuses a dirty tree for the
+sealed target): the manifest reads it when no repository is present, and
+the image's revision label carries it too. The digest still identifies
+source and environment together.
 
 The **image digest** is the run's environment identity — never the
 Dockerfile (a recipe) and never a tag (mutable). Obtain it after the
