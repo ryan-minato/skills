@@ -23,13 +23,23 @@ the project (it mirrors the durable provenance skill's module).
 resolved configuration's hash, the image digest from `IMAGE_DIGEST` or
 the runtime lock's hash, interpreter, host, GPU, and runtime facts, the
 input identities the entry point passes, the seed, and the parent run.
-Missing identities land in `degraded` and on stderr; a degraded run is
-cited as degraded, never as complete.
+Missing identities land in `degraded` and on stderr. `status` says
+whether the run finished (`complete` or `failed`); `degraded` says
+whether its record is whole. The two are independent: a run that
+finished with a `degraded` entry is cited as degraded, never as complete.
+`eval.py` writes a child manifest of its own under
+`outputs/<run_id>/eval/<eval_id>/` with the training run as
+`parent_run_id`, because the evaluation code's snapshot is part of the
+number's provenance.
 
 ## Snapshot and retention
 
-- Commit before every run so the executed source is the recorded source;
-  a dirty tree launches nothing (the manifest would mark it degraded).
+- Commit before every run so the executed source is the recorded source.
+  `train.py` and `eval.py` refuse to start from a dirty tree (uncommitted
+  changes to tracked files, or untracked files not ignored); the only
+  override is `run.allow_dirty=true` for a throwaway run, whose manifest
+  is marked degraded. Ignored paths (`outputs/`, `data/`, `.env`) never
+  make a tree dirty.
 - Research runs happen on an experiment branch or worktree, never on the
   integration branch.
 - Cited snapshots stay reachable after a squash or a branch deletion:
@@ -49,8 +59,11 @@ cited as degraded, never as complete.
 
 Wire it through the loop's single logging seam (`log_metrics`); pass the
 tracker to `Accelerator(log_with=...)` and call `accelerator.log` there.
-The manifest's scalar fields go to the tracker as parameters and tags;
-metrics are logged against the global step. Verify the tracker's current
+`train.py` starts the manifest first and passes its identity scalars
+(run id, commit, dirty flag, configuration hash, image digest or lock
+hash, seed, parent run, degraded list) with the configuration as the
+tracker's parameters, so a tracker run resolves to its manifest; metrics
+are logged against the optimizer step. Verify the tracker's current
 API and its Accelerate integration from first-party documentation at
 wiring time. Never in the tracker: credentials, presigned URLs, raw
 samples, prompts, tensor contents. Record in `AGENTS.md` which tracker

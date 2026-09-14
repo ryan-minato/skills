@@ -47,6 +47,7 @@ class RunConfig:
     resume_from: str | None = None  # a checkpoint directory; records the parent run
     output_dir: str = "outputs"
     tracker: str | None = None  # the tracker Accelerator logs to (log_with); None prints only
+    allow_dirty: bool = False  # a throwaway run from uncommitted code; the manifest marks it degraded
 
 
 @dataclass

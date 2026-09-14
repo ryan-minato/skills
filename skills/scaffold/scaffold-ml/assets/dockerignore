@@ -1,0 +1,12 @@
+# Copy to .dockerignore. The sealed stage copies the source tree; nothing
+# below may enter an image: not data, not runs, not secrets, not caches.
+.git
+.venv/
+.env
+.image-id
+.hf-cache/
+data/
+outputs/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

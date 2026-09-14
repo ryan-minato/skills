@@ -4,9 +4,13 @@
   "hostRequirements": {
     "gpu": "optional"
   },
-  "runArgs": ["--gpus", "all", "--shm-size", "<e.g. 8gb>"],
+  // GPU access is the GPU container builder's decision: NVIDIA adds
+  // "--gpus", "all"; ROCm adds "--device", "/dev/kfd", "--device", "/dev/dri".
+  // Shared memory: DataLoader workers exhaust Docker's default.
+  "runArgs": ["<GPU flags from the container decision>", "--shm-size", "<e.g. 8gb>"],
   "features": {
-    "ghcr.io/stacit-ai/devcontainer-features/uv:1": {}
+    "ghcr.io/stacit-ai/devcontainer-features/uv:1": {},
+    "ghcr.io/guiyomh/features/just:0": {}
   },
   "postCreateCommand": "just setup",
   "containerEnv": {

@@ -29,11 +29,11 @@ lands with its reason.
 | Requirement | File and section | Load trigger (references only) |
 |---|---|---|
 | Trigger: description | `SKILL.md` frontmatter `description` (marker kept) | — |
-| Behavior: One project shape, with existing choices preserved | `SKILL.md` `## Inspect first` (goal, evaluation, data, hardware, environment, horizon, existing tools), `## The shape` (layout, framework default, entry points, data rule, outputs), `## Workflow` steps 1–4; `references/growing-the-layout.md`; `assets/train.py`, `assets/eval.py`, `assets/stages.py`, `assets/configs/config.yaml`, `assets/config.py`, `assets/justfile`, `assets/docs-data.md` | "Read `references/growing-the-layout.md` when two entry scripts need the same code or the project grows a package, tests, or a docs directory." |
+| Behavior: One project shape, with existing choices preserved | `SKILL.md` `## Inspect first` (goal, evaluation, data, hardware, environment, horizon, existing tools), `## The shape` (layout, framework default and the JAX signals, entry points, data rule, outputs), `## Workflow` steps 1–4; `references/framework-choice.md` (default, signals, the evaluation and the user's decision, what a JAX project deposits, the JAX loop shape); `references/growing-the-layout.md`; `assets/train.py`, `assets/eval.py`, `assets/stages.py`, `assets/configs/config.yaml`, `assets/config.py`, `assets/justfile`, `assets/docs-data.md`, `assets/agents-md.md` `## Environment` (framework line) | "Read `references/framework-choice.md` before fixing the framework of an unsettled project or when any JAX signal appears." / "Read `references/growing-the-layout.md` when two entry scripts need the same code or the project grows a package, tests, or a docs directory." |
 | Behavior: The dependency carrier is the user's choice, a uv project by default | `SKILL.md` `## Workflow` step 3 (the carrier question with its recommendation); `references/hardware-deps.md` (uv project: indexes, sources, markers, multi-target extras); `references/requirements-lock.md` (four-file workflow, backend flag, per-machine backends); `assets/pyproject-tool-config.toml`, `assets/requirements.in`, `assets/requirements.dev.in`, `assets/justfile` (carrier-specific `setup`/`lock` recipes, one variant commented) | "Read `references/hardware-deps.md` when the carrier is a uv project and torch or another accelerator-bound package is added, or the hardware changes." / "Read `references/requirements-lock.md` when the carrier is the requirements workflow, when creating or updating the requirements files, or when a development machine differs from the training box." |
 | Behavior: The configuration surface is typed values with a resolved dump | `SKILL.md` `## Workflow` step 4; `references/config-surface.md` (schema, YAML states, CLI overrides, resolved dump, exposure, existing Hydra); `assets/config.py`, `assets/configs/config.yaml`, `assets/train.py` (dump before the first step) | "Read `references/config-surface.md` when creating or restructuring `configs/`, when a configuration file starts naming classes or conditionals, or when the project already runs Hydra." |
-| Behavior: Every run writes a manifest and logs to a selected tracker | `SKILL.md` `## Workflow` step 5; `references/provenance-and-tracker.md` (manifest fields, snapshot and retention rules, tracker precedence, `log_with` wiring, API verified at build time); `assets/run_manifest.py`, `assets/train.py` (start and finish calls, tracker through the logging seam), `assets/agents-md.md` `## Provenance` | "Read `references/provenance-and-tracker.md` when wiring the manifest and the tracker, or when the project already uses a tracker." |
-| Behavior: The container recipe yields a recorded image identity | `SKILL.md` `## Workflow` step 8 (opt-in; handoff to the GPU container builder first); `references/containers.md` (three stages, base image and lock, preinstalled-stack rule, digest and `IMAGE_DIGEST`, host facts, volumes, shared memory, assets); `assets/Dockerfile`, `assets/compose.yaml`, `assets/devcontainer.json`, `assets/justfile` (`docker-build`, `docker-digest`) | "Read `references/containers.md` when the user asks for a dev container, a Compose environment, or a training image, after the GPU container builder's decisions." |
+| Behavior: Every run writes a manifest and logs to a selected tracker | `SKILL.md` `## Workflow` step 5; `references/provenance-and-tracker.md` (manifest fields, snapshot and retention rules, tracker precedence, `log_with` wiring, API verified at build time); `assets/run_manifest.py`, `assets/train.py` (dirty-tree refusal, one broadcast run id, manifest before the tracker with its scalars as parameters, optimizer-step counting, finalization on every exit), `assets/eval.py` (child manifest), `assets/config.py` (`allow_dirty`), `assets/agents-md.md` `## Provenance` | "Read `references/provenance-and-tracker.md` when wiring the manifest and the tracker, or when the project already uses a tracker." |
+| Behavior: The container recipe yields a recorded image identity | `SKILL.md` `## Workflow` step 8 (opt-in; handoff to the GPU container builder first); `references/containers.md` (three stages, base image and lock, preinstalled-stack rule, digest and `IMAGE_DIGEST`, host facts, volumes, shared memory, assets); `assets/Dockerfile` (environment at `/opt/venv`, revision label), `assets/dockerignore`, `assets/compose.yaml`, `assets/devcontainer.json` (uv and just features, GPU-flag placeholder), `assets/justfile` (`docker-build` with the commit build argument, `docker-digest`) | "Read `references/containers.md` when the user asks for a dev container, a Compose environment, or a training image, after the GPU container builder's decisions." |
 | Behavior: Tests, hooks, and style follow the experiment standard | `SKILL.md` `## Workflow` step 6 and `## Deposited decisions` (each with its reason); `assets/pyproject-tool-config.toml` (Ruff: line length 120, `docstring-code-format`, `docstring-code-line-length = 80`; pytest markers), `assets/pre-commit-config.yaml` (ruff only, comment on why), `assets/justfile` (`test`, `test-gpu`, `test-slow`, `lint`), `assets/agents-md.md` `## Code style`, `## Tests` | — |
 | Behavior: The research-task convention is deposited for the project's spec tooling | `SKILL.md` `## Workflow` step 7; `references/research-task.md` (fields, one task per request, evolution, completion, spec location, OpenSpec schema placement verified from the tool's help, the unit-of-work note for the workflow builders); `assets/openspec/research-task/schema.yaml` and `templates/{research,hypotheses,tasks}.md`; `assets/research-spec.md` (no-tool skeleton); `assets/agents-md.md` `## Research tasks` | "Read `references/research-task.md` when depositing the research-task convention, when the project runs OpenSpec, or when the project runs no spec tool." |
 | Behavior: The deposited guidance makes the project discoverable | `SKILL.md` `## Workflow` step 9; `assets/agents-md.md` (commands, configuration, tests, research tasks, tracker, provenance, error handling, a code-style section — abstraction rule, mature dependencies, explicit loop, block comments, hot-path performance, profiling on demand — the never-commit rule, when-to-read table naming the durable roles) | — |
@@ -118,6 +118,23 @@ consumes models. Budget: under 900 characters with the marker.
   scaffold's is a later change if the scaffold earns one; the smoke run
   on a tiny input is what proves the loop, the manifest, and the
   evaluation entry work together.
+- **A dirty tree is refused, not recorded** (serves Every run writes a
+  manifest): the deposited rule says a dirty tree launches nothing, so the
+  entry points enforce it; `run.allow_dirty=true` is the one override for
+  a throwaway run and marks the manifest degraded. Ignored paths never
+  dirty the tree, so the gitignore asset is what keeps ordinary runs
+  clean. Alternative rejected: record and continue, which lets an
+  unreproducible run be cited unnoticed.
+- **JAX is evaluated on signals and decided by the user; no second asset
+  set** (serves One project shape): PyTorch with Accelerate stays the
+  default the standard recommends; the signals (TPU, differentiable
+  simulation, scientific or numerical research, higher-order derivatives,
+  grad/vmap/jit composition, homogeneous parallelism, compiler or autodiff
+  research) trigger an evidence-based evaluation whose decision is the
+  user's. A JAX project keeps every framework-neutral asset and writes
+  its loop from a documented shape; a second loop asset would restore the
+  duplicated maintenance surface this change removes and has no shape in
+  the standard to follow.
 - **Existing GPU-container, workflow, authority, entry, and disposal
   handoff wording is kept verbatim** so the four handoffs stay
   consistent with the sibling scaffolds.
@@ -188,7 +205,11 @@ Asset harness (scratch directory outside version control):
   fixture, run `python train.py steps=3` and `python eval.py`, and check
   that `outputs/<run_id>/config.resolved.yaml`, `manifest.json`, and
   `manifest.running.json` exist and that the manifest's `config.sha256`
-  matches the dump. Recorded as skipped with the reason if the packages
+  matches the dump; then that a dirty fixture is refused with no run
+  directory, that `run.allow_dirty=true` runs with `dirty_tree` under
+  degraded, that `eval.py` leaves a child manifest with the training run
+  as parent, and that `accelerate launch --num_processes 2 --cpu` creates
+  one run directory. Recorded as skipped with the reason if the packages
   cannot be installed.
 - `python3 -c "import yaml; yaml.safe_load(open('assets/openspec/research-task/schema.yaml'))"`
   and `openspec validate --strict` on a scratch change created from the

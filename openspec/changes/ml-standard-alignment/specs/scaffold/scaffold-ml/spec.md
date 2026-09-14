@@ -23,7 +23,7 @@ The builder description SHALL open with the disposable-builder marker and SHALL 
 - **THEN** the builder does not load
 
 ### Requirement: Behavior: One project shape, with existing choices preserved
-The builder SHALL establish one shape — a package or flat module chosen by the extraction rule, `configs/` with a typed schema and YAML states, a committed dependency lock from the carrier the user chose, a training entry point that is an explicit loop on an acceleration library with seeding, gradient accumulation, checkpoint save and resume, an evaluation cadence, one logging seam and one stage-trace seam, an evaluation entry point bound to the project's recorded benchmark or evaluation-set identity, a launch command for multi-device runs, `data/raw/` as the local cache of immutable inputs whose identities the manifest records and which no transformation writes into, `outputs/<run_id>/` for run artifacts, focused tests, and an agent entrypoint — SHALL default the framework to PyTorch for an otherwise empty project and use JAX only when the user asks or the project already depends on that ecosystem, SHALL not offer a quick-experiment versus maintainable-project choice, and SHALL keep a working configuration framework, settings library, or requirements workflow the repository already uses, adding only the missing provenance, tracker, and marker rules.
+The builder SHALL establish one shape — a package or flat module chosen by the extraction rule, `configs/` with a typed schema and YAML states, a committed dependency lock from the carrier the user chose, a training entry point that is an explicit loop on an acceleration library with seeding, gradient accumulation, checkpoint save and resume, an evaluation cadence, one logging seam and one stage-trace seam, an evaluation entry point bound to the project's recorded benchmark or evaluation-set identity, a launch command for multi-device runs, `data/raw/` as the local cache of immutable inputs whose identities the manifest records and which no transformation writes into, `outputs/<run_id>/` for run artifacts, focused tests, and an agent entrypoint — SHALL default the framework to PyTorch with Accelerate, SHALL keep a framework the project already uses, SHALL, when the inventory shows a JAX signal (TPU hardware; a differentiable simulation or solver; scientific or numerical research where the computation outweighs the model; higher-order differentiation; heavy composition of grad, vmap, and jit; large homogeneous parallel computation; compiler or automatic-differentiation research), evaluate JAX against PyTorch from the evidence, present one recommendation with its reason, and leave the decision to the user, recording the chosen framework and its deciding signal in the agent entrypoint, SHALL, when JAX is chosen, deposit the framework-neutral parts unchanged and write the training entry point from its documented JAX loop shape instead of the Accelerate asset, SHALL not offer a quick-experiment versus maintainable-project choice, and SHALL keep a working configuration framework, settings library, or requirements workflow the repository already uses, adding only the missing provenance, tracker, and marker rules.
 
 #### Scenario: Empty repository
 - **WHEN** the repository has no training code and the user asks for the scaffold
@@ -32,6 +32,18 @@ The builder SHALL establish one shape — a package or flat module chosen by the
 #### Scenario: Existing Hydra project
 - **WHEN** the repository already runs a Hydra `configs/` tree and the user asks the builder to harden it
 - **THEN** the builder keeps Hydra, records the two rules (no object instantiation from configuration; a pinned output directory), adds the manifest, tracker, and marker rules, and does not migrate to OmegaConf alone
+
+#### Scenario: Ordinary training project
+- **WHEN** the repository fine-tunes a language or vision model on GPUs and shows no JAX signal
+- **THEN** the builder fixes PyTorch with Accelerate without asking and records it
+
+#### Scenario: JAX signal present
+- **WHEN** the inventory shows a TPU target or a differentiable simulation whose whole solver must be differentiated
+- **THEN** the builder presents the signals with their evidence, the cost of each framework here, and one recommendation, waits for the user's decision, records the decision and its signal in the entrypoint, and, when JAX is chosen, keeps every framework-neutral asset and writes the loop from the JAX loop shape
+
+#### Scenario: Existing JAX project
+- **WHEN** the repository already trains with JAX
+- **THEN** the builder keeps JAX without an evaluation and adds only the missing provenance, tracker, and marker rules
 
 #### Scenario: Evaluation before the first experiment
 - **WHEN** the project has a training goal but no stated way to judge "better"
@@ -76,7 +88,7 @@ The builder SHALL default an unsettled project to a typed schema (dataclasses) m
 - **THEN** it writes the merged configuration to `outputs/<run_id>/config.resolved.yaml` before the first step and the manifest records its hash
 
 ### Requirement: Behavior: Every run writes a manifest and logs to a selected tracker
-The scaffolded entry point SHALL write a run manifest at start (status running) and finalize it at the end — run id, executed commit and dirty flag, resolved-configuration hash, image digest or lock digest, host and runtime facts, input identities, seed, parent run — keeping the start-time record, SHALL send the manifest's scalar fields to the tracker as parameters and tags, and the builder SHALL select the tracker by precedence: a working tracker the project already uses, else the hosting platform's experiment tracking when the platform provides it, else Trackio; and SHALL deposit the snapshot-commit and snapshot-retention rules in the agent guidance.
+The scaffolded entry point SHALL write a run manifest at start (status running) and finalize it at the end — run id, executed commit and dirty flag, resolved-configuration hash, image digest or lock digest, host and runtime facts, input identities, seed, parent run — keeping the start-time record, SHALL mint one run id per run shared by every process of a multi-device launch, SHALL start the manifest before the tracker and send the manifest's identity scalars to the tracker as parameters, SHALL refuse to start from a dirty tree (uncommitted changes to tracked files or unignored untracked files) unless the run passes the explicit `run.allow_dirty` override, whose manifest is marked degraded, SHALL count steps as optimizer steps, SHALL finalize the manifest on every exit after it is started, SHALL have the evaluation entry point write a child manifest under the training run's output directory naming that run as its parent, and the builder SHALL select the tracker by precedence: a working tracker the project already uses, else the hosting platform's experiment tracking when the platform provides it, else Trackio; and SHALL deposit the snapshot-commit and snapshot-retention rules in the agent guidance.
 
 #### Scenario: New project on GitHub
 - **WHEN** the repository is hosted on GitHub and uses no tracker
@@ -87,15 +99,39 @@ The scaffolded entry point SHALL write a run manifest at start (status running) 
 - **THEN** the builder keeps it, adds the manifest fields to it, and does not propose a migration
 
 #### Scenario: Dirty tree at launch
-- **WHEN** the deposited guidance is read by an agent about to launch a run with uncommitted changes
-- **THEN** it instructs a snapshot commit on the experiment branch first and names the retention rule that keeps cited snapshots reachable
+- **WHEN** the scaffolded training or evaluation entry point starts with uncommitted changes and no override
+- **THEN** it exits before creating a run directory, naming the snapshot commit as the fix and the override as the throwaway alternative, and the deposited guidance says the same and names the retention rule that keeps cited snapshots reachable
+
+#### Scenario: Throwaway run from a dirty tree
+- **WHEN** the entry point starts with uncommitted changes and `run.allow_dirty=true`
+- **THEN** the run proceeds, its manifest lists `dirty_tree` under degraded, and the tracker's parameters carry the dirty flag
+
+#### Scenario: Ignored artifacts
+- **WHEN** only ignored paths (`outputs/`, `data/`, `.env`) have changed
+- **THEN** the tree counts as clean and the run starts
+
+#### Scenario: Multi-device launch
+- **WHEN** the training entry point runs under the launcher with several processes
+- **THEN** every process shares the run id minted by the main process and one run directory holds the run
+
+#### Scenario: Evaluation of a run
+- **WHEN** the evaluation entry point evaluates a finished run
+- **THEN** it writes its own manifest under `outputs/<run_id>/eval/<eval_id>/` with the training run as its parent, the evaluation set and model artifact as inputs, and the metrics in the finalized record
 
 ### Requirement: Behavior: The container recipe yields a recorded image identity
-When the user opts into containers, the builder SHALL provide a multi-stage recipe — an environment stage installed from the committed lock on a bare CUDA or ROCm base image, a runtime target, and a sealed target that adds the source — SHALL record the pushed image's digest (or the local image id when never pushed) as the run's environment identity by injecting it into the run, SHALL keep the Dockerfile and any tag out of the identity, SHALL still record the host facts a container cannot pin, SHALL mount `data/`, `outputs/`, and the model-hub cache as volumes with the container-path mapping recorded and raise the container's shared memory for data-loader workers, and, when a preinstalled-stack image is chosen instead, SHALL make the image's framework authoritative by removing it from the project's dependencies and recording that rule; containers SHALL stay opt-in.
+When the user opts into containers, the builder SHALL provide a multi-stage recipe — an environment stage installed from the committed lock on a bare CUDA or ROCm base image, a runtime target, and a sealed target that adds the source — SHALL record the pushed image's digest (or the local image id when never pushed) as the run's environment identity by injecting it into the run, SHALL keep the Dockerfile and any tag out of the identity, SHALL install the environment outside the path the source is mounted on and filter the build context so data, outputs, secrets, caches, and the repository metadata never enter an image, SHALL give the dev container the task runner it invokes and take its GPU flags from the GPU container decision, SHALL still record the host facts a container cannot pin, SHALL mount `data/`, `outputs/`, and the model-hub cache as volumes with the container-path mapping recorded and raise the container's shared memory for data-loader workers, and, when a preinstalled-stack image is chosen instead, SHALL make the image's framework authoritative by removing it from the project's dependencies and recording that rule; containers SHALL stay opt-in.
 
 #### Scenario: Container requested
 - **WHEN** the user asks for a training image
 - **THEN** the builder writes the three-stage recipe, a `docker-digest` recipe that prints the digest to inject, and the AGENTS.md rule that the digest, not the tag, is recorded
+
+#### Scenario: Source mounted over the image
+- **WHEN** the Compose service mounts the working tree over the application directory
+- **THEN** the image's environment still resolves because it lives outside that directory, and the run records the injected digest
+
+#### Scenario: Sealed image built
+- **WHEN** the sealed target is built from a working tree
+- **THEN** the build context excludes data, outputs, secrets, caches, and the repository metadata, and the image carries the commit as a revision label
 
 #### Scenario: No container requested
 - **WHEN** the user does not ask for a container

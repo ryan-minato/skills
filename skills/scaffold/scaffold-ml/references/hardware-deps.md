@@ -63,6 +63,16 @@ the container's environment stage syncs with `--no-dev` and a
 development machine syncs everything. `uv.lock` covers both and is the
 environment identity.
 
+## JAX projects
+
+JAX ships its accelerator runtime as extras (`jax[cuda12]`-style for
+CUDA, `jax[tpu]` with the libtpu index for TPUs) rather than through a
+separate wheel index; declare the extra that matches the hardware and,
+for TPUs, the extra index the JAX installation guide names — fetch the
+current extra names and index URL, do not recall them. Development
+machines without the accelerator install the CPU extra through the same
+environment-marker gating as above.
+
 ## Boundaries
 
 - `--torch-backend` / `UV_TORCH_BACKEND` belong to uv's pip interface
