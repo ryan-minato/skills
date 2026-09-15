@@ -25,7 +25,7 @@ The skill description SHALL cause the skill to load when the request concerns wh
 - **THEN** the skill does not load
 
 ### Requirement: Behavior: Run identity is composed of four immutable parts plus a run id
-When asked what a run must record or whether a run is reproducible, the agent SHALL name the source snapshot (the executed commit), the resolved configuration, the environment identity (a container image digest or the dependency lock digest, with the host facts a performance claim needs), and the identities of every input that affects the result, SHALL mint a run id distinct from the commit so one snapshot may produce many runs, and SHALL refuse a branch name, a tag such as `latest`, a Dockerfile, or a working-directory path as an identity.
+When asked what a run must record or whether a run is reproducible, the agent SHALL name the source snapshot (the executed commit), the resolved configuration, the environment identity (a container image digest or the dependency lock digest, with the host facts a performance claim needs), and the identities of every input that affects the result, SHALL mint a run id distinct from the commit so one snapshot may produce many runs, SHALL refuse a branch name, a tag such as `latest`, a Dockerfile, or a working-directory path as an identity, and SHALL, through its manifest module, mark a run whose environment declares an image digest variable but leaves it empty as degraded rather than substituting the lock digest for the image identity.
 
 #### Scenario: Run record contents
 - **WHEN** the user asks what their run record should contain
@@ -38,6 +38,10 @@ When asked what a run must record or whether a run is reproducible, the agent SH
 #### Scenario: Performance claim without host facts
 - **WHEN** the user wants to record a run whose result is a throughput improvement and the record carries only the image digest
 - **THEN** the agent adds the GPU model, driver, and runtime versions to the record and states that the digest alone does not explain a performance result
+
+#### Scenario: Empty image digest declared
+- **WHEN** the manifest module runs with `IMAGE_DIGEST` present in the environment but empty, as a Compose default leaves it
+- **THEN** the manifest records no image digest, lists `no_image_digest` under degraded, prints the degraded reasons to standard error, and the record is cited as degraded
 
 ### Requirement: Behavior: The resolved configuration is saved whole and is immutable after start
 The agent SHALL save the configuration actually in effect after every source is merged (defaults, project and experiment files, command-line overrides, search suggestions, runtime-derived values) with the run, SHALL not accept the command line, a partial override, or the raw YAML as that record, SHALL treat scheduler-driven state such as a changing learning rate as training state rather than configuration mutation, SHALL use "hyperparameter" only for values that are hyperparameters and call other searched values search variables, and SHALL refuse to rewrite the recorded configuration of a completed run.

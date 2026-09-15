@@ -16,4 +16,4 @@
 
 ## 4. Finish
 
-- [ ] 4.1 Run `just check`, write the results to the pull request's Validation section linking this plan, then `just spec-validate`; archiving waits for the maintainer's instruction
+- [x] 4.1 Run `just check`, write the results to the pull request's Validation section linking this plan, then `just spec-validate`; archiving waits for the maintainer's instruction
