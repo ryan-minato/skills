@@ -187,13 +187,3 @@ Each fact has one home; every other place points to it.
 - A research spec is not a requirements spec: no scenarios, no acceptance
   criteria beyond the evaluation, no solution steps. Objective and
   evaluation are the whole contract.
-- Search Scope is a hypothesis about where the answer lies. Crossing it
-  with a reason is research; treating it as an access-control list stalls
-  the task.
-- A hypothesis is not a work item and not a request; tracking each one in
-  the tracker or the board multiplies bookkeeping without adding a
-  decision.
-- Changing the spec never edits a run: a run belongs to the spec version
-  it ran under.
-- "Completed" and "succeeded" are different columns: a task closes when
-  enough is known.
