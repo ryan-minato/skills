@@ -4,3 +4,4 @@ torch
 accelerate
 omegaconf
 <the model and data libraries the project uses>
+<the selected tracker's package, once run.tracker is set>
