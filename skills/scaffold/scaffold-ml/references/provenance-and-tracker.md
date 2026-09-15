@@ -55,8 +55,9 @@ number's provenance.
    one — GitLab's machine-learning experiments through its
    MLflow-compatible client; verify on the instance that the feature is
    enabled.
-3. Trackio otherwise: local-first, minimal dependencies, shareable
-   without a server.
+3. Trackio otherwise — GitHub provides no experiment tracking, so a
+   GitHub-hosted project without a tracker lands here: local-first,
+   minimal dependencies, shareable without a server.
 
 Wire it through the loop's single logging seam (`log_metrics`); pass the
 tracker to `Accelerator(log_with=...)` and call `accelerator.log` there.
