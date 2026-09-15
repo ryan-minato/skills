@@ -173,31 +173,16 @@ Read [references/alerting-and-dashboards.md](references/alerting-and-dashboards.
 when the request includes alerts, severity, on-call routing, or
 dashboards.
 
-## PyTorch skeleton
+## Health measurements in the loop
 
 The order matters: backward, unscale, measure the true gradient, clip,
-step, then measure the update from the previous parameters.
-[`assets/torch_health.py`](assets/torch_health.py) is a drop-in module
-that performs these measurements behind one function; the loop's single
-logging seam receives its dictionary.
-
-```python
-health = TrainingHealth(model, max_norm=max_norm)  # once, before the loop
-...
-scaler.scale(loss).backward()
-scaler.unscale_(optimizer)                      # measure real gradients
-grad_norm = clip_grad_norm_(model.parameters(), max_norm)  # returns the pre-clip norm
-scaler.step(optimizer); scaler.update()         # a skipped step means non-finite grads
-metrics = health.after_step(model, optimizer, loss_vec, grad_norm, scaler)
-log_metrics(step, metrics)                      # the one seam
-```
-
-`max_norm` is a project value, not a recommendation; pass the same value
-to the helper or the clipping indicator stays at zero. Per-layer views,
-the update-to-weight ratio, and bounded histograms run at their low
-frequencies inside `after_step`; every step it reports the loss
-quantiles, the gradient norm, finiteness of loss, gradients, and
-parameters, and the scaler's scale and skipped steps.
+step, then measure the update from the previous parameters. For a
+PyTorch loop, [`assets/torch_health.py`](assets/torch_health.py) is a
+drop-in module that performs these measurements behind one function
+whose dictionary the single logging seam receives; its docstring shows
+the call site, and `max_norm` is the project's clipping value, not a
+recommendation — pass the same value to the helper or the clipping
+indicator stays at zero.
 
 ## Privacy
 
@@ -222,23 +207,6 @@ before long-term storage.
 
 ## Gotchas
 
-- Device utilization is not efficiency: a device can read 100% busy while
-  running tiny kernels, or idle behind a data loader. Pair it with step
-  time, data wait, and the stage trace.
 - A framework's allocator statistics see only its own allocations; the
   communication library's buffers and other native allocations are
   invisible, so compare with the device manager's total.
-- Optimizer second-moment underestimation precedes loss spikes; logging
-  only the gradient norm misses it.
-- Calibration error is bin-dependent; report it with a reliability view
-  and a proper scoring rule, never as a single truth.
-- Drift-detection libraries' default thresholds are tool defaults, not
-  physiological norms.
-- Sharpness, stable rank, and Jacobian alignment are research signals,
-  not health scores.
-- The framework's distributed debug mode and the communication library's
-  trace level slow training; they are diagnosis windows, never resident.
-- Job accounting commands on a scheduler are not for polling every
-  second; export once, never loop.
-- Managed-platform profilers come and go; keep the model in open formats
-  (OpenTelemetry, Prometheus, the framework's trace files).
