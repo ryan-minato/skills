@@ -50,8 +50,12 @@ Everything framework-neutral is deposited unchanged: the configuration
 surface, the manifest (its runtime facts already record `jax` and its
 backend), the tracker selection, the research-task convention, the test
 markers, Ruff, hooks, and the container recipe (a base image with the
-matching CUDA or TPU runtime instead of the PyTorch-routed one; see the
-JAX section of `references/hardware-deps.md`). Both entry-point assets
+matching CUDA or TPU runtime instead of the PyTorch-routed one). The
+dependency declaration (`pyproject.toml` or `requirements.in`) names JAX
+and the accelerator extra from the JAX section of
+`references/hardware-deps.md` in place of `torch` and `accelerate`, and
+the base image follows the same section and `references/containers.md`
+rather than the CUDA-for-PyTorch default. Both entry-point assets
 (`train.py` and `eval.py`) are PyTorch-only: write the training entry
 point from the shape below with the same seams, and write the evaluator
 from the same shape's evaluation step — bound to the recorded benchmark,

@@ -36,7 +36,7 @@ def main() -> None:
     cfg = OmegaConf.load(run_dir / "config.resolved.yaml")  # the run's own configuration, never a fresh merge
     # The dirty-tree decision is this invocation's, not the training run's.
     refuse_dirty_tree("run.allow_dirty=true" in sys.argv[2:])
-    accelerator = Accelerator()
+    accelerator = Accelerator(mixed_precision=cfg.run.mixed_precision)  # the run's precision, so the number is comparable
     eval_id = f"{run_dir.name}-eval-{uuid.uuid4().hex[:6]}"
     eval_dir = run_dir / "eval" / eval_id
     manifest_path = None
