@@ -37,7 +37,8 @@ run = source snapshot + resolved configuration + environment identity + input id
 plus a **run id** minted when the run starts. Every part is immutable once
 recorded. A part that can change meaning later — a branch, a tag such as
 `latest`, a path, a Dockerfile — is not an identity; resolve it to the
-immutable form before recording.
+immutable form before recording. The test of every recorded value:
+"could this resolve to something else next week?".
 
 ## Run identity
 
@@ -133,30 +134,21 @@ lock digest — carries the reason in `degraded` and is cited as degraded,
 never as complete. Emit it to
 the tracker as parameters and tags and to the run's output directory as a
 file. [`assets/run_manifest.py`](assets/run_manifest.py) is a drop-in
-standard-library module that collects the fields below and writes them;
-copy it into the project and call it from the training entry point.
+standard-library module that collects the canonical field list and writes
+it; copy it into the project unchanged and call it from the training entry
+point — its docstring shows the call.
 
-| Field | Source |
-|---|---|
-| `run_id`, `started_at`, `ended_at`, `status`, `degraded[]` | the run |
-| `source.commit`, `source.dirty`, `source.patch_sha256` (dirty only: tracked diff plus untracked files), `source.remote` | git |
-| `config.resolved_path`, `config.sha256` | the resolved configuration dump |
-| `environment.image_digest` or `environment.lock_sha256` (a real lock file, or a fully pinned requirements file), `environment.python` | image, lock file, interpreter |
-| `host.hostname`, `host.platform`, `host.gpus` (model, count), `host.driver`, `host.runtime` | the machine |
-| `inputs[]` — `name`, `kind`, `identity` | resolved before the run |
-| `randomness.seed`, `randomness.deterministic` | the run |
-| `parent_run_id` | when resumed or fine-tuned from a run |
-| `tracker.run_url` | the tracker |
-
-Read [references/run-record.md](references/run-record.md) when a run is
-cited as evidence in a pull or merge request, a report, or a promotion, or
-when a committed run record is required; the committed record's shape is
+Read [references/run-record.md](references/run-record.md) for the
+canonical field list, when a run is cited as evidence in a pull or merge
+request, a report, or a promotion, or when a committed run record is
+required; the committed record's shape is
 [`assets/run-record.md`](assets/run-record.md).
 
 ## Where the facts live
 
 - The tracker holds runs: metrics, the manifest as parameters and tags,
-  artifact locations. Read
+  artifact locations; cite a run by its id — a tracker's `latest` or
+  `best` alias moves. Read
   [references/tracker-selection.md](references/tracker-selection.md) when
   choosing or wiring a tracker, or when the project has none.
 - The repository holds code and configuration; the pull or merge request
@@ -180,14 +172,8 @@ when a committed run record is required; the committed record's shape is
 
 ## Gotchas
 
-- `main`, `latest`, `HEAD`, and a working-directory path are names, not
-  identities; the validator of a record is "could this resolve to
-  something else next week?".
 - A seed does not make a run deterministic: record the framework's
   determinism flags and the nondeterministic operations the project
   accepts, or a "same seed" comparison proves nothing.
 - A presigned URL is both a credential and a mutable reference; record the
   object's version id and checksum instead.
-- A tracker's own "latest" or "best" alias moves; cite the run id.
-- Recording the Dockerfile's hash records the recipe, not the environment:
-  the same file builds different images on different days.
