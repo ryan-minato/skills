@@ -141,8 +141,10 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
    else the hosting platform's experiment tracking when it provides one
    (GitLab's experiments); else Trackio. Wire it through the loop's single
    logging seam; the manifest starts before the tracker so its identity
-   fields ride along as the tracker's parameters; once it is wired, set
-   `run.tracker` in `configs/config.yaml`. Deposit the snapshot
+   fields ride along as the tracker's parameters. Add the selected
+   tracker's package to the dependency carrier (`[project]` dependencies
+   or `requirements.in`) and relock; only then set `run.tracker` in
+   `configs/config.yaml`. Deposit the snapshot
    rule (commit before every run; the entry points refuse a dirty tree,
    and `run.allow_dirty=true` is the one override, for a throwaway run
    marked degraded) and the retention rule (a tag per run or a kept
