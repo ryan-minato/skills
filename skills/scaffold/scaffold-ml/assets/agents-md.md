@@ -13,7 +13,7 @@ model is for, and what counts as "better" (the benchmark).>
 | `data/raw/` | immutable inputs (local cache) | never written by a transformation; never committed |
 | `data/interim/`, `data/processed/` | derived data | regenerable; never committed |
 | `outputs/<run_id>/` | resolved config, manifests, checkpoints, exports | never committed |
-| `<research/<task>/ | the OpenSpec change directory under the research-task schema>` | the research spec and hypothesis log | the spec evolves; run history is never rewritten |
+| `<research/<task>/ or the OpenSpec change directory under the research-task schema>` | the research spec and hypothesis log | the spec evolves; run history is never rewritten |
 | `docs/data.md` | sources, identities, the benchmark | updated with the work |
 
 ## Commands
@@ -78,7 +78,8 @@ model is for, and what counts as "better" (the benchmark).>
 
 - A research task is one objective judged by one evaluation. Its spec
   (Objective and Evaluation required; Context, Search Scope, Constraints,
-  Completion Condition, Hypotheses as needed) lives at
+  Completion Condition, Hypotheses as needed — any of them one line; an
+  empty section is deleted, never filled) lives at
   `<research/<task>/spec.md | an OpenSpec change under the research-task
   schema (schema: research-task, skip_specs: true in .openspec.yaml)>`
   with the hypothesis log beside it.
