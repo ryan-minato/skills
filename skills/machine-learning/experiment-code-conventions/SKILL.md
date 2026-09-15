@@ -167,8 +167,6 @@ path.
 
 ## Gotchas
 
-- A Trainer hides the step: the order of zeroing, accumulation, clipping,
-  stepping, and scheduling is where results silently change.
 - A configuration key that names an import path (`_target_`, `class:`)
   has turned configuration into code; replace it with a named choice.
 - `skipif(no GPU)` on a GPU-only test makes the suite green on every
@@ -176,6 +174,3 @@ path.
   failure under the explicit suite is the honest shape.
 - Mocking tensor operations tests the mock. Use small real tensors on
   the CPU.
-- Deduplicating two research scripts into a base class couples two
-  hypotheses; the next change to one breaks the other.
-- Coverage numbers say nothing about whether a shape contract holds.
