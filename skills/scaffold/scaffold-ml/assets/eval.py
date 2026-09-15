@@ -13,7 +13,6 @@ evaluation code's snapshot is part of the number's provenance.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import sys
 import uuid
@@ -22,15 +21,14 @@ from pathlib import Path
 from accelerate import Accelerator
 from omegaconf import OmegaConf
 
-from run_manifest import finish_manifest, start_manifest
+from run_manifest import finish_manifest, sha256_file, start_manifest
 from train import evaluate, refuse_dirty_tree
 
 
 def checkpoint_identity(path: Path) -> dict[str, str]:
     # A path is a locator, not an identity: the weights' digest is what the
     # evaluation is matched to after the directory moves or is overwritten.
-    digest = hashlib.sha256(path.read_bytes()).hexdigest()
-    return {"name": "model", "kind": "checkpoint", "identity": f"sha256:{digest}", "locator": str(path)}
+    return {"name": "model", "kind": "checkpoint", "identity": f"sha256:{sha256_file(path)}", "locator": str(path)}
 
 
 def main() -> None:

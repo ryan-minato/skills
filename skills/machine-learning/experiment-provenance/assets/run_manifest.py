@@ -23,7 +23,8 @@ the image digest (from IMAGE_DIGEST) or a real lock file's hash,
 interpreter and host facts, GPU and runtime facts when available, seeds,
 inputs, and lineage. A `degraded` list names every identity the record
 lacks (a dirty tree, no resolved configuration, no environment identity,
-no runtime facts), and the same reasons are printed to stderr, so an
+an image digest declared but left empty, no runtime facts), and the same
+reasons are printed to stderr, so an
 incomplete record never looks complete. The start-time record is kept as
 `manifest.running.json` when the run finishes. Every value is an identity
 or a hash; the module never records secrets, environment variables,
@@ -63,7 +64,7 @@ def _sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def _sha256_file(path: Path) -> str:
+def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1 << 20), b""):
@@ -98,7 +99,7 @@ def source_snapshot(repo_root: Path | None = None) -> dict[str, Any]:
         for rel in untracked:
             path = root / rel
             if path.is_file():
-                parts.append(f"{rel}\n{_sha256_file(path)}")
+                parts.append(f"{rel}\n{sha256_file(path)}")
         patch_sha = _sha256_text("\n".join(parts))
     return {
         "commit": commit,
@@ -148,7 +149,7 @@ def environment_identity(repo_root: Path | None = None) -> dict[str, Any]:
         # An empty variable (e.g. a Compose default) is no identity.
         "image_digest": os.environ.get("IMAGE_DIGEST") or None,
         "lock_file": lock.name if lock else None,
-        "lock_sha256": _sha256_file(lock) if lock else None,
+        "lock_sha256": sha256_file(lock) if lock else None,
         "unpinned_manifest": unpinned,
         "python": platform.python_version(),
     }
@@ -214,7 +215,7 @@ def start_manifest(
     output_dir.mkdir(parents=True, exist_ok=True)
     config: dict[str, Any] = {"resolved_path": None, "sha256": None}
     if resolved_config_path and resolved_config_path.is_file():
-        config = {"resolved_path": str(resolved_config_path), "sha256": _sha256_file(resolved_config_path)}
+        config = {"resolved_path": str(resolved_config_path), "sha256": sha256_file(resolved_config_path)}
     source = source_snapshot(repo_root)
     environment = environment_identity(repo_root)
     host = host_facts()
@@ -227,6 +228,10 @@ def start_manifest(
         degraded.append("no_resolved_config")
     if environment["image_digest"] is None and environment["lock_sha256"] is None:
         degraded.append("no_environment_identity")
+    if os.environ.get("IMAGE_DIGEST") == "":
+        # Declared but empty (a Compose default): the run meant to record an
+        # image identity and has none; the lock hash does not stand in for it.
+        degraded.append("no_image_digest")
     if not host["runtime"]:
         degraded.append("no_runtime_facts")
     manifest = {
