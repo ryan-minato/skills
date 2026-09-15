@@ -112,18 +112,5 @@ to alert. No single metric is a health score; diagnosis combines them.
 - **Early stopping**: patience on a smoothed validation metric with
   restore-best; not on the raw noisy value when the set is small.
 
-## Recording the Adam state (PyTorch)
-
-```python
-@torch.no_grad()
-def adam_health(optimizer):
-    v_mean, ratio, n = 0.0, 0.0, 0
-    for group in optimizer.param_groups:
-        for p in group["params"]:
-            v = optimizer.state.get(p, {}).get("exp_avg_sq")
-            if v is None or p.grad is None:
-                continue
-            g2 = p.grad.float().pow(2).mean()
-            v_mean += v.float().mean().item(); ratio += (g2 / (v.float().mean() + 1e-30)).item(); n += 1
-    return {"adam/mean_v": v_mean / n, "adam/g2_over_v": ratio / n} if n else {}
-```
+`assets/torch_health.py` records the Adam state as `adam/mean_v` and
+`adam/g2_over_v` at its sampled cadence.
