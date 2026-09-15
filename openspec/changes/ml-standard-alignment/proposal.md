@@ -60,6 +60,32 @@ decisions settled. Now, before the next ML project is scaffolded.
   and both asset trees are removed; the requirements-compile reference
   stays as the carrier's branch; the description no longer offers two
   modes.
+- `scaffold-ml` — the asset set is held to a template ceiling after the
+  review rounds: the entry-point asset is one functionally complete
+  Accelerate loop whose seams are fixed (configuration load and resolved
+  dump, dirty-tree refusal, one broadcast run id, manifest start and
+  finish, tracker parameters, the logging and stage-trace seams,
+  accumulation and clipping, checkpoint save and resume, the evaluation
+  cadence, the final unwrapped save) and whose business logic — model,
+  optimizer, data loader, scheduler, forward pass, metrics — is a
+  placeholder; the schema asset keeps only the fields the loop reads,
+  with project values marked missing rather than defaulted; every asset
+  has one pointer in the workflow with a verb (copy, copy and fill,
+  merge, rework), comments addressed to the builder move to those
+  pointers, task-runner and Dockerfile fragments that serve one branch
+  become fenced blocks in that branch's reference, the research-task
+  templates are the one home of the research-spec skeleton for both the
+  OpenSpec and the no-tool path, and the Gotchas section keeps only
+  facts no step or reference states. Review findings folded in: a JAX
+  project takes its dependency declaration and base image from the JAX
+  sections, `.gitignore` covers `.env.*`, `secrets/`, and key files,
+  the loop returns to training mode after each cadence evaluation, the
+  evaluator hashes the checkpoint in chunks and evaluates under the
+  run's recorded precision, the stage seam books time when a stage
+  raises, the work-tracking and closing handoffs carry their own
+  installer instruction, and a Compose run whose `IMAGE_DIGEST` is left
+  empty is marked degraded (`no_image_digest`) instead of silently
+  falling back to the lock hash.
 - No `meta` builder changes: the generic base stays generic.
 
 ## Skills touched
@@ -94,8 +120,9 @@ is the user's explicit choice → `feat!`.
   manifest module (`experiment-provenance/assets/run_manifest.py` ↔
   `scaffold-ml/assets/run_manifest.py`) and the research-spec section
   headings (`research-workflow/assets/research-spec.md` ↔ the
-  `research-task` schema template in `scaffold-ml/assets/`) — the
-  companion repository change.
+  `research-task` schema template `templates/research.md` in
+  `scaffold-ml/assets/`; the scaffold ships no separate
+  `research-spec.md`) — the companion repository change.
 - Mirrored files in `scripts/validate_harness.py`: none. Symlinks:
   unchanged. No `meta` skill, reference, or asset changes.
 
@@ -115,11 +142,15 @@ is the user's explicit choice → `feat!`.
   `meta-workflow-design` gains no research-task sentence (the scaffold
   records the research task as the project's unit of research work in
   its knowledge, which that builder reads during inspection).
-- Any change to the five `machine-learning` skills, except the two
+- Any change to the five `machine-learning` skills, except the
   corrections the byte-identical `run_manifest.py` mirror must share with
-  the scaffold's copy: an empty `IMAGE_DIGEST` is no environment identity,
-  and a sealed image's stamped `GIT_COMMIT` stands in for the commit when
-  no repository is present.
+  the scaffold's copy: an empty `IMAGE_DIGEST` is no environment identity
+  and, when declared, marks the run degraded; a sealed image's stamped
+  `GIT_COMMIT` stands in for the commit when no repository is present;
+  the chunked file hash is public (`sha256_file`) so the evaluator can
+  reuse it. The companion skill change `ml-catalog-asset-cleanup` on
+  this branch carries the provenance skill's delta for the degraded
+  marker and the catalog's own asset and gotcha review.
 - A validator script for the scaffold; a later change if the scaffold
   earns one.
 - Changing `scaffold-data-science`'s `data/<source>/` rule or reconciling
