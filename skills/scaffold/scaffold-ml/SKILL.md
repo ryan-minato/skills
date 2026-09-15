@@ -251,8 +251,9 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
     yourself. (If that installer skill is absent too, it lives in the
     `core` catalog of https://github.com/ryan-minato/skills.) Record in
     the when-to-read table where each role applies. If the user declines,
-    the deposited `AGENTS.md` rules stand alone; note that the durable
-    skills are not installed.
+    the deposited `AGENTS.md` rules — manifest, snapshot, tracker, test
+    markers, hooks — stand alone; note that the durable skills are not
+    installed.
 13. **Hand off and close.** Hand the rest of the harness — entrypoint
     depth, knowledge, project skills, synchronization — and the closing
     of the build to the `meta-harness-building` skill; when it is not
