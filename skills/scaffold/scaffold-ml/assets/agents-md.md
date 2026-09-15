@@ -13,7 +13,7 @@ model is for, and what counts as "better" (the benchmark).>
 | `data/raw/` | immutable inputs (local cache) | never written by a transformation; never committed |
 | `data/interim/`, `data/processed/` | derived data | regenerable; never committed |
 | `outputs/<run_id>/` | resolved config, manifests, checkpoints, exports | never committed |
-| `research/<task>/` | the research spec and hypothesis log | <or: the OpenSpec change directory under the `research-task` schema> |
+| `<research/<task>/ | the OpenSpec change directory under the research-task schema>` | the research spec and hypothesis log | the spec evolves; run history is never rewritten |
 | `docs/data.md` | sources, identities, the benchmark | updated with the work |
 
 ## Commands
@@ -53,9 +53,6 @@ model is for, and what counts as "better" (the benchmark).>
   command line (`optim.lr=1e-4`). Every run writes
   `outputs/<run_id>/config.resolved.yaml` before its first step — that
   file, not the command line, is the run's configuration.
-- "Hyperparameter" means learning rate, weight decay, dropout, betas,
-  warm-up; dataset, optimizer family, architecture, seed, and device
-  count are search variables when searched.
 
 ## Provenance
 

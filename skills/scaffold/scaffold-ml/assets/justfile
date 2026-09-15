@@ -1,28 +1,16 @@
-# Dependency carrier: uv project (default). For the requirements carrier,
-# replace `setup`, `setup-train`, and `lock` with the commented variants and
-# set the backend per machine class (see references/requirements-lock.md).
-# torch_backend := "<cpu|cu130|rocm7.2>"
-
 # Create the development environment from the committed lock and install hooks.
 # `--locked` refuses a stale lock instead of rewriting it: `just lock` is the only writer.
 setup:
     uv sync --locked
     uv run pre-commit install
-    # requirements carrier:
-    # uv venv && uv pip sync requirements.dev.txt --torch-backend {{torch_backend}} && uv run pre-commit install
 
 # Training-box install: runtime dependencies only.
 setup-train:
     uv sync --frozen --no-dev
-    # requirements carrier:
-    # uv venv && uv pip sync requirements.txt --torch-backend {{torch_backend}}
 
 # Refresh the lock after editing dependencies.
 lock:
     uv lock
-    # requirements carrier:
-    # uv pip compile requirements.in -o requirements.txt --torch-backend {{torch_backend}}
-    # uv pip compile requirements.dev.in -o requirements.dev.txt --torch-backend {{torch_backend}}
 
 train *args:
     uv run python train.py {{args}}
@@ -48,13 +36,3 @@ test-gpu:
 # Heavy validation; by hand only, never from hooks or CI.
 test-slow:
     uv run pytest -m slow
-
-# Container recipes (only when containers were opted in).
-docker-build target="runtime":
-    @if [ "{{target}}" = sealed ] && [ -n "$(git status --porcelain)" ]; then echo "docker-build: commit first; a sealed image stamps the commit it copies" >&2; exit 1; fi
-    docker build --target {{target}} --build-arg GIT_COMMIT=$(git rev-parse HEAD) --iidfile .image-id -t <project name>:{{target}} .
-
-# The image digest is the run's environment identity: export it as IMAGE_DIGEST
-# before launching, or read the pushed image's repository digest instead.
-docker-digest:
-    @cat .image-id

@@ -27,9 +27,9 @@ it as a settled fact.
 
 - The project runs a specification contract → inside it (for OpenSpec,
   a change under the `research-task` schema).
-- No spec tool → `research/<task>/spec.md` from
-  `assets/research-spec.md`, with the
-  hypothesis log beside it.
+- No spec tool → `research/<task>/spec.md` copied from
+  `assets/openspec/research-task/templates/research.md`, with the
+  hypothesis log copied from `templates/hypotheses.md` beside it.
 
 ## OpenSpec projects
 

@@ -1,7 +1,3 @@
-# Merge into pyproject.toml. For a uv project also declare the runtime
-# dependencies under [project], the tools under [dependency-groups] dev,
-# and the accelerator index and source routing (references/hardware-deps.md).
-
 [dependency-groups]
 dev = ["ruff", "pytest", "pre-commit"]
 

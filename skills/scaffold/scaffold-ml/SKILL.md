@@ -78,6 +78,10 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
 
 1. **Inventory** (above). Present the concrete project shape you intend
    to create — files, commands, the decisions below — before creating it.
+   Before the first commit, add every skill directory whose description
+   opens with `Disposable builder skill (delete after the harness is built):`
+   to `$(git rev-parse --git-path info/exclude)`; stage explicit paths and
+   read `git status` before each commit — the builders never enter one.
 2. **Framework and evaluation.** Fix the framework: the default without
    a question, a JAX evaluation with a recommendation and the user's
    decision when a signal is present, the existing framework without any
@@ -101,7 +105,12 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
    [references/requirements-lock.md](references/requirements-lock.md)
    when the carrier is the requirements workflow, when creating or
    updating the requirements files, or when a development machine differs
-   from the training box.
+   from the training box. Copy [`justfile`](assets/justfile); for the
+   requirements carrier replace its `setup`, `setup-train`, and `lock`
+   recipes with the block in that reference and copy
+   [`requirements.in`](assets/requirements.in) and
+   [`requirements.dev.in`](assets/requirements.dev.in), filling the
+   model and data libraries.
 4. **Configuration surface.** Default: a dataclass schema, named states
    in `configs/*.yaml`, command-line overrides, and one resolved document
    written to `outputs/<run_id>/config.resolved.yaml` before the first
@@ -153,20 +162,30 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
    linter only: commits are experiment snapshots and a hook that runs
    tests taxes every snapshot; an existing hook that runs tests gets a
    proposal to limit it, with that reason, and the user's decision
-   stands. Copy
-   [`pyproject-tool-config.toml`](assets/pyproject-tool-config.toml) and
-   [`pre-commit-config.yaml`](assets/pre-commit-config.yaml).
+   stands. Merge
+   [`pyproject-tool-config.toml`](assets/pyproject-tool-config.toml)
+   into `pyproject.toml` — a uv project also declares the runtime
+   dependencies under `[project]` and the index routing from
+   `references/hardware-deps.md`; the requirements carrier drops
+   `[dependency-groups]`. Copy
+   [`pre-commit-config.yaml`](assets/pre-commit-config.yaml) to
+   `.pre-commit-config.yaml` and pin `rev` to the current
+   ruff-pre-commit release.
 7. **Research-task convention.** Deposit the research spec's fields
    (Objective and Evaluation always; Context, Search Scope, Constraints,
    Completion Condition, Hypotheses as needed), one research task per
    pull or merge request carrying its hypotheses and runs, the spec
    evolving while run history stays immutable, and completion on the
    completion condition with negative results as valid outcomes. Place
-   the spec inside the project's specification contract when one exists,
-   else under `research/<task>/` from [`research-spec.md`](assets/research-spec.md).
+   the spec inside the project's specification contract when one exists.
    When the project runs OpenSpec, copy
    [`assets/openspec/research-task/`](assets/openspec/research-task/schema.yaml)
-   to the tool's schema directory and record how a change selects it.
+   whole to the tool's schema directory and record how a change selects
+   it; with no spec tool, copy its
+   [`templates/research.md`](assets/openspec/research-task/templates/research.md)
+   to `research/<task>/spec.md` and
+   [`templates/hypotheses.md`](assets/openspec/research-task/templates/hypotheses.md)
+   beside it.
    Record the research task as the project's unit of research work. Read
    [references/research-task.md](references/research-task.md) when
    depositing the convention, when the project runs OpenSpec, or when it
@@ -186,18 +205,24 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
    [references/containers.md](references/containers.md) — the three-stage
    recipe, the digest as the environment identity, the environment outside
    the source mount, the build-context filter, volumes, shared memory.
+   Copy [`Dockerfile`](assets/Dockerfile) to the project root and pin the
+   uv image tag and the live-enumerated base tag; copy
+   [`compose.yaml`](assets/compose.yaml) and fill `shm_size`; copy
+   [`devcontainer.json`](assets/devcontainer.json) to
+   `.devcontainer/devcontainer.json`, fill the image and the
+   shared-memory size, and insert the GPU flags the container decision
+   produced into `runArgs` as separate items (NVIDIA `"--gpus", "all"`;
+   ROCm `"--device", "/dev/kfd", "--device", "/dev/dri"`); copy
+   [`dockerignore`](assets/dockerignore) to `.dockerignore`; append the
+   task-runner recipes from that reference to the justfile.
 9. **Deposit the guidance.** Merge [`gitignore`](assets/gitignore) into
    `.gitignore` (an unignored `outputs/` or `data/` makes every run's
-   tree dirty, and the entry points refuse a dirty tree) and, with
-   containers, [`dockerignore`](assets/dockerignore) into `.dockerignore`. Rework [`agents-md.md`](assets/agents-md.md) into
-   `AGENTS.md` and [`docs-data.md`](assets/docs-data.md) into
-   `docs/data.md`: the commands, where configuration enters and how it is
-   overridden, the test suites, the research-spec location, the tracker,
-   the provenance rules, the error-handling convention (catch only
-   expected data or environment failures; fail early with context for
-   everything else), the code-style section, the never-commit rule for
-   data, weights, checkpoints, and credentials, and the when-to-read
-   table. One authoritative source per fact. No generated file carries
+   tree dirty, and the entry points refuse a dirty tree). Rework
+   [`agents-md.md`](assets/agents-md.md) into `AGENTS.md`: fill every
+   `<…>` slot and keep every section — together they are the guidance
+   the specification requires — with one authoritative source per fact.
+   Copy [`docs-data.md`](assets/docs-data.md) to `docs/data.md` and fill
+   the source rows and the evaluation line. No generated file carries
    this builder's marker.
 10. **Verify.** Run `just setup`, `just lint`, `just test`, and a smoke
     run of `just train` and `just eval` on a tiny input; confirm every
@@ -261,18 +286,8 @@ marker remains; and the user has approved the shape.
 
 ## Gotchas
 
-- Disposable builders never enter a commit: before the first commit, add
-  every skill directory whose description opens with
-  `Disposable builder skill (delete after the harness is built):` to
-  `$(git rev-parse --git-path info/exclude)`, stage explicit paths, and
-  read `git status` before each commit.
-- A run launched from a dirty tree records a commit that is not the code
-  that ran; the entry points refuse it, and the one override marks the
-  manifest degraded. Ignored paths never dirty the tree — an unignored
-  artifact directory is the usual cause, and the fix is `.gitignore`.
-- `latest`, a branch, a Dockerfile, and a tag are names, not identities:
-  record revisions, checksums, and digests.
-- A preinstalled-framework image and a locked environment conflict: one
-  of them is authoritative, and the guidance says which.
-- Readability beats abstraction in experiment code; the extraction test
-  is "must these stay consistent?", never "do these look alike?".
+- `run.mixed_precision=no` on the command line parses as YAML `false`;
+  `load_config` maps it back before the resolved dump — keep that
+  normalization when reworking `train.py`.
+- `{{args}}` and `{{run_dir}}` in the justfile are just's recipe syntax,
+  not placeholders to remove.

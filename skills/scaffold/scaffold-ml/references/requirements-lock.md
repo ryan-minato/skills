@@ -30,6 +30,25 @@ with no installable package; a uv project is the default otherwise.
 - Upgrades happen only by editing an `.in` file (or compiling with
   `--upgrade` / `--upgrade-package`) and recompiling.
 
+## Task-runner recipes
+
+Replace the uv-project `setup`, `setup-train`, and `lock` recipes of the
+justfile asset with these, and set the backend per machine class:
+
+```just
+torch_backend := "<cpu|cu130|rocm7.2>"
+
+setup:
+    uv venv && uv pip sync requirements.dev.txt --torch-backend {{torch_backend}} && uv run pre-commit install
+
+setup-train:
+    uv venv && uv pip sync requirements.txt --torch-backend {{torch_backend}}
+
+lock:
+    uv pip compile requirements.in -o requirements.txt --torch-backend {{torch_backend}}
+    uv pip compile requirements.dev.in -o requirements.dev.txt --torch-backend {{torch_backend}}
+```
+
 ## Accelerator wheels
 
 - Write `torch` plainly in `requirements.in` — no index URLs in the
