@@ -21,7 +21,7 @@ from pathlib import Path
 import torch
 from accelerate import Accelerator
 from accelerate.utils import broadcast_object_list, set_seed
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 from torch.utils.data import DataLoader
 
 from config import TrainConfig
@@ -29,7 +29,7 @@ from run_manifest import finish_manifest, source_snapshot, start_manifest
 from stages import drain_stage_seconds, stage
 
 
-def load_config(argv: list[str]) -> TrainConfig:
+def load_config(argv: list[str]) -> DictConfig:
     """Schema + named state + command-line overrides → one resolved configuration."""
     config_path = Path("configs/config.yaml")
     schema = OmegaConf.structured(TrainConfig)
@@ -204,6 +204,7 @@ def main() -> None:
                 )
             if step % cfg.run.eval_every_steps == 0:
                 log_metrics(accelerator, step, evaluate(accelerator, model, <eval loader>))
+                model.train()  # evaluate() switches to eval mode; the next step must train again
             if step % cfg.run.checkpoint_every_steps == 0:
                 accelerator.save_state(run_dir / "checkpoints" / f"step_{step}")
 

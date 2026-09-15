@@ -61,8 +61,11 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
   computation, compiler or autodiff research — evaluate JAX and give the
   decision to the user. Read [references/framework-choice.md](references/framework-choice.md)
   before fixing the framework of an unsettled project or when any of
-  those signals appears; it also carries the loop shape a JAX project
-  writes in place of the Accelerate asset.
+  those signals appears. A JAX project keeps only the framework-neutral
+  assets: both entry points (`train.py`, `eval.py`) are PyTorch-only and
+  are written from that reference's loop shape, and the dependency
+  declaration and base image follow the JAX sections of
+  `references/hardware-deps.md` and `references/containers.md`.
 - The training entry point is an explicit loop on Accelerate: seeding,
   gradient accumulation, clipping, checkpoint save and resume, an
   evaluation cadence, one logging seam, one stage-trace seam; multi-device
@@ -194,9 +197,11 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
     agent-autonomy rules are designed with the `meta-workflow-design` and
     `meta-agent-authority` skills, not improvised here — do not invent an
     issue, review, or autonomy flow in the scaffold. If they are not
-    installed, the same `meta` catalog install from step 8 covers them; if
-    the user declines, leave management design out and record the gap in
-    the handoff.
+    installed, load the `ryan-minato-skills-installing` skill and install
+    the whole `meta` catalog at project scope as it directs (one install
+    covers every `meta` builder this workflow names); never run an install
+    command yourself. If the user declines, leave management design out
+    and record the gap in the handoff.
 12. **Durable machine-learning skills.** The project's ongoing guidance
     lives in five durable roles — run provenance, the research task,
     experiment code conventions, training instrumentation, training
@@ -212,9 +217,11 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
     skills are not installed.
 13. **Hand off and close.** Hand the rest of the harness — entrypoint
     depth, knowledge, project skills, synchronization — and the closing
-    of the build to the `meta-harness-building` skill; the same `meta`
-    catalog install from step 8 covers it when it is not installed. If
-    the user declines that handoff, close here: once the deposit is
+    of the build to the `meta-harness-building` skill; when it is not
+    installed, load the `ryan-minato-skills-installing` skill and install
+    the whole `meta` catalog at project scope as it directs, never running
+    an install command yourself. If the user declines that handoff, close
+    here: once the deposit is
     verified and before the work goes to review, ask the user whether to
     delete the disposable builders now — the build request is not
     deletion consent — and on that decision load `meta-disposal`, which
@@ -250,9 +257,6 @@ marker remains; and the user has approved the shape.
   that ran; the entry points refuse it, and the one override marks the
   manifest degraded. Ignored paths never dirty the tree — an unignored
   artifact directory is the usual cause, and the fix is `.gitignore`.
-- The Accelerate entry-point assets (`train.py`, `eval.py`) are
-  PyTorch-only; a JAX project writes both from the framework reference's
-  shape and keeps every other asset.
 - `latest`, a branch, a Dockerfile, and a tag are names, not identities:
   record revisions, checksums, and digests.
 - A preinstalled-framework image and a locked environment conflict: one

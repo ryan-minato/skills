@@ -37,6 +37,9 @@ with no installable package; a uv project is the default otherwise.
   and sync time with `--torch-backend <value>` (or `UV_TORCH_BACKEND`),
   which uv's pip interface supports on `compile`, `sync`, and `install`.
   Verify current values in uv's official first-party PyTorch guidance.
+- A JAX project does not use `--torch-backend`: it declares the
+  accelerator extra the JAX section of `references/hardware-deps.md`
+  names and compiles without the flag.
 - Record an explicit backend (for example `cu130`) in the justfile so
   every machine that must match uses the same one; `auto` — which probes
   the local driver — is for exploratory installs, not for the recorded

@@ -32,12 +32,14 @@ except ImportError:  # the seam works without the dependency
 @contextmanager
 def stage(name: str) -> Iterator[None]:
     started = time.perf_counter()
-    if _tracer is not None:
-        with _tracer.start_as_current_span(name):
+    try:
+        if _tracer is not None:
+            with _tracer.start_as_current_span(name):
+                yield
+        else:
             yield
-    else:
-        yield
-    STAGE_SECONDS[name] += time.perf_counter() - started
+    finally:  # a stage that raises still books its time
+        STAGE_SECONDS[name] += time.perf_counter() - started
 
 
 def drain_stage_seconds() -> dict[str, float]:
