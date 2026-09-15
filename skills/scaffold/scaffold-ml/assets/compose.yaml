@@ -4,7 +4,7 @@ services:
       context: .
       target: runtime
     environment:
-      IMAGE_DIGEST: "${IMAGE_DIGEST:-}"   # export from `just docker-digest` or the pushed digest; empty marks the run degraded
+      IMAGE_DIGEST: "${IMAGE_DIGEST:-}"   # just docker-digest, or the pushed digest; empty marks the run degraded
     volumes:
       - .:/app                             # the source, at run time; the environment is at /opt/venv, outside the mount
       - ./data:/app/data

@@ -1,4 +1,4 @@
-# Merge into .gitignore. Runs, data, weights, and secrets never enter version control.
+# Runs, data, weights, and secrets never enter version control.
 .venv/
 __pycache__/
 .pytest_cache/

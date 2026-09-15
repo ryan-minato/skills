@@ -8,16 +8,10 @@ artifacts:
     template: research.md
     instruction: |
       Write the research spec. Objective and Evaluation are required; add
-      Context, Search Scope, Constraints, Completion Condition, and
-      Hypotheses only when they carry information. Any section may be one
-      line; delete an empty one rather than filling it with template
-      prose. The Objective states a problem, never a solution trajectory;
-      the Evaluation names the benchmark or evaluation set by identity and
-      the metric definitions, citing the project's existing benchmark rather
-      than restating it. Search Scope is a hypothesis about where answers
-      lie, not a permission boundary. This spec evolves as findings arrive;
-      runs stay attributed to the version they ran under, and their records
-      are never rewritten.
+      the other sections only when they carry information, any of them one
+      line, and delete an empty section rather than filling it. The spec
+      evolves as findings arrive; runs stay attributed to the version they
+      ran under, and their records are never rewritten.
     requires: []
 
   - id: hypotheses
@@ -25,12 +19,9 @@ artifacts:
     description: The hypothesis log - one row per hypothesis with its spec version, snapshot commit, runs, verdict, and evidence
     template: hypotheses.md
     instruction: |
-      Keep one row per hypothesis: an id, the statement, the spec version it
-      belongs to, the snapshot commit that ran it, the run ids or tracker
-      links, the verdict (supported, refuted, inconclusive), and the
-      comparison that decided it. Snapshot before every run; a dirty tree
-      launches nothing. Negative and inconclusive verdicts are recorded with
-      the same care as wins - they are what prevents repetition.
+      Keep one row per hypothesis, in the template's columns. Snapshot
+      before every run; a dirty tree launches nothing. Negative and
+      inconclusive verdicts are recorded with the same care as wins.
     requires:
       - research
 

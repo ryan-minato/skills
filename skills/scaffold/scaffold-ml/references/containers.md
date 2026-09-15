@@ -30,6 +30,15 @@ sealed        the environment plus the source tree copied in; the target
               for a run that must be reproducible from the image alone
 ```
 
+For the requirements carrier the environment stage installs the compiled
+file instead of the lock:
+
+```dockerfile
+ENV UV_TORCH_BACKEND=<backend matching the base image>
+COPY requirements.txt .
+RUN uv venv --python <version> /opt/venv && uv pip sync --python /opt/venv/bin/python requirements.txt
+```
+
 Only the CUDA or ROCm layer comes from the base image; the environment
 equals the committed lock (`uv sync --frozen --no-dev` for a uv project,
 `uv pip sync requirements.txt` for the requirements carrier), which is
@@ -89,13 +98,17 @@ asset carries an `shm_size` placeholder and the dev-container asset an
 value. Plain `docker run` configures nothing — add `--shm-size` (or
 `ipc: host`) yourself.
 
-## Assets
+## Task-runner recipes
 
-- Dev environment → `assets/devcontainer.json`
-  to `.devcontainer/devcontainer.json` (uv and just features, the GPU
-  flags the GPU container builder decided, shared memory, post-create
-  setup for the chosen carrier, cache directory).
-- Training image and runner → `assets/Dockerfile`,
-  `assets/compose.yaml`, and `assets/dockerignore` (to `.dockerignore`)
-  at the project root; the justfile's `docker-build` and `docker-digest`
-  recipes land in the same change.
+Append to the justfile; `<project name>` is the one slot. The sealed
+build refuses a dirty tree so the stamp is the code inside; the digest
+recipe prints what a run exports as `IMAGE_DIGEST`.
+
+```just
+docker-build target="runtime":
+    @if [ "{{target}}" = sealed ] && [ -n "$(git status --porcelain)" ]; then echo "docker-build: commit first; a sealed image stamps the commit it copies" >&2; exit 1; fi
+    docker build --target {{target}} --build-arg GIT_COMMIT=$(git rev-parse HEAD) --iidfile .image-id -t <project name>:{{target}} .
+
+docker-digest:
+    @cat .image-id
+```
