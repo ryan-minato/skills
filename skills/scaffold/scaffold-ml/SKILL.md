@@ -102,25 +102,38 @@ AGENTS.md, docs/data.md      the harness: commands, rules, when-to-read
    when the carrier is the requirements workflow, when creating or
    updating the requirements files, or when a development machine differs
    from the training box.
-4. **Configuration surface.** Default: dataclass schema in
-   [`config.py`](assets/config.py), named states in
-   [`configs/config.yaml`](assets/configs/config.yaml), command-line
-   overrides, and one resolved document written to
-   `outputs/<run_id>/config.resolved.yaml` before the first step. Expose
+4. **Configuration surface.** Default: a dataclass schema, named states
+   in `configs/*.yaml`, command-line overrides, and one resolved document
+   written to `outputs/<run_id>/config.resolved.yaml` before the first
+   step. Copy [`config.py`](assets/config.py) and
+   [`configs/config.yaml`](assets/configs/config.yaml) and fill every
+   placeholder and every `MISSING` value; add the fields the project's
+   data, model, and optimizer take. The schema keeps the loop's
+   control-plane fields and the named choices (`model.name`,
+   `optim.name`); construction stays in `train.py`. Expose
    values a run may choose — named choices, never import paths,
    registries, control flow, or deep inheritance; call searched values
    that are not hyperparameters search variables. Read
    [references/config-surface.md](references/config-surface.md) when
    creating or restructuring `configs/`, when a configuration file starts
    naming classes or conditionals, or when the project already runs Hydra.
-5. **Manifest and tracker.** Copy [`run_manifest.py`](assets/run_manifest.py)
-   unchanged; [`train.py`](assets/train.py) writes the manifest at start
-   and finalizes it at the end (the start-time record is kept). Select
+5. **Manifest, loop, and tracker.** Copy
+   [`run_manifest.py`](assets/run_manifest.py) and
+   [`stages.py`](assets/stages.py) unchanged. Copy
+   [`train.py`](assets/train.py) and fill its placeholders — model,
+   optimizer, training loader, scheduler, forward pass, evaluation,
+   resume step, parent run — without touching its seams: it writes the
+   manifest at start and finalizes it at the end (the start-time record
+   is kept), and metrics leave only through `log_metrics`. Copy
+   [`eval.py`](assets/eval.py) and fill its model-load and
+   evaluation-loader placeholders; it imports `evaluate` from
+   `train.py`. Select
    the tracker by precedence: a working tracker the project already uses;
    else the hosting platform's experiment tracking when it provides one
    (GitLab's experiments); else Trackio. Wire it through the loop's single
    logging seam; the manifest starts before the tracker so its identity
-   fields ride along as the tracker's parameters. Deposit the snapshot
+   fields ride along as the tracker's parameters; once it is wired, set
+   `run.tracker` in `configs/config.yaml`. Deposit the snapshot
    rule (commit before every run; the entry points refuse a dirty tree,
    and `run.allow_dirty=true` is the one override, for a throwaway run
    marked degraded) and the retention rule (a tag per run or a kept

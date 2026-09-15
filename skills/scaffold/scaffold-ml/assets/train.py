@@ -4,11 +4,9 @@
     just train optim.lr=1e-4        # one override
     accelerate launch train.py ...  # multi-device; the loop does not change
 
-Every run: the tree is clean (or `run.allow_dirty=true` marks the run
-degraded), one run id is shared by every process, the resolved configuration
-and the manifest are written before the first step and the manifest is
-finalized at the end, the tracker receives the manifest's identity fields,
-metrics go through one logging seam, stages through one trace seam.
+Every run leaves config.resolved.yaml, manifest.json, and manifest.running.json
+under outputs/<run_id>/; metrics leave through log_metrics, stage time through
+stage(). The <placeholders> are the project's; the seams around them are not.
 """
 
 from __future__ import annotations
@@ -18,11 +16,9 @@ import sys
 import uuid
 from pathlib import Path
 
-import torch
 from accelerate import Accelerator
 from accelerate.utils import broadcast_object_list, set_seed
 from omegaconf import DictConfig, OmegaConf
-from torch.utils.data import DataLoader
 
 from config import TrainConfig
 from run_manifest import finish_manifest, source_snapshot, start_manifest
@@ -65,29 +61,6 @@ def manifest_params(manifest_path: Path) -> dict:
         "parent_run_id": manifest["parent_run_id"],
         "degraded": ",".join(manifest["degraded"]),
     }
-
-
-def build_dataloader(cfg) -> DataLoader:
-    dataset = <build the dataset from cfg.data.train — the identity, not a branch>
-    # The project's one sanctioned try/except lives in the dataset or collate
-    # path: skip KNOWN-dirty samples, counting and logging every skip.
-    # Everything else crashes with its traceback.
-    return DataLoader(
-        dataset,
-        batch_size=cfg.data.batch_size,
-        shuffle=True,
-        num_workers=cfg.data.num_workers,
-        pin_memory=True,
-    )
-
-
-def build_optimizer(cfg, model) -> torch.optim.Optimizer:
-    # Named choices only; construction stays in code.
-    if cfg.optim.name == "adamw":
-        return torch.optim.AdamW(model.parameters(), lr=cfg.optim.lr, weight_decay=cfg.optim.weight_decay)
-    if cfg.optim.name == "sgd":
-        return torch.optim.SGD(model.parameters(), lr=cfg.optim.lr, weight_decay=cfg.optim.weight_decay)
-    raise ValueError(f"unknown optimizer {cfg.optim.name!r}")
 
 
 def log_metrics(accelerator: Accelerator, step: int, metrics: dict) -> None:
@@ -155,9 +128,9 @@ def main() -> None:
 
         set_seed(cfg.run.seed)
         model = <build the model from cfg.model — a named choice>
-        optimizer = build_optimizer(cfg, model)
-        train_loader = build_dataloader(cfg)
-        scheduler = <lr scheduler from cfg.optim, or None>
+        optimizer = <build the optimizer from cfg.optim.name — construction stays in code>
+        train_loader = <build the training DataLoader from cfg.data.train — the identity, not a branch>
+        scheduler = <lr scheduler stepping after optimizer.step(), or None>
 
         # prepare() is the entire device story: no manual .to(device) anywhere.
         # Multi-GPU comes from `accelerate launch train.py`; offload and FSDP
@@ -170,7 +143,7 @@ def main() -> None:
             accelerator.load_state(cfg.run.resume_from)
             step = <restore the step counter, e.g. from the checkpoint dir name>
 
-        grad_norm = None  # set on every optimizer step, before it is logged
+        grad_norm = None  # the clipping seam's return; None where a plugin clips for us
         model.train()
         iterator = iter(train_loader)
         while step < cfg.run.steps:
@@ -180,7 +153,6 @@ def main() -> None:
                 except StopIteration:
                     iterator = iter(train_loader)
                     batch = next(iterator)
-            # No try/except around the step: a crash points at the bug.
             with accelerator.accumulate(model):
                 with stage("forward"):
                     loss = <forward pass returning a scalar loss>
@@ -197,11 +169,10 @@ def main() -> None:
                 continue  # an accumulation micro-batch: no optimizer step happened
             step += 1
             if step % cfg.run.log_every_steps == 0:
-                log_metrics(
-                    accelerator,
-                    step,
-                    {"loss": loss.item(), "grad_norm": float(grad_norm), "lr": optimizer.param_groups[0]["lr"]},
-                )
+                metrics = {"loss": loss.item(), "lr": optimizer.param_groups[0]["lr"]}
+                if grad_norm is not None:
+                    metrics["grad_norm"] = float(grad_norm)
+                log_metrics(accelerator, step, metrics)
             if step % cfg.run.eval_every_steps == 0:
                 log_metrics(accelerator, step, evaluate(accelerator, model, <eval loader>))
                 model.train()  # evaluate() switches to eval mode; the next step must train again
