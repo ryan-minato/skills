@@ -80,31 +80,12 @@ chain is written.
 | checkpoint or data read slow, storage alerts | storage latency versus link throughput; request concurrency and queues; metadata service | [references/checkpoint-and-storage.md](references/checkpoint-and-storage.md) when checkpoints or data reads are slow, or storage latency alerts fire |
 | resident signals cannot separate the remaining causes | profiler window; memory snapshot; communication debug window; replay | [references/deep-diagnosis-tools.md](references/deep-diagnosis-tools.md) when the resident signals cannot separate the remaining causes and a profiler, memory snapshot, communication debug window, or replay must be switched on |
 
-## Numerical instability and replay
+## Numerical instability
 
-Reconstruct the timeline across loss, learning rate, precision scale,
-gradient norm and clipping, update magnitude, optimizer second moment,
-activations, and the batch identity. The usual order of suspicion:
-learning-rate or schedule change → an abnormal batch → gradient or update
-blow-up → optimizer second-moment lag → precision overflow → distributed
-or hardware fault. Then replay:
-
-```text
-save the offending batch, model state, optimizer state, scaler state
-→ replay step T0 with the same batch and seed
-→ in full precision
-→ on another device or node
-→ with per-layer gradient, update, and activation logging
-→ split into micro-batches and per-example losses
-```
-
-Reproduces everywhere → data or model and optimizer state, and hardware
-is ruled out (a hardware cause is plausible only when the anomaly follows
-the device); isolate the micro-batch or layer. Reproduces only on the
-original device → quarantine that device for a health test and recompute
-the affected steps elsewhere.
 Do not lower the learning rate and restart before the replay: it hides
-the cause and the same spike returns later.
+the cause and the same spike returns later. The timeline, the order of
+suspicion, and the replay ladder are in the reference the symptom index
+names for a spike or NaN.
 
 ## Deep diagnosis
 
@@ -117,13 +98,11 @@ debug mode enabled.
 
 ## The evidence chain
 
-Deliver every diagnosis as the chain in
-[`assets/evidence-chain.md`](assets/evidence-chain.md): T0; the
-symptom; the signals consulted with their values; the causes ruled out
-and why; the root cause; the fix; the verification that confirmed it;
-the signal that was missing. Keep the chain to what the evidence
-supports; when two causes remain, report both with the deciding signal to
-capture next, and do not pick one. Run a sensitivity check on any log
+Deliver every diagnosis as
+[`assets/evidence-chain.md`](assets/evidence-chain.md), filled line by
+line. Keep the chain to what the evidence supports; when two causes
+remain, report both with the deciding signal to capture next, and do not
+pick one. Run a sensitivity check on any log
 excerpt before it leaves the machine. This skill pairs with
 `sensitivity-check` for it. If it is not installed, load the
 `ryan-minato-skills-installing` skill and install `sensitivity-check` as
@@ -161,10 +140,5 @@ say so.
 - An idle network link does not clear the storage path: request-queue
   saturation and metadata limits throttle writes while bandwidth sits
   unused.
-- The framework's allocator statistics see only their own allocations;
-  communication buffers and other native allocations are invisible.
 - Bounded oscillation at a large learning rate can be normal training at
   the edge of stability; runaway growth is the failure.
-- A seed does not make a run deterministic; a "same seed, different
-  result" comparison proves nothing without the determinism flags.
-- The last error message is the end of the causal chain, not its start.
