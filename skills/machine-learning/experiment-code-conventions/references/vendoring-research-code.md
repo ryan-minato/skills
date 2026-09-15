@@ -16,7 +16,7 @@ component is the project's responsibility from that moment.
 
 | Mode | Goal | Rule |
 |---|---|---|
-| Replication | reproduce a baseline faithfully | minimize semantic difference from the original: copy the component, adapt only the interface, change nothing that affects the numbers; keep a characterization test against the original outputs |
+| Replication | reproduce a baseline faithfully | minimize semantic difference from the original: copy the component, adapt only the interface, change nothing that affects the numbers — a nonstandard initialization or an epsilon is part of the semantics, documented rather than fixed; keep a characterization test against the original outputs |
 | Innovation | build on the idea | keep only the research semantics; the original's engineering structure is not inherited, and the implementation may be better than the source |
 
 State the mode in the vendored module's header and in the project's
@@ -25,12 +25,13 @@ not a replication.
 
 ## Procedure
 
-1. Record the upstream: URL, exact commit, license, the files taken, and
-   the date. Keep the license text with the code and respect its
-   attribution terms.
+1. Record the upstream: URL, exact commit (never a branch name or
+   `master`), license, the files taken, and the date. Keep the license
+   text with the code and respect its attribution terms.
 2. Copy the smallest surface the project needs; delete training loops,
-   experiment tracking, dataset preparation, and task code the project
-   does not use.
+   experiment tracking, dataset preparation, task code the project does
+   not use, and the upstream's configuration system — take the
+   mechanism, leave the machinery.
 3. Adapt the interface to the project's conventions (configuration
    surface, logging seam, tensor conventions) without touching the
    semantics in replication mode.
@@ -40,13 +41,3 @@ not a replication.
    a test pass; explain any accepted difference.
 5. Record the boundary in the project's architecture notes: what is
    vendored, from where, in which mode, and what test guards it.
-
-## Gotchas
-
-- A branch name or "master" is not an upstream identity; record the
-  commit.
-- Copying the upstream's configuration system along with the model
-  imports its abstractions; take the mechanism, leave the machinery.
-- Upstream numerical quirks (a nonstandard initialization, an epsilon)
-  are part of the semantics in replication mode; document them instead of
-  fixing them.

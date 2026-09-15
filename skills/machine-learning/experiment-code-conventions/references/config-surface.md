@@ -16,26 +16,14 @@ the source first.
 Typed schema + YAML + command-line overrides + a resolved dump:
 
 ```python
-from dataclasses import dataclass, field
-from omegaconf import OmegaConf
-
-@dataclass
-class OptimConfig:
-    name: str = "adamw"          # adamw | sgd — named choices the code supports
-    lr: float = 3e-4
-    weight_decay: float = 0.01
-
-@dataclass
-class TrainConfig:
-    seed: int = 0
-    steps: int = 10_000
-    optim: OptimConfig = field(default_factory=OptimConfig)
-    data: str = "hf:org/dataset@<revision>"   # an identity, not a branch
-
 schema = OmegaConf.structured(TrainConfig)
 cfg = OmegaConf.merge(schema, OmegaConf.load("configs/base.yaml"), OmegaConf.from_cli())
-OmegaConf.save(OmegaConf.to_container(cfg, resolve=True), run_dir / "config.resolved.yaml")
+OmegaConf.save(cfg, run_dir / "config.resolved.yaml", resolve=True)
 ```
+
+`TrainConfig` nests one dataclass per group (data, model, optim, run); a
+named choice is a string field such as `optim.name`, never a class path;
+the defaults are the project's, not this skill's.
 
 - The schema is the legal surface: a key the schema lacks is an error,
   a wrong type is an error.

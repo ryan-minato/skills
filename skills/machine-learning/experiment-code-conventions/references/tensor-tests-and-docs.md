@@ -20,8 +20,7 @@ The project's own contracts, where a mistake would corrupt a result:
 - adaptation and integration code around a third-party library — not
   the library itself.
 
-Use small real tensors on the CPU. Mocking tensor operations tests the
-mock.
+Use small real tensors on the CPU.
 
 ## Suites and cost
 
