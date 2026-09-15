@@ -18,4 +18,4 @@
 
 ## 4. Finish
 
-- [ ] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, run `just spec-validate`; archiving waits for the maintainer's instruction
+- [x] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, run `just spec-validate`; archiving waits for the maintainer's instruction
