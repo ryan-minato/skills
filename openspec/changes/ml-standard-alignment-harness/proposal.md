@@ -16,11 +16,12 @@ cannot silently let them drift.
   through the installing skill.
 - `.agents/knowledge/harness-maintenance.md` register rows: the run
   manifest module (`skills/machine-learning/experiment-provenance/assets/run_manifest.py`
-  ↔ `skills/scaffold/scaffold-ml/assets/run_manifest.py`, byte-identical
-  apart from the docstring's first line) and the research-spec section
-  headings (`skills/machine-learning/research-workflow/assets/research-spec.md`
-  ↔ the `research-task` schema template under
-  `skills/scaffold/scaffold-ml/assets/`), each with its trigger and owner.
+  ↔ `skills/scaffold/scaffold-ml/assets/run_manifest.py`, byte-identical)
+  and the research-spec section headings
+  (`skills/machine-learning/research-workflow/assets/research-spec.md`
+  ↔ `skills/scaffold/scaffold-ml/assets/openspec/research-task/templates/research.md`,
+  the scaffold's one skeleton for both the OpenSpec and the no-tool
+  path), each with its trigger and owner.
 - `.claude-plugin/marketplace.json`: the `scaffold` plugin description,
   if the skill change moves its wording.
 

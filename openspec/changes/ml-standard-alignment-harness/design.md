@@ -15,7 +15,7 @@ touches.
 | What Changes bullet | File | Check that proves it |
 |---|---|---|
 | Cross-catalog naming rule | `skills/scaffold/CONTEXT.md` `## Dependencies`, one sentence after the existing grant bullets | read-through; `just validate` (`check_catalogs`) |
-| Register rows | `.agents/knowledge/harness-maintenance.md`, two rows in the mirrored-pairs table: the manifest module and the research-spec headings | `diff skills/machine-learning/experiment-provenance/assets/run_manifest.py skills/scaffold/scaffold-ml/assets/run_manifest.py` shows only the docstring's first line; `grep -c '^## ' skills/machine-learning/research-workflow/assets/research-spec.md` equals the template's heading count; `just validate` (`validate_harness.py` register checks) |
+| Register rows | `.agents/knowledge/harness-maintenance.md`, two rows in the mirrored-pairs table: the manifest module and the research-spec headings (two files: the durable skill's `research-spec.md` and the scaffold's `templates/research.md`) | `cmp skills/machine-learning/experiment-provenance/assets/run_manifest.py skills/scaffold/scaffold-ml/assets/run_manifest.py` is silent; the `## ` heading lists of the two research-spec files are identical; `just validate` (`validate_harness.py` register checks) |
 | Marketplace description | `.claude-plugin/marketplace.json` `scaffold` plugin `description` | `just gen-marketplace` then `git diff --exit-code` on the `skills` arrays (only the description line may differ); `just validate` |
 
 ## External impact
@@ -44,7 +44,7 @@ touches.
 
 - Cross-catalog rule: read-through of `skills/scaffold/CONTEXT.md`;
   `just validate` green.
-- Register rows: the two commands in the placement table run green;
+- Register rows: the two commands in the placement table run green (rerun after the scaffold's separate `research-spec.md` is removed);
   `just validate` green.
 - Marketplace: `just gen-marketplace` then `git diff --exit-code
   .claude-plugin/marketplace.json` after the description edit is

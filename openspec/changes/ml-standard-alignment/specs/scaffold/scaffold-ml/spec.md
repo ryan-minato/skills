@@ -23,7 +23,7 @@ The builder description SHALL open with the disposable-builder marker and SHALL 
 - **THEN** the builder does not load
 
 ### Requirement: Behavior: One project shape, with existing choices preserved
-The builder SHALL establish one shape — a package or flat module chosen by the extraction rule, `configs/` with a typed schema and YAML states, a committed dependency lock from the carrier the user chose, a training entry point that is an explicit loop on an acceleration library with seeding, gradient accumulation, checkpoint save and resume, an evaluation cadence, one logging seam and one stage-trace seam, an evaluation entry point bound to the project's recorded benchmark or evaluation-set identity, a launch command for multi-device runs, `data/raw/` as the local cache of immutable inputs whose identities the manifest records and which no transformation writes into, `outputs/<run_id>/` for run artifacts, focused tests, and an agent entrypoint — SHALL default the framework to PyTorch with Accelerate, SHALL keep a framework the project already uses, SHALL, when the inventory shows a JAX signal (TPU hardware; a differentiable simulation or solver; scientific or numerical research where the computation outweighs the model; higher-order differentiation; heavy composition of grad, vmap, and jit; large homogeneous parallel computation; compiler or automatic-differentiation research), evaluate JAX against PyTorch from the evidence, present one recommendation with its reason, and leave the decision to the user, recording the chosen framework and its deciding signal in the agent entrypoint, SHALL, when JAX is chosen, deposit the framework-neutral parts unchanged and write the training entry point from its documented JAX loop shape instead of the Accelerate asset, SHALL not offer a quick-experiment versus maintainable-project choice, and SHALL keep a working configuration framework, settings library, or requirements workflow the repository already uses, adding only the missing provenance, tracker, and marker rules.
+The builder SHALL establish one shape — a package or flat module chosen by the extraction rule, `configs/` with a typed schema and YAML states, a committed dependency lock from the carrier the user chose, a training entry point that is an explicit loop on an acceleration library with seeding, gradient accumulation, checkpoint save and resume, an evaluation cadence, one logging seam and one stage-trace seam, an evaluation entry point bound to the project's recorded benchmark or evaluation-set identity, a launch command for multi-device runs, `data/raw/` as the local cache of immutable inputs whose identities the manifest records and which no transformation writes into, `outputs/<run_id>/` for run artifacts, focused tests, and an agent entrypoint — SHALL default the framework to PyTorch with Accelerate, SHALL keep a framework the project already uses, SHALL, when the inventory shows a JAX signal (TPU hardware; a differentiable simulation or solver; scientific or numerical research where the computation outweighs the model; higher-order differentiation; heavy composition of grad, vmap, and jit; large homogeneous parallel computation; compiler or automatic-differentiation research), evaluate JAX against PyTorch from the evidence, present one recommendation with its reason, and leave the decision to the user, recording the chosen framework and its deciding signal in the agent entrypoint, SHALL, when JAX is chosen, deposit the framework-neutral parts unchanged, declare the JAX dependencies and base image in place of the PyTorch ones, and write both entry points from its documented JAX loop shape instead of the Accelerate assets, SHALL not offer a quick-experiment versus maintainable-project choice, and SHALL keep a working configuration framework, settings library, or requirements workflow the repository already uses, adding only the missing provenance, tracker, and marker rules.
 
 #### Scenario: Empty repository
 - **WHEN** the repository has no training code and the user asks for the scaffold
@@ -39,7 +39,7 @@ The builder SHALL establish one shape — a package or flat module chosen by the
 
 #### Scenario: JAX signal present
 - **WHEN** the inventory shows a TPU target or a differentiable simulation whose whole solver must be differentiated
-- **THEN** the builder presents the signals with their evidence, the cost of each framework here, and one recommendation, waits for the user's decision, records the decision and its signal in the entrypoint, and, when JAX is chosen, keeps every framework-neutral asset and writes the loop from the JAX loop shape
+- **THEN** the builder presents the signals with their evidence, the cost of each framework here, and one recommendation, waits for the user's decision, records the decision and its signal in the entrypoint, and, when JAX is chosen, keeps the framework-neutral assets, takes the dependency declaration and the base image from the JAX sections of the hardware and container references, and writes both entry points from the JAX loop shape
 
 #### Scenario: Existing JAX project
 - **WHEN** the repository already trains with JAX
@@ -137,6 +137,10 @@ When the user opts into containers, the builder SHALL provide a multi-stage reci
 - **WHEN** the training entry point runs inside a sealed image with no repository present
 - **THEN** the manifest records the stamped commit with an unknown dirty flag and the injected digest, and lists no missing commit under degraded
 
+#### Scenario: Compose run without a digest
+- **WHEN** the Compose service starts the training entry point with `IMAGE_DIGEST` left at its empty default
+- **THEN** the manifest records no image digest, lists `no_image_digest` under degraded, and the run is cited as degraded
+
 #### Scenario: No container requested
 - **WHEN** the user does not ask for a container
 - **THEN** the builder scaffolds no Dockerfile, Compose file, or dev container and records the lock digest as the environment identity
@@ -169,7 +173,7 @@ The builder SHALL deposit the research-task convention — a research spec with 
 
 #### Scenario: No spec tool
 - **WHEN** the repository runs no spec tool
-- **THEN** the builder deposits the research section pointing at `research/<task>/spec.md` and the skeleton, and installs no tool
+- **THEN** the builder deposits the research section pointing at `research/<task>/spec.md`, copies the spec and hypothesis-log skeletons beside each other there, and installs no tool
 
 #### Scenario: Specification workflow builder runs afterwards
 - **WHEN** the specification workflow builder inspects the project after the scaffold's deposit
