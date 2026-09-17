@@ -2,9 +2,9 @@
 # pull request comments: `/spec show [<change>] [proposal|design|tasks|specs|all]`,
 # `/spec status [<change>]`, `/spec help`. An `issue_comment` run uses the
 # workflow file and the checkout of the DEFAULT branch, so every script comes
-# from there; the pull request's head is fetched as git objects only and read
-# by the script, never checked out, installed, or executed — which is what
-# makes the job safe for pull requests from forks. Only a collaborator
+# from there; the pull request's head is fetched by its exact SHA as git
+# objects only and read by the script, never checked out, installed, or
+# executed — which is what makes the job safe for pull requests from forks. Only a collaborator
 # (owner, member, collaborator) or the pull request's author may invoke it.
 # Replies are posted with the platform token, whose comments start no
 # workflow run, so the job cannot loop. Replace {{PINNED_SHA}} with the
@@ -55,7 +55,7 @@ jobs:
             echo "base=$base"
             echo "state=$(jq -r .state "$RUNNER_TEMP/pr.json")"
           } >> "$GITHUB_OUTPUT"
-          git fetch --no-tags origin "+refs/pull/$N/head:refs/remotes/pr/$N" "+refs/heads/$base:refs/remotes/origin/$base"
+          git fetch --no-tags origin "$head" "+refs/heads/$base:refs/remotes/origin/$base"
       - name: Run the command and reply
         env:
           COMMENT_BODY: ${{ github.event.comment.body }}
@@ -81,12 +81,12 @@ jobs:
                 for a in "$@"; do
                   case "$a" in proposal|design|tasks|specs|all) doc="$a" ;; *) change="$a" ;; esac
                 done
-                python3 scripts/spec_changes.py show --base "origin/$BASE" --head "pr/$N" \
+                python3 scripts/spec_changes.py show --base "origin/$BASE" --head "$HEAD" \
                   ${change:+--change "$change"} --doc "$doc" \
                   --url-prefix "https://github.com/$REPO/blob/$HEAD" --max-chars 60000
                 ;;
               status)
-                python3 scripts/spec_changes.py status --base "origin/$BASE" --head "pr/$N" ${1:+--change "$1"}
+                python3 scripts/spec_changes.py status --base "origin/$BASE" --head "$HEAD" ${1:+--change "$1"}
                 ;;
               *)
                 printf 'Commands: `/spec show [<change>] [proposal|design|tasks|specs|all]`, `/spec status [<change>]`, `/spec help`.\n'

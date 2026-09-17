@@ -17,8 +17,9 @@
 # `pull_request_target` runs with a writable token; every script and the CLI
 # install come from the BASE checkout in `base/`. Head content is checked
 # out into `pr/` only when the head repository is this repository (its code
-# already runs in the project's own CI); a fork's head is fetched as objects
-# for the status table and never checked out, installed, or executed.
+# already runs in the project's own CI); a fork's head is fetched by its SHA
+# as objects for the status table and never checked out, installed, or
+# executed.
 # Replace every {{PLACEHOLDER}}; `scripts/spec_changes.py` is the project's
 # copy of this skill's script; the commit subject follows the project's
 # commit convention.
@@ -67,14 +68,16 @@ jobs:
           printf 'This pull request is not open: nothing was archived. Archive on a new branch.\n' > "$RUNNER_TEMP/summary.md"
       - name: Fork — post the commands instead of pushing
         if: env.OPEN == 'true' && env.SAME_REPO != 'true'
+        env:
+          EVENT_HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
-          git -C base fetch --no-tags origin "+refs/pull/$N/head:refs/remotes/pr/$N"
+          git -C base fetch --no-tags origin "$EVENT_HEAD"
           {
             printf '@%s this pull request comes from a fork, so the bot cannot push to it. Archive locally:\n\n' "$AUTHOR"
             printf '```bash\n%s\npython3 scripts/spec_changes.py archive --base origin/%s --head HEAD\n%s\ngit add openspec\ngit commit -m "%s"\ngit push\n```\n\n' \
               "{{INSTALL_COMMAND}}" "$BASE_REF" "{{VALIDATE_COMMAND}}" "{{ARCHIVE_COMMIT_SUBJECT}}"
             printf 'Current state of the related changes:\n\n'
-            python3 base/scripts/spec_changes.py --root base status --base "origin/$BASE_REF" --head "pr/$N"
+            python3 base/scripts/spec_changes.py --root base status --base "origin/$BASE_REF" --head "$EVENT_HEAD"
           } > "$RUNNER_TEMP/summary.md"
       - uses: "actions/checkout@{{PINNED_SHA}}"
         if: env.OPEN == 'true' && env.SAME_REPO == 'true'
