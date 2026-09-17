@@ -1,0 +1,96 @@
+# GitLab CI jobs for Spec-Kit features in merge requests. Include this file
+# from the project's `.gitlab-ci.yml` (`include: - local: ...`) or paste the
+# jobs in; add the `spec` stage or rename the stage below. Replace
+# {{PYTHON_IMAGE}}. `scripts/spec_kit_features.py` is the project's copy of
+# this skill's script. Spec-Kit has no archive operation, so there is no
+# archive job: completion is every task ticked, which `spec:check` enforces
+# once the merge request is no longer a draft.
+#
+# GitLab offers no pipeline source for a merge request note or a label
+# change: `spec:show` and `spec:status` are manual jobs whose arguments come
+# from the manual job's variables form; their output goes to the job log
+# and, with SPEC_NOTE_TOKEN (api scope, masked), to a merge request note;
+# `spec:labels` applies the progress label with SPEC_LABELS_TOKEN (api
+# scope) or only prints the plan. Merge request pipelines from a fork run in
+# the fork without the parent's variables, so notes and labels work for a
+# fork only when a parent-project member runs the pipeline in the parent
+# context. Enforcement is the project setting "Pipelines must succeed".
+
+variables:
+  GIT_DEPTH: "0"
+
+.spec-base:
+  image: "{{PYTHON_IMAGE}}"
+  stage: spec
+  before_script:
+    - export SPEC_BASE="$CI_MERGE_REQUEST_DIFF_BASE_SHA" SPEC_HEAD="$CI_COMMIT_SHA"
+    - export SPEC_API="$CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID"
+
+spec:check:
+  extends: .spec-base
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - |
+      if [ -n "$CI_MERGE_REQUEST_IID" ]; then
+        flag=""
+        case "$CI_MERGE_REQUEST_TITLE" in Draft:*|WIP:*) flag="--draft" ;; esac
+        python3 scripts/spec_kit_features.py check --base "$SPEC_BASE" --head "$SPEC_HEAD" $flag
+      else
+        python3 scripts/spec_kit_features.py check --all
+      fi
+
+spec:show:
+  extends: .spec-base
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+      allow_failure: true
+  variables:
+    SPEC_FEATURE: ""
+    SPEC_DOC: "all"
+  script:
+    - |
+      python3 scripts/spec_kit_features.py show --base "$SPEC_BASE" --head "$SPEC_HEAD" \
+        ${SPEC_FEATURE:+--feature "$SPEC_FEATURE"} --doc "$SPEC_DOC" \
+        --url-prefix "$CI_PROJECT_URL/-/blob/$CI_COMMIT_SHA" --max-chars 60000 | tee reply.md
+      if [ -n "$SPEC_NOTE_TOKEN" ]; then
+        jq -Rs '{body: .}' reply.md > note.json
+        curl --fail --silent --header "PRIVATE-TOKEN: $SPEC_NOTE_TOKEN" --header "Content-Type: application/json" \
+          --data @note.json "$SPEC_API/notes" > /dev/null
+      fi
+
+spec:status:
+  extends: .spec-base
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+      allow_failure: true
+  variables:
+    SPEC_FEATURE: ""
+  script:
+    - |
+      python3 scripts/spec_kit_features.py status --base "$SPEC_BASE" --head "$SPEC_HEAD" \
+        ${SPEC_FEATURE:+--feature "$SPEC_FEATURE"} | tee reply.md
+      if [ -n "$SPEC_NOTE_TOKEN" ]; then
+        jq -Rs '{body: .}' reply.md > note.json
+        curl --fail --silent --header "PRIVATE-TOKEN: $SPEC_NOTE_TOKEN" --header "Content-Type: application/json" \
+          --data @note.json "$SPEC_API/notes" > /dev/null
+      fi
+
+spec:labels:
+  extends: .spec-base
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      allow_failure: true
+  script:
+    - |
+      python3 scripts/spec_kit_features.py labels --base "$SPEC_BASE" --head "$SPEC_HEAD" --current "$CI_MERGE_REQUEST_LABELS" --json | tee plan.json
+      if [ -n "$SPEC_LABELS_TOKEN" ]; then
+        add=$(jq -r '.add | join(",")' plan.json); remove=$(jq -r '.remove | join(",")' plan.json)
+        curl --fail --silent --request PUT --header "PRIVATE-TOKEN: $SPEC_LABELS_TOKEN" \
+          --data-urlencode "add_labels=$add" --data-urlencode "remove_labels=$remove" "$SPEC_API" > /dev/null
+      else
+        echo "SPEC_LABELS_TOKEN is not set: plan printed, labels unchanged."
+      fi
