@@ -84,7 +84,11 @@ out.
   fork it reads the snapshot, posts the commands, and pushes nothing.
   Write the comparison in the `if:` itself rather than behind an `env`
   variable: the guard is then visible at the step it guards, and code
-  scanning recognizes it.
+  scanning recognizes it. The CLI install and the CLI itself are
+  third-party code, so the token stays out of their reach: no checkout
+  persists credentials, the install runs before the head is checked out,
+  archiving runs in a step without the token, and only the push and API
+  steps receive it (the push through a one-shot header).
 - The snapshot fetches only the documents the commands read and caps
   what one request can make a runner read: files touched, bytes per file,
   bytes in total, and API requests (the platform token's REST budget is
@@ -107,7 +111,9 @@ directory), and the phase marker the project's template uses.
 
 - Every workflow parses; actions are pinned by commit; `permissions: {}`
   at the top of each; the archive workflow's fork step contains no
-  `git push`.
+  `git push`; its checkouts set `persist-credentials: false`, and
+  `GH_TOKEN` appears only in the `env` of the fork, push, and summary
+  steps, never at the job level.
 - No privileged workflow fetches or checks out the head: `grep -n 'git .*fetch\|checkout'`
   over the three files finds only the base checkouts and the
   same-repository checkout guarded by the literal `head.repo.full_name`

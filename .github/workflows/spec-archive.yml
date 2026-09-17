@@ -21,6 +21,12 @@
 # already runs in the project's own CI. A fork's head is never fetched into
 # the runner's git store: it is read through the REST API by the base's own
 # script, which parses it and never executes it.
+#
+# The token reaches only the steps that call the API or push: no checkout
+# persists credentials, the CLI is installed before the head is checked out
+# and runs in a step without the token, and the push authenticates through
+# a one-shot header. Third-party install and CLI code therefore never sees
+# the token in its environment or on disk.
 # `scripts/spec_changes.py` is the project's copy of the openspec-workflow
 # skill's script; the commit subject follows this repository's commit
 # convention.
@@ -50,7 +56,6 @@ jobs:
       pull-requests: write
       issues: write
     env:
-      GH_TOKEN: ${{ github.token }}
       N: ${{ github.event.pull_request.number }}
       REPO: ${{ github.repository }}
       BASE_REF: ${{ github.event.pull_request.base.ref }}
@@ -60,6 +65,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: base
+          persist-credentials: false
       - name: Note a pull request that is not open
         if: github.event.pull_request.state != 'open'
         run: |
@@ -68,6 +74,8 @@ jobs:
         if: >-
           github.event.pull_request.state == 'open'
           && github.event.pull_request.head.repo.full_name != github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python3 base/scripts/spec_changes.py snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
           {
@@ -77,14 +85,6 @@ jobs:
             printf 'Current state of the related changes:\n\n'
             python3 base/scripts/spec_changes.py status --snapshot "$RUNNER_TEMP/snapshot.json"
           } > "$RUNNER_TEMP/summary.md"
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: >-
-          github.event.pull_request.state == 'open'
-          && github.event.pull_request.head.repo.full_name == github.repository
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          path: pr
-          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         if: >-
           github.event.pull_request.state == 'open'
@@ -97,18 +97,27 @@ jobs:
           && github.event.pull_request.head.repo.full_name == github.repository
         working-directory: base
         run: "python3 -m pip install --quiet rust-just==1.58.0 && just install-tools"
-      - name: Archive, commit, push, relabel
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: >-
+          github.event.pull_request.state == 'open'
+          && github.event.pull_request.head.repo.full_name == github.repository
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      - id: archive
+        name: Archive and commit locally
         if: >-
           github.event.pull_request.state == 'open'
           && github.event.pull_request.head.repo.full_name == github.repository
         env:
           EVENT_HEAD: ${{ github.event.pull_request.head.sha }}
-          CURRENT: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
-          git -C pr fetch --no-tags origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          # fetch-depth 0 fetched every branch, so origin/$BASE_REF is present.
           tip=$(git -C pr rev-parse HEAD)
-          moved=""
-          [ "$tip" = "$EVENT_HEAD" ] || moved="The branch moved after the label was applied; the latest tip $tip was archived."
+          [ "$tip" = "$EVENT_HEAD" ] \
+            || printf 'The branch moved after the label was applied; the latest tip %s was archived.\n\n' "$tip" > "$RUNNER_TEMP/moved.md"
           if ! python3 base/scripts/spec_changes.py --root pr archive --base "origin/$BASE_REF" --head HEAD --json \
               > "$RUNNER_TEMP/plan.json" 2> "$RUNNER_TEMP/archive.err"; then
             {
@@ -123,7 +132,6 @@ jobs:
             printf 'Nothing to archive: every related change is already archived or removed.\n' > "$RUNNER_TEMP/summary.md"
             exit 0
           fi
-          count=$(jq -r '.archived | length' "$RUNNER_TEMP/plan.json")
           subject=$(jq -r '.archived | if length == 1 then "docs: archive the \(.[0]) change"
             elif length == 2 then "docs: archive the \(.[0]) and \(.[1]) changes"
             else "docs: archive the \(.[:-1] | join(", ")), and \(.[-1]) changes" end' "$RUNNER_TEMP/plan.json")
@@ -131,10 +139,22 @@ jobs:
           git -C pr config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C pr add openspec
           git -C pr commit -q -m "$subject"
-          if ! git -C pr push origin "HEAD:$HEAD_REF"; then
+          echo "commit=true" >> "$GITHUB_OUTPUT"
+      - name: Push and relabel
+        if: steps.archive.outputs.commit == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURRENT: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          basic=$(printf '%s:%s' x-access-token "$GH_TOKEN" | base64 -w0)
+          echo "::add-mask::$basic"
+          if ! GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.$GITHUB_SERVER_URL/.extraheader" \
+              GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $basic" git -C pr push origin "HEAD:$HEAD_REF"; then
             printf 'The archive commit could not be pushed: the branch moved during the run. Push your work, then apply `spec/archive` again.\n' > "$RUNNER_TEMP/summary.md"
             exit 1
           fi
+          count=$(jq -r '.archived | length' "$RUNNER_TEMP/plan.json")
+          names=$(jq -r '.archived | join(", ")' "$RUNNER_TEMP/plan.json")
           sha=$(git -C pr rev-parse HEAD)
           python3 base/scripts/spec_changes.py --root pr labels --base "origin/$BASE_REF" --head HEAD --current "$CURRENT" --json \
             > "$RUNNER_TEMP/labels.json"
@@ -146,12 +166,14 @@ jobs:
           done
           {
             printf 'Archived %s change(s) in %s: %s.\n\n' "$count" "$sha" "$names"
-            [ -z "$moved" ] || printf '%s\n\n' "$moved"
+            [ ! -s "$RUNNER_TEMP/moved.md" ] || cat "$RUNNER_TEMP/moved.md"
             printf 'A user with write access must click **Approve workflows to run** in the merge box for the checks to run on this commit. '
             printf 'The `Spec:` link in the description may now point at the archive directory of each change.\n'
           } > "$RUNNER_TEMP/summary.md"
       - name: Remove the trigger label and post the summary
         if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh api -X DELETE "repos/$REPO/issues/$N/labels/spec%2Farchive" > /dev/null || true
           [ -s "$RUNNER_TEMP/summary.md" ] || printf 'The archive run ended before it could report; see the workflow log.\n' > "$RUNNER_TEMP/summary.md"
