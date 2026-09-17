@@ -37,16 +37,25 @@ specification, which nothing in the kit enforces.
 
 ## Fork safety
 
-- `spec / command` runs the default-branch workflow file and checkout;
-  the head is fetched by its exact SHA as git objects and read by the
-  base's script. Comment text reaches the shell only through `env`,
-  with globbing off, and only as arguments to the script.
-- `spec / labels` uses `pull_request_target`, whose token is writable even
-  for a fork; it is safe because the checkout is the base, the head is
-  fetched by its SHA as objects, and nothing from the head executes. Never
-  add a checkout of the head, an install from it, or a `run:` of its
-  files; a code-scanning finding on the fetch is reviewed against these
-  rules and dismissed by the maintainer, never satisfied by a checkout.
+One rule carries this, and it is structural rather than a promise: **no
+object authored by the request ever reaches a privileged runner.** A
+privileged job (`pull_request_target`, `issue_comment`) checks out the
+base and reads the head through `spec_kit_features.py snapshot`, which
+pulls the file list and the documents from the REST API. The head's bytes
+are parsed and never executed, so a later edit cannot turn a `git
+checkout` typo into a takeover: the head is not in the runner's git store
+to check out. Never add a checkout of the head, a `git fetch` of it, an
+install from it, or a `run:` of its files.
+
+- `spec / command` runs the default-branch workflow file and checkout, so
+  every script comes from the base. Comment text reaches the shell only
+  through `env`, with globbing off, and only as arguments to the script.
+- `spec / labels` applies only labels that match the literal taxonomy
+  written in the workflow, so a tampered script cannot make it apply an
+  arbitrary one.
+- The snapshot caps what one request can make a runner read: files
+  touched, bytes per file, bytes in total. Over a cap the job fails loudly
+  instead of labeling on partial data.
 - Commands need a collaborator or the author; the bot's own comments start
   no workflow run.
 
@@ -54,6 +63,11 @@ specification, which nothing in the kit enforces.
 
 - Every workflow parses; actions are pinned by commit; `permissions: {}`
   at the top of each.
+- No privileged workflow fetches or checks out the head: `grep -n 'git .*fetch\|checkout'`
+  over the two files finds only the base checkouts.
+- `snapshot --repo <o/r> --pr <n>` on a real pull request exits 0, and
+  `status --snapshot` on its output matches `status --base ... --head ...`
+  run against a local clone.
 - `python3 scripts/spec_kit_features.py --help` exits 0; `check --draft`
   on a branch whose touched feature has an open task exits 0 with a
   warning, `check` exits 1; a touched feature without `plan.md` fails

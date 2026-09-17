@@ -3,13 +3,29 @@
 
 A request's *touched features* are the numbered feature directories under
 the kit's specs directory (default ``specs/``, entries named
-``<NNN>-<name>``) whose files the diff between ``--base`` and ``--head``
-touches. Every subcommand reads the head through git plumbing, so the head
-never needs a checkout. Layout verified against Spec-Kit's templates and
-feature script on 2026-09-17: ``spec.md`` and ``plan.md`` are required,
-``tasks.md`` lists tasks as ``- [ ] T001 ...`` checkboxes, and the feature
-script creates the directory and no git branch. The kit ships no validator
-and no archive operation: completion is every task ticked.
+``<NNN>-<name>``) whose files the request touches. Layout verified against
+Spec-Kit's templates and feature script on 2026-09-17: ``spec.md`` and
+``plan.md`` are required, ``tasks.md`` lists tasks as ``- [ ] T001 ...``
+checkboxes, and the feature script creates the directory and no git
+branch. The kit ships no validator and no archive operation: completion is
+every task ticked.
+
+The head is read through one of two sources, never through a checkout:
+
+* ``--base``/``--head`` reads the two commits with git plumbing. Use it
+  where the head is already trusted or already present: a developer's
+  clone, or an unprivileged pull-request check that checks the head out
+  the ordinary way.
+* ``--snapshot FILE`` reads a document built by the ``snapshot`` command,
+  which pulls the head's file list and contents from the GitHub REST API.
+  Use it in every privileged workflow (``pull_request_target``,
+  ``issue_comment``, ``workflow_run``), so no object authored by the
+  request ever reaches the runner's git store. The snapshot's bytes are
+  parsed and never executed, feature names are checked against the
+  numbered-directory pattern before they reach a URL, and the byte and
+  file caps below bound what one request can make the workflow read.
+
+``check --all`` is the exception: it reads the working tree.
 
 Exit codes: 0 success; 1 a finding or a failure; 2 bad arguments, an
 unresolvable ref, or a tree that is not a git repository.
@@ -18,10 +34,16 @@ unresolvable ref, or a tree that is not a git repository.
 from __future__ import annotations
 
 import argparse
+import base64
 import json
+import os
 import re
 import subprocess
 import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 OPEN_TASK = re.compile(r"^\s*-\s*\[ \]\s+(.*)$", re.MULTILINE)
@@ -31,6 +53,13 @@ DOCS = ("spec", "plan", "tasks")
 REQUIRED = ("spec.md", "plan.md")
 PROGRESS_LABELS = ("spec/not-started", "spec/in-progress", "spec/done")
 
+SNAPSHOT_SCHEMA = "spec-kit-snapshot/1"
+SAFE_REPO = re.compile(r"^[A-Za-z0-9._-]{1,100}/[A-Za-z0-9._-]{1,100}$")
+TEXT_SUFFIXES = (".md", ".yaml", ".yml", ".txt", ".json")
+MAX_FILES = 3000
+MAX_FILE_BYTES = 1_000_000
+MAX_TOTAL_BYTES = 8_000_000
+
 
 class Usage(Exception):
     """Bad arguments or an unusable repository (exit 2)."""
@@ -38,6 +67,9 @@ class Usage(Exception):
 
 class Failure(Exception):
     """A finding or a failure (exit 1)."""
+
+
+# --- git plumbing ---------------------------------------------------------
 
 
 def git(root: Path, *args: str, check: bool = True) -> str:
@@ -55,34 +87,255 @@ def resolve(root: Path, ref: str, what: str) -> str:
     )
     if result.returncode != 0:
         raise Usage(
-            f"{what} {ref!r} does not resolve to a commit in {root}; fetch it first "
-            "(for a pull request head: `git fetch origin refs/pull/<n>/head`)."
+            f"{what} {ref!r} does not resolve to a commit in {root}; fetch it first, or read the head "
+            "through `snapshot` instead of fetching it into a privileged workflow."
         )
     return result.stdout.strip()
 
 
-def diff_names(root: Path, base: str, head: str) -> list[str]:
-    result = subprocess.run(
-        ["git", "-C", str(root), "diff", "--name-only", "--no-renames", f"{base}...{head}"],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        raise Usage(
-            f"`git diff {base}...{head}` failed ({result.stderr.strip()}); the merge base must be reachable — "
-            "fetch with full history (fetch-depth 0) rather than a shallow clone."
+# --- sources --------------------------------------------------------------
+
+
+class Source:
+    """A read-only view of the head."""
+
+    base_label = "base"
+    head_label = "head"
+
+    def changed_paths(self) -> list[str]:
+        raise NotImplementedError
+
+    def entries(self, path: str) -> list[str]:
+        raise NotImplementedError
+
+    def read(self, path: str) -> str | None:
+        raise NotImplementedError
+
+
+class GitSource(Source):
+    """Reads the two commits out of a local git object store."""
+
+    def __init__(self, root: Path, base: str, head: str) -> None:
+        self.root = root
+        self.base = base
+        self.head = head
+        self.base_label = base
+        self.head_label = head
+
+    def changed_paths(self) -> list[str]:
+        result = subprocess.run(
+            ["git", "-C", str(self.root), "diff", "--name-only", "--no-renames", f"{self.base}...{self.head}"],
+            capture_output=True,
+            text=True,
         )
-    return [line for line in result.stdout.splitlines() if line]
+        if result.returncode != 0:
+            raise Usage(
+                f"`git diff {self.base}...{self.head}` failed ({result.stderr.strip()}); the merge base must be "
+                "reachable — fetch with full history (fetch-depth 0) rather than a shallow clone."
+            )
+        return [line for line in result.stdout.splitlines() if line]
+
+    def entries(self, path: str) -> list[str]:
+        out = git(self.root, "ls-tree", "--name-only", self.head, f"{path.rstrip('/')}/", check=False)
+        return [line.rsplit("/", 1)[-1] for line in out.splitlines() if line]
+
+    def read(self, path: str) -> str | None:
+        result = subprocess.run(
+            ["git", "-C", str(self.root), "show", f"{self.head}:{path}"], capture_output=True, text=True
+        )
+        return result.stdout if result.returncode == 0 else None
 
 
-def tree_entries(root: Path, ref: str, path: str) -> list[str]:
-    out = git(root, "ls-tree", "--name-only", ref, f"{path.rstrip('/')}/", check=False)
-    return [line.rsplit("/", 1)[-1] for line in out.splitlines() if line]
+class SnapshotSource(Source):
+    """Reads a snapshot document built from the GitHub REST API."""
+
+    def __init__(self, doc: dict) -> None:
+        if doc.get("schema") != SNAPSHOT_SCHEMA:
+            raise Usage(f"snapshot schema {doc.get('schema')!r} is not {SNAPSHOT_SCHEMA!r}; rebuild it.")
+        self.doc = doc
+        self.head = doc.get("head") or {}
+        self.base_label = (doc.get("base") or {}).get("sha", "base")
+        self.head_label = self.head.get("sha", "head")
+
+    def changed_paths(self) -> list[str]:
+        return list(self.doc.get("changed_paths") or [])
+
+    def entries(self, path: str) -> list[str]:
+        prefix = path.rstrip("/") + "/"
+        names: list[str] = []
+        for item in list(self.head.get("dirs") or []) + list(self.head.get("paths") or []):
+            if item.startswith(prefix):
+                name = item[len(prefix) :].split("/")[0]
+                if name and name not in names:
+                    names.append(name)
+        return names
+
+    def read(self, path: str) -> str | None:
+        return (self.head.get("files") or {}).get(path)
 
 
-def read_file(root: Path, ref: str, path: str) -> str | None:
-    result = subprocess.run(["git", "-C", str(root), "show", f"{ref}:{path}"], capture_output=True, text=True)
-    return result.stdout if result.returncode == 0 else None
+# --- github rest api ------------------------------------------------------
+
+
+class Api:
+    """The few REST reads the snapshot needs, over the standard library."""
+
+    def __init__(self, repo: str, api_url: str, auth: str) -> None:
+        if not SAFE_REPO.match(repo):
+            raise Usage(f"--repo {repo!r} is not an OWNER/NAME pair.")
+        self.repo = repo
+        self.api_url = api_url.rstrip("/")
+        self.auth = auth
+        self.calls = 0
+
+    def get(self, path: str, allow_404: bool = False):
+        url = f"{self.api_url}/{path.lstrip('/')}"
+        request = urllib.request.Request(
+            url,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {self.auth}",
+                "X-GitHub-Api-Version": "2022-11-28",
+                "User-Agent": "spec-kit-features",
+            },
+        )
+        for attempt in range(3):
+            try:
+                self.calls += 1
+                with urllib.request.urlopen(request, timeout=30) as response:
+                    return json.loads(response.read().decode("utf-8"))
+            except urllib.error.HTTPError as exc:
+                if exc.code == 404 and allow_404:
+                    return None
+                if exc.code in (429, 500, 502, 503, 504) and attempt < 2:
+                    time.sleep(2**attempt)
+                    continue
+                detail = exc.read().decode("utf-8", "replace")[:200].replace("\n", " ")
+                raise Failure(
+                    f"GitHub API {exc.code} for {path}: {detail}; check the token's permissions "
+                    "(a read needs `contents: read` and `pull-requests: read`)."
+                ) from exc
+            except urllib.error.URLError as exc:
+                if attempt < 2:
+                    time.sleep(2**attempt)
+                    continue
+                raise Failure(f"cannot reach the GitHub API at {url}: {exc.reason}") from exc
+        raise Failure(f"GitHub API kept failing for {path}.")
+
+    def pull(self, number: int) -> dict:
+        data = self.get(f"repos/{self.repo}/pulls/{number}")
+        if not isinstance(data, dict):
+            raise Failure(f"pull request {number} did not return an object.")
+        return data
+
+    def pull_files(self, number: int, max_files: int) -> list[str]:
+        paths: list[str] = []
+        page = 1
+        while True:
+            batch = self.get(f"repos/{self.repo}/pulls/{number}/files?per_page=100&page={page}")
+            if not batch:
+                break
+            paths.extend(item["filename"] for item in batch if "filename" in item)
+            if len(batch) < 100 or len(paths) >= max_files:
+                break
+            page += 1
+        if len(paths) >= max_files:
+            raise Failure(
+                f"the request touches at least {len(paths)} files, at or over the --max-files cap "
+                f"({max_files}); split the request, or raise the cap deliberately."
+            )
+        return paths
+
+    def tree(self, sha: str, recursive: bool = False) -> dict | None:
+        query = "?recursive=1" if recursive else ""
+        return self.get(f"repos/{self.repo}/git/trees/{urllib.parse.quote(sha, safe='')}{query}", allow_404=True)
+
+    def blob_text(self, sha: str) -> str | None:
+        data = self.get(f"repos/{self.repo}/git/blobs/{urllib.parse.quote(sha, safe='')}", allow_404=True)
+        if not data or data.get("encoding") != "base64":
+            return None
+        try:
+            return base64.b64decode(data["content"]).decode("utf-8")
+        except (ValueError, UnicodeDecodeError):
+            return None
+
+
+def tree_sha_at(api: Api, commit: str, segments: list[str]) -> str | None:
+    """Walk a commit's tree down a path, one tree read per segment."""
+    sha = commit
+    for segment in segments:
+        data = api.tree(sha)
+        if not data:
+            return None
+        entry = next((e for e in data.get("tree", []) if e.get("path") == segment and e.get("type") == "tree"), None)
+        if entry is None:
+            return None
+        sha = entry["sha"]
+    return sha
+
+
+def build_snapshot(api: Api, number: int, specs_dir: str, caps: dict) -> dict:
+    pull = api.pull(number)
+    base_sha = pull["base"]["sha"]
+    head_sha = pull["head"]["sha"]
+    changed = api.pull_files(number, caps["max_files"])
+
+    dirs: list[str] = []
+    shas: dict[str, str] = {}
+    root = tree_sha_at(api, head_sha, specs_dir.split("/"))
+    if root:
+        for entry in (api.tree(root) or {}).get("tree", []):
+            if entry.get("type") == "tree":
+                dirs.append(f"{specs_dir}/{entry['path']}")
+                shas[f"{specs_dir}/{entry['path']}"] = entry["sha"]
+
+    skipped: list[dict] = []
+    paths: list[str] = []
+    files: dict[str, str] = {}
+    total = 0
+    for name in feature_names(changed, specs_dir):
+        path = f"{specs_dir}/{name}"
+        if path not in shas:
+            continue
+        listing = api.tree(shas[path], recursive=True) or {"tree": []}
+        if listing.get("truncated"):
+            skipped.append({"name": name, "reason": "the feature directory's tree came back truncated"})
+        for entry in listing.get("tree", []):
+            if entry.get("type") != "blob":
+                continue
+            full = f"{path}/{entry['path']}"
+            paths.append(full)
+            if not full.endswith(TEXT_SUFFIXES):
+                skipped.append({"path": full, "reason": "not a text document"})
+                continue
+            size = int(entry.get("size") or 0)
+            if size > caps["max_file_bytes"]:
+                skipped.append({"path": full, "reason": f"{size} bytes is over the per-file cap"})
+                continue
+            if total + size > caps["max_total_bytes"]:
+                skipped.append({"path": full, "reason": "the snapshot's total byte cap was reached"})
+                continue
+            text = api.blob_text(entry["sha"])
+            if text is None:
+                skipped.append({"path": full, "reason": "not decodable as UTF-8 text"})
+                continue
+            files[full] = text
+            total += size
+
+    return {
+        "schema": SNAPSHOT_SCHEMA,
+        "repo": api.repo,
+        "pull_request": number,
+        "specs_dir": specs_dir,
+        "changed_paths": changed,
+        "base": {"sha": base_sha},
+        "head": {"sha": head_sha, "dirs": dirs, "paths": sorted(paths), "files": files},
+        "skipped": skipped,
+        "bytes": total,
+    }
+
+
+# --- touched features -----------------------------------------------------
 
 
 def feature_names(paths: list[str], specs_dir: str) -> list[str]:
@@ -111,20 +364,20 @@ def task_counts(text: str | None) -> dict:
     return {"done": done, "open": len(open_tasks), "open_tasks": open_tasks, "progress": progress}
 
 
-def describe(root: Path, ref: str, specs_dir: str, name: str) -> dict:
+def describe(source: Source, specs_dir: str, name: str) -> dict:
     path = f"{specs_dir}/{name}"
-    present = set(tree_entries(root, ref, path))
+    present = set(source.entries(path))
     return {
         "name": name,
         "path": path,
         "state": "present" if present else "removed",
         "missing": [f for f in REQUIRED if f not in present] if present else [],
-        "tasks": task_counts(read_file(root, ref, f"{path}/tasks.md")) if present else task_counts(None),
+        "tasks": task_counts(source.read(f"{path}/tasks.md")) if present else task_counts(None),
     }
 
 
-def touched_features(root: Path, base: str, head: str, specs_dir: str) -> list[dict]:
-    return [describe(root, head, specs_dir, n) for n in feature_names(diff_names(root, base, head), specs_dir)]
+def touched_features(source: Source, specs_dir: str) -> list[dict]:
+    return [describe(source, specs_dir, n) for n in feature_names(source.changed_paths(), specs_dir)]
 
 
 def select(features: list[dict], wanted: list[str]) -> list[dict]:
@@ -164,7 +417,7 @@ def fence_for(text: str) -> str:
     return "`" * max(3, longest + 1)
 
 
-def show_markdown(root: Path, head: str, features: list[dict], doc: str, url_prefix: str, max_chars: int) -> str:
+def show_markdown(source: Source, features: list[dict], doc: str, url_prefix: str, max_chars: int) -> str:
     docs = DOCS if doc == "all" else (doc,)
     out: list[str] = []
     used = 0
@@ -179,7 +432,7 @@ def show_markdown(root: Path, head: str, features: list[dict], doc: str, url_pre
             p = f"{f['path']}/{d}.md"
             link = f"{url_prefix.rstrip('/')}/{p}" if url_prefix else p
             header = f"**{p}** ([view]({link}))\n\n" if url_prefix else f"**{p}**\n\n"
-            text = read_file(root, head, p)
+            text = source.read(p)
             if text is None:
                 block = f"**{p}** — _no {d}.md yet_\n\n"
             elif overflow:
@@ -197,10 +450,45 @@ def show_markdown(root: Path, head: str, features: list[dict], doc: str, url_pre
     return "".join(out) or "No touched Spec-Kit feature: the diff touches nothing under the specs directory.\n"
 
 
+# --- commands -------------------------------------------------------------
+
+
+def cmd_snapshot(args, root, specs_dir) -> int:
+    auth = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if not auth:
+        raise Usage("snapshot needs a GitHub token in GH_TOKEN or GITHUB_TOKEN.")
+    if args.pr <= 0:
+        raise Usage("--pr must be a positive pull request number.")
+    api = Api(args.repo, args.api_url, auth)
+    caps = {
+        "max_files": args.max_files,
+        "max_file_bytes": args.max_file_bytes,
+        "max_total_bytes": args.max_total_bytes,
+    }
+    doc = build_snapshot(api, args.pr, specs_dir, caps)
+    text = json.dumps(doc, indent=2)
+    if args.out:
+        try:
+            Path(args.out).write_text(text + "\n", encoding="utf-8")
+        except OSError as exc:
+            raise Usage(f"cannot write the snapshot to {args.out}: {exc}") from exc
+        print(
+            f"snapshot of {api.repo}#{args.pr} at {doc['head']['sha'][:7]}: "
+            f"{len(doc['head']['files'])} file(s), {doc['bytes']} byte(s), {api.calls} API call(s) → {args.out}",
+            file=sys.stderr,
+        )
+    else:
+        print(text)
+    for item in doc["skipped"]:
+        print(f"skipped {item.get('path') or item.get('name')}: {item['reason']}", file=sys.stderr)
+    return 0
+
+
 def cmd_related(args, root, specs_dir) -> int:
-    features = touched_features(root, args.base, args.head, specs_dir)
+    source = args.source
+    features = touched_features(source, specs_dir)
     if args.json:
-        print(json.dumps({"base": args.base, "head": args.head, "features": features}, indent=2))
+        print(json.dumps({"base": source.base_label, "head": source.head_label, "features": features}, indent=2))
     else:
         for f in features:
             print(f"{f['name']}\t{f['state']}\t{f['tasks']['done']}/{f['tasks']['open']}")
@@ -208,17 +496,19 @@ def cmd_related(args, root, specs_dir) -> int:
 
 
 def cmd_status(args, root, specs_dir) -> int:
-    features = select(touched_features(root, args.base, args.head, specs_dir), args.feature)
+    source = args.source
+    features = select(touched_features(source, specs_dir), args.feature)
     if args.json:
-        print(json.dumps({"base": args.base, "head": args.head, "features": features}, indent=2))
+        print(json.dumps({"base": source.base_label, "head": source.head_label, "features": features}, indent=2))
     else:
         sys.stdout.write(status_markdown(features))
     return 0
 
 
 def cmd_show(args, root, specs_dir) -> int:
-    features = select(touched_features(root, args.base, args.head, specs_dir), [args.feature] if args.feature else [])
-    sys.stdout.write(show_markdown(root, args.head, features, args.doc, args.url_prefix, args.max_chars))
+    source = args.source
+    features = select(touched_features(source, specs_dir), [args.feature] if args.feature else [])
+    sys.stdout.write(show_markdown(source, features, args.doc, args.url_prefix, args.max_chars))
     return 0
 
 
@@ -232,7 +522,7 @@ def cmd_check(args, root, specs_dir) -> int:
                     if not (entry / required).is_file():
                         findings.append(f"feature {entry.name}: missing {required}.")
     else:
-        for f in touched_features(root, args.base, args.head, specs_dir):
+        for f in touched_features(args.source, specs_dir):
             if f["state"] == "removed":
                 continue
             for m in f["missing"]:
@@ -267,9 +557,7 @@ def cmd_labels(args, root, specs_dir) -> int:
     if args.taxonomy:
         print(json.dumps({"managed": list(PROGRESS_LABELS)}, indent=2))
         return 0
-    if not (args.base and args.head):
-        raise Usage("labels needs --base and --head (or --taxonomy).")
-    desired = desired_labels(touched_features(root, args.base, args.head, specs_dir))
+    desired = desired_labels(touched_features(args.source, specs_dir))
     current = [label.strip() for label in (args.current or "").split(",") if label.strip()]
     result = {
         "desired": desired,
@@ -284,36 +572,55 @@ def cmd_labels(args, root, specs_dir) -> int:
     return 0
 
 
+# --- argument parsing -----------------------------------------------------
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="spec_kit_features.py",
         description="Resolve, show, check, and label the Spec-Kit features a pull or merge request touches.",
         epilog=(
             "Examples: python3 scripts/spec_kit_features.py status --base origin/main --head HEAD; "
-            "python3 scripts/spec_kit_features.py check --base origin/main --head HEAD --draft"
+            "python3 scripts/spec_kit_features.py snapshot --repo owner/name --pr 12 --out snapshot.json; "
+            "python3 scripts/spec_kit_features.py labels --snapshot snapshot.json"
         ),
     )
     parser.add_argument("--root", default=".", help="git work tree holding the specs directory (default: .)")
     parser.add_argument("--specs-dir", default="specs", help="the kit's specs directory relative to --root")
     sub = parser.add_subparsers(dest="command", required=True, metavar="<command>")
 
-    def refs(p: argparse.ArgumentParser, required: bool = True) -> None:
-        p.add_argument("--base", required=required, help="base ref (the target branch)")
-        p.add_argument("--head", required=required, help="head ref (the request's tip)")
+    def reads(p: argparse.ArgumentParser) -> None:
+        group = p.add_argument_group("head source (one of)")
+        group.add_argument("--base", help="base ref, read with git plumbing (with --head)")
+        group.add_argument("--head", help="head ref, read with git plumbing (with --base)")
+        group.add_argument(
+            "--snapshot",
+            help="snapshot file from the snapshot command; the only source a privileged workflow may use",
+        )
+
+    p = sub.add_parser("snapshot", help="build a head snapshot from the GitHub REST API (no checkout, no fetch)")
+    p.add_argument("--repo", required=True, help="OWNER/NAME of the repository the pull request targets")
+    p.add_argument("--pr", required=True, type=int, help="pull request number")
+    p.add_argument("--out", help="write the snapshot here (default: stdout)")
+    p.add_argument("--api-url", default=os.environ.get("GITHUB_API_URL", "https://api.github.com"))
+    p.add_argument("--max-files", type=int, default=MAX_FILES, help=f"cap on touched files (default {MAX_FILES})")
+    p.add_argument("--max-file-bytes", type=int, default=MAX_FILE_BYTES, help="per-file byte cap")
+    p.add_argument("--max-total-bytes", type=int, default=MAX_TOTAL_BYTES, help="total byte cap")
+    p.set_defaults(func=cmd_snapshot)
 
     p = sub.add_parser("related", help="list the touched features with their files and task counts")
-    refs(p)
+    reads(p)
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_related)
 
     p = sub.add_parser("status", help="print a progress table (markdown) for the touched features")
-    refs(p)
+    reads(p)
     p.add_argument("--feature", action="append", default=[], help="limit to this feature (repeatable)")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_status)
 
     p = sub.add_parser("show", help="print a feature's documents inside fenced blocks")
-    refs(p)
+    reads(p)
     p.add_argument("--feature", help="one touched feature (default: every touched feature)")
     p.add_argument("--doc", choices=(*DOCS, "all"), default="all")
     p.add_argument("--url-prefix", default="", help="link prefix, e.g. https://github.com/o/r/blob/<sha>")
@@ -321,18 +628,43 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_show)
 
     p = sub.add_parser("check", help="required files present; open tasks warn on a draft and fail when ready")
-    refs(p, required=False)
+    reads(p)
     p.add_argument("--all", action="store_true", help="check every feature's required files in the working tree")
     p.add_argument("--draft", action="store_true", help="report open tasks as warnings")
     p.set_defaults(func=cmd_check)
 
     p = sub.add_parser("labels", help="compute the progress label")
-    refs(p, required=False)
+    reads(p)
     p.add_argument("--current", default="", help="comma-separated labels currently on the request")
     p.add_argument("--taxonomy", action="store_true", help="print the managed label names")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_labels)
     return parser
+
+
+def open_source(args, root: Path) -> Source | None:
+    """Build the head source the command asked for, or None when it needs none."""
+    snapshot = getattr(args, "snapshot", None)
+    base, head = getattr(args, "base", None), getattr(args, "head", None)
+    if snapshot and (base or head):
+        raise Usage("--snapshot reads the head on its own; do not pass --base/--head with it.")
+    if snapshot:
+        try:
+            doc = json.loads(Path(snapshot).read_text(encoding="utf-8"))
+        except OSError as exc:
+            raise Usage(f"cannot read the snapshot {snapshot}: {exc}") from exc
+        except json.JSONDecodeError as exc:
+            raise Usage(f"snapshot {snapshot} is not valid JSON: {exc}") from exc
+        return SnapshotSource(doc)
+    if base and head:
+        if git(root, "rev-parse", "--git-dir", check=False).strip() == "":
+            raise Usage(f"{root} is not a git work tree.")
+        resolve(root, base, "--base")
+        resolve(root, head, "--head")
+        return GitSource(root, base, head)
+    if base or head:
+        raise Usage("--base and --head go together; pass both, or pass --snapshot instead.")
+    return None
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -344,13 +676,16 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.root).resolve()
     specs_dir = args.specs_dir.strip("/")
     try:
-        if git(root, "rev-parse", "--git-dir", check=False).strip() == "":
-            raise Usage(f"{root} is not a git work tree.")
-        if args.command == "check" and not args.all and not (args.base and args.head):
-            raise Usage("check needs --base and --head, or --all.")
-        if getattr(args, "base", None) and getattr(args, "head", None):
-            resolve(root, args.base, "--base")
-            resolve(root, args.head, "--head")
+        if args.command == "snapshot":
+            return args.func(args, root, specs_dir)
+        args.source = open_source(args, root)
+        needs_no_source = (args.command == "check" and args.all) or (args.command == "labels" and args.taxonomy)
+        if args.source is None and not needs_no_source:
+            raise Usage(
+                f"{args.command} needs a head source: --base with --head, or --snapshot from the snapshot command."
+            )
+        if args.command == "check" and args.all and args.source is not None:
+            raise Usage("check --all reads the working tree; do not pass a head source with it.")
         return args.func(args, root, specs_dir)
     except Usage as exc:
         print(f"error: {exc}", file=sys.stderr)
