@@ -18,18 +18,19 @@ acceptance criteria.
 
 Split shape: When the issue has no merged specification PR yet, the draft
 is the specification PR: its body references the issue with `Refs #N` in
-place of `Closes #N`, its only content is the change record (proposal and
-delta specs, created through the spec tool's commands and passing its
-validator), and its body reads `Phase: specification`. Stop there; the
+place of `Closes #N`, its only content is the approval package (the
+specification and the design when warranted, created through the spec
+tool's commands and passing its validator), and its body reads `Phase:
+specification`. Stop there; the
 gate owner's approval and merge of that PR is the approval. Each
 implementation PR links the merged record; only the last one carries
 `Closes #N`.
 
-Combined shape: Its first push is the change record — the proposal
-and the delta specs, created through the spec tool's commands and passing
-its validator, with no design or tasks — and the body's `Phase:` line
-reads `specification` while Changes and Validation keep their reserved
-line. Then stop. <discussion-closed: "The gate owner discusses on the PR
+Combined shape: The draft opens once the approval package is complete —
+the specification and, when warranted, the design, created through the
+spec tool's commands and passing its validator, with no task list — and
+the body's `Phase:` line reads `specification` while Changes and
+Validation keep their reserved line. Then stop. <discussion-closed: "The gate owner discusses on the PR
 and directs record changes in conversation; push each through the publish
 gate. When the gate owner says in conversation that the discussion is
 closed, read the PR's comments (`gh api repos/<owner/repo>/issues/<n>/comments`)
@@ -37,13 +38,13 @@ and its review threads with their resolution state (the GraphQL
 `reviewThreads` connection, field `isResolved`); list every unresolved
 thread, every adjustment requested in the discussion that the record does
 not carry, and every pair of conclusions that contradict each other; ask
-the gate owner to confirm them; and start design, tasks, and
+the gate owner to confirm them; and start the task list and the
 implementation only when nothing is open or the open items are confirmed.
 Record the closing on the `Approval:` line." | blocking: "Wait for the gate
-owner's `<exact text>` comment; it covers the record as of the last push
-before it, and a later push to the record needs a fresh comment unless the
-gate owner decided that push in conversation. Then run the same
-reconciliation of comments and review threads before design.">
+owner's `<exact text>` comment; it covers the package as of the last push
+before it, and a later push to the package needs a fresh comment unless
+the gate owner decided that push in conversation. Then run the same
+reconciliation of comments and review threads before the task list.">
 
 ## CREATE_WORK_RULE — `## Create issues`, before the tracking-issue sentence
 
@@ -60,8 +61,11 @@ Set the `Phase:` line to `implementation`; replace the reserved line of
 Changes with permalinks to the commits (the exact lines for a local
 change, the whole file or directory for a broad one) and the reserved line
 of Validation with each scenario and its result, linking the plan; and
-confirm the spec-side step: <in-request: "the change record is archived in
-this PR before it is marked ready" | automated: "every task of the change
-record is ticked so the `<archive workflow name>` workflow archives it
-after merge">. The local check command runs the specification validator; a
-red validator is a red check.
+confirm the spec-side step: every task of the change record is ticked and
+the record is archived in this PR before it is marked ready <by hand with
+the tool's archive command | "by hand, or by applying the `<trigger
+label>` label and waiting for the bot's commit — an authorized remote
+write; after the bot pushes, a user with write access approves the
+workflow runs">. The `<check job name>` check the framework skill
+installed fails a ready PR with an unarchived record; a red check is a red
+check.

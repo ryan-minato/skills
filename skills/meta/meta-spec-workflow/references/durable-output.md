@@ -54,11 +54,15 @@ The deposited file, adapted from the asset, must state:
   point to it.
 - The specification lifecycle (for example proposed, approved, implemented,
   archived) and the event that moves a spec between states.
-- The approval gate: who approves a specification before planning and
-  implementation, whether an agent may approve its own, and the mode —
-  discussion-closed (the agent stops after publishing, the owner closes
-  the discussion in conversation, the agent reconciles threads and record
-  before implementing) or blocking (the fixed comment text, what it
+- The approval gate: who approves before the task list and the
+  implementation, whether an agent may approve its own, the approval
+  package the gate is exercised on (the specification plus the design when
+  warranted, with the project's rule for when a design is warranted, the
+  design's role as bounds rather than steps, and the rule that it carries
+  no secret or private data), and the mode — discussion-closed (the agent
+  stops after publishing the complete package, the owner closes the
+  discussion in conversation, the agent reconciles threads and package
+  before the task list) or blocking (the fixed comment text, what it
   covers, when a fresh one is needed) — with the reconciliation step in
   both.
 - The division of labor with tracked work, phrased so an agent can apply it
@@ -68,11 +72,13 @@ The deposited file, adapted from the asset, must state:
   default specification author, where the approval is recorded, what the
   integration branch may hold, and the request body's lines: the
   specification block and the sections reserved until ready.
-- The archive mode (automated or in-request) with its selecting fact and,
-  for automated, the job's name, its serialization, idempotence, and
-  no-retry rules, and the push path by platform and owner type recorded
-  as a maintainer action; for in-request, the freeze that review works
-  under.
+- The archive executor — by hand, or the automation the framework skill
+  installs (the check, the comment commands, the trigger label, the status
+  labels), named as the framework skill installed them — with its
+  selecting fact, the fork rule, the freeze that review works under, and
+  the fact that archiving happens inside the request before ready.
+- The framework skill the project uses, as a fact, or that none exists
+  for the approach.
 - The specification scope: domains cover the product; the project's own
   harness, tooling, checks, workflows, and documents are spec-less changes
   under the tool's marker; the hand-corrected purpose line as the one
@@ -89,7 +95,9 @@ The deposited file, adapted from the asset, must state:
   step-5 check enforces it. Which intake fields, template lines, project
   skill steps, and checks exist because of this contract is the second
   phase's output, recorded in the platform knowledge file's Specifications
-  section, not in this file. Tool names are facts and appear as they are.
+  section, not in this file. Tool names and the framework skill's name are
+  facts and appear as they are; a tool's command, script, or workflow
+  never does.
 - No trace of the builder: the deposited file never carries this skill's
   disposable marker, name, or paths.
 - Governance and management are adjacent, not inlined: agent authority

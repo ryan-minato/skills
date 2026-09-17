@@ -20,17 +20,17 @@ acceptance criteria.
 Split shape: When the work item has no merged specification MR yet, the
 draft is the specification MR: its description references the work item
 with a non-closing reference in place of the closing pattern, its only
-content is the change record (proposal and delta specs, created through
-the spec tool's commands and passing its validator), and its description
-reads `Phase: specification`. Stop there; the gate owner's approval and
+content is the approval package (the specification and the design when
+warranted, created through the spec tool's commands and passing its
+validator), and its description reads `Phase: specification`. Stop there; the gate owner's approval and
 merge of that MR is the approval. Each implementation MR links the merged
 record; only the last one carries the closing pattern.
 
-Combined shape: Its first push is the change record — the proposal
-and the delta specs, created through the spec tool's commands and passing
-its validator, with no design or tasks — and the description's `Phase:`
-line reads `specification` while Changes and Validation keep their
-reserved line. Then stop. <discussion-closed: "The gate owner discusses on
+Combined shape: The draft opens once the approval package is complete —
+the specification and, when warranted, the design, created through the
+spec tool's commands and passing its validator, with no task list — and
+the description's `Phase:` line reads `specification` while Changes and
+Validation keep their reserved line. Then stop. <discussion-closed: "The gate owner discusses on
 the MR and directs record changes in conversation; push each through the
 publish gate. When the gate owner says in conversation that the discussion
 is closed, read the MR's discussions and their notes (the merge request
@@ -38,13 +38,13 @@ discussions API: resolution lives on each note, `resolvable: true` with
 `resolved: false` is an open one); list every discussion with an open
 note, every adjustment requested that the record
 does not carry, and every pair of conclusions that contradict each other;
-ask the gate owner to confirm them; and start design, tasks, and
+ask the gate owner to confirm them; and start the task list and the
 implementation only when nothing is open or the open items are confirmed.
 Record the closing on the `Approval:` line." | blocking: "Wait for the gate
-owner's `<exact text>` comment; it covers the record as of the last push
-before it, and a later push to the record needs a fresh comment unless the
-gate owner decided that push in conversation. Then run the same
-reconciliation of notes and discussions before design.">
+owner's `<exact text>` comment; it covers the package as of the last push
+before it, and a later push to the package needs a fresh comment unless
+the gate owner decided that push in conversation. Then run the same
+reconciliation of notes and discussions before the task list.">
 
 ## CREATE_WORK_RULE — a `## Create work` section inserted before `## Publish gate`
 
@@ -64,7 +64,8 @@ set the `Phase:` line to `implementation`, replace the reserved line of
 Changes with permalinks to the commits (the exact lines for a local
 change, the whole file or directory for a broad one) and the reserved line
 of Validation with each scenario and its result linking the plan, confirm
-the spec-side step — <in-request: "the change record is archived in this
-MR before the draft flag is removed" | automated: "every task of the change
-record is ticked so the `<archive job name>` job archives it after
-merge"> — and then
+the spec-side step — every task of the change record is ticked and the
+record is archived in this MR before the draft flag is removed <by hand
+with the tool's archive command | "by hand, or by applying the `<trigger
+label>` label and running the pipeline">; the `<check job name>` job the
+framework skill installed fails otherwise — and then

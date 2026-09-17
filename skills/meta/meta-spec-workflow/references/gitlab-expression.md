@@ -4,9 +4,9 @@ Read in step 7 when the evidenced platform is GitLab and the platform
 builder has delivered its base. The base registers its extension slots in
 its own durable-harness reference (`## Extension slots`): a slot is a
 heading, a step, or a section, never a marker. This file says what to
-insert into each slot for the contract's shape, approval mode, and archive
-mode; the exact texts live in `assets/gitlab/`. Never
-re-decide a contract fact here.
+insert into each slot for the contract's shape, approval package and
+mode, and archive executor; the exact texts live in `assets/gitlab/`.
+Never re-decide a contract fact here.
 
 ## Fill contract
 
@@ -30,51 +30,48 @@ re-decide a contract fact here.
 |---|---|---|---|
 | `RELATED_WORK_LINES` | MR template, `## Related work`, after the reference-syntax comment | the specification block: `Spec:`, `Phase:`, records, `Approval:` in the contract's mode | always |
 | `ACCEPTANCE_ITEM` | MR template, the checklist item beginning "The change satisfies" | ", or the scenarios of the linked change record" | always |
-| `CHECKLIST_ITEMS` | MR template, between the acceptance item and "The documented local checks pass" | the approval item worded for the mode; the archive item worded for the archive mode | always |
+| `CHECKLIST_ITEMS` | MR template, between the acceptance item and "The documented local checks pass" | the approval item worded for the mode and the package; the archive item worded for the archive executor | always |
 | `INTAKE_LINK_FIELD` | task template, one section before `## Acceptance criteria` | `## Specification` with its comment | always |
 | `ACCEPTANCE_SOURCE` | task template, the comment under `## Acceptance criteria` | the change-record alternative, "never both" | always |
 | `COMPLETION_SOURCE` | the goal milestone's description, under `## Observable completion` | link the specifications whose scenarios define it | always |
 | `TAKE_WORK_PRECONDITION` | project skill, `## Take and execute work` step 1 | combined: record to the draft first, then stop; split: unmerged specification MR is escalated | always |
 | `DRAFT_FIRST_CONTENT` | project skill, `## Take and execute work` step 3 | combined: the record as first push, `Phase: specification`, reserved sections, stop; the wait and the reconciliation for the mode. Split: a non-closing reference in place of the closing pattern on the specification MR, the record as its only content, the closing pattern on the last implementation MR | always |
 | `CREATE_WORK_RULE` | project skill, a `## Create work` section before `## Publish gate` | items carry no acceptance criteria and link the record; task-derived items optional; a non-closing reference for a specification MR | always |
-| `FINISH_STEP` | project skill, `## Take and execute work` step 6 | `Phase: implementation`, the reserved lines replaced, the spec-side step for the archive mode, the validator inside the check command | always |
-| archive job | `.gitlab-ci.yml` fragment from `assets/gitlab/ci-spec-archive.yml` | the resource-grouped job calling the project's copy of this builder's archive script | automated archiving with OpenSpec |
-| local check command | the command the MR checklist's "documented local checks" item and the pipeline already run | the tool's strict validator as one more step; no pipeline edit | the tool ships a validator |
-| `KNOWLEDGE_SECTION` | `.agents/knowledge/gitlab-workflow.md`, appended `## Specifications` | the contract's location, the slots filled because of it, the validator's place, the update trigger "when the spec directory or tool changes, re-check every template link" — never the contract's tables | always |
+| `FINISH_STEP` | project skill, `## Take and execute work` step 6 | `Phase: implementation`, the reserved lines replaced, the spec-side step for the archive executor, the check the framework skill installed | always |
+| `KNOWLEDGE_SECTION` | `.agents/knowledge/gitlab-workflow.md`, appended `## Specifications` | the contract's location, the slots filled because of it, the framework skill that owns the check, the manual jobs, and the labels, the update trigger "when the spec directory or tool changes, re-check every template link" — never the contract's tables | always |
 | `SYNC_ROW` | `.agents/knowledge/gitlab-workflow.md`, the `## Synchronization` table | one row per insertion above | per insertion |
-| `MAINTAINER_ACTION` | the platform-settings knowledge, one row | the push path below, with its readback | automated archiving |
+| `MAINTAINER_ACTION` | the platform-settings knowledge, one row each | the actions the framework skill names: the label creation, the token variables, "pipelines must succeed" | the framework skill's automation |
 
-Do not add a specification label or work-item type: a spec is a document
-in the repository, and its lifecycle lives in the tool's layout. The issue
-and incident templates are unchanged.
+The check, the manual jobs, the label-gated archive, the status labels,
+and the validator's place in the local check command are the framework
+skill's to install (the handoff of step 3); this builder edits no
+pipeline. Do not add a specification work-item type: a spec is a document
+in the repository, and its lifecycle lives in the tool's layout. The
+`spec/*` status labels are facts a job derives from the record and are
+applied by that job, never by hand. The issue and incident templates are
+unchanged.
 
 ## Ready-state rules
 
 State them in the knowledge section: a draft may hold the reserved lines
 and `Phase: specification`; removing the draft flag needs `Phase:
 implementation`, a `Spec:` line, no reserved line in Changes or
-Validation, and every checklist item ticked. A pipeline job that checks
-the description against these rules is a project asset, not this
-builder's.
+Validation, every checklist item ticked, and the framework skill's check
+green. A pipeline job that checks the description against these rules is
+a project asset, not this builder's.
 
-## Push path
+## Automation identity
 
-The archive job pushes to the protected default branch. Record the path as
-the `MAINTAINER_ACTION` row, and state in the contract that in-request
-archiving is in force until it exists: a project access token with write
-permission, stored as a masked, protected CI variable, **and** an
-allowed-to-push entry for that token's user on the protected branch — a
-valid token without the entry is refused. A push made with the token runs
-the default-branch pipeline again, including this job, whose second run
-finds nothing completed and exits 0; say so in the pipeline knowledge.
-
-Verify the CLI's non-interactive archive flag from its help before
-shipping the asset; the asset quotes none.
+When the framework skill installs an archive job, it pushes to the
+request's own source branch with a project access token the maintainer
+creates as a masked variable; the framework skill states what the token
+needs and what GitLab does not offer (no pipeline on a note or a label
+change). This builder records the token creation as a maintainer action
+and nothing else.
 
 ## Platform-native option
 
 When the contract records committed specification documents with no tool,
 the same slots apply: `## Specification` holds a repository path, the
-checklist carries the archive item, and no validator joins the check
-command. Do not promote work items or the Wiki into the specification
+checklist carries the archive item, and no framework skill exists. Do not promote work items or the Wiki into the specification
 store — a closed item reads as "done", not as a requirement.
