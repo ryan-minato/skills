@@ -28,7 +28,8 @@ tree, so both keep the git source. ``archive`` edits it through the
 OpenSpec CLI (``openspec archive <name> --yes``, plus ``--skip-specs``
 for a change whose ``.openspec.yaml`` sets ``skip_specs: true``; flags
 verified against OpenSpec 1.12.0 on 2026-09-17) and must only run where
-the head is already trusted.
+the head is already trusted. The CLI's own output goes to stderr, so
+``--json`` output on stdout stays machine-readable.
 
 Exit codes: 0 success; 1 a failure, a finding, or a refusal; 2 bad
 arguments, an unresolvable ref, or a tree that is not a git repository.
@@ -582,9 +583,12 @@ def show_markdown(source: Source, changes: list[dict], doc: str, url_prefix: str
 def run_openspec(root: Path, executable: str, *args: str) -> None:
     env = {**os.environ, "OPENSPEC_NO_UPDATE_CHECK": "1"}
     try:
-        result = subprocess.run([executable, *args], cwd=root, env=env)
+        # The CLI's progress output is relayed to stderr so that `--json` on stdout stays parseable.
+        result = subprocess.run([executable, *args], cwd=root, env=env, stdout=subprocess.PIPE, text=True)
     except OSError as exc:
         raise Failure(f"cannot run `{executable}`: {exc}; install the pinned OpenSpec CLI first.") from exc
+    if result.stdout:
+        sys.stderr.write(result.stdout)
     if result.returncode != 0:
         raise Failure(f"`{executable} {' '.join(args)}` exited {result.returncode}.")
 
