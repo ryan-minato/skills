@@ -53,9 +53,14 @@ install from it, or a `run:` of its files.
 - `spec / labels` applies only labels that match the literal taxonomy
   written in the workflow, so a tampered script cannot make it apply an
   arbitrary one.
-- The snapshot caps what one request can make a runner read: files
-  touched, bytes per file, bytes in total. Over a cap the job fails loudly
-  instead of labeling on partial data.
+- The snapshot fetches only the documents the commands read and caps
+  what one request can make a runner read: files touched, bytes per file,
+  bytes in total, and API requests (the platform token's REST budget is
+  shared by every workflow of the repository). Over a cap, or on a
+  truncated tree, the job fails loudly instead of labeling on partial data.
+- Request-authored names, paths, and task text reach a bot comment only
+  inside code spans, and the echoed command loses its backticks, so a
+  comment cannot carry a link or a mention under the bot's name.
 - Commands need a collaborator or the author; the bot's own comments start
   no workflow run.
 

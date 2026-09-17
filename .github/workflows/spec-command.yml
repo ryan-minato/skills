@@ -68,7 +68,8 @@ jobs:
           note=""
           [ "$STATE" = "OPEN" ] || note=" (pull request is $STATE)"
           {
-            printf '`/spec %s` — head `%s`%s\n\n' "$(echo "$cmd $*" | sed 's/ *$//')" "${HEAD:0:7}" "$note"
+            # Backticks are dropped so the echoed command stays inside its code span.
+            printf '`/spec %s` — head `%s`%s\n\n' "$(echo "$cmd $*" | tr -d '`' | sed 's/ *$//')" "${HEAD:0:7}" "$note"
             case "$cmd" in
               show)
                 change=""; doc="all"
