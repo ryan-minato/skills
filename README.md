@@ -15,6 +15,7 @@ and other compatible clients) how to perform specific tasks well.
 | [`meta`](skills/meta/) | Disposable builders for generic harness machinery: a harness-build entry workflow, contract builders for branching, project workflow, specification workflow, and agent authority, GitHub and GitLab lifecycle workflows, GPU container environments, Python convention defaults, and the disposal step | Per project, remove after the harness is verified |
 | [`scaffold`](skills/scaffold/) | Disposable builders for a project of a specific topic (ML, data science, Colab notebooks) — install the one that matches | Per project, remove after the harness is verified |
 | [`machine-learning`](skills/machine-learning/) | Durable skills for the daily work of a project that trains or evaluates models: run provenance, the research task workflow, experiment code conventions, training instrumentation, training diagnosis | Per project, as needed |
+| [`sdd`](skills/sdd/) | Spec-driven development: the framework-agnostic methodology and one skill per framework (OpenSpec, Spec-Kit) with its approval package, in-request archive, comment commands, status labels, and CI automation | Per project, as needed |
 | [`writing`](skills/writing/) | Human-audience writing: genre skills (academic, blog/opinion, copy) and medium skills (LaTeX, Typst, Markdown) | Per project, as needed |
 
 Each catalog's README lists its skills.
@@ -50,7 +51,7 @@ need:
 ```
 /plugin marketplace add ryan-minato/skills
 /plugin install core@ryan-minato-skills
-/plugin install meta@ryan-minato-skills     # or core@, engineering@, machine-learning@, scaffold@, writing@, ...
+/plugin install meta@ryan-minato-skills     # or core@, engineering@, machine-learning@, sdd@, scaffold@, writing@, ...
 ```
 
 ## Contributing

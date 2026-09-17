@@ -42,6 +42,11 @@ Public skills are grouped into catalogs under `skills/`:
   scoped artifact-authoring workflows (e.g. Dev Container Features,
   Templates, image prebuilds, and durable visual-design specifications)
   that do not warrant a catalog of their own.
+- `sdd` — durable skills for spec-driven development: the framework-
+  agnostic methodology (`spec-driven-development`) and one skill per
+  framework (`openspec-workflow`, `spec-kit-workflow`) carrying that
+  tool's approval package, in-request archive or completion, comment
+  commands, status labels, and per-platform automation.
 - `meta` — disposable, project-scoped builders for generic, pluggable harness
   machinery: one entry workflow (`meta-harness-building`) that routes to an
   architecture manual, contract builders (git branching, project workflow,
