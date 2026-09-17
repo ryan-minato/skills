@@ -10,9 +10,9 @@ description: >-
   plan is approved before tasks, what must be complete before the PR or MR
   is ready, what the `/spec` commands or `spec/*` labels do, or to add the
   feature check, the comment commands, or the progress labels to a
-  repository. Not for the kit's own commands that create or implement one
-  feature, for choosing a spec tool or adopting the practice, or for a
-  project on another framework.
+  repository. Not for running the kit's own commands (`specify`, its
+  slash commands) to create or implement one feature, for choosing a spec
+  tool or adopting the practice, or for a project on another framework.
 license: Apache-2.0
 compatibility: >-
   The bundled script requires Python 3.10+ (stdlib only) and git.
