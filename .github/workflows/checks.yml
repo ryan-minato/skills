@@ -6,6 +6,7 @@ name: checks
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
   push:
     branches: [main]
 
@@ -74,8 +75,23 @@ jobs:
           python3 -m pip install --quiet rust-just==1.58.0
           just install-tools
       - if: steps.changed.outputs.run == 'true'
-        name: Validate specs and changes
-        run: just spec-validate
+        name: Validate strictly and refuse an unarchived related change
+        # A pull request: strict validation, then every related change that
+        # is still unarchived warns on a draft and fails when ready. A push
+        # to main: strict validation, then any change outside archive/ fails.
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            flag=""
+            [ "$DRAFT" = "true" ] && flag="--draft"
+            just spec-check "$BASE" "$HEAD" $flag
+          else
+            just spec-changes check --all
+          fi
       - if: steps.changed.outputs.run == 'true'
         name: Generated OpenSpec skills match the pinned CLI
         run: |

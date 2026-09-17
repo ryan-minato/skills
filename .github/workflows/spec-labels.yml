@@ -1,0 +1,60 @@
+# .github/workflows/spec-labels.yml — keeps two label axes on every pull
+# request from its related OpenSpec changes: `spec/archived` | `spec/unarchived`
+# and `spec/not-started` | `spec/in-progress` | `spec/done`. A pull request
+# with no related change carries none of them. The trigger label
+# `spec/archive` is never touched here.
+#
+# `pull_request_target` runs with a writable token even for a fork, which a
+# plain `pull_request` run does not have; it is safe here because nothing from
+# the head executes: the checkout is the BASE (the event's default), the head
+# is fetched as git objects only, and the base's script reads them. Never add
+# a checkout of the head, an install from it, or a `run:` of its files.
+# `scripts/spec_changes.py` is the project's copy of the openspec-workflow
+# skill's script.
+name: spec-labels
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+concurrency:
+  group: spec-labels-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  labels:
+    name: spec / labels
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Fetch the head as objects only
+        env:
+          N: ${{ github.event.pull_request.number }}
+        run: git fetch --no-tags origin "+refs/pull/$N/head:refs/remotes/pr/$N"
+      - name: Compute the label plan and apply it
+        env:
+          N: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          CURRENT: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          python3 scripts/spec_changes.py labels --base "$BASE" --head "$HEAD" --current "$CURRENT" --json \
+            > "$RUNNER_TEMP/plan.json"
+          cat "$RUNNER_TEMP/plan.json"
+          for label in $(jq -r '.add[]' "$RUNNER_TEMP/plan.json"); do
+            gh api -X POST "repos/$REPO/issues/$N/labels" -f "labels[]=$label" > /dev/null
+          done
+          for label in $(jq -r '.remove[]' "$RUNNER_TEMP/plan.json"); do
+            gh api -X DELETE "repos/$REPO/issues/$N/labels/$(jq -rn --arg l "$label" '$l | @uri')" > /dev/null || true
+          done
