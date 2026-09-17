@@ -23,6 +23,6 @@ operations:
       - When the implementation must deviate from the spec, stop and revise the change first.
   archive:
     guidance:
-      - Archiving is the spec-archive workflow's job after the merge to main; archive by hand inside the pull request only while that workflow cannot push (see .agents/knowledge/spec-workflow.md, Archive mode).
-      - Never tick a task that is not done; a fully ticked tasks.md is what the workflow archives.
-      - Run `just spec-validate` after archiving.
+      - Archive inside the pull request before it is marked ready, by hand or by applying the spec/archive label (see .agents/knowledge/spec-workflow.md, Archive executor); main never holds an unarchived change.
+      - Never tick a task that is not done; a fully ticked tasks.md is what the archive consumes, and the label bot refuses every change of the pull request while any has an open task.
+      - Run `just spec-validate` after archiving; `just spec-check` reproduces the checks / spec verdict.

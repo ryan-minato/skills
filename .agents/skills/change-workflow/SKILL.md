@@ -74,28 +74,34 @@ Record the issue number or a one-line reason there is none.
 3. If the change alters what a skill does, run the OpenSpec loop on that
    branch with the `openspec-*` skills: propose (the change is
    `openspec/changes/<slug>/`), clarify with the `plan-clarification`
-   skill until no assumption is silent, commit the change record, then
-   publish at once — run the publish gate (step 6) and open the draft pull
-   request with the record as its first content and `Phase:
-   specification` in the body, before any design or task list is
-   finished. Then stop. The maintainer discusses the proposal and the
-   delta specs on the pull request — never `design.md` or `tasks.md` —
-   and directs record changes in conversation; push each through the
-   publish gate. When the maintainer says in conversation that the
-   discussion is closed, read the pull request's comments
+   skill until no assumption is silent, write `design.md` whenever the
+   schema requires one (the approach's bounds and the verification plan —
+   never a step list, never a secret or private datum), validate, commit
+   the approval package (proposal, delta specs, design), then publish —
+   run the publish gate (step 6) and open the draft pull request with the
+   complete package as its first content and `Phase: specification` in
+   the body. Never open it before the design is written or after the task
+   list is. Then stop. The maintainer discusses the package on the pull
+   request — the proposal, the delta specs, and the design's bounds, never
+   `tasks.md` — and directs record changes in conversation; push each
+   through the publish gate. When the maintainer says in conversation
+   that the discussion is closed, read the pull request's comments
    (`gh api repos/ryan-minato/skills/issues/<n>/comments`) and its review
    threads with their resolution state (GraphQL `reviewThreads`, field
    `isResolved`); list every unresolved thread, every requested adjustment
-   the record does not carry, and every contradiction; ask the maintainer
+   the package does not carry, and every contradiction; ask the maintainer
    to confirm the open items; proceed only when nothing is open or the
    open items are confirmed, and note the closing on the body's
-   `Approval:` line. Finish design and tasks after that, then implement.
-   `spec-driven-development` supplies the loop's rules; `spec-workflow.md`
-   says which domains exist and that specs are never backfilled.
+   `Approval:` line. Write `tasks.md` after that, then implement.
+   `spec-driven-development` supplies the loop's rules; `openspec-workflow`
+   the tool's records, the archive executor, and the `/spec` commands;
+   `spec-workflow.md` says which domains exist and that specs are never
+   backfilled.
 4. A change to the repository itself (environment, harness, tooling,
    checks, workflows, documents) runs the same loop as a repository change:
    `openspec new change` then `skip_specs: true` in its `.openspec.yaml`,
-   so it carries a proposal, design, and tasks and no delta spec. Only a
+   so it carries a proposal, a design, and tasks and no delta spec; the
+   draft opens once the proposal and the design are written. Only a
    change too small to plan (a pin bump, a typo) skips the loop, and its PR
    says `Spec: none — <reason>`.
 
@@ -126,13 +132,19 @@ the result, not the diff: for a skill, the behavioral tests in the
 `skill-authoring` project skill, planned in the change's `design.md` and
 derived from the scenarios; for a repository change, the proofs its
 `design.md` names. Tick each task only when its verification ran. Then
-run `just check`. Archiving is the `spec-archive` workflow's job after the
-merge; while that workflow cannot push (`spec-workflow.md`, Archive mode),
-archive the change here with the archive skill (a skill change's delta
-lands in `openspec/specs/`; a repository change's record only moves under
-`openspec/changes/archive/`). Record what ran and the outcome for the PR's Validation
-section, linking the plan in `design.md` rather than restating it; that
-section and Changes stay reserved until ready (step 7).
+run `just check`. Archive every change of this PR inside it before it is
+marked ready (`spec-workflow.md`, Archive executor): by hand with the
+archive skill (a skill change's delta lands in `openspec/specs/`; a
+repository change's record only moves under `openspec/changes/archive/`),
+then `just spec-validate` and a commit `docs: archive the <slug> change`;
+or, with the user's authorization for the remote write, apply the
+`spec/archive` label and wait for the bot's commit — after it pushes, the
+maintainer clicks **Approve workflows to run** on the PR, and you pull the
+branch. Never archive by hand while the bot is running. `just spec-check`
+reproduces the `checks / spec` verdict locally; `/spec status` on the PR
+shows the related changes' progress. Record what ran and the outcome for
+the PR's Validation section, linking the plan in `design.md` rather than
+restating it; that section and Changes stay reserved until ready (step 7).
 
 ## 6. Publish gate, then the draft PR and every later push
 
@@ -178,8 +190,9 @@ publish secrets, private data, or internal context on any surface.
 Mark the PR ready and request the maintainer's review yourself only when
 every condition in `agent-authority.md` holds: the change's discussion
 closed on the draft by the maintainer and reconciled with nothing open,
-every task done, archived or left for the `spec-archive` workflow
-(or `Spec: none` justified), `just check` green locally and every
+every task done and every change of the PR archived inside it with
+`checks / spec` green (or `Spec: none` justified), `just check` green
+locally and every
 required check green (`.agents/knowledge/github-checks.md`; digest a red
 run with
 `python3 .agents/skills/change-workflow/scripts/run_log_digest.py --repo ryan-minato/skills --run-id <id>`
@@ -208,10 +221,15 @@ closes the issue through the closing keyword.
 
 - Authorization is task-scoped; a successful `gh auth status` is not
   permission to publish.
-- Archiving runs after merge; never tick a task that is not done, because
-  a fully ticked task list is what the workflow archives. While the
-  workflow cannot push, archive before ready.
-- The draft exists to review the specification: opening it after
+- Never tick a task that is not done: a fully ticked task list is what
+  the archive (by hand or by the label bot) consumes, and the bot refuses
+  every change of the PR while any has an open task.
+- A push made by the archive bot leaves the PR's checks waiting for the
+  maintainer's **Approve workflows to run**; a blocked PR after a bot push
+  is waiting for that click, not failing.
+- The draft opens with the complete approval package — proposal, delta
+  specs, and design — never at the proposal alone.
+- The draft exists to review the approval package: opening it after
   implementation turns the approval gate into a formality.
 - A branch, issue, or PR does not authorize unrelated cleanup; report
   discovered work separately.
