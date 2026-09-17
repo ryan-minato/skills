@@ -26,6 +26,14 @@
 - [x] 3.9 Script harness for `spec_kit_features.py` — closes SKW Script: Help, Representative run, Repeated run, Bad arguments, Missing plan
 - [x] 3.10 Workflow read-through (YAML parse, pinned SHAs, top-level permissions, no push on the fork branch); record skipped cases and their reasons for the pull request's Validation section
 
-## 4. Finish
+## 4. Zero-trust read path (review amendment)
 
-- [x] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, archive both changes inside this pull request by hand
+- [ ] 4.1 `spec_changes.py`: a head-source abstraction (git plumbing or `--snapshot`), a `snapshot` subcommand over the GitHub REST API with file, per-file, and total byte caps, `archive` restricted to the git source; verify `just lint`, `--help`, the error matrix, and parity of `status`, `show`, `labels` between the two sources on a live pull request
+- [ ] 4.2 `spec_kit_features.py`: the same abstraction, subcommand, and caps; verify `just lint`, `--help`, and source parity in a fixture
+- [ ] 4.3 `openspec-workflow` assets: labels and command workflows read the head through the snapshot and fetch nothing; the archive workflow reads a fork's head through the snapshot and checks the head out only under the literal `head.repo.full_name == github.repository` condition; the label plan is checked against the literal taxonomy before it is applied; verify YAML parse, job names, permissions, and a grep for head fetches
+- [ ] 4.4 `spec-kit-workflow` assets: the same for the labels and command workflows; verify YAML parse and the grep
+- [ ] 4.5 Both skills' `SKILL.md` and `references/github.md` state the rule (no object authored by the request reaches a privileged runner), the snapshot, the literal same-repository guard, and the caps; the verification lists gain the grep and the parity check; verify `just check-skill` on both
+
+## 5. Finish
+
+- [x] 5.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, archive both changes inside this pull request by hand

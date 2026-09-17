@@ -90,6 +90,12 @@ puts the resulting `pull_request` runs in an approval-required state;
 - **This pull request archives its two changes by hand**: the bot exists
   on `main` only after the merge.
 
+- **This repository's three `spec / *` workflows follow the same rule as
+  the skill's assets** (serves the archive automation): they are the
+  dogfooded copy, so the read path changes with the assets in the same
+  request rather than drifting. The mirror check keeps
+  `scripts/spec_changes.py` byte-identical with the skill's copy.
+
 ## Risks / Trade-offs
 
 - [The validators read the whole tree at commit time, so a skill
@@ -143,6 +149,21 @@ puts the resulting `pull_request` runs in an approval-required state;
 - Knowledge and maps: `just validate` green (pointers and recipe names);
   `grep -rn 'spec-archive / archive\|archive_completed_changes\|spec-archive-completed' . --exclude-dir=.git --exclude-dir=archive` empty.
 - `just check` at the end.
+
+### Zero-trust read path (review amendment)
+
+- `.github/workflows/spec-labels.yml`, `spec-command.yml`, and
+  `spec-archive.yml` parse; their job names (`spec / labels`, `spec /
+  command`, `spec / archive`) and permissions are unchanged, so the checks
+  table and `check_spec_labels()` still agree.
+- `grep -n 'git .*fetch'` finds nothing in the labels and command
+  workflows, and in the archive workflow only the base-ref fetch inside the
+  same-repository step.
+- `diff scripts/spec_changes.py skills/sdd/openspec-workflow/scripts/spec_changes.py`
+  is empty and `just validate` is green.
+- `just spec-check origin/main HEAD` and `just spec-changes check --all`
+  behave as before on this branch (draft warns, ready fails, `--all`
+  fails while the records are open).
 
 ## Open Questions
 
