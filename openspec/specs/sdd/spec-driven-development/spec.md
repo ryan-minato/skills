@@ -1,4 +1,4 @@
-# engineering/spec-driven-development Specification
+# sdd/spec-driven-development Specification
 
 ## Purpose
 Governs what an agent that loaded the `spec-driven-development` skill observably does when it settles how specifications and tracked work interact: the change request shape, the archive mode, the approval record, the timing of each step, the scope of specification review, and harness design without a builder.
