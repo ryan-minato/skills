@@ -82,7 +82,7 @@ The deposited specification contract SHALL state the change request shape, in-re
 - **THEN** the artifact operations section names the structural check the project adopts for its spec files or states that none exists, and quotes no command
 
 ### Requirement: Behavior: The platform base is shaped for the contract in a second phase
-After the platform builder has delivered its paradigm-neutral base, the builder SHALL fill the base's extension slots for the evidenced platform from its own references and assets — the request template's specification block and checklist items worded for the package and the executor, the intake template's specification field, the project skill's take-work precondition, draft content, package completion, reconciliation, and finish steps, the knowledge section, the sync rows, and the maintainer actions — locating each slot by heading, step, or field id, inserting without rewording base text, skipping a slot whose text is already present, and re-running the base's delivery checks; SHALL then hand the archive automation and the validator's place in the check command to the framework skill; and when no base exists the builder SHALL end its run after depositing the contract and say what remains.
+After the platform builder has delivered its paradigm-neutral base, the builder SHALL fill the base's extension slots for the evidenced platform from its own references and assets — the request template's specification block and checklist items worded for the package and the executor, the intake template's specification field, the project skill's take-work precondition, draft content (the complete approval package), reconciliation, and finish steps, the knowledge section, the sync rows, and the maintainer actions — locating each slot by heading, step, or field id, inserting without rewording base text, skipping a slot whose text is already present, and re-running the base's delivery checks; SHALL then hand the archive automation and the validator's place in the check command to the framework skill; and when no base exists the builder SHALL end its run after depositing the contract and say what remains.
 
 #### Scenario: Base delivered on GitHub
 - **WHEN** the contract is deposited, the GitHub base exists, and the builder runs
@@ -101,11 +101,11 @@ After the platform builder has delivered its paradigm-neutral base, the builder 
 - **THEN** the builder ends after the contract deposit and names the platform builder and its own second phase as the remaining steps
 
 ### Requirement: Behavior: Take-work and the draft follow the change request shape on the platform
-The project skill steps the builder inserts SHALL, under the combined shape, take a work item that has no specification by committing the change record to a draft request first, completing the approval package on that draft, stopping, and waiting for the closed discussion or the approval comment per the contract's mode, and SHALL, under the split shape, escalate a work item whose specification request is not merged; a specification-only request SHALL reference the work item without closing it.
+The project skill steps the builder inserts SHALL, under the combined shape, take a work item that has no specification by writing the change record's approval package, committing it, publishing it as a draft request, stopping, and waiting for the closed discussion or the approval comment per the contract's mode, and SHALL, under the split shape, escalate a work item whose specification request is not merged; a specification-only request SHALL reference the work item without closing it.
 
 #### Scenario: Combined shape, no specification yet
 - **WHEN** the contract records the combined shape and an agent takes a work item with an empty specification field
-- **THEN** the inserted steps direct it to publish the change record on a draft request, complete the package, and stop rather than escalating
+- **THEN** the inserted steps direct it to publish the change record with its complete approval package on a draft request and stop rather than escalating
 
 #### Scenario: Split shape
 - **WHEN** the contract records the split shape and the agent opens the specification request

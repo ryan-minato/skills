@@ -1,15 +1,15 @@
 ## ADDED Requirements
 
-### Requirement: Behavior: The draft opens at the specification and the gate is exercised on the complete approval package
-The agent SHALL publish the change record as a draft change request (or as the specification change request) as soon as the specification is written and clarified, SHALL then add the design when one is warranted and state on the request that the approval package is complete, and SHALL not write tasks or code until the discussion is closed (discussion-closed mode) or the approval comment exists (blocking mode); while waiting it SHALL say what it waits for.
+### Requirement: Behavior: The draft opens when the approval package is complete
+The agent SHALL write and clarify the specification, write the design when one is warranted, validate, and commit the change record, and only then publish it as a draft change request (or as the specification change request) whose first content is the complete approval package; SHALL not write tasks or code until the discussion is closed (discussion-closed mode) or the approval comment exists (blocking mode); and while waiting SHALL say what it waits for.
 
 #### Scenario: Tasks requested before approval
 - **WHEN** the specification and the design are written and the user asks the agent to write the task list next
-- **THEN** the agent declines, says the task list follows the approved package, and confirms the package is declared complete on the draft
+- **THEN** the agent declines, says the task list follows the approved package, and publishes (or confirms) the draft carrying the complete package
 
-#### Scenario: Package completed
-- **WHEN** the draft carries the specification and the agent finishes a warranted design
-- **THEN** the agent pushes the design through the project's publish gate, states on the request that the package is complete, and waits
+#### Scenario: Publication requested before the design
+- **WHEN** the specification is written and clarified, a design is warranted, and the user asks the agent to open the draft now
+- **THEN** the agent writes the design first and publishes the draft with the complete package, saying the gate is exercised on the whole package
 
 #### Scenario: Waiting after publication
 - **WHEN** the package is complete and nobody has closed the discussion or commented an approval
@@ -24,10 +24,10 @@ The agent SHALL describe the approval gate as reviewing the outcome description 
 
 #### Scenario: Design offered as a step list
 - **WHEN** the design on the draft reads as a numbered procedure of implementation steps
-- **THEN** the agent rewrites it as bounds — approach, constraints, preferences, rejected alternatives — before declaring the package complete
+- **THEN** the agent rewrites it as bounds — approach, constraints, preferences, rejected alternatives — before publishing the draft
 
 ### Requirement: Behavior: The design bounds the approach and is part of the approval package
-When a design is warranted — more than one reasonable approach exists, or the change touches structure, interfaces, dependencies, or files outside the record, or the project's schema or contract requires one — the agent SHALL write it as a broad record of the chosen approach, the technical constraints, the preferences, and the rejected alternatives; SHALL never put implementation steps or tasks in it; SHALL finish a tool-generated design before declaring the package complete; and SHALL keep secrets and private data out of it, because it is committed and published like every other record.
+When a design is warranted — more than one reasonable approach exists, or the change touches structure, interfaces, dependencies, or files outside the record, or the project's schema or contract requires one — the agent SHALL write it as a broad record of the chosen approach, the technical constraints, the preferences, and the rejected alternatives; SHALL never put implementation steps or tasks in it; SHALL finish a tool-generated design before publishing the draft; and SHALL keep secrets and private data out of it, because it is committed and published like every other record.
 
 #### Scenario: Design requested as a step list
 - **WHEN** the user asks for the design to be written as the ordered steps of the implementation
@@ -35,7 +35,7 @@ When a design is warranted — more than one reasonable approach exists, or the 
 
 #### Scenario: Wording change
 - **WHEN** the change edits the wording inside one section of one file and the project's schema does not require a design
-- **THEN** the agent states that no design is warranted and declares the package complete with the specification alone
+- **THEN** the agent states that no design is warranted and publishes the draft with the specification alone
 
 #### Scenario: Constraint with a private detail
 - **WHEN** a technical constraint involves an internal hostname, a credential, or a person's private data
@@ -157,7 +157,7 @@ The agent SHALL take the level, tool and its framework skill, change request sha
 
 #### Scenario: No contract
 - **WHEN** the project has no specification contract and the user asks what happens next after the draft is published
-- **THEN** the agent says it completes the package, then stops until the discussion is closed (the default), names the harness builder for changing that, and asks no questioning round
+- **THEN** the agent says the draft carries the complete package and that it stops until the discussion is closed (the default), names the harness builder for changing that, and asks no questioning round
 
 ### Requirement: Handoff: the harness builder for spec workflows
 The agent SHALL route setting up or improving a project's specification rules to the spec workflow builder of the harness catalog through the installing skill, which installs that catalog whole; when the user declines or lacks it, the agent SHALL record the defaults it applies (combined shape, discussion-closed approval on the complete package, in-request archiving by hand, product-only domains with spec-less repository changes, a request body that carries no implementation until ready) in the project's knowledge base and list the harness build as remaining work, without editing templates, forms, checks, automation, or a project skill.
@@ -192,8 +192,8 @@ When the project uses a specification tool, the agent SHALL perform every operat
 ## REMOVED Requirements
 
 ### Requirement: Behavior: The draft is published as soon as the specification is written
-**Reason**: the gate is now exercised on the complete approval package, not on the specification alone.
-**Migration**: "The draft opens at the specification and the gate is exercised on the complete approval package".
+**Reason**: the draft now opens with the complete approval package, not at the specification alone.
+**Migration**: "The draft opens when the approval package is complete".
 
 ### Requirement: Behavior: Specification review examines the outcome, never the tasks
 **Reason**: the design's bounds join the review; the name no longer describes the scope.

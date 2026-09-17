@@ -23,11 +23,11 @@ The skill description SHALL cause the skill to load when a project that runs Ope
 - **THEN** the skill does not load
 
 ### Requirement: Behavior: The approval package is the proposal, the delta specs, and the design when warranted
-The agent SHALL treat `proposal.md` and the delta specs as the first push of a change and `design.md` as part of the approval package when the project's rule warrants one (by default: more than one reasonable approach, or the change touches structure, interfaces, dependencies, or files outside the record; a wording change inside one section needs none), SHALL treat `tasks.md` as after-approval material even when the tool's propose step generated it, SHALL mark a change to the project's own harness, tooling, checks, workflows, or documents with `skip_specs: true` in its change configuration so it carries no delta spec, and SHALL run the strict validator after each artifact edit, before publishing the draft, before ready, and after archiving.
+The agent SHALL treat `proposal.md`, the delta specs, and `design.md` when the project's rule warrants one as the approval package the draft opens with (by default: more than one reasonable approach, or the change touches structure, interfaces, dependencies, or files outside the record; a wording change inside one section needs none), SHALL treat `tasks.md` as after-approval material even when the tool's propose step generated it, SHALL mark a change to the project's own harness, tooling, checks, workflows, or documents with `skip_specs: true` in its change configuration so it carries no delta spec, and SHALL run the strict validator after each artifact edit, before publishing the draft, before ready, and after archiving.
 
 #### Scenario: Propose generated all four files
 - **WHEN** the tool's propose step generated the proposal, the delta specs, the design, and the task list
-- **THEN** the agent lists the first three as the package on the request, marks the task list as after-approval, and finishes the design before declaring the package complete
+- **THEN** the agent finishes the design, publishes the draft with the first three as the package, and marks the task list as after-approval
 
 #### Scenario: Harness change
 - **WHEN** the change edits the project's CI workflow
