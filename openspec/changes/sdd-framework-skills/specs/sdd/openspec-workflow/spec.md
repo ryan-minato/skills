@@ -60,11 +60,19 @@ The agent SHALL use `/spec show [<change>] [proposal|design|tasks|specs|all]` an
 - **THEN** the agent declines and says the labels workflow derives it from the task list
 
 ### Requirement: Behavior: The automation is installed per platform from the skill's assets
-When asked to install the automation on GitHub, the agent SHALL produce from its assets a check job that joins the base's existing checks workflow and its gate (strict validation, and an unarchived related change as a warning on a draft and a failure when ready; on a push to the default branch, any change outside the archive directory fails), the comment-command workflow, the label-triggered archive workflow (same-repository branch: archive, commit, push with the platform token, remove the label, summarize; fork: mention the author with the commands, push nothing, remove the label), and the status-label workflow, SHALL add the six `spec/*` labels to the project's label file, SHALL copy `scripts/spec_changes.py` into the project's scripts, SHALL keep every workflow fork-safe (scripts run from the base ref; the request's head is fetched as data and never checked out, installed, or executed except on a same-repository branch), SHALL state that a push made with the platform token puts the resulting pull-request runs in an approval-required state that a write-access user starts, and SHALL record the maintainer actions (label sync; the approval click after each bot push); on GitLab the agent SHALL produce the jobs fragment (check, manual show and status, label-gated or manual archive, labels) and state its limitations (no pipeline on a note or label change; manual jobs take no chat arguments; a project token variable for the source-branch push; fork pipelines run in the fork).
+When asked to install the automation on GitHub, the agent SHALL produce from its assets a check job that joins the base's existing checks workflow and its gate (strict validation, and an unarchived related change as a warning on a draft and a failure when ready; on a push to the default branch, any change outside the archive directory fails), the comment-command workflow, the label-triggered archive workflow (same-repository branch: archive, commit, push with the platform token, remove the label, summarize; fork: mention the author with the commands, push nothing, remove the label), and the status-label workflow, SHALL add the six `spec/*` labels to the project's label file, SHALL copy `scripts/spec_changes.py` into the project's scripts, SHALL keep every workflow fork-safe by one structural rule — no object authored by the request reaches a privileged runner: scripts run from the base ref, the head is read through the script's API snapshot rather than fetched into the runner's git store, and the only job that needs the head's working tree checks it out under a literal `head.repo.full_name == github.repository` comparison written in the step's own condition, SHALL state that a push made with the platform token puts the resulting pull-request runs in an approval-required state that a write-access user starts, and SHALL record the maintainer actions (label sync; the approval click after each bot push); on GitLab the agent SHALL produce the jobs fragment (check, manual show and status, label-gated or manual archive, labels) and state its limitations (no pipeline on a note or label change; manual jobs take no chat arguments; a project token variable for the source-branch push; fork pipelines run in the fork).
 
 #### Scenario: GitHub install
 - **WHEN** the user asks to install the automation in a GitHub repository whose base has a checks workflow with a gate
 - **THEN** the agent adds the check job to that workflow and its gate's dependencies, adds the three workflows and the labels, copies the script, and names the two maintainer actions
+
+#### Scenario: Privileged job reads the head
+- **WHEN** a produced workflow that runs with a writable token needs the head's documents
+- **THEN** it checks out the base and reads them through the script's API snapshot, and no step fetches or checks out the head except the archive job's own checkout under the literal same-repository comparison
+
+#### Scenario: Label plan checked before it is applied
+- **WHEN** the label workflow applies the plan the script produced
+- **THEN** it refuses and fails on any name outside the literal label taxonomy written in the workflow
 
 #### Scenario: Fork pull request labeled
 - **WHEN** the trigger label is applied to a pull request from a fork
@@ -101,11 +109,19 @@ The agent SHALL route setting or changing the project's rules — the approval m
 - **THEN** the agent installs the automation, applies the defaults for what the contract does not say, and names the contract update as remaining work
 
 ### Requirement: Script: spec_changes.py
-The bundled script SHALL resolve a request's related changes from a base and head ref with git plumbing (no checkout of the head needed); SHALL offer `related`, `status`, `show`, `check`, `archive`, and `labels` subcommands; `check` SHALL run the strict validator and fail on an unarchived related change (a warning with `--draft`) or, with `--all`, on any change outside the archive directory; `archive` SHALL archive every related change whose tasks are all ticked through the tool's archive command (with the spec-less flag for a marked change), refuse all of them when any has an open task, validate strictly afterwards, and change nothing on a repeated run; `show` SHALL print a change's documents inside a fence and truncate at `--max-chars` with a link; `labels` SHALL compute the desired archive-axis and progress-axis labels and the additions and removals against the current set, never touching the trigger label; every subcommand SHALL support `--help`, exit 0 on success, 1 on a failure or a finding, and 2 on bad arguments.
+The bundled script SHALL resolve a request's related changes from either of two head sources — a base and head ref read with git plumbing, or a snapshot document read with `--snapshot` — and SHALL offer a `snapshot` subcommand that builds that document from the platform's REST API, listing the request's touched files and the related changes' documents without fetching or checking out the head, capping the files and bytes it will read and failing when a cap is reached; `archive` SHALL accept only the git source, because it edits the working tree; SHALL offer `related`, `status`, `show`, `check`, `archive`, `labels`, and `snapshot` subcommands; `check` SHALL run the strict validator and fail on an unarchived related change (a warning with `--draft`) or, with `--all`, on any change outside the archive directory; `archive` SHALL archive every related change whose tasks are all ticked through the tool's archive command (with the spec-less flag for a marked change), refuse all of them when any has an open task, validate strictly afterwards, and change nothing on a repeated run; `show` SHALL print a change's documents inside a fence and truncate at `--max-chars` with a link; `labels` SHALL compute the desired archive-axis and progress-axis labels and the additions and removals against the current set, never touching the trigger label; every subcommand SHALL support `--help`, exit 0 on success, 1 on a failure or a finding, and 2 on bad arguments.
 
 #### Scenario: Help
 - **WHEN** the script runs with `--help`
-- **THEN** it prints usage naming the six subcommands and exits 0
+- **THEN** it prints usage naming the seven subcommands and exits 0
+
+#### Scenario: Snapshot source matches the git source
+- **WHEN** `snapshot` runs against a pull request and `status`, `show`, and `labels` run against the resulting document
+- **THEN** their output is identical to the same subcommands run with `--base` and `--head` over a clone of that pull request
+
+#### Scenario: Archive refuses a snapshot
+- **WHEN** `archive` is invoked with `--snapshot`
+- **THEN** it exits 2 and says the archive edits the working tree and needs the git source
 
 #### Scenario: Representative run
 - **WHEN** a related change with every task ticked exists at the checked-out head and `archive --base <base> --head HEAD` runs

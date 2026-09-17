@@ -36,6 +36,10 @@ The agent SHALL treat the feature's `spec.md` and `plan.md` together as the appr
 ### Requirement: Behavior: Completion before ready replaces archiving
 The agent SHALL state that Spec-Kit has no archive operation, SHALL require every task of every feature the request touches to be ticked before the request is marked ready, SHALL name the project's rule for updating the living specification when the level is spec-anchored, and SHALL refuse to tick a task whose verification did not run.
 
+#### Scenario: Privileged job reads the head
+- **WHEN** a produced workflow that runs with a writable token needs a touched feature's documents
+- **THEN** it checks out the base and reads them through the script's API snapshot, and no step fetches or checks out the head
+
 #### Scenario: Ready with an open task
 - **WHEN** the user asks to mark the request ready while a touched feature's task list has an open item
 - **THEN** the agent refuses, names the task, and says the check would fail
@@ -45,7 +49,7 @@ The agent SHALL state that Spec-Kit has no archive operation, SHALL require ever
 - **THEN** the agent says the kit archives nothing, completion is the ticked task list, and a spec-anchored project updates its living specification per its rule
 
 ### Requirement: Behavior: The automation is installed per platform from the skill's assets
-When asked to install the automation on GitHub, the agent SHALL produce from its assets a check job that joins the base's existing checks workflow and its gate (required files present for every touched feature; an open task as a warning on a draft and a failure when ready), the comment-command workflow (`/spec show` and `/spec status` over touched features), and the progress-label workflow, SHALL add the three progress labels to the project's label file, SHALL copy `scripts/spec_kit_features.py` into the project's scripts, SHALL keep every workflow fork-safe (scripts from the base ref; the head fetched as data only), and SHALL say that no archive bot exists because the kit has no archive operation; on GitLab the agent SHALL produce the jobs fragment and state its limitations.
+When asked to install the automation on GitHub, the agent SHALL produce from its assets a check job that joins the base's existing checks workflow and its gate (required files present for every touched feature; an open task as a warning on a draft and a failure when ready), the comment-command workflow (`/spec show` and `/spec status` over touched features), and the progress-label workflow, SHALL add the three progress labels to the project's label file, SHALL copy `scripts/spec_kit_features.py` into the project's scripts, SHALL keep every workflow fork-safe by one structural rule — no object authored by the request reaches a privileged runner: scripts run from the base ref and the head is read through the script's API snapshot rather than fetched into the runner's git store, and SHALL say that no archive bot exists because the kit has no archive operation; on GitLab the agent SHALL produce the jobs fragment and state its limitations.
 
 #### Scenario: GitHub install
 - **WHEN** the user asks to install the automation in a GitHub repository whose base has a checks workflow with a gate
@@ -78,11 +82,15 @@ The agent SHALL route setting or changing the project's rules — the approval m
 - **THEN** the agent installs the automation, applies the defaults, and names the contract update as remaining work
 
 ### Requirement: Script: spec_kit_features.py
-The bundled script SHALL resolve a request's touched features (numbered directories under the kit's specs directory whose files the diff between a base and a head ref touches) with git plumbing; SHALL offer `related`, `status`, `show`, `check`, and `labels` subcommands; `check` SHALL fail when a touched feature lacks its specification or plan, or when a touched feature has an open task and the request is ready (a warning with `--draft`); `show` SHALL print a feature's documents inside a fence and truncate at `--max-chars` with a link; `labels` SHALL compute the desired progress label and the additions and removals against the current set; every subcommand SHALL support `--help`, exit 0 on success, 1 on a failure or a finding, and 2 on bad arguments.
+The bundled script SHALL resolve a request's touched features (numbered directories under the kit's specs directory whose files the request touches) from either of two head sources — a base and head ref read with git plumbing, or a snapshot document read with `--snapshot` — and SHALL offer a `snapshot` subcommand that builds that document from the platform's REST API without fetching or checking out the head, capping the files and bytes it will read and failing when a cap is reached; SHALL offer `related`, `status`, `show`, `check`, `labels`, and `snapshot` subcommands; `check` SHALL fail when a touched feature lacks its specification or plan, or when a touched feature has an open task and the request is ready (a warning with `--draft`); `show` SHALL print a feature's documents inside a fence and truncate at `--max-chars` with a link; `labels` SHALL compute the desired progress label and the additions and removals against the current set; every subcommand SHALL support `--help`, exit 0 on success, 1 on a failure or a finding, and 2 on bad arguments.
 
 #### Scenario: Help
 - **WHEN** the script runs with `--help`
-- **THEN** it prints usage naming the five subcommands and exits 0
+- **THEN** it prints usage naming the six subcommands and exits 0
+
+#### Scenario: Snapshot source matches the git source
+- **WHEN** `snapshot` runs against a pull request and `status`, `show`, and `labels` run against the resulting document
+- **THEN** their output is identical to the same subcommands run with `--base` and `--head` over a clone of that pull request
 
 #### Scenario: Representative run
 - **WHEN** a touched feature has its specification, plan, and a fully ticked task list and `check --base <base> --head <head>` runs

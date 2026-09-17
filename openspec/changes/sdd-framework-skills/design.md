@@ -187,6 +187,39 @@ skill directory moves catalogs and two are added. Binding constraints:
   hand**: the delta targets the new path so `MODIFIED` blocks resolve;
   the alternative (an `ADDED` rebuild at the new path) loses history.
 
+- **Privileged jobs read the head through the platform's API, never as git
+  objects** (serves the automation of both framework skills): a
+  `pull_request_target` or `issue_comment` job holds a writable token, so
+  the question is not whether today's steps execute the head — they do not
+  — but whether the invariant survives a later edit. Fetching the head's
+  SHA leaves the request's objects in the runner's store, one `git
+  checkout` away from a takeover, and ships that shape to every project
+  that installs the skill. Reading the head through `snapshot` removes the
+  objects from the runner, so the guarantee is structural rather than a
+  promise in a comment. Considered and rejected: the two-workflow
+  `pull_request` → `workflow_run` artifact pattern that code scanning
+  documents as the correct usage — it is the right answer when the
+  privileged job must build untrusted code, but here it would add a trust
+  hop instead of removing one, because an artifact is attacker-controlled
+  data and `workflow_run.pull_requests` is empty for a fork, so the
+  privileged half would have to believe the artifact's own claim about
+  which request it belongs to. Also rejected: dismissing the scanner's
+  finding and leaving the fetch, which keeps a correct-but-fragile design
+  and trains the maintainer to wave through critical alerts.
+- **The one job that needs the head's working tree keeps it, under a
+  literal condition**: the archive executor runs the CLI over the head, so
+  it checks the head out — but only when `head.repo.full_name ==
+  github.repository`, written in the step's own `if:` rather than behind an
+  environment variable. Such a branch lives in the base repository and its
+  code already runs in the project's own CI, the guard is visible at the
+  step it guards, and code scanning recognizes that shape.
+- **The label plan is checked against a literal taxonomy in the workflow**
+  before any API call, so the shell cannot be made to apply an arbitrary
+  label even if the script were replaced; the loops read the plan without
+  word splitting.
+- **The snapshot caps files, per-file bytes, and total bytes** and fails
+  loudly at a cap rather than labeling on partial data.
+
 ## Risks / Trade-offs
 
 - [Behavioral tests across four skills are expensive] → one fixture
@@ -269,6 +302,31 @@ Skipped:
 - Live end-to-end runs of the comment, label, and archive workflows: they
   need the workflows on the default branch; run after merge on a test
   pull request and recorded in `github-checks.md` (companion change).
+
+### Zero-trust read path (review amendment)
+
+- `spec_changes.py`: `--help` exits 0; the error matrix (snapshot with
+  `--base`, `--base` without `--head`, no source, `archive --snapshot`,
+  `check --all --snapshot`, malformed and missing snapshot, bad `--repo`,
+  non-positive `--pr`, unknown option, unwritable `--out`, missing token)
+  exits 2 with a message naming the fix; `snapshot` against a live pull
+  request exits 0; `related`, `status`, `show --doc proposal`, `show --doc
+  specs`, and `labels` produce byte-identical output from the snapshot and
+  from `--base`/`--head` over the same commits; a repeated `snapshot` writes
+  an identical document.
+- `spec_kit_features.py`: `--help` exits 0; in a fixture with two feature
+  directories, `status`, `show`, `labels`, and `check` produce identical
+  output from the git source and from a snapshot document built over the
+  same commits.
+- Workflows: all six files (three repository copies, three assets, plus the
+  two Spec-Kit assets) parse; job names and permissions are unchanged;
+  `grep -n 'git .*fetch\|checkout'` over the privileged workflows finds
+  only base checkouts and the archive job's guarded head checkout; the
+  label loop applies a valid plan and exits 1 on a plan naming a label
+  outside the taxonomy.
+- Code scanning: the open `actions/untrusted-checkout/critical` alert on
+  `.github/workflows/spec-labels.yml` closes on the next default-setup scan
+  of the branch; the outcome goes in the pull request's Validation section.
 
 ## Open Questions
 
