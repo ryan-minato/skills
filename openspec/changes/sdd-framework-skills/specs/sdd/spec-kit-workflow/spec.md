@@ -36,10 +36,6 @@ The agent SHALL treat the feature's `spec.md` and `plan.md` together as the appr
 ### Requirement: Behavior: Completion before ready replaces archiving
 The agent SHALL state that Spec-Kit has no archive operation, SHALL require every task of every feature the request touches to be ticked before the request is marked ready, SHALL name the project's rule for updating the living specification when the level is spec-anchored, and SHALL refuse to tick a task whose verification did not run.
 
-#### Scenario: Privileged job reads the head
-- **WHEN** a produced workflow that runs with a writable token needs a touched feature's documents
-- **THEN** it checks out the base and reads them through the script's API snapshot, and no step fetches or checks out the head
-
 #### Scenario: Ready with an open task
 - **WHEN** the user asks to mark the request ready while a touched feature's task list has an open item
 - **THEN** the agent refuses, names the task, and says the check would fail
@@ -54,6 +50,10 @@ When asked to install the automation on GitHub, the agent SHALL produce from its
 #### Scenario: GitHub install
 - **WHEN** the user asks to install the automation in a GitHub repository whose base has a checks workflow with a gate
 - **THEN** the agent adds the check job to that workflow and its gate's dependencies, adds the two workflows and the labels, copies the script, and says no archive bot is installed
+
+#### Scenario: Privileged job reads the head
+- **WHEN** a produced workflow that runs with a writable token needs a touched feature's documents
+- **THEN** it checks out the base and reads them through the script's API snapshot, and no step fetches or checks out the head
 
 #### Scenario: Ready with an open task
 - **WHEN** a ready pull request touches a feature whose task list has an open item
