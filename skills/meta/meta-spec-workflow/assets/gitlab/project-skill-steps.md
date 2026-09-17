@@ -28,7 +28,9 @@ record; only the last one carries the closing pattern.
 
 Combined shape: The draft opens once the approval package is complete —
 the specification and, when warranted, the design, created through the
-spec tool's commands and passing its validator, with no task list — and
+spec tool's commands and passing its validator; a task list the tool
+generated alongside them is pushed but marked as after-approval and kept
+out of the review — and
 the description's `Phase:` line reads `specification` while Changes and
 Validation keep their reserved line. Then stop. <discussion-closed: "The gate owner discusses on
 the MR and directs record changes in conversation; push each through the

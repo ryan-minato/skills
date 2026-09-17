@@ -80,8 +80,8 @@ jobs:
           python3 base/scripts/spec_changes.py snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
           {
             printf '@%s this pull request comes from a fork, so the bot cannot push to it. Archive locally:\n\n' "$AUTHOR"
-            printf '```bash\n%s\npython3 scripts/spec_changes.py archive --base origin/%s --head HEAD\n%s\ngit add openspec\ngit commit -m "%s"\ngit push\n```\n\n' \
-              "{{INSTALL_COMMAND}}" "$BASE_REF" "{{VALIDATE_COMMAND}}" "{{ARCHIVE_COMMIT_SUBJECT}}"
+            printf '```bash\n# `upstream` is this repository; a fork clone'"'"'s `origin` is the fork.\ngit fetch upstream %s\n%s\npython3 scripts/spec_changes.py archive --base upstream/%s --head HEAD\n%s\ngit add openspec\ngit commit -m "%s"\ngit push\n```\n\n' \
+              "$BASE_REF" "{{INSTALL_COMMAND}}" "$BASE_REF" "{{VALIDATE_COMMAND}}" "{{ARCHIVE_COMMIT_SUBJECT}}"
             printf 'Current state of the related changes:\n\n'
             python3 base/scripts/spec_changes.py status --snapshot "$RUNNER_TEMP/snapshot.json"
           } > "$RUNNER_TEMP/summary.md"

@@ -39,10 +39,13 @@ Verified against GitLab's documentation on 2026-09-17:
   request pipeline again, which re-runs the check and the labels on the
   archive commit; there is no approval click.
 - Merge request pipelines from a fork run in the fork without the parent
-  project's variables: archiving, labels, and notes work for a fork only
-  when a parent-project member runs the pipeline in the parent context.
-  The fork branch of `spec:archive` therefore prints the local commands and
-  fails.
+  project's variables, so the fork branch of `spec:archive` prints the local
+  commands and fails. **Do not enable running fork pipelines in the parent
+  project to work around this**: GitLab then runs the CI configuration from
+  the fork's branch with the parent's variables, including the archive
+  token, which is the takeover this design exists to prevent. A fork's
+  changes are archived by its author locally, or by a member after the
+  branch is in this project.
 - Enforcement is the project setting **Pipelines must succeed**; a failing
   `spec:check` blocks the merge.
 

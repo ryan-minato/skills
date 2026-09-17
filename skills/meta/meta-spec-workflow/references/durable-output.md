@@ -22,8 +22,8 @@ Add one pointer to the project's agent entrypoint (`AGENTS.md` or its
 equivalent), event-triggered rather than always-read:
 
 > Read `.agents/knowledge/spec-workflow.md` before starting a change that
-> alters behavior, before creating tracked work from a specification, and
-> before editing any file under `<spec tool directory>`.
+> alters behavior, before creating `<an issue | a work item>` from a
+> specification, and before editing any file under `<spec tool directory>`.
 
 Where the tool keeps a project-wide principles file (a constitution or
 steering file), the tool loads it itself; add an entrypoint pointer only

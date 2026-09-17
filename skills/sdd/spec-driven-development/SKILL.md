@@ -52,7 +52,8 @@ command for each. This skill pairs with `plan-clarification` for step 2,
 the interrogation the clarify step needs. If it is not installed, load the
 `ryan-minato-skills-installing` skill and install `plan-clarification` as
 it directs; never run an install command yourself. If the user declines,
-run step 2 from the questions in this file.
+run step 2 by interrogating the draft against the specification quality
+rules below until none of them is unanswered.
 
 1. **Specify.** Create the change record with the tool's command, then
    write the requirements and their scenarios for this change only, plus
