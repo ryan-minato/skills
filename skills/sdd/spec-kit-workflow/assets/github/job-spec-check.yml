@@ -1,0 +1,36 @@
+# A job for the project's existing checks workflow (the one whose aggregator
+# gate the ruleset requires). Paste it under `jobs:`, add `spec-check` to the
+# gate's `needs:`, and make sure the workflow's `on.pull_request.types` lists
+# `opened, synchronize, reopened, ready_for_review, converted_to_draft` so the
+# verdict follows the draft state. Replace {{PINNED_SHA}} with the checkout
+# action's pinned commit. `scripts/spec_kit_features.py` is the project's copy
+# of this skill's script; Spec-Kit ships no validator, so the check is the
+# script alone.
+#
+# On a pull request: every touched feature has its specification and plan;
+# an open task is a warning while the pull request is a draft and a failure
+# once it is ready. On a push to the default branch: every feature directory
+# has its required files.
+  spec-check:
+    name: spec / check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: "actions/checkout@{{PINNED_SHA}}"
+        with:
+          fetch-depth: 0
+      - name: Check the touched features
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            flag=""
+            [ "$DRAFT" = "true" ] && flag="--draft"
+            python3 scripts/spec_kit_features.py check --base "$BASE" --head "$HEAD" $flag
+          else
+            python3 scripts/spec_kit_features.py check --all
+          fi
