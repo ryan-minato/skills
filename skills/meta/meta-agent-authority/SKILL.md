@@ -81,8 +81,9 @@ specification before planning and implementation, and in which mode it
 passes), and the levels below attach to it; its change request shape says
 where that gate sits on the path (on the draft itself under the combined
 shape, on a separate specification change request under split), and its
-archive mode says whether archiving is a step the agent runs before ready
-or a job that runs after merge. Their absence blocks nothing: a project
+archive executor says who archives inside the change request before it is
+marked ready — the agent by hand, or the automation the framework skill
+installs — never a job after merge. Their absence blocks nothing: a project
 with no tracker still needs an authority policy. Then evidence the project's real
 verification strength yourself — test coverage and trustworthiness, CI
 gates, rollback and revert paths, observability — because these facts price
