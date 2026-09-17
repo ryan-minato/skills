@@ -51,7 +51,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-OPEN_TASK = re.compile(r"^\s*-\s*\[ \]\s+(.*)$", re.MULTILINE)
+OPEN_TASK = re.compile(r"^\s*-\s*\[ \]\s*(.*)$", re.MULTILINE)
 DONE_TASK = re.compile(r"^\s*-\s*\[[xX]\]\s", re.MULTILINE)
 FEATURE_DIR = re.compile(r"^\d{3,}-[A-Za-z0-9._-]+$")
 DOCS = ("spec", "plan", "tasks")
@@ -155,9 +155,15 @@ class GitSource(Source):
 class SnapshotSource(Source):
     """Reads a snapshot document built from the GitHub REST API."""
 
-    def __init__(self, doc: dict) -> None:
+    def __init__(self, doc: dict, specs_dir: str | None = None) -> None:
         if doc.get("schema") != SNAPSHOT_SCHEMA:
             raise Usage(f"snapshot schema {doc.get('schema')!r} is not {SNAPSHOT_SCHEMA!r}; rebuild it.")
+        recorded = doc.get("specs_dir")
+        if specs_dir is not None and recorded is not None and recorded != specs_dir:
+            raise Usage(
+                f"the snapshot was built for the specs directory {recorded!r}, not {specs_dir!r}; "
+                "rebuild it with the same --specs-dir."
+            )
         self.doc = doc
         self.head = doc.get("head") or {}
         self.base_label = (doc.get("base") or {}).get("sha", "base")
@@ -248,19 +254,25 @@ class Api:
             if not batch:
                 break
             paths.extend(item["filename"] for item in batch if "filename" in item)
-            if len(batch) < 100 or len(paths) >= max_files:
+            if len(batch) < 100 or len(paths) > max_files:
                 break
             page += 1
-        if len(paths) >= max_files:
+        if len(paths) > max_files:
             raise Failure(
-                f"the request touches at least {len(paths)} files, at or over the --max-files cap "
+                f"the request touches at least {len(paths)} files, over the --max-files cap "
                 f"({max_files}); split the request, or raise the cap deliberately."
             )
         return paths
 
     def tree(self, sha: str, recursive: bool = False) -> dict | None:
         query = "?recursive=1" if recursive else ""
-        return self.get(f"repos/{self.repo}/git/trees/{urllib.parse.quote(sha, safe='')}{query}", allow_404=True)
+        data = self.get(f"repos/{self.repo}/git/trees/{urllib.parse.quote(sha, safe='')}{query}", allow_404=True)
+        if data and data.get("truncated"):
+            raise Failure(
+                f"the tree {sha} came back truncated; nothing is reported from a partial snapshot. "
+                "Narrow the specs directory."
+            )
+        return data
 
     def blob_text(self, sha: str) -> str | None:
         data = self.get(f"repos/{self.repo}/git/blobs/{urllib.parse.quote(sha, safe='')}", allow_404=True)
@@ -310,8 +322,6 @@ def build_snapshot(api: Api, number: int, specs_dir: str, caps: dict) -> dict:
         if path not in shas:
             continue
         listing = api.tree(shas[path], recursive=True) or {"tree": []}
-        if listing.get("truncated"):
-            raise Failure(f"the tree of {path} came back truncated; nothing is reported from a partial snapshot.")
         for entry in listing.get("tree", []):
             if entry.get("type") != "blob":
                 continue
@@ -333,8 +343,7 @@ def build_snapshot(api: Api, number: int, specs_dir: str, caps: dict) -> dict:
                 )
             text = api.blob_text(entry["sha"])
             if text is None:
-                skipped.append({"path": full, "reason": "not decodable as UTF-8 text"})
-                continue
+                raise Failure(f"{full} is not decodable as UTF-8 text; nothing is reported from a partial snapshot.")
             files[full] = text
             total += size
 
@@ -370,7 +379,7 @@ def task_counts(text: str | None) -> dict:
     if text is None:
         return {"done": 0, "open": 0, "open_tasks": [], "progress": "not-started"}
     done = len(DONE_TASK.findall(text))
-    open_tasks = [m.strip() for m in OPEN_TASK.findall(text)]
+    open_tasks = [m.strip() or "(untitled task)" for m in OPEN_TASK.findall(text)]
     if not open_tasks and done > 0:
         progress = "done"
     elif done == 0:
@@ -679,7 +688,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def open_source(args, root: Path) -> Source | None:
+def open_source(args, root: Path, specs_dir: str) -> Source | None:
     """Build the head source the command asked for, or None when it needs none."""
     snapshot = getattr(args, "snapshot", None)
     base, head = getattr(args, "base", None), getattr(args, "head", None)
@@ -692,7 +701,7 @@ def open_source(args, root: Path) -> Source | None:
             raise Usage(f"cannot read the snapshot {snapshot}: {exc}") from exc
         except json.JSONDecodeError as exc:
             raise Usage(f"snapshot {snapshot} is not valid JSON: {exc}") from exc
-        return SnapshotSource(doc)
+        return SnapshotSource(doc, specs_dir)
     if base and head:
         if git(root, "rev-parse", "--git-dir", check=False).strip() == "":
             raise Usage(f"{root} is not a git work tree.")
@@ -715,7 +724,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "snapshot":
             return args.func(args, root, specs_dir)
-        args.source = open_source(args, root)
+        args.source = open_source(args, root, specs_dir)
         needs_no_source = (args.command == "check" and args.all) or (args.command == "labels" and args.taxonomy)
         if args.source is None and not needs_no_source:
             raise Usage(

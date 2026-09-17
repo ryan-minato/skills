@@ -54,7 +54,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-OPEN_TASK = re.compile(r"^\s*-\s*\[ \]\s+(.*)$", re.MULTILINE)
+OPEN_TASK = re.compile(r"^\s*-\s*\[ \]\s*(.*)$", re.MULTILINE)
 DONE_TASK = re.compile(r"^\s*-\s*\[[xX]\]\s", re.MULTILINE)
 SKIP_SPECS = re.compile(r"^\s*skip_specs\s*:\s*true\s*$", re.MULTILINE)
 ARCHIVE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}-")
@@ -131,6 +131,9 @@ class Source:
     def files(self, side: str, path: str) -> list[str]:
         raise NotImplementedError
 
+    def has_file(self, side: str, path: str) -> bool:
+        raise NotImplementedError
+
     def read(self, side: str, path: str) -> str | None:
         raise NotImplementedError
 
@@ -175,6 +178,12 @@ class GitSource(Source):
         out = git(self.root, "ls-tree", "-r", "--name-only", self._ref(side), f"{path.rstrip('/')}/", check=False)
         return [line for line in out.splitlines() if line]
 
+    def has_file(self, side: str, path: str) -> bool:
+        result = subprocess.run(
+            ["git", "-C", str(self.root), "cat-file", "-e", f"{self._ref(side)}:{path}"], capture_output=True
+        )
+        return result.returncode == 0
+
     def read(self, side: str, path: str) -> str | None:
         result = subprocess.run(
             ["git", "-C", str(self.root), "show", f"{self._ref(side)}:{path}"], capture_output=True, text=True
@@ -185,9 +194,15 @@ class GitSource(Source):
 class SnapshotSource(Source):
     """Reads a snapshot document built from the GitHub REST API."""
 
-    def __init__(self, doc: dict) -> None:
+    def __init__(self, doc: dict, changes_dir: str | None = None) -> None:
         if doc.get("schema") != SNAPSHOT_SCHEMA:
             raise Usage(f"snapshot schema {doc.get('schema')!r} is not {SNAPSHOT_SCHEMA!r}; rebuild it.")
+        recorded = doc.get("changes_dir")
+        if changes_dir is not None and recorded is not None and recorded != changes_dir:
+            raise Usage(
+                f"the snapshot was built for the changes directory {recorded!r}, not {changes_dir!r}; "
+                "rebuild it with the same --changes-dir."
+            )
         self.doc = doc
         self.sides = {"base": doc.get("base") or {}, "head": doc.get("head") or {}}
         self.base_label = self.sides["base"].get("sha", "base")
@@ -220,6 +235,9 @@ class SnapshotSource(Source):
     def files(self, side: str, path: str) -> list[str]:
         prefix = path.rstrip("/") + "/"
         return [p for p in (self._side(side).get("paths") or []) if p.startswith(prefix)]
+
+    def has_file(self, side: str, path: str) -> bool:
+        return path in (self._side(side).get("paths") or [])
 
     def read(self, side: str, path: str) -> str | None:
         return (self._side(side).get("files") or {}).get(path)
@@ -293,19 +311,25 @@ class Api:
             if not batch:
                 break
             paths.extend(item["filename"] for item in batch if "filename" in item)
-            if len(batch) < 100 or len(paths) >= max_files:
+            if len(batch) < 100 or len(paths) > max_files:
                 break
             page += 1
-        if len(paths) >= max_files:
+        if len(paths) > max_files:
             raise Failure(
-                f"the request touches at least {len(paths)} files, at or over the --max-files cap "
+                f"the request touches at least {len(paths)} files, over the --max-files cap "
                 f"({max_files}); split the request, or raise the cap deliberately."
             )
         return paths
 
     def tree(self, sha: str, recursive: bool = False) -> dict | None:
         query = "?recursive=1" if recursive else ""
-        return self.get(f"repos/{self.repo}/git/trees/{urllib.parse.quote(sha, safe='')}{query}", allow_404=True)
+        data = self.get(f"repos/{self.repo}/git/trees/{urllib.parse.quote(sha, safe='')}{query}", allow_404=True)
+        if data and data.get("truncated"):
+            raise Failure(
+                f"the tree {sha} came back truncated; nothing is reported from a partial snapshot. "
+                "Narrow the changes directory or archive older changes."
+            )
+        return data
 
     def blob_text(self, sha: str) -> str | None:
         data = self.get(f"repos/{self.repo}/git/blobs/{urllib.parse.quote(sha, safe='')}", allow_404=True)
@@ -397,8 +421,6 @@ def build_snapshot(api: Api, number: int, changes_dir: str, caps: dict) -> dict:
         if path is None:
             continue
         listing = api.tree(head["shas"][path], recursive=True) or {"tree": []}
-        if listing.get("truncated"):
-            raise Failure(f"the tree of {path} came back truncated; nothing is reported from a partial snapshot.")
         for entry in listing.get("tree", []):
             if entry.get("type") != "blob":
                 continue
@@ -419,8 +441,7 @@ def build_snapshot(api: Api, number: int, changes_dir: str, caps: dict) -> dict:
                 )
             text = api.blob_text(entry["sha"])
             if text is None:
-                skipped.append({"path": full, "reason": "not decodable as UTF-8 text"})
-                continue
+                raise Failure(f"{full} is not decodable as UTF-8 text; nothing is reported from a partial snapshot.")
             files[full] = text
             total += size
 
@@ -480,7 +501,7 @@ def task_counts(text: str | None) -> dict:
     if text is None:
         return {"done": 0, "open": 0, "open_tasks": [], "progress": "not-started"}
     done = len(DONE_TASK.findall(text))
-    open_tasks = [m.strip() for m in OPEN_TASK.findall(text)]
+    open_tasks = [m.strip() or "(untitled task)" for m in OPEN_TASK.findall(text)]
     if not open_tasks and done > 0:
         progress = "done"
     elif done == 0:
@@ -589,7 +610,7 @@ def show_markdown(source: Source, changes: list[dict], doc: str, url_prefix: str
         for d in docs:
             paths = doc_paths(source, change, d)
             if not paths:
-                emit(f"**{code_span(change['name'] + '/' + d + '.md')}** — _no {d}.md yet_\n\n")
+                emit(f"**{code_span(change['path'] + '/specs/')}** — _no delta spec yet_\n\n")
                 continue
             for p in paths:
                 link = link_to(url_prefix, p) if url_prefix else ""
@@ -600,7 +621,9 @@ def show_markdown(source: Source, changes: list[dict], doc: str, url_prefix: str
                     continue
                 text = source.read("head", p)
                 if text is None:
-                    emit(f"**{code_span(p)}** — not in the snapshot (not decodable as text){view}\n\n")
+                    absent = not source.has_file("head", p)
+                    note = f"_no {p.rsplit('/', 1)[-1]} yet_" if absent else "not in the snapshot"
+                    emit(f"**{code_span(p)}** — {note}{'' if absent else view}\n\n")
                     continue
                 fence = fence_for(text)
                 block = f"{header}{fence}markdown\n{text.rstrip()}\n{fence}\n\n"
@@ -725,8 +748,11 @@ def cmd_archive(args, root, changes_dir) -> int:
     head_sha = resolve(root, args.head, "--head")
     if git(root, "rev-parse", "HEAD").strip() != head_sha:
         raise Usage("archive edits the working tree, so --head must be the checked-out HEAD; check it out first.")
-    if git(root, "status", "--porcelain", "--", changes_dir).strip():
-        raise Usage(f"{changes_dir} has uncommitted changes; commit or stash them before archiving.")
+    # The CLI rewrites the main specs as well as the change records, and the
+    # documented follow-up stages the whole tree the tool owns.
+    owned = str(Path(changes_dir).parent) if "/" in changes_dir else changes_dir
+    if git(root, "status", "--porcelain", "--", owned).strip():
+        raise Usage(f"{owned} has uncommitted changes; commit or stash them before archiving.")
     changes = related_changes(args.source, changes_dir)
     plan = {"archived": [], "skipped": [], "refused": [], "validated": False}
     todo: list[dict] = []
@@ -879,7 +905,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def open_source(args, root: Path) -> Source | None:
+def open_source(args, root: Path, changes_dir: str) -> Source | None:
     """Build the head source the command asked for, or None when it needs none."""
     snapshot = getattr(args, "snapshot", None)
     base, head = getattr(args, "base", None), getattr(args, "head", None)
@@ -892,7 +918,7 @@ def open_source(args, root: Path) -> Source | None:
             raise Usage(f"cannot read the snapshot {snapshot}: {exc}") from exc
         except json.JSONDecodeError as exc:
             raise Usage(f"snapshot {snapshot} is not valid JSON: {exc}") from exc
-        return SnapshotSource(doc)
+        return SnapshotSource(doc, changes_dir)
     if base and head:
         if not (root / ".git").exists() and git(root, "rev-parse", "--git-dir", check=False).strip() == "":
             raise Usage(f"{root} is not a git work tree.")
@@ -916,7 +942,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "snapshot":
             return args.func(args, root, changes_dir)
-        args.source = open_source(args, root)
+        args.source = open_source(args, root, changes_dir)
         needs_no_source = (args.command == "check" and args.all) or (args.command == "labels" and args.taxonomy)
         if args.source is None and not needs_no_source:
             raise Usage(
