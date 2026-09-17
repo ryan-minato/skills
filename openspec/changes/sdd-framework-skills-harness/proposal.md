@@ -41,8 +41,8 @@ and the repository that ships them say the same thing.
   `.agents/knowledge/spec-workflow.md` (design as part of the approval
   package, the lifecycle, the archive section rewritten around the
   in-request executor and the automation, the framework skill named),
-  `.agents/skills/change-workflow/SKILL.md` (first push, package
-  completion, stop; archive in the pull request by hand or by the
+  `.agents/skills/change-workflow/SKILL.md` (the draft opens with the
+  complete package, then stop; archive in the pull request by hand or by the
   `spec/archive` label with the maintainer's approval click afterwards;
   the archive check before ready), `.github/PULL_REQUEST_TEMPLATE.md`
   (records table, approval line, archive checklist item),
@@ -64,9 +64,9 @@ repository change
 
 ## Installed behavior
 
-Agents working in this repository publish the draft at proposal plus delta
-specs, complete the design before declaring the package ready for the
-maintainer, write tasks after the closing, archive every related change
+Agents working in this repository publish the draft once the proposal,
+the delta specs, and the design are written, write tasks after the
+closing, archive every related change
 inside the pull request (by hand, or by applying `spec/archive` with the
 maintainer's authorization), and see the `checks / spec` job fail when a
 ready pull request still carries an unarchived change. The maintainer

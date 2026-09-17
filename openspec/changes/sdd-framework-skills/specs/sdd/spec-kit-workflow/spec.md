@@ -23,7 +23,7 @@ The skill description SHALL cause the skill to load when a project that runs Spe
 - **THEN** the skill does not load
 
 ### Requirement: Behavior: The approval package is the specification and the plan
-The agent SHALL treat the feature's `spec.md` as the first push and `plan.md` as the second half of the approval package (the plan bounds the approach; it is not a step list), SHALL treat `tasks.md` as after-approval material even when the kit generated it, SHALL check the feature directory against the kit's template headings and say that no programmatic validator exists, and SHALL say that the kit's feature script creates a numbered directory and no branch.
+The agent SHALL treat the feature's `spec.md` and `plan.md` together as the approval package the draft opens with (the plan bounds the approach; it is not a step list), SHALL treat `tasks.md` as after-approval material even when the kit generated it, SHALL check the feature directory against the kit's template headings and say that no programmatic validator exists, and SHALL say that the kit's feature script creates a numbered directory and no branch.
 
 #### Scenario: Reviewer's set
 - **WHEN** the user asks what the reviewer is handed at the gate
@@ -31,7 +31,7 @@ The agent SHALL treat the feature's `spec.md` as the first push and `plan.md` as
 
 #### Scenario: Plan written as steps
 - **WHEN** the plan reads as an ordered implementation procedure
-- **THEN** the agent rewrites it as approach, constraints, and preferences before declaring the package complete
+- **THEN** the agent rewrites it as approach, constraints, and preferences before publishing the draft
 
 ### Requirement: Behavior: Completion before ready replaces archiving
 The agent SHALL state that Spec-Kit has no archive operation, SHALL require every task of every feature the request touches to be ticked before the request is marked ready, SHALL name the project's rule for updating the living specification when the level is spec-anchored, and SHALL refuse to tick a task whose verification did not run.

@@ -40,7 +40,7 @@ puts the resulting `pull_request` runs in an approval-required state;
 | Archive automation — workflows | `.github/workflows/spec-archive.yml` (replaced), `spec-command.yml`, `spec-labels.yml`, `checks.yml` (types, `checks / spec` steps) | YAML parses; `grep -rn '{{[A-Z]' .github/` empty; `just validate` (`check_checks_doc`, hard-coded-version scan) |
 | Archive automation — script and recipes | `scripts/spec_changes.py` (mirror), `scripts/archive_completed_changes.py` deleted, `justfile` `spec-check` and `spec-changes` | `diff scripts/spec_changes.py skills/sdd/openspec-workflow/scripts/spec_changes.py` empty; `just spec-check` on this branch (draft mode warns, exit 0); `just spec-changes --help`; `just lint` |
 | Archive automation — labels and validator | `.github/labels.json` six `spec/*` rows; `scripts/validate_harness.py` (mirror pair, `workflow` applier, `check_spec_labels()`, scan set) | `just validate`; `python3 scripts/sync_labels.py --file .github/labels.json --repo ryan-minato/skills` dry run lists `catalog/sdd` and the six `spec/*` labels to create |
-| Approval gate and executor — contract and skill | `.agents/knowledge/spec-workflow.md`, `.agents/skills/change-workflow/SKILL.md` | read-through; a clean-context read of the project skill can state the first push, the package completion, the stop, the archive executor, and the finish step |
+| Approval gate and executor — contract and skill | `.agents/knowledge/spec-workflow.md`, `.agents/skills/change-workflow/SKILL.md` | read-through; a clean-context read of the project skill can state what the draft's first content is, the stop, the archive executor, and the finish step |
 | Approval gate and executor — templates and schema | `.github/PULL_REQUEST_TEMPLATE.md`, `openspec/config.yaml`, `openspec/schemas/skill-change/schema.yaml` | `just validate` (template headings, `Spec:` line); `python3 scripts/check_pr_policy.py` over a body built from the template with every item ticked passes; `just spec-validate` |
 | Approval gate and executor — knowledge and maps | `AGENTS.md`, `ARCHITECTURE.md`, `.agents/knowledge/{agent-authority,github-workflow,github-checks,github-settings,harness-maintenance}.md` | `just validate` (pointers, recipe names, check table, mirror register); read-through |
 
@@ -133,8 +133,8 @@ puts the resulting `pull_request` runs in an approval-required state;
   `spec/extra` label `applied_by: workflow` makes `just validate` fail.
 - Contract and project skill: a clean-context subagent reads
   `.agents/knowledge/spec-workflow.md` and `change-workflow/SKILL.md`
-  and answers: what is pushed first, when the package is complete, what
-  the maintainer reviews, who archives and how, what happens after a bot
+  and answers: what the draft's first content is, what the maintainer
+  reviews, who archives and how, what happens after a bot
   push.
 - Templates and schema: `python3 scripts/check_pr_policy.py` over a
   ready-shaped body built from the new template passes and over a draft
