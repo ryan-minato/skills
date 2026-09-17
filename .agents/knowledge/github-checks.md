@@ -12,8 +12,8 @@ command that exists and passes locally; CI never chooses its own linters.
 | `pr / policy` | `pr-policy.yml` | `python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"` (template and script from the base commit) | pull request opened, edited, synchronized, reopened, ready, converted to draft | **required** | Body carries every template heading, the `Closes`/`N/A` line, and the security checkbox line, and every commit subject (the title, for a fork) follows Conventional Commits; ready pull requests also have Changes and Validation filled (no reserved line, not empty), `Phase: implementation`, every checklist box ticked, and a `Spec:` line (a link to the change directory; a bare URL or path is still accepted). |
 | `scan-secrets` | `secret.yml` | TruffleHog `--only-verified` over the pull request range or the pushed range | every pull request; push to `main` | **required** | No verified secret. The job id is the check name; it predates the other checks. |
 | `spec / archive` | `spec-archive.yml` | `python3 base/scripts/spec_changes.py --root pr archive …`, then a commit and push to the pull request's branch | the `spec/archive` label applied to a pull request (`pull_request_target: labeled`); one run per pull request at a time, never cancelled | automation | Same-repository branch: one commit `docs: archive the <name> change` lands on the branch, the status labels are recomputed, the label is removed, and a summary comment asks the maintainer to click **Approve workflows to run**. Fork: a comment with the local commands, the label removed, nothing pushed. A red run is a refusal (an open task), a rejected push (the branch moved — re-apply the label after pushing), or a red validator; never a retry. |
-| `spec / command` | `spec-command.yml` | `python3 scripts/spec_changes.py show|status …` from the default branch, replying with `gh pr comment` | a pull request comment starting with `/spec` by a collaborator or the author (`issue_comment`) | automation | One reply comment per command (`/spec show [<change>] [proposal|design|tasks|specs|all]`, `/spec status [<change>]`, `/spec help`); the run is skipped for other comments and for bots. |
-| `spec / labels` | `spec-labels.yml` | `python3 scripts/spec_changes.py labels …`, then `gh api` label writes | pull request opened, synchronized, reopened, or ready (`pull_request_target`) | automation | The plan JSON is printed and the `spec/archived`/`spec/unarchived` and `spec/not-started`/`spec/in-progress`/`spec/done` labels match it; a pull request with no related change carries none. |
+| `spec / command` | `spec-command.yml` | `python3 scripts/spec_changes.py snapshot …` then `show|status --snapshot …` from the default branch, replying with `gh pr comment` | a pull request comment starting with `/spec` by a collaborator or the author (`issue_comment`) | automation | One reply comment per command (`/spec show [<change>] [proposal|design|tasks|specs|all]`, `/spec status [<change>]`, `/spec help`); the run is skipped for other comments and for bots. |
+| `spec / labels` | `spec-labels.yml` | `python3 scripts/spec_changes.py snapshot …` then `labels --snapshot …`, then `gh api` label writes checked against the literal taxonomy | pull request opened, synchronized, reopened, or ready (`pull_request_target`) | automation | The plan JSON is printed and the `spec/archived`/`spec/unarchived` and `spec/not-started`/`spec/in-progress`/`spec/done` labels match it; a pull request with no related change carries none. |
 | `issues / triage` | `issue-triage.yml` | `python3 scripts/sync_issue_metadata.py --event "$GITHUB_EVENT_PATH" --apply` | issue opened or edited | automation | Prints the label plan as JSON and applies it; exit 1 means a form answer did not map to a label in `.github/labels.json`. |
 
 Required-check names are a stable interface: `scripts/validate_harness.py`
@@ -37,6 +37,17 @@ name live on `main` before the ruleset requires it.
    an approval-required state: click **Approve workflows to run** in the
    merge box. A pull request that stays blocked after a bot push is
    waiting for that click, not failing.
+5. The three `spec / *` jobs run with a writable token on content the
+   request's author controls. The rule that keeps them safe is structural:
+   no object authored by the request reaches the runner. They check out
+   the base and read the head through `spec_changes.py snapshot`, which
+   pulls the file list and the documents from the REST API. `spec /
+   archive` is the only one that needs the head's working tree, and it
+   checks it out only under a literal
+   `github.event.pull_request.head.repo.full_name == github.repository`
+   condition written in the step's `if:`. Never add a checkout or a `git
+   fetch` of the head to any of them, and never move that comparison
+   behind an `env` variable.
 
 ## Tool pins
 

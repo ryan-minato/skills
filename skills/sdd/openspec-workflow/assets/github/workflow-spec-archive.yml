@@ -15,11 +15,12 @@
 # push (the branch moved during the run) fails without retry.
 #
 # `pull_request_target` runs with a writable token; every script and the CLI
-# install come from the BASE checkout in `base/`. Head content is checked
-# out into `pr/` only when the head repository is this repository (its code
-# already runs in the project's own CI); a fork's head is fetched by its SHA
-# as objects for the status table and never checked out, installed, or
-# executed.
+# install come from the BASE checkout in `base/`. The head is checked out into
+# `pr/` only under a literal `head.repo.full_name == github.repository`
+# condition, because such a branch lives in this repository and its code
+# already runs in the project's own CI. A fork's head is never fetched into
+# the runner's git store: it is read through the REST API by the base's own
+# script, which parses it and never executes it.
 # Replace every {{PLACEHOLDER}}; `scripts/spec_changes.py` is the project's
 # copy of this skill's script; the commit subject follows the project's
 # commit convention.
@@ -54,47 +55,52 @@ jobs:
       REPO: ${{ github.repository }}
       BASE_REF: ${{ github.event.pull_request.base.ref }}
       HEAD_REF: ${{ github.event.pull_request.head.ref }}
-      SAME_REPO: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-      OPEN: ${{ github.event.pull_request.state == 'open' }}
       AUTHOR: ${{ github.event.pull_request.user.login }}
     steps:
       - uses: "actions/checkout@{{PINNED_SHA}}"
         with:
           path: base
-          fetch-depth: 0
       - name: Note a pull request that is not open
-        if: env.OPEN != 'true'
+        if: github.event.pull_request.state != 'open'
         run: |
           printf 'This pull request is not open: nothing was archived. Archive on a new branch.\n' > "$RUNNER_TEMP/summary.md"
       - name: Fork — post the commands instead of pushing
-        if: env.OPEN == 'true' && env.SAME_REPO != 'true'
-        env:
-          EVENT_HEAD: ${{ github.event.pull_request.head.sha }}
+        if: >-
+          github.event.pull_request.state == 'open'
+          && github.event.pull_request.head.repo.full_name != github.repository
         run: |
-          git -C base fetch --no-tags origin "$EVENT_HEAD"
+          python3 base/scripts/spec_changes.py snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
           {
             printf '@%s this pull request comes from a fork, so the bot cannot push to it. Archive locally:\n\n' "$AUTHOR"
             printf '```bash\n%s\npython3 scripts/spec_changes.py archive --base origin/%s --head HEAD\n%s\ngit add openspec\ngit commit -m "%s"\ngit push\n```\n\n' \
               "{{INSTALL_COMMAND}}" "$BASE_REF" "{{VALIDATE_COMMAND}}" "{{ARCHIVE_COMMIT_SUBJECT}}"
             printf 'Current state of the related changes:\n\n'
-            python3 base/scripts/spec_changes.py --root base status --base "origin/$BASE_REF" --head "$EVENT_HEAD"
+            python3 base/scripts/spec_changes.py status --snapshot "$RUNNER_TEMP/snapshot.json"
           } > "$RUNNER_TEMP/summary.md"
       - uses: "actions/checkout@{{PINNED_SHA}}"
-        if: env.OPEN == 'true' && env.SAME_REPO == 'true'
+        if: >-
+          github.event.pull_request.state == 'open'
+          && github.event.pull_request.head.repo.full_name == github.repository
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           path: pr
           fetch-depth: 0
       - uses: "actions/setup-node@{{PINNED_SHA}}"
-        if: env.OPEN == 'true' && env.SAME_REPO == 'true'
+        if: >-
+          github.event.pull_request.state == 'open'
+          && github.event.pull_request.head.repo.full_name == github.repository
         with:
           node-version: "{{NODE_LTS}}"
       - name: Install the pinned OpenSpec CLI from the base
-        if: env.OPEN == 'true' && env.SAME_REPO == 'true'
+        if: >-
+          github.event.pull_request.state == 'open'
+          && github.event.pull_request.head.repo.full_name == github.repository
         working-directory: base
         run: "{{INSTALL_COMMAND}}"
       - name: Archive, commit, push, relabel
-        if: env.OPEN == 'true' && env.SAME_REPO == 'true'
+        if: >-
+          github.event.pull_request.state == 'open'
+          && github.event.pull_request.head.repo.full_name == github.repository
         env:
           EVENT_HEAD: ${{ github.event.pull_request.head.sha }}
           CURRENT: ${{ join(github.event.pull_request.labels.*.name, ',') }}

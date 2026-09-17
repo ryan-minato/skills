@@ -60,21 +60,34 @@ documentation on 2026-09-17:
 
 ## Fork safety
 
-- `spec / command` runs the default-branch workflow file and checkout;
-  the head is fetched by its exact SHA as git objects and read by the
-  base's script, so the content read is the content the event named. Comment text reaches the shell only through `env`,
-  with globbing off, and only as arguments to the script.
-- `spec / labels` and `spec / archive` use `pull_request_target`, whose
-  token is writable even for a fork. Every script and the CLI install come
-  from the base checkout. The head is checked out only when the head
-  repository is the base repository (its code already runs in the
-  project's own CI); a fork's head is fetched by its SHA as objects for
-  the status table and never checked out, installed, or executed.
-- Code scanning may still flag the fetch as an untrusted checkout in a
-  privileged workflow: the rule cannot see that nothing from the head
-  runs. The maintainer reviews the finding against these rules and
-  dismisses it as a false positive; never add a checkout of the head to
-  satisfy it.
+One rule carries this, and it is structural rather than a promise: **no
+object authored by the request ever reaches a privileged runner.** A
+privileged job (`pull_request_target`, `issue_comment`) checks out the
+base and reads the head through `spec_changes.py snapshot`, which pulls
+the file list and the documents from the REST API. The head's bytes are
+parsed and never executed, so a later edit cannot turn a `git checkout`
+typo into a takeover: the head is not in the runner's git store to check
+out.
+
+- `spec / command` runs the default-branch workflow file and checkout, so
+  every script comes from the base. Comment text reaches the shell only
+  through `env`, with globbing off, and only as arguments to the script.
+- `spec / labels` never touches git beyond the base checkout. The label
+  plan it applies is checked against the literal label taxonomy in the
+  workflow before any API call, so a tampered script cannot make it apply
+  an arbitrary label.
+- `spec / archive` is the one job that needs the head's working tree,
+  because it runs the CLI over it. It checks the head out only under a
+  literal `github.event.pull_request.head.repo.full_name ==
+  github.repository` condition on the step — such a branch lives in the
+  base repository and its code already runs in the project's own CI. For a
+  fork it reads the snapshot, posts the commands, and pushes nothing.
+  Write the comparison in the `if:` itself rather than behind an `env`
+  variable: the guard is then visible at the step it guards, and code
+  scanning recognizes it.
+- The snapshot caps what one request can make a runner read: files
+  touched, bytes per file, bytes in total. Over a cap the job fails loudly
+  instead of labeling on partial data.
 - Invocation gates: labeling needs triage access; commands need a
   collaborator or the author; the bot's own comments start nothing.
 
@@ -90,8 +103,15 @@ directory), and the phase marker the project's template uses.
 - Every workflow parses; actions are pinned by commit; `permissions: {}`
   at the top of each; the archive workflow's fork step contains no
   `git push`.
+- No privileged workflow fetches or checks out the head: `grep -n 'git .*fetch\|checkout'`
+  over the three files finds only the base checkouts and the
+  same-repository checkout guarded by the literal `head.repo.full_name`
+  condition.
 - `python3 scripts/spec_changes.py --help` exits 0; `check --draft` on a
   branch with an unarchived change exits 0 with a warning, `check` exits 1.
+- `snapshot --repo <o/r> --pr <n>` on a real pull request exits 0, and
+  `status --snapshot` on its output matches `status --base ... --head ...`
+  run against a local clone.
 - A test pull request: `/spec status` gets a reply; applying
   `spec/archive` on a complete change produces the commit, the summary, and
   the removed label; the approval banner appears.

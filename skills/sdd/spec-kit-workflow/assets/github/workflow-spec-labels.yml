@@ -4,11 +4,12 @@
 # touches no feature carries none of them.
 #
 # `pull_request_target` runs with a writable token even for a fork, which a
-# plain `pull_request` run does not have; it is safe here because nothing from
-# the head executes: the checkout is the BASE (the event's default), the head
-# is fetched by its exact SHA as git objects only, and the base's script reads
-# them. Never add
-# a checkout of the head, an install from it, or a `run:` of its files.
+# plain `pull_request` run does not have. The rule that makes that safe: no
+# object authored by the request ever reaches this runner. The checkout is the
+# BASE (the event's default), and the head is read through the REST API by the
+# base's own script, which parses it and never executes it. Never add a
+# checkout of the head, a `git fetch` of it, an install from it, or a `run:`
+# of its files.
 # Replace {{PINNED_SHA}}; `scripts/spec_kit_features.py` is the project's copy of
 # this skill's script.
 name: spec-labels
@@ -35,26 +36,36 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: "actions/checkout@{{PINNED_SHA}}"
-        with:
-          fetch-depth: 0
-      - name: Fetch the head as objects only, by its SHA
+      - name: Snapshot the head through the API
         env:
-          HEAD: ${{ github.event.pull_request.head.sha }}
-        run: git fetch --no-tags origin "$HEAD"
+          N: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: python3 scripts/spec_kit_features.py snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
       - name: Compute the label plan and apply it
         env:
           N: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
-          BASE: ${{ github.event.pull_request.base.sha }}
-          HEAD: ${{ github.event.pull_request.head.sha }}
           CURRENT: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
-          python3 scripts/spec_kit_features.py labels --base "$BASE" --head "$HEAD" --current "$CURRENT" --json \
-            > "$RUNNER_TEMP/plan.json"
+          set -euo pipefail
+          python3 scripts/spec_kit_features.py labels --snapshot "$RUNNER_TEMP/snapshot.json" \
+            --current "$CURRENT" --json > "$RUNNER_TEMP/plan.json"
           cat "$RUNNER_TEMP/plan.json"
-          for label in $(jq -r '.add[]' "$RUNNER_TEMP/plan.json"); do
+          # The plan may only ever name a label of the fixed taxonomy; anything
+          # else means the script was tampered with, so the job stops.
+          check() {
+            case "$1" in
+              spec/not-started|spec/in-progress|spec/done) ;;
+              *) echo "refusing unexpected label: $1" >&2; exit 1 ;;
+            esac
+          }
+          while IFS= read -r label; do
+            [ -n "$label" ] || continue
+            check "$label"
             gh api -X POST "repos/$REPO/issues/$N/labels" -f "labels[]=$label" > /dev/null
-          done
-          for label in $(jq -r '.remove[]' "$RUNNER_TEMP/plan.json"); do
+          done < <(jq -r '.add[]' "$RUNNER_TEMP/plan.json")
+          while IFS= read -r label; do
+            [ -n "$label" ] || continue
+            check "$label"
             gh api -X DELETE "repos/$REPO/issues/$N/labels/$(jq -rn --arg l "$label" '$l | @uri')" > /dev/null || true
-          done
+          done < <(jq -r '.remove[]' "$RUNNER_TEMP/plan.json")

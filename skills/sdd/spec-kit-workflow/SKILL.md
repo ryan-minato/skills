@@ -96,6 +96,15 @@ place the script, the check, the commands, and the label, list the
 maintainer actions and the fork-safety rules, and say why there is no
 archive bot.
 
+One rule governs every job that runs with a writable token on someone
+else's request: **no object authored by the request reaches the runner.**
+Such a job checks out the base and reads the head through
+`spec_kit_features.py snapshot`, which pulls the file list and the
+documents from the platform's API and parses them. Reading the head with
+a `git fetch` of its SHA works and is not exploitable on its own, but it
+leaves the request's objects one command away from being checked out by a
+later edit; the snapshot removes them from the runner instead.
+
 ## Handoffs
 
 - Whether or at which level to adopt spec-driven development, what a good
