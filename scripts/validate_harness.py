@@ -18,10 +18,13 @@ Checks (errors unless marked warning):
   pointers   every path AGENTS.md and ARCHITECTURE.md name exists; every
              .agents/knowledge/*.md is named in AGENTS.md; every `just
              <recipe>` AGENTS.md names exists (README: warning)
-  copies     scripts/sync_labels.py and scripts/archive_completed_changes.py
-             are byte-identical to their origins in the meta-github-workflow
-             and meta-spec-workflow skills unless one carries a
+  copies     scripts/sync_labels.py and scripts/spec_changes.py are
+             byte-identical to their origins in the meta-github-workflow
+             and openspec-workflow skills unless one carries a
              `# DIVERGENCE:` line explaining why
+  spec       the spec/* labels are exactly the trigger and managed labels
+             scripts/spec_changes.py declares, the managed ones applied by
+             a workflow, and the archive workflow keys on the trigger
   checks     workflow job names and the table in
              .agents/knowledge/github-checks.md agree in both directions
   openspec   .agents/skills/openspec-* is exactly the core skill set, each
@@ -62,12 +65,13 @@ SKILLS_DIR = ROOT / ".agents" / "skills"
 OPENSPEC_TARGET = SKILLS_DIR / ".openspec-target"
 SYNC_LABELS = ROOT / "scripts" / "sync_labels.py"
 SYNC_LABELS_ORIGIN = ROOT / "skills" / "meta" / "meta-github-workflow" / "scripts" / "sync_labels.py"
-ARCHIVE_SCRIPT = ROOT / "scripts" / "archive_completed_changes.py"
-ARCHIVE_SCRIPT_ORIGIN = ROOT / "skills" / "meta" / "meta-spec-workflow" / "scripts" / "archive_completed_changes.py"
+SPEC_CHANGES = ROOT / "scripts" / "spec_changes.py"
+SPEC_CHANGES_ORIGIN = ROOT / "skills" / "sdd" / "openspec-workflow" / "scripts" / "spec_changes.py"
+SPEC_ARCHIVE_WORKFLOW = WORKFLOWS / "spec-archive.yml"
 
 MANAGED_PREFIXES = ("priority/", "catalog/")
 NEEDS_TRIAGE = "status/needs-triage"
-APPLIERS = {"form", "triage", "human"}
+APPLIERS = {"form", "triage", "human", "workflow"}
 OPENSPEC_CORE_SKILLS = {
     "openspec-apply-change",
     "openspec-archive-change",
@@ -212,6 +216,7 @@ def check_labels() -> None:
             or name.startswith(MANAGED_PREFIXES)
             or name == NEEDS_TRIAGE
             or applier == "human"
+            or applier == "workflow"
         )
         if not consumed:
             error(
@@ -222,6 +227,8 @@ def check_labels() -> None:
             error(f"{rel(LABELS)}: label {name!r} says applied_by form but no form applies it.")
         if applier == "triage" and not (name.startswith(MANAGED_PREFIXES)):
             error(f"{rel(LABELS)}: label {name!r} says applied_by triage but has no managed prefix.")
+        if applier == "workflow" and not name.startswith("spec/"):
+            error(f"{rel(LABELS)}: label {name!r} says applied_by workflow; only spec/* labels are workflow-owned.")
 
     catalogs_on_disk = {p.name for p in (ROOT / "skills").iterdir() if p.is_dir()}
     catalog_labels = {n.split("/", 1)[1] for n in labels if n.startswith("catalog/")} - {"repository"}
@@ -297,12 +304,39 @@ def check_copies() -> None:
             f"{rel(SYNC_LABELS)} differs from {rel(SYNC_LABELS_ORIGIN)}; copy the origin over it "
             "(run `ruff format` on both) or add a `# DIVERGENCE: <why>` line."
         )
-    ours, origin = read(ARCHIVE_SCRIPT), read(ARCHIVE_SCRIPT_ORIGIN)
+    ours, origin = read(SPEC_CHANGES), read(SPEC_CHANGES_ORIGIN)
     if ours != origin:
         error(
-            f"{rel(ARCHIVE_SCRIPT)} differs from {rel(ARCHIVE_SCRIPT_ORIGIN)}; copy the origin over it "
+            f"{rel(SPEC_CHANGES)} differs from {rel(SPEC_CHANGES_ORIGIN)}; copy the origin over it "
             "(the repository runs the skill's script, never a fork of it)."
         )
+
+
+def check_spec_labels() -> None:
+    result = subprocess.run(
+        [sys.executable, str(SPEC_CHANGES), "labels", "--taxonomy"], capture_output=True, text=True, cwd=ROOT
+    )
+    if result.returncode != 0:
+        fail(f"`{rel(SPEC_CHANGES)} labels --taxonomy` failed: {result.stderr.strip()}")
+    taxonomy = json.loads(result.stdout)
+    trigger, managed = taxonomy["trigger"], set(taxonomy["managed"])
+    labels = {item["name"]: item.get("applied_by") for item in json.loads(read(LABELS))}
+    for name in sorted(managed | {trigger}):
+        if name not in labels:
+            error(f"{rel(LABELS)} lacks {name!r}, which {rel(SPEC_CHANGES)} declares; add the row.")
+    for name, applier in labels.items():
+        if not name.startswith("spec/"):
+            continue
+        if name not in managed | {trigger}:
+            error(
+                f"{rel(LABELS)}: {name!r} is not a label {rel(SPEC_CHANGES)} declares; remove it or teach the script."
+            )
+        elif name == trigger and applier != "human":
+            error(f"{rel(LABELS)}: the trigger label {name!r} must say applied_by human.")
+        elif name in managed and applier != "workflow":
+            error(f"{rel(LABELS)}: the managed label {name!r} must say applied_by workflow.")
+    if f"'{trigger}'" not in read(SPEC_ARCHIVE_WORKFLOW):
+        error(f"{rel(SPEC_ARCHIVE_WORKFLOW)} does not key on the trigger label {trigger!r} the script declares.")
 
 
 def check_checks_doc() -> None:
@@ -339,7 +373,7 @@ def check_openspec() -> None:
             )
     if not OPENSPEC_TARGET.exists() or read(OPENSPEC_TARGET).strip() != OPENSPEC_TARGET_VALUE:
         error(f"{rel(OPENSPEC_TARGET)} must contain {OPENSPEC_TARGET_VALUE!r} (the shared .agents/skills target).")
-    for path in (CHECKS_WORKFLOW, DEVCONTAINER):
+    for path in (CHECKS_WORKFLOW, SPEC_ARCHIVE_WORKFLOW, DEVCONTAINER):
         if "@fission-ai/openspec@" in read(path):
             error(
                 f"{rel(path)} hard-codes the OpenSpec version; "
@@ -384,6 +418,7 @@ def main() -> int:
         check_intake,
         check_pointers,
         check_copies,
+        check_spec_labels,
         check_checks_doc,
         check_openspec,
         check_ruff,

@@ -46,9 +46,13 @@ spec-validate:
 spec-sync:
     OPENSPEC_NO_UPDATE_CHECK=1 openspec update --force
 
-# Archive every OpenSpec change whose tasks are all complete (what the spec-archive workflow runs after a merge)
-spec-archive-completed *ARGS:
-    python3 scripts/archive_completed_changes.py {{ARGS}}
+# Strict validation plus the unarchived-change rule for the changes this branch touches (what `checks / spec` runs on a pull request)
+spec-check BASE="origin/main" HEAD="HEAD" *ARGS:
+    python3 scripts/spec_changes.py check --base {{BASE}} --head {{HEAD}} {{ARGS}}
+
+# Related-change tooling for a pull request: related, status, show, check, archive, labels (see --help)
+spec-changes *ARGS:
+    python3 scripts/spec_changes.py {{ARGS}}
 
 # Safety gate for staged changes (also runs as the first pre-commit hook)
 commit-gate:
