@@ -66,8 +66,9 @@ rewrite** only when the user confirms the prototype cannot be maintained and
 agrees to rebuild it feature by feature from specs, with the old code kept
 as a reference until each feature's scenarios pass on the new one.
 
-Then pick the tool with the defaults in SKILL.md — a spec-anchored change
-workflow is the default for existing code — and let the user decide. Write
+Then pick the approach family with `references/adoption-decision.md` — a
+spec-anchored change workflow is the default for existing code — and let
+the user decide. Write
 the chosen path, the recommended tool with its reason, and every decision
 still open into the project's plan file for this adoption; a
 recommendation that lives only in the conversation is lost by the next
@@ -79,9 +80,10 @@ open decisions, and the user has been told where it is.
 ## 4. Run a pilot change
 
 Pick one small, safe, user-visible change and take it through the entire
-loop before touching anything else: proposal, delta spec with scenarios,
-clarification, plan, tasks, implementation, verification, archive or
-converge. The pilot exists to expose friction cheaply:
+loop before touching anything else: the specification with its scenarios,
+clarification, the design when warranted, the draft with the complete
+package, approval, tasks, implementation, verification, archive or
+converge before ready. The pilot exists to expose friction cheaply:
 
 - a scenario that cannot be executed reveals missing test infrastructure;
 - a requirement that contradicts the harness or the goal document reveals a
