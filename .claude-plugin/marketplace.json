@@ -36,8 +36,7 @@
         "./skills/engineering/gitmoji",
         "./skills/engineering/goal-alignment",
         "./skills/engineering/knowledge-deposition",
-        "./skills/engineering/session-retrospective",
-        "./skills/engineering/spec-driven-development"
+        "./skills/engineering/session-retrospective"
       ],
       "description": "General programming methodology skills and narrow artifact-authoring workflows (e.g. Dev Container artifacts)."
     },
@@ -53,6 +52,15 @@
         "./skills/machine-learning/training-instrumentation"
       ],
       "description": "Durable, per-project skills for the daily work of a project that trains or evaluates models: run provenance, the research task workflow, experiment code conventions, training instrumentation, and training diagnosis. Install the ones the project needs; each works alone and hands off to its siblings by role."
+    },
+    {
+      "name": "sdd",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/sdd/spec-driven-development"
+      ],
+      "description": "Spec-driven development in three layers: the framework-agnostic methodology (spec-driven-development) and one skill per framework (openspec-workflow, spec-kit-workflow) with its approval package, in-request archive or completion, comment commands, status labels, and per-platform CI automation. Install the methodology skill and the skill for the framework the project runs."
     },
     {
       "name": "meta",
