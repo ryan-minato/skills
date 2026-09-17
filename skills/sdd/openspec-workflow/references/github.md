@@ -85,9 +85,14 @@ out.
   Write the comparison in the `if:` itself rather than behind an `env`
   variable: the guard is then visible at the step it guards, and code
   scanning recognizes it.
-- The snapshot caps what one request can make a runner read: files
-  touched, bytes per file, bytes in total. Over a cap the job fails loudly
-  instead of labeling on partial data.
+- The snapshot fetches only the documents the commands read and caps
+  what one request can make a runner read: files touched, bytes per file,
+  bytes in total, and API requests (the platform token's REST budget is
+  shared by every workflow of the repository). Over a cap, or on a
+  truncated tree, the job fails loudly instead of labeling on partial data.
+- Request-authored names, paths, and task text reach a bot comment only
+  inside code spans, and the echoed command loses its backticks, so a
+  comment cannot carry a link or a mention under the bot's name.
 - Invocation gates: labeling needs triage access; commands need a
   collaborator or the author; the bot's own comments start nothing.
 

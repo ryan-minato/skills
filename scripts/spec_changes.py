@@ -20,8 +20,12 @@ The head is read through one of two sources, never through a checkout:
   ``issue_comment``, ``workflow_run``), so no object authored by the
   request ever reaches the runner's git store. The snapshot's bytes are
   parsed and never executed, change names are checked against a strict
-  pattern before they reach a URL, and the byte and file caps below bound
-  what one request can make the workflow read.
+  pattern before they reach a URL, only the documents the commands read
+  are fetched, and the file, byte, and API-call caps below bound what one
+  request can make the workflow read. A snapshot that would be partial (a
+  cap reached, a truncated tree) fails instead of being reported on.
+  Request-authored names, paths, and task text reach the rendered
+  markdown only inside code spans, so they cannot add links or mentions.
 
 ``check`` and ``archive`` are the exceptions: both act on the working
 tree, so both keep the git source. ``archive`` edits it through the
@@ -65,10 +69,13 @@ SNAPSHOT_SCHEMA = "spec-snapshot/1"
 # A change name reaches an API path, so it is checked before it is used.
 SAFE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$")
 SAFE_REPO = re.compile(r"^[A-Za-z0-9._-]{1,100}/[A-Za-z0-9._-]{1,100}$")
-TEXT_SUFFIXES = (".md", ".yaml", ".yml", ".txt", ".json")
+# The documents inside a change directory the commands read; nothing else is fetched.
+CHANGE_DOCS = ("proposal.md", "design.md", "tasks.md", ".openspec.yaml")
 MAX_FILES = 3000
 MAX_FILE_BYTES = 1_000_000
 MAX_TOTAL_BYTES = 8_000_000
+# The platform token's REST budget is shared by every workflow of the repository.
+MAX_CALLS = 200
 
 
 class Usage(Exception):
@@ -224,12 +231,13 @@ class SnapshotSource(Source):
 class Api:
     """The few REST reads the snapshot needs, over the standard library."""
 
-    def __init__(self, repo: str, api_url: str, auth: str) -> None:
+    def __init__(self, repo: str, api_url: str, auth: str, max_calls: int = MAX_CALLS) -> None:
         if not SAFE_REPO.match(repo):
             raise Usage(f"--repo {repo!r} is not an OWNER/NAME pair.")
         self.repo = repo
         self.api_url = api_url.rstrip("/")
         self.auth = auth
+        self.max_calls = max_calls
         self.calls = 0
 
     def get(self, path: str, allow_404: bool = False):
@@ -244,6 +252,11 @@ class Api:
             },
         )
         for attempt in range(3):
+            if self.calls >= self.max_calls:
+                raise Failure(
+                    f"the snapshot reached the --max-calls cap ({self.max_calls} API requests); nothing is "
+                    "reported from a partial snapshot. Split the request, or raise the cap deliberately."
+                )
             try:
                 self.calls += 1
                 with urllib.request.urlopen(request, timeout=30) as response:
@@ -344,6 +357,11 @@ def side_listing(api: Api, commit: str, changes_dir: str) -> dict:
     return {"sha": commit, "dirs": dirs, "shas": shas}
 
 
+def is_change_doc(relative: str) -> bool:
+    """Whether a path inside a change directory is a document the commands read."""
+    return relative in CHANGE_DOCS or (relative.startswith("specs/") and relative.endswith("/spec.md"))
+
+
 def build_snapshot(api: Api, number: int, changes_dir: str, caps: dict) -> dict:
     pull = api.pull(number)
     base_sha = pull["base"]["sha"]
@@ -380,22 +398,25 @@ def build_snapshot(api: Api, number: int, changes_dir: str, caps: dict) -> dict:
             continue
         listing = api.tree(head["shas"][path], recursive=True) or {"tree": []}
         if listing.get("truncated"):
-            skipped.append({"name": name, "reason": "the change directory's tree came back truncated"})
+            raise Failure(f"the tree of {path} came back truncated; nothing is reported from a partial snapshot.")
         for entry in listing.get("tree", []):
             if entry.get("type") != "blob":
                 continue
             full = f"{path}/{entry['path']}"
             paths.append(full)
-            if not full.endswith(TEXT_SUFFIXES):
-                skipped.append({"path": full, "reason": "not a text document"})
+            if not is_change_doc(entry["path"]):
                 continue
             size = int(entry.get("size") or 0)
             if size > caps["max_file_bytes"]:
-                skipped.append({"path": full, "reason": f"{size} bytes is over the per-file cap"})
-                continue
+                raise Failure(
+                    f"{full} is {size} bytes, over the --max-file-bytes cap ({caps['max_file_bytes']}); "
+                    "nothing is reported from a partial snapshot."
+                )
             if total + size > caps["max_total_bytes"]:
-                skipped.append({"path": full, "reason": "the snapshot's total byte cap was reached"})
-                continue
+                raise Failure(
+                    f"the documents reached the --max-total-bytes cap ({caps['max_total_bytes']}) at {full}; "
+                    "nothing is reported from a partial snapshot."
+                )
             text = api.blob_text(entry["sha"])
             if text is None:
                 skipped.append({"path": full, "reason": "not decodable as UTF-8 text"})
@@ -504,19 +525,35 @@ def select(changes: list[dict], wanted: list[str]) -> list[dict]:
 # --- rendering ------------------------------------------------------------
 
 
+def code_span(text: str, in_table: bool = False) -> str:
+    """Inline code that request-authored text cannot break out of (no links, mentions, or markup)."""
+    text = " ".join(text.split())
+    if in_table:  # a table splits cells before it parses code spans
+        text = text.replace("|", "\\|")
+    longest = max((len(m) for m in re.findall(r"`+", text)), default=0)
+    ticks = "`" * (longest + 1)
+    pad = " " if not text or text.startswith("`") or text.endswith("`") else ""
+    return f"{ticks}{pad}{text}{pad}{ticks}"
+
+
+def link_to(url_prefix: str, path: str) -> str:
+    return f"{url_prefix.rstrip('/')}/{urllib.parse.quote(path, safe='/')}"
+
+
 def status_markdown(changes: list[dict]) -> str:
     if not changes:
         return "No related OpenSpec change: the diff touches nothing under the changes directory.\n"
     lines = ["| Change | State | Tasks | Progress |", "|---|---|---|---|"]
     for c in changes:
         t = c["tasks"]
-        lines.append(f"| `{c['name']}` | {c['state']} | {t['done']} done, {t['open']} open | {t['progress']} |")
+        name = code_span(c["name"], in_table=True)
+        lines.append(f"| {name} | {c['state']} | {t['done']} done, {t['open']} open | {t['progress']} |")
     for c in changes:
         if c["tasks"]["open_tasks"]:
             lines.append("")
-            lines.append(f"Open tasks of `{c['name']}` (first ten):")
+            lines.append(f"Open tasks of {code_span(c['name'])} (first ten):")
             for task in c["tasks"]["open_tasks"][:10]:
-                lines.append(f"- {task[:117] + '...' if len(task) > 120 else task}")
+                lines.append(f"- {code_span(task[:117] + '...' if len(task) > 120 else task)}")
     return "\n".join(lines) + "\n"
 
 
@@ -547,22 +584,23 @@ def show_markdown(source: Source, changes: list[dict], doc: str, url_prefix: str
 
     for change in changes:
         if change["path"] is None:
-            emit(f"### `{change['name']}` — removed at the head; nothing to show.\n\n")
+            emit(f"### {code_span(change['name'])} — removed at the head; nothing to show.\n\n")
             continue
         for d in docs:
             paths = doc_paths(source, change, d)
             if not paths:
-                emit(f"**{change['name']}/{d}.md** — _no {d}.md yet_\n\n")
+                emit(f"**{code_span(change['name'] + '/' + d + '.md')}** — _no {d}.md yet_\n\n")
                 continue
             for p in paths:
-                link = f"{url_prefix.rstrip('/')}/{p}" if url_prefix else p
-                header = f"**{p}** ([view]({link}))\n\n" if url_prefix else f"**{p}**\n\n"
+                link = link_to(url_prefix, p) if url_prefix else ""
+                view = f" ([view]({link}))" if url_prefix else ""
+                header = f"**{code_span(p)}**{view}\n\n"
                 if overflow:
-                    emit(f"**{p}** — omitted for size ([view]({link}))\n\n")
+                    emit(f"**{code_span(p)}** — omitted for size{view}\n\n")
                     continue
                 text = source.read("head", p)
                 if text is None:
-                    emit(f"**{p}** — not in the snapshot (binary, oversize, or capped) ([view]({link}))\n\n")
+                    emit(f"**{code_span(p)}** — not in the snapshot (not decodable as text){view}\n\n")
                     continue
                 fence = fence_for(text)
                 block = f"{header}{fence}markdown\n{text.rstrip()}\n{fence}\n\n"
@@ -571,7 +609,8 @@ def show_markdown(source: Source, changes: list[dict], doc: str, url_prefix: str
                     overflow = True
                     keep = text[: max(0, budget - len(header) - len(fence) * 2 - 80)]
                     keep = keep[: keep.rfind("\n")] if "\n" in keep else keep
-                    emit(f"{header}{fence}markdown\n{keep}\n{fence}\n… truncated — full file: {link}\n\n")
+                    tail = f": {link}" if url_prefix else ""
+                    emit(f"{header}{fence}markdown\n{keep}\n{fence}\n… truncated — full file{tail}\n\n")
                     continue
                 emit(block)
     return "".join(out) or "No related OpenSpec change: the diff touches nothing under the changes directory.\n"
@@ -599,7 +638,9 @@ def cmd_snapshot(args, root, changes_dir) -> int:
         raise Usage("snapshot needs a GitHub token in GH_TOKEN or GITHUB_TOKEN.")
     if args.pr <= 0:
         raise Usage("--pr must be a positive pull request number.")
-    api = Api(args.repo, args.api_url, auth)
+    if min(args.max_files, args.max_file_bytes, args.max_total_bytes, args.max_calls) <= 0:
+        raise Usage("every snapshot cap must be a positive number.")
+    api = Api(args.repo, args.api_url, auth, args.max_calls)
     caps = {
         "max_files": args.max_files,
         "max_file_bytes": args.max_file_bytes,
@@ -792,6 +833,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--max-files", type=int, default=MAX_FILES, help=f"cap on touched files (default {MAX_FILES})")
     p.add_argument("--max-file-bytes", type=int, default=MAX_FILE_BYTES, help="per-file byte cap")
     p.add_argument("--max-total-bytes", type=int, default=MAX_TOTAL_BYTES, help="total byte cap")
+    p.add_argument("--max-calls", type=int, default=MAX_CALLS, help=f"cap on API requests (default {MAX_CALLS})")
     p.set_defaults(func=cmd_snapshot)
 
     p = sub.add_parser("related", help="list the related changes with their state and task counts")
