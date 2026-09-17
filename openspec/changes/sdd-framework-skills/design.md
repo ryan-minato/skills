@@ -220,6 +220,18 @@ skill directory moves catalogs and two are added. Binding constraints:
 - **The snapshot caps files, per-file bytes, and total bytes** and fails
   loudly at a cap rather than labeling on partial data.
 
+- **A partial read is a failure, not a caveat** (serves the request
+  automation): a command that reports on documents it could not fetch is
+  worse than one that stops, because the reader cannot tell the difference.
+  Every incomplete path — a cap reached, a truncated tree, a document that
+  does not decode — now exits 1 naming the path. The alternative, recording
+  the omissions in the document and letting the commands run, was rejected
+  because nothing read that record.
+- **The `meta-agent-authority` skill gets a delta in this change** rather
+  than a follow-up: it reads the archive executor from the contract, and
+  this change is what replaced the archive mode with an executor, so the
+  two land together.
+
 ## Risks / Trade-offs
 
 - [Behavioral tests across four skills are expensive] → one fixture
@@ -327,6 +339,20 @@ Skipped:
 - Code scanning: the open `actions/untrusted-checkout/critical` alert on
   `.github/workflows/spec-labels.yml` closes on the next default-setup scan
   of the branch; the outcome goes in the pull request's Validation section.
+
+### Review findings
+
+- Scripts: `just lint` clean; the eleven-case error matrix still exits 2 with
+  an actionable message, plus a twelfth for a snapshot built against another
+  changes directory; `related`, `status` and `labels` byte-identical between
+  the git source and a live snapshot of this request; a fixture whose task
+  list ends in a bare `- [ ]` reports one open task and fails `check`; `show`
+  on a change with no design says the document was never written.
+- Workflows: all six files parse; job names and permissions unchanged except
+  the comment job's added `pull-requests: read`; the fork comment renders with
+  its five arguments in order.
+- Guidance: `just check-skill` green on the four skills; each corrected
+  passage read back against the behavior it describes.
 
 ## Open Questions
 

@@ -34,6 +34,13 @@
 - [x] 4.4 `spec-kit-workflow` assets: the same for the labels and command workflows; verify YAML parse and the grep
 - [x] 4.5 Both skills' `SKILL.md` and `references/github.md` state the rule (no object authored by the request reaches a privileged runner), the snapshot, the literal same-repository guard, and the caps; the verification lists gain the grep and the parity check; verify `just check-skill` on both
 
-## 5. Finish
+## 5. Review findings (code review of this request)
 
-- [x] 5.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, archive both changes inside this pull request by hand
+- [x] 5.1 Scripts: a partial read of any kind fails the snapshot (cap, truncated tree, undecodable document); a snapshot built for another changes or specs directory is refused; `show` tells a document that was never written from one the source does not hold; the clean-tree guard before archiving covers every path the tool writes; an unchecked box with no text is an open task; a request touching exactly the file cap is inside it — verify `just lint`, the error matrix, source parity on a live request, and a fixture whose task list ends in a bare checkbox
+- [x] 5.2 Workflows: the comment job grants `pull-requests: read` for the reads it makes; the fork instructions fetch from `upstream` because a fork clone's `origin` is the fork — verify YAML parse, job names and permissions, and a rendering of the fork comment
+- [x] 5.3 Guidance: both GitLab references refuse the parent-project pipeline as a fork workaround; the archiving bullet says a GitLab label change starts no pipeline; the by-hand command takes the request's target branch; the catalog README pair, the deposited draft rule, the entrypoint pointer, the clarify fallback, and the catalog's adding-a-framework rule match what the skills do — verify `just check-skill` on the four skills and a read of each corrected passage
+- [x] 5.4 Delta specs extended to cover the above and a `meta/meta-agent-authority` delta added for the archive executor it now reads — verify `just spec-validate`
+
+## 6. Finish
+
+- [x] 6.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, archive both changes inside this pull request by hand

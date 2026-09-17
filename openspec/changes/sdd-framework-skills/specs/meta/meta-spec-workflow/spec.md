@@ -69,6 +69,14 @@ The builder SHALL ask the change request shape, the archive executor, the defaul
 ### Requirement: Behavior: The deposited contract carries the new facts in platform vocabulary
 The deposited specification contract SHALL state the change request shape, in-request archiving with its executor (by hand, or the framework skill's automation: a required check, comment commands, a trigger label, and status labels), the fork rule, and the freeze that archiving before review implies, the default specification author, the approval mode with its record (the closing of the discussion plus the reconciliation the agent performs, or the blocking comment's fixed text and what it covers) exercised on the complete approval package, the specification scope with the spec-less change kind, the specification lines the change request body carries and the sections it reserves until ready, what the integration branch may hold, the framework skill the project uses, and the artifact operations — the categories of operation performed through the tool's commands (verified from its help, none quoted), the rule that hand edits are limited to the record's text, the validator with its strict mode, its place in the project's local check command, and when it runs (after each artifact edit, before publishing the draft, before ready, after archiving), or the structural check the project adopts when the tool has no validator — and SHALL use the project's platform vocabulary for work items, change requests, and automation, with no builder-only model noun appearing without its definition and no framework command or script named.
 
+#### Scenario: Generated task list in the draft
+- **WHEN** the deposited project skill states what the first draft carries
+- **THEN** it says the approval package and that a task list the tool generated alongside it is pushed but marked as after-approval and kept out of the review, never that the draft carries no task list
+
+#### Scenario: Entrypoint pointer
+- **WHEN** the builder writes the entrypoint line that points at the contract
+- **THEN** that line uses the platform's own words for the work item, carrying none of the builder's design vocabulary
+
 #### Scenario: GitHub project deposit
 - **WHEN** the builder deposits the contract for a project hosted on GitHub
 - **THEN** the file names issues, pull requests, draft pull requests, and Actions workflows, states shape, executor, author, approval mode and package, and scope, names the framework skill, and contains no undefined model noun such as "tracked work" or "change request" and no tool command

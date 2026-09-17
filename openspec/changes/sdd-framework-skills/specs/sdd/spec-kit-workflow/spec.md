@@ -1,9 +1,7 @@
-# sdd/spec-kit-workflow Specification
-
 ## Purpose
 Governs what an agent that loaded the `spec-kit-workflow` skill observably does when a project runs Spec-Kit features through pull or merge requests: the approval package, the completion criterion before ready, the comment commands and progress labels, and the automation it installs per platform.
 
-## Requirements
+## ADDED Requirements
 
 ### Requirement: Trigger: description
 The skill description SHALL cause the skill to load when a project that runs Spec-Kit asks how a feature's specification and plan pass approval, what must be complete before the request is ready, or how to use or install the `/spec` comment commands, the progress labels, and the feature check in CI, and SHALL not cause it to load for running the kit's own commands on one feature, for choosing a spec tool, or for a project that runs another framework.
@@ -47,7 +45,7 @@ The agent SHALL state that Spec-Kit has no archive operation, SHALL require ever
 - **THEN** the agent says the kit archives nothing, completion is the ticked task list, and a spec-anchored project updates its living specification per its rule
 
 ### Requirement: Behavior: The automation is installed per platform from the skill's assets
-When asked to install the automation on GitHub, the agent SHALL produce from its assets a check job that joins the base's existing checks workflow and its gate (required files present for every touched feature; an open task as a warning on a draft and a failure when ready), the comment-command workflow (`/spec show` and `/spec status` over touched features), and the progress-label workflow, SHALL add the three progress labels to the project's label file, SHALL copy `scripts/spec_kit_features.py` into the project's scripts, SHALL keep every workflow fork-safe by one structural rule — no object authored by the request reaches a privileged runner: scripts run from the base ref and the head is read through the script's API snapshot rather than fetched into the runner's git store, and SHALL say that no archive bot exists because the kit has no archive operation; on GitLab the agent SHALL produce the jobs fragment and state its limitations.
+When asked to install the automation on GitHub, the agent SHALL produce from its assets a check job that joins the base's existing checks workflow and its gate (required files present for every touched feature; an open task as a warning on a draft and a failure when ready), the comment-command workflow (`/spec show` and `/spec status` over touched features), and the progress-label workflow, SHALL add the three progress labels to the project's label file, SHALL copy `scripts/spec_kit_features.py` into the project's scripts, SHALL grant each job only the scopes its own reads and writes need, remembering that a permission left out of the block is none, SHALL keep every workflow fork-safe by one structural rule — no object authored by the request reaches a privileged runner: scripts run from the base ref and the head is read through the script's API snapshot rather than fetched into the runner's git store, and SHALL say that no archive bot exists because the kit has no archive operation; on GitLab the agent SHALL produce the jobs fragment, state its limitations, and refuse running a fork's pipeline in the parent project as a workaround, because that runs the fork's configuration with the parent's token.
 
 #### Scenario: GitHub install
 - **WHEN** the user asks to install the automation in a GitHub repository whose base has a checks workflow with a gate
@@ -84,11 +82,15 @@ The agent SHALL route setting or changing the project's rules — the approval m
 - **THEN** the agent installs the automation, applies the defaults, and names the contract update as remaining work
 
 ### Requirement: Script: spec_kit_features.py
-The bundled script SHALL resolve a request's touched features (numbered directories under the kit's specs directory whose files the request touches) from either of two head sources — a base and head ref read with git plumbing, or a snapshot document read with `--snapshot` — and SHALL offer a `snapshot` subcommand that builds that document from the platform's REST API without fetching or checking out the head, capping the files and bytes it will read and failing when a cap is reached; SHALL offer `related`, `status`, `show`, `check`, `labels`, and `snapshot` subcommands; `check` SHALL fail when a touched feature lacks its specification or plan, or when a touched feature has an open task and the request is ready (a warning with `--draft`); `show` SHALL print a feature's documents inside a fence and truncate at `--max-chars` with a link; `labels` SHALL compute the desired progress label and the additions and removals against the current set; every subcommand SHALL support `--help`, exit 0 on success, 1 on a failure or a finding, and 2 on bad arguments.
+The bundled script SHALL resolve a request's touched features (numbered directories under the kit's specs directory whose files the request touches) from either of two head sources — a base and head ref read with git plumbing, or a snapshot document read with `--snapshot` — and SHALL offer a `snapshot` subcommand that builds that document from the platform's REST API without fetching or checking out the head, capping the files, bytes, and API calls it will read and refusing to report on a partial read of any kind — a cap reached, a truncated tree, or a document that is not decodable as text; a snapshot built for a different specs directory SHALL be refused rather than silently matched against none; SHALL offer `related`, `status`, `show`, `check`, `labels`, and `snapshot` subcommands; `check` SHALL fail when a touched feature lacks its specification or plan, or when a touched feature has an open task and the request is ready (a warning with `--draft`); an unchecked box with no text is an open task; `show` SHALL print a feature's documents inside a fence and truncate at `--max-chars` with a link; `labels` SHALL compute the desired progress label and the additions and removals against the current set; every subcommand SHALL support `--help`, exit 0 on success, 1 on a failure or a finding, and 2 on bad arguments.
 
 #### Scenario: Help
 - **WHEN** the script runs with `--help`
 - **THEN** it prints usage naming the six subcommands and exits 0
+
+#### Scenario: Partial read refused
+- **WHEN** the `snapshot` command reaches a cap, meets a truncated tree, or finds a document it cannot decode as text
+- **THEN** it exits 1 naming the path and reports nothing, so no command runs on data it does not hold
 
 #### Scenario: Snapshot source matches the git source
 - **WHEN** `snapshot` runs against a pull request and `status`, `show`, and `labels` run against the resulting document
