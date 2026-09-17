@@ -29,6 +29,10 @@
 - [x] 4.4 `.agents/knowledge/github-checks.md` records the rule, the snapshot in the two job rows, and the standing instruction never to add a head checkout or fetch; verify a read-through and `just validate`
 - [x] 4.5 The open CodeQL alert on `spec-labels.yml` closes on the next default-setup scan of the branch; record the outcome in the pull request's Validation section
 
-## 5. Finish
+## 5. Review findings (code review of this request)
 
-- [x] 5.1 Run `just check`, write the results to the pull request's Validation section, archive this change inside the pull request by hand
+- [x] 5.1 This repository's `spec-command.yml` grants `pull-requests: read` and `spec-archive.yml` posts fork instructions that fetch from `upstream`, both regenerated from the corrected assets; `scripts/spec_changes.py` mirror refreshed — verify YAML parse, `just validate`, and the mirror diff empty
+
+## 6. Finish
+
+- [x] 6.1 Run `just check`, write the results to the pull request's Validation section, archive this change inside the pull request by hand
