@@ -59,7 +59,7 @@ the disposable `scaffold` catalog's `scaffold-ml`; GPU container
 environments to the `meta` catalog's `meta-gpu-container`; data pipelines
 that consume models without training them to `scaffold-data-science`;
 software specifications and the specify-plan-implement loop to
-`engineering/spec-driven-development`; settling a project's spec tooling,
+`sdd/spec-driven-development`; settling a project's spec tooling,
 including a research-task schema, to the `meta` catalog's
 `meta-spec-workflow`.
 
@@ -70,7 +70,7 @@ which run produced an artifact, wiring a tracker → `experiment-provenance`
 · a series of hypotheses toward one objective, the research spec, one task
 per pull or merge request, evidence for a claim, closing with a verdict →
 `research-workflow`; a software feature's specification → the
-`engineering` catalog's `spec-driven-development`; how a team tracks and
+`sdd` catalog's `spec-driven-development`; how a team tracks and
 plans work → the `meta` catalog's `meta-workflow-design` · the shape of
 experiment code — share or duplicate, Trainer or loop, vendoring,
 configuration contents, tests, typing, docstrings, hot-path trade-offs →

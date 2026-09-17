@@ -32,7 +32,7 @@ between releases and are not recorded here.
 
 - One domain per public skill, at the skill's catalog path:
   `openspec/specs/<catalog>/<skill-name>/spec.md` (for example
-  `openspec/specs/engineering/spec-driven-development/spec.md`). Its
+  `openspec/specs/sdd/spec-driven-development/spec.md`). Its
   requirements describe what an agent that loaded the skill observably
   does; its scenarios are the skill's behavioral test cases. A skill that
   moves catalogs moves its domain in the same change.
