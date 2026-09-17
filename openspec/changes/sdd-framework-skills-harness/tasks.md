@@ -23,10 +23,10 @@
 
 ## 4. Zero-trust read path (review amendment)
 
-- [ ] 4.1 `.github/workflows/spec-labels.yml` and `spec-command.yml` regenerated from the updated assets: base checkout only, the head read through `scripts/spec_changes.py snapshot`, the label plan checked against the literal taxonomy; verify YAML parse, job names unchanged, and `grep -n 'git .*fetch'` empty in both
-- [ ] 4.2 `.github/workflows/spec-archive.yml` regenerated: the fork branch reads the snapshot, the same-repository steps carry the literal `head.repo.full_name == github.repository` condition, the `SAME_REPO` and `OPEN` environment variables are gone; verify YAML parse and `just validate` (`check_spec_labels`)
-- [ ] 4.3 `scripts/spec_changes.py` mirror refreshed; verify `diff scripts/spec_changes.py skills/sdd/openspec-workflow/scripts/spec_changes.py` empty and `just validate` green
-- [ ] 4.4 `.agents/knowledge/github-checks.md` records the rule, the snapshot in the two job rows, and the standing instruction never to add a head checkout or fetch; verify a read-through and `just validate`
+- [x] 4.1 `.github/workflows/spec-labels.yml` and `spec-command.yml` regenerated from the updated assets: base checkout only, the head read through `scripts/spec_changes.py snapshot`, the label plan checked against the literal taxonomy; verify YAML parse, job names unchanged, and `grep -n 'git .*fetch'` empty in both
+- [x] 4.2 `.github/workflows/spec-archive.yml` regenerated: the fork branch reads the snapshot, the same-repository steps carry the literal `head.repo.full_name == github.repository` condition, the `SAME_REPO` and `OPEN` environment variables are gone; verify YAML parse and `just validate` (`check_spec_labels`)
+- [x] 4.3 `scripts/spec_changes.py` mirror refreshed; verify `diff scripts/spec_changes.py skills/sdd/openspec-workflow/scripts/spec_changes.py` empty and `just validate` green
+- [x] 4.4 `.agents/knowledge/github-checks.md` records the rule, the snapshot in the two job rows, and the standing instruction never to add a head checkout or fetch; verify a read-through and `just validate`
 - [ ] 4.5 The open CodeQL alert on `spec-labels.yml` closes on the next default-setup scan of the branch; record the outcome in the pull request's Validation section
 
 ## 5. Finish
