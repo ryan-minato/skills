@@ -17,6 +17,7 @@
   {"name": "catalog/engineering", "color": "1d76db", "description": "Touches the engineering catalog", "applied_by": "triage"},
   {"name": "catalog/machine-learning", "color": "1d76db", "description": "Touches the machine-learning catalog", "applied_by": "triage"},
   {"name": "catalog/meta", "color": "1d76db", "description": "Touches the meta catalog", "applied_by": "triage"},
+  {"name": "catalog/sdd", "color": "1d76db", "description": "Touches the sdd catalog", "applied_by": "triage"},
   {"name": "catalog/scaffold", "color": "1d76db", "description": "Touches the scaffold catalog", "applied_by": "triage"},
   {"name": "catalog/writing", "color": "1d76db", "description": "Touches the writing catalog", "applied_by": "triage"},
   {"name": "catalog/repository", "color": "5319e7", "description": "Touches the repository harness rather than a catalog", "applied_by": "triage"},

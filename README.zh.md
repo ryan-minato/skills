@@ -15,6 +15,7 @@
 | [`meta`](skills/meta/) | 通用 harness 机制的一次性构建技能：harness 构建入口工作流，分支、项目工作流、规格工作流、agent 权限四类合同构建器，GitHub 与 GitLab 生命周期工作流，GPU 容器环境，Python 约定默认值，以及清除步骤 | 安装到项目，harness 验证后移除 |
 | [`scaffold`](skills/scaffold/) | 特定主题项目（ML、数据科学、Colab 笔记本）的一次性构建技能——只安装匹配的那一个 | 安装到项目，harness 验证后移除 |
 | [`machine-learning`](skills/machine-learning/) | 训练或评估模型的项目在日常工作中长期使用的 skill：run 溯源、research task 工作流、实验代码约定、训练观测埋点、训练诊断 | 按需安装到项目 |
+| [`sdd`](skills/sdd/) | 规格驱动开发：框架无关的方法论，以及每个框架一个的 skill（OpenSpec、Spec-Kit），含审批包、request 内存档、评论命令、状态标签与 CI 自动化 | 按需安装到项目 |
 | [`writing`](skills/writing/) | 面向人类读者的写作：体裁类（学术、博客/评论、文案）与载体类（LaTeX、Typst、Markdown） | 按需安装到项目 |
 
 每个 catalog 的 README 列出了其包含的 skill。
@@ -48,7 +49,7 @@ npx skills add ryan-minato/skills --skill <skill-name> -g
 ```
 /plugin marketplace add ryan-minato/skills
 /plugin install core@ryan-minato-skills
-/plugin install meta@ryan-minato-skills     # 或 core@、engineering@、machine-learning@、scaffold@、writing@ 等
+/plugin install meta@ryan-minato-skills     # 或 core@、engineering@、machine-learning@、sdd@、scaffold@、writing@ 等
 ```
 
 ## 参与贡献
