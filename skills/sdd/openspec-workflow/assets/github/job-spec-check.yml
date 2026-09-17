@@ -1,0 +1,44 @@
+# A job for the project's existing checks workflow (the one whose aggregator
+# gate the ruleset requires). Paste it under `jobs:`, add `spec-check` to the
+# gate's `needs:`, and make sure the workflow's `on.pull_request.types` lists
+# `opened, synchronize, reopened, ready_for_review, converted_to_draft` so the
+# verdict follows the draft state. Replace every {{PLACEHOLDER}}: the pinned
+# commit SHA of each action, the Node LTS line, and the project's command that
+# installs the pinned OpenSpec CLI (the version pin stays in one place).
+# `scripts/spec_changes.py` is the project's copy of this skill's script.
+#
+# On a pull request: strict validation, then every related change that is
+# still unarchived is a warning while the pull request is a draft and a
+# failure once it is ready. On a push to the default branch: strict
+# validation, then any change outside archive/ fails.
+  spec-check:
+    name: spec / check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      OPENSPEC_NO_UPDATE_CHECK: "1"
+      DO_NOT_TRACK: "1"
+    steps:
+      - uses: "actions/checkout@{{PINNED_SHA}}"
+        with:
+          fetch-depth: 0
+      - uses: "actions/setup-node@{{PINNED_SHA}}"
+        with:
+          node-version: "{{NODE_LTS}}"
+      - name: Install the pinned OpenSpec CLI
+        run: "{{INSTALL_COMMAND}}"
+      - name: Validate strictly and refuse an unarchived related change
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          DRAFT: ${{ github.event.pull_request.draft }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            flag=""
+            [ "$DRAFT" = "true" ] && flag="--draft"
+            python3 scripts/spec_changes.py check --base "$BASE" --head "$HEAD" $flag
+          else
+            python3 scripts/spec_changes.py check --all
+          fi
