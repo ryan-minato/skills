@@ -25,9 +25,11 @@ form: `SPEC_FEATURE`, `SPEC_DOC`) whose output goes to the job log and,
 with `SPEC_NOTE_TOKEN` (`api` scope, masked), to a merge request note;
 `spec:labels` applies the progress label with `SPEC_LABELS_TOKEN` or only
 prints the plan; merge request pipelines from a fork run in the fork
-without the parent's variables, so notes and labels work for a fork only
-when a parent-project member runs the pipeline in the parent context;
-enforcement is the project setting **Pipelines must succeed**.
+without the parent's variables, so notes and labels stay unwritten for a
+fork. Do not enable running fork pipelines in the parent project to work
+around that: GitLab then runs the CI configuration from the fork's branch
+with the parent's variables and tokens. Enforcement is the project setting
+**Pipelines must succeed**.
 
 ## Maintainer actions
 

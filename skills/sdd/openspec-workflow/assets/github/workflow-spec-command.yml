@@ -34,6 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # The reply is an issue comment; reading the request and its files is a
+      # pull-request read, and every permission left out of this block is none.
+      pull-requests: read
       issues: write
     env:
       GH_TOKEN: ${{ github.token }}

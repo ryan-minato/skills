@@ -40,8 +40,11 @@ project, and carry no disposable marker.
   and never lists implementation steps; it is committed, so it carries no
   secret or private data.
 - Adding a framework is one new skill here plus a row in this catalog's
-  README pair; the methodology skill and the `meta` builder are not
-  edited for it.
+  README pair. The methodology skill and the `meta` builder carry no
+  framework-specific behavior, but each names the framework skills it can
+  hand off to, so adding one also updates those lists — the methodology's
+  approach families and handoff, and the builder's questioning round and
+  adoption step.
 
 ## Dependencies
 

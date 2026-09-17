@@ -84,7 +84,8 @@ contract names the executor:
   open task:
 
   ```bash
-  python3 scripts/spec_changes.py archive --base origin/main --head HEAD
+  # `<target>` is the branch the request merges into, not always `main`.
+  python3 scripts/spec_changes.py archive --base origin/<target> --head HEAD
   ```
 
 - **The label bot**: apply `spec/archive` to the request — an authorized
@@ -92,7 +93,10 @@ contract names the executor:
   commits, pushes, recomputes the status labels, removes the label, and
   posts a summary; on GitHub its push leaves the checks in an
   approval-required state that a user with write access starts with one
-  click, and the summary says so. Do not archive by hand in parallel.
+  click, and the summary says so. On GitLab a label change starts no
+  pipeline, so apply the label **and start a pipeline** (the Run pipeline
+  button or the `/run_pipeline` quick action); until one runs, nothing
+  happens. Do not archive by hand in parallel.
 - **A fork**: the bot pushes nothing; it posts the commands. Run them,
   validate, commit, push.
 
