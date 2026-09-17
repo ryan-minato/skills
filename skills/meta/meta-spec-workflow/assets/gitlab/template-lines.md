@@ -9,8 +9,8 @@ leave no placeholder and no comment behind. -->
 
 Spec: [<path of the change record>](<link to the record on the branch>)
 Phase: specification
-Records: <one link per record file — proposal and delta specs; design and tasks are added when they exist>
-Approval: <discussion-closed: "discussion open on this draft — the gate owner closes it in conversation; design and implementation follow the reconciled record" | blocking: "pending — the gate owner's comment on this draft, covering the record as of the last push before it; to approve, post this comment on one line:" followed by a fenced block holding exactly the text the contract fixes, for example `Specification approved`>
+Records: <one link per file of the approval package — the specification and the design when warranted; the task list is listed as after-approval material>
+Approval: <discussion-closed: "discussion open on this draft — the gate owner reviews the complete package here and closes the discussion in conversation; the task list and the implementation follow the reconciled package" | blocking: "pending — the gate owner's comment on this draft, covering the record as of the last push before it; to approve, post this comment on one line:" followed by a fenced block holding exactly the text the contract fixes, for example `Specification approved`>
 
 ## ACCEPTANCE_ITEM — inserted into the checklist item beginning "The change satisfies", before the final period
 
@@ -20,8 +20,8 @@ Approval: <discussion-closed: "discussion open on this draft — the gate owner 
 
 ## CHECKLIST_ITEMS — between the acceptance item and "The documented local checks pass."
 
-- [ ] <discussion-closed: "The change record's discussion was closed on this draft before implementation" | blocking: "The gate owner's `<exact text>` comment on this draft is later than the record's last push">, or this merge request carries the specification only.
-- [ ] <in-request: "The change record is archived in this merge request, or the specification is updated." | automated: "Every task of the change record is done and it is left for the `<archive job name>` job, or the specification is updated.">
+- [ ] <discussion-closed: "The approval package's discussion was closed on this draft before the task list" | blocking: "The gate owner's `<exact text>` comment on this draft is later than the package's last push">, or this merge request carries the specification only.
+- [ ] Every task of the change record is done and the record is archived in this merge request <by hand | "by hand or by the `<trigger label>` label">, or the specification is updated.
 
 ## INTAKE_LINK_FIELD — task template, one section before `## Acceptance criteria`
 

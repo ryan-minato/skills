@@ -3,21 +3,21 @@ name: meta-spec-workflow
 description: >-
   Disposable builder skill (delete after the harness is built): configures
   a project's spec-driven development rules — settles level, tool, request
-  shape, approval and archive modes, and scope with the user, adopts the
-  tool's layout, gives every fact one source of truth, and deposits the
-  specification contract in the project's platform vocabulary; in a second
-  phase, once the platform base is delivered, fills its extension slots
-  (templates, forms, project skill steps, archive job, validator). Use in
-  a harness build when the workflow contract records spec-driven intent,
-  when a spec tool's directories sit beside an agent harness, when asked
-  to make the harness match the spec tool or stop issues and specs
-  contradicting each other, or when a delivered platform base awaits its
-  specification shaping. Not for writing specs, choosing the practice, the
-  spec loop, the tracker, or branching.
+  shape, approval package and mode, archive executor, and scope with the
+  user, gives every fact one source of truth, deposits the specification
+  contract in the project's platform vocabulary, and hands tool adoption
+  and automation to the tool's framework skill; in a second phase, once the
+  platform base is delivered, fills its extension slots (templates, forms,
+  project skill steps, knowledge). Use in a harness build when the workflow
+  contract records spec-driven intent, when a spec tool's directories sit
+  beside an agent harness, when asked to make the harness match the spec
+  tool or stop issues and specs contradicting each other, or when a
+  delivered platform base awaits its specification shaping. Not for
+  writing specs, choosing the practice, the loop, the tracker, branching,
+  or one framework's automation.
 license: Apache-2.0
 compatibility: >-
-  The bundled scripts require Python 3.10+ (stdlib only); the archive
-  script also needs the OpenSpec CLI on PATH.
+  The bundled script requires Python 3.10+ (stdlib only).
 ---
 
 # Specification Workflow Contract
@@ -27,11 +27,13 @@ keeps its specifications, make the harness say the same thing the chosen
 tool assumes, and leave the result in the target project as a contract.
 Then, once the platform builder has delivered its paradigm-neutral base,
 come back and shape that base for the contract: the templates, the intake
-forms, the project skill's steps, the archive automation, the validator in
-the check command. The design is settled in tool and workflow terms with no
-hosting platform in mind; the deposited contract and the inserted slot
-text name the platform's objects, because the agents that read them work
-on that platform. Both must survive this builder and this conversation.
+forms, the project skill's steps, the knowledge section — and hand the
+tool's automation and validator wiring to the tool's framework skill. The
+design is settled in tool and workflow terms with no hosting platform in
+mind; the deposited contract and the inserted slot text name the
+platform's objects, because the agents that read them work on that
+platform. No framework command, script, or workflow appears in either.
+Both must survive this builder and this conversation.
 
 ## Non-negotiable boundaries
 
@@ -56,10 +58,10 @@ on that platform. Both must survive this builder and this conversation.
   or knowledge base state the same fact — engineering principles, behavior
   of a domain, acceptance of a change — exactly one keeps it and the other
   points to it. Restating is the failure this builder exists to prevent.
-- Tool commands are verified, never recalled. Every reference here names
-  what a tool generates and assumes, not its current command set; run the
-  tool's own `--help` and read its current documentation before invoking
-  or documenting a command.
+- Framework content lives in the framework skill. This builder names no
+  tool command, layout detail, script, or workflow; the `sdd` catalog's
+  framework skill for the selected approach owns them, and tool commands
+  are verified from the tool's own `--help` there, never recalled.
 - A recommendation is not a decision. Attach one reasoned recommendation
   to every question and let the user overrule it; a settled decision becomes
   a downstream constraint later builders must not reopen.
@@ -107,9 +109,8 @@ must follow it, never a tool default), and the project's goal document.
 When no workflow file evidences the platform, establish it from the remote
 and the CI or template directories; if nothing does, ask in step 2 before
 anything else, because no contract is deposited without it. Record also
-whether automation exists (a workflow or pipeline directory) and whether
-its identity may push to the protected integration branch: that evidence
-decides the archive mode. Record whether a platform base is already
+whether automation exists (a workflow or pipeline directory): that
+evidence decides the archive executor. Record whether a platform base is already
 delivered — a project workflow skill, request and intake templates, a
 mechanics section in the workflow file — and whether this contract is
 already deposited: with both present, the run is the second phase and
@@ -143,21 +144,30 @@ recommendation:
    to other agents stated; the team refuses tooling → committed
    specification documents; custom layout only for a stated constraint none
    of these meets. A tool the project already runs is the answer unless the
-   user asks to change it.
-3. **Approval gate and mode** — who approves a specification before
-   planning and implementation start, whether an agent may approve its
-   own, and how the approval is recorded. Recommend the discussion-closed
-   mode: the draft opens at the record and the agent stops; the gate owner
-   discusses on the request, directs record changes in conversation, and
-   declares the discussion closed in conversation; the agent reconciles
-   the request's threads and the record before designing. Offer the
-   blocking alternative once — a fixed-wording comment on the draft
-   covering the record as of the last push before it — and take it only
-   when the user or a project file asks for an explicit token. Both modes
-   are defined in
-   [tracked-work-lifecycle.md](references/tracked-work-lifecycle.md), read
-   before this round. Record the owner and the mode; the authority builder
-   attaches its levels to this gate later.
+   user asks to change it. Record which framework skill of the `sdd`
+   catalog owns the tool (`openspec-workflow`, `spec-kit-workflow`), or
+   that none exists for it.
+3. **Approval gate, mode, and package** — who approves before the task
+   list and the implementation start, whether an agent may approve its
+   own, how the approval is recorded, and when a design is warranted. The
+   gate is exercised on the complete approval package: the specification
+   plus the design when one is warranted — by default when more than one
+   reasonable approach exists, or the change touches structure,
+   interfaces, dependencies, or files outside the record; a wording change
+   inside one section needs none; the project may fix the rule in its
+   schema. The design bounds the approach and lists no steps; it is
+   committed, so it carries no secret or private data. Recommend the
+   discussion-closed mode: the draft opens with the complete package and
+   the agent stops; the gate owner discusses on the request, directs
+   record changes in conversation, and declares the discussion closed in
+   conversation; the agent reconciles the request's threads and the
+   package before the task list. Offer the blocking alternative once — a
+   fixed-wording comment on the draft covering the package as of the last
+   push before it — and take it only when the user or a project file asks
+   for an explicit token. Both modes are defined in
+   [contract-design.md](references/contract-design.md), read before this
+   round. Record the owner, the mode, and the design rule; the authority
+   builder attaches its levels to this gate later.
 4. **Division of labor** — confirm the default: specifications own what,
    why, and acceptance; tracked work owns who, when, and status and links
    the specification. Any deviation is recorded with its reason.
@@ -172,14 +182,20 @@ recommendation:
    any consumer that depends on a stable contract → split. Any project may
    take a single contract-level change through split as a recorded
    deviation.
-6. **Archive mode** — automated (a job on the integration branch archives
-   every completed change after merge, one run at a time, rescanning
-   everything, failing without retry on a rejected push) or in-request
-   (the change request archives before it is marked ready). Derive the
-   recommendation from step 1's evidence: automation that exists and may
-   push to the protected integration branch → automated; otherwise
-   in-request, naming the missing capability. Record the push authorization
-   the automation identity needs as a maintainer action.
+6. **Archive executor** — archiving (or converging) always happens inside
+   the change request before it is marked ready, so the integration branch
+   never holds an unarchived record; the question is who runs it: by hand
+   with the tool's archive command, or the automation the framework skill
+   installs — a required check that fails a ready request with an
+   unarchived record, comment commands that show a record and its
+   progress, a trigger label whose bot archives, commits, pushes, and
+   removes the label, and status labels. Derive the recommendation from
+   step 1's evidence: automation exists → the framework skill's automation;
+   otherwise by hand with the request checklist as the gate. Record the
+   fork rule either way: a fork's request is archived by its author from
+   the commands the bot posts. Archiving after the merge by a job that
+   pushes to the integration branch is a rejected alternative, not an
+   option.
 7. **Default specification author** — the implementer, or a named planning
    role. Record who publishes the draft and who approves it (the approval
    owner of question 3); the record of approval is the mode's closing or
@@ -188,23 +204,26 @@ recommendation:
 8. **Specification scope** — recommend that domains cover the product the
    project delivers and that a change to the project's own harness,
    tooling, checks, workflows, or documents is a spec-less change carried
-   by the tool's marker (OpenSpec: `skip_specs: true` with a proposal,
-   design, and tasks and no delta spec), linked by tracked work the same
-   way and never given a domain. Name the marker; record any deviation
-   with its reason.
+   by the tool's marker (the framework skill names it; the change carries
+   a proposal, a design, and tasks and no delta spec), linked by tracked
+   work the same way and never given a domain. Record any deviation with
+   its reason.
 
 Done when: level, approach, approval owner and mode, division of labor,
-change request shape, archive mode, default author, and specification
+change request shape, archive executor, default author, and specification
 scope are settled by the user or confirmed from evidence, each with its
 selecting fact recorded.
 
 ### 3. Install or adopt the tool
 
-Read the one reference matching the selected approach:
-[spec-kit.md](references/spec-kit.md), [openspec.md](references/openspec.md),
-[kiro.md](references/kiro.md), or
-[committed-documents.md](references/committed-documents.md) for both the
-no-tool and the custom-layout choices.
+Hand the installation or adoption to the framework skill for the selected
+approach — the `sdd` catalog's `openspec-workflow` or `spec-kit-workflow`
+of https://github.com/ryan-minato/skills. If it is not installed, load the
+`ryan-minato-skills-installing` skill and install it as it directs; never
+run an install command yourself. When the user declines, or no framework
+skill exists for the approach (an IDE's native spec files, committed
+documents, a custom layout), apply only the generic rule below and record
+the by-hand executor.
 
 Before any tool initializer runs in an existing repository, record the
 current tree (`git status --porcelain` and a file listing of every agent
@@ -306,29 +325,28 @@ Fill the slots in this order, each from the matching section of
 nothing, never touch the security or sensitivity-review checklist item):
 
 1. Templates and forms: the six template slots, worded for the contract's
-   approval and archive modes.
+   approval package and mode, and the archive executor.
 2. The project skill: the four step slots, worded for the shape and the
    modes, including the reconciliation the discussion-closed mode requires.
-3. The archive automation: under automated archiving with OpenSpec,
-   produce the workflow or job from the asset and copy
-   [`scripts/archive_completed_changes.py`](scripts/archive_completed_changes.py)
-   into the project's scripts; for any other tool, design the job with the
-   user from the completion criterion and post-processing step the
-   contract records, copying no OpenSpec command.
-4. The validator: when the tool ships one, add its strict run to the local
-   check command the base already runs in CI; edit no workflow or
-   pipeline file.
-5. Knowledge: `KNOWLEDGE_SECTION` in the platform workflow file, one
-   `SYNC_ROW` per insertion, and the `MAINTAINER_ACTION` row for the push
-   path by owner type when archiving is automated.
+3. The archive automation and the validator: hand both to the framework
+   skill (the handoff of step 3), which installs the check into the
+   command and workflow the base already runs, the comment commands, the
+   label-triggered archive, the status labels, and its script, and records
+   the maintainer actions those need; edit no workflow or pipeline file
+   yourself. Without a framework skill, record the by-hand executor, the
+   request checklist as the gate, and the automation as remaining work.
+4. Knowledge: `KNOWLEDGE_SECTION` in the platform workflow file, one
+   `SYNC_ROW` per insertion, and the `MAINTAINER_ACTION` rows the
+   framework skill names (label sync; the approval click after a bot push
+   where the platform requires it).
 
 Done when: every slot the contract's shape and modes require is filled;
 `grep -rn '{{[A-Z]'` over the delivered paths returns nothing (the
 uppercase form is the builders' placeholder; Actions expressions stay); a body built
-from the shaped template passes the base's checklist check; the validator
-runs inside the check command; and a clean-context read of the project
-skill can state the precondition, first content, reconciliation, and
-finish step.
+from the shaped template passes the base's checklist check; the framework
+skill has been handed the automation or the by-hand executor is recorded;
+and a clean-context read of the project skill can state the precondition,
+first content, reconciliation, and finish step.
 
 ### 8. Close
 
@@ -343,8 +361,7 @@ it in the handoff.
 
 ## Gotchas
 
-- Spec tools rename commands and move files between releases; one of the
-  tools covered here has already renamed its whole command set once. The
+- Spec tools rename commands and move files between releases; the
   contract records paths the build verified, with the date, never a command
   list.
 - The spec-first kit's feature script creates a numbered spec directory and
@@ -369,7 +386,9 @@ it in the handoff.
 - Filling a slot by rewording the base's sentence, or by leaving a
   placeholder for "later", breaks the base's own delivery checks; insert
   whole sentences at the registered structure and grep before inserting.
-- Automated archiving needs a fixed archive operation. OpenSpec has one;
-  Spec-Kit, Kiro, and committed documents do not, so for them the contract
-  records the project's own completion criterion and post-processing step
-  before any job is designed.
+- A design approved as part of the package is a set of bounds, never a
+  procedure; a contract that lets it list steps turns the gate into a
+  method review.
+- A framework's automation ages with the framework; the moment a tool
+  command or script lands in the contract or a slot text, the builder has
+  taken on a dependency it cannot verify. Name the framework skill instead.

@@ -63,15 +63,16 @@ it never restates the fact.
 
 <States a specification passes through, the event that moves it, and where
 that event is recorded, e.g. proposed (change record committed and the
-draft <pull request | merge request> opened) → approved (<the approval
-owner closing the discussion on the draft in conversation, reconciled
-with nothing open | the approval owner's `<exact text>` comment on the
-draft, covering the record as of the last push before it>, or the merged
-specification <pull request | merge request>) → implemented (every task
-done and every scenario verified, recorded in the <pull request | merge
-request>'s validation section) → archived (delta merged into the
-source-of-truth spec and the record moved to the archive, by the archive
-job after merge or by the <pull request | merge request> before ready).
+draft <pull request | merge request> opened with the complete approval
+package) → approved (<the approval owner closing the discussion on the
+draft in conversation, reconciled with nothing open | the approval owner's
+`<exact text>` comment on the draft, covering the package as of the last
+push before it>, or the merged specification <pull request | merge
+request>) → implemented (the task list written after the closing, every
+task done and every scenario verified, recorded in the <pull request |
+merge request>'s validation section) → archived (delta merged into the
+source-of-truth spec and the record moved to the archive inside the <pull
+request | merge request> before ready, by the executor below).
 Name the tool command category for each move without quoting the
 command.>
 
@@ -82,16 +83,23 @@ a role or a person, never "the team" — and whether an agent may approve a
 specification it wrote. Agent authority levels are governed by
 `.agents/knowledge/agent-authority.md`; this gate is where they attach.>
 
-The gate is exercised as soon as the specification is written and
-clarified and the <draft pull request | draft merge request> carrying it
-is open — before any plan or task list exists. The agent that published
-the draft stops there. It reviews the outcome description, each item as
-this project needs it: goals and scope, terminology and domain model,
-behavior, invariants, constraints and rules, states and transitions,
-interface and data contracts, exceptions and edge cases, security and
-permissions, metrics and acceptance criteria. It never reviews design or
-tasks: those are the implementer's after approval and are judged by
-implementation review.
+The gate is exercised on the approval package: the specification plus
+the design when one is warranted — <the project's rule, by default: more
+than one reasonable approach exists, or the change touches structure,
+interfaces, dependencies, or files outside the record; a wording change
+inside one section needs none>. The <draft pull request | draft merge
+request> opens once the package is complete, before any task list exists,
+and the agent that published it stops there. The review covers the outcome
+description, each item as this project needs it — goals and scope,
+terminology and domain model, behavior, invariants, constraints and
+rules, states and transitions, interface and data contracts, exceptions
+and edge cases, security and permissions, metrics and acceptance criteria
+— and the design's bounds: the approach, the technical constraints, the
+preferences, the rejected alternatives. The design lists no steps; a
+design written as a procedure is rewritten before the draft opens. It is
+committed, so it carries no secret or private data. The gate never
+reviews the task list: it is the implementer's after approval and is
+judged by implementation review.
 
 <Discussion-closed: <the approval owner> discusses on the draft and
 directs record changes in conversation; each change is pushed through the
@@ -101,13 +109,14 @@ conversation that the discussion is closed: the agent then reads the
 discussions> with their resolution state, lists every unresolved one,
 every requested adjustment the record does not carry, and every pair of
 contradicting conclusions, confirms them with <the approval owner>, and
-starts design and implementation only when nothing is open or the open
-items are confirmed; the closing is noted on the draft's `Approval:` line.
+starts the task list and the implementation only when nothing is open or
+the open items are confirmed; the closing is noted on the draft's
+`Approval:` line.
 | Blocking: <the approval owner> posts the comment `<exact text>` on the
 draft; it covers the record as of the last push before it, and a later
 push to the record needs a fresh comment unless <the approval owner>
 decided that push in conversation. The same reconciliation of comments
-and review <threads | discussions> runs before design.> A platform review
+and review <threads | discussions> runs before the task list.> A platform review
 approval is not the record in either mode, because later pushes dismiss
 it.
 
@@ -118,13 +127,12 @@ it.
 decided it>.
 
 <Combined: one <pull request | merge request> carries the whole lifecycle.
-It opens as a draft the moment the change record is committed, with the
-record as its only content and the agent stopped; the gate is exercised
-on that draft; plan, tasks, and implementation follow the recorded
+It opens as a draft once the approval package is committed, with the
+package as its only content and the agent stopped; the gate is exercised
+on that draft; the task list and the implementation follow the recorded
 approval and the reconciliation; marking it ready requests implementation
-review; the merge closes the <issue | work item>. The default branch <never holds an
-unarchived change record (in-request archiving) | holds a completed record
-only between merge and the archive job (automated archiving)>.>
+review; the merge closes the <issue | work item>. The default branch never
+holds an unarchived change record.>
 
 <Split: a specification <pull request | merge request> carries only the
 change record, references the <issue | work item> without closing it, and
@@ -139,34 +147,39 @@ project may take this path as a recorded deviation.>
 Default specification author: <the implementer | role>. The author
 publishes the draft; <the approval owner> approves it.
 
-## Archive mode
+## Archive executor
 
-<Automated | In-request>. Selected because <the automation evidence that
-decided it>.
-
-<Automated: after each merge to <default branch>, <the workflow | the job>
-`<name>` archives every change record whose tasks are all complete —
-one run at a time (<a concurrency group | a resource group> named
-`<name>`, never cancelling a run in progress), rescanning every completed
-record on each run, validating strictly, committing under the project's
-commit convention, and failing without retry when its push is rejected
-because the run the competing merge triggered archives the rest. <Default
-branch> holds a completed, unarchived record between a merge and that
-run. Its push path — <GitHub, organization-owned: the Actions app as a
-bypass actor on the ruleset | GitHub, user-owned: a deploy key with write
-access or a GitHub App installation, whose pushes trigger workflows
-including `<name>` itself | GitLab: a project access token as a masked,
-protected variable plus an allowed-to-push entry on the protected branch,
-whose pushes run the default-branch pipeline again> — is a setting <the
-maintainer> grants and records in `<platform settings knowledge file>`;
-until it is granted, the in-request mode below is in force.>
-
-<In-request: the <pull request | merge request> archives its change record
+Every change record is archived inside its <pull request | merge request>
 before it is marked ready, so <default branch> never holds an unarchived
-record. The archived record is frozen under review: a defect found in it
+record; the archived record is frozen under review: a defect found in it
 is recorded in the request's Validation section or a follow-up change,
-never edited into the archive. Automated archiving is preferred as soon as
-a push path exists.>
+never edited into the archive. Executor: <by hand — every task ticked,
+then the tool's archive command, the validator, and a commit on the
+branch; the request checklist is the gate | the automation the framework
+skill `<framework skill name>` installed: the `<check job name>` check
+fails a ready <pull request | merge request> that still holds an
+unarchived record (a warning while it is a draft); the `<trigger label>`
+label makes the `<archive job name>` <workflow | job> archive every
+complete related record, commit, push to the branch, and remove the label
+— applying the label is an authorized remote write, and <GitHub: after
+the bot's push a user with write access approves the workflow runs the
+push queued | GitLab: the label takes effect on the next pipeline>; a
+<pull request | merge request> from a fork is archived by its author from
+the commands the bot posts>. Selected because <the automation evidence
+that decided it>.
+
+## Request automation
+
+<Delete when no framework skill is installed.> The framework skill
+`<framework skill name>` owns the request automation and its script:
+`<command syntax>` shows a related record's documents and
+`<command syntax>` its task progress <on GitHub as comment commands | on
+GitLab as manual jobs>; the `<labels job name>` <workflow | job> keeps the
+status labels `<archived-axis labels>` and `<progress-axis labels>` on
+every <pull request | merge request> from the related records' task lists
+— read them, never set them by hand. Maintainer actions: <label sync | the
+label creation and the token variables>; <the approval click after a bot
+push | "pipelines must succeed">.
 
 ## Specifications and <issues | work items>
 
@@ -182,8 +195,8 @@ a push path exists.>
   and carries no implementation until ready: an opening paragraph stating
   the goal, a section stating the value, the specification block (`Spec:`
   linking the record on the branch, `Phase:` specification or
-  implementation, one link per record file, `Approval:` in the mode
-  above), related work with the closing reference (<a split-shape
+  implementation, one link per file of the approval package with the task
+  list marked as after-approval, `Approval:` in the mode above), related work with the closing reference (<a split-shape
   specification <pull request | merge request> references the <issue |
   work item> with <`Refs #N` | a bare `#N`> and never closes it; the last
   implementation request does | delete under the combined shape>), and
@@ -203,8 +216,8 @@ a push path exists.>
 Specifications cover behavior a change touches, and specification domains
 describe the product this project delivers. A change to the project's own
 harness, tooling, checks, workflows, or documents is a spec-less change:
-<the tool's marker, e.g. `skip_specs: true` in the change's
-`.openspec.yaml`, with a proposal, design, and tasks and no delta spec>,
+<the tool's marker, as the framework skill names it, with a proposal,
+design, and tasks and no delta spec>,
 linked by <issues | work items> the same way, never a domain. <Main specs
 change only through archived changes, with one exception: a change that
 removes or reshapes a domain's capabilities corrects that domain's purpose
@@ -222,5 +235,6 @@ commit with the current one and re-map when they differ.
   it back, do not let it stand.
 - The management model or the authority policy changes in a way that touches
   acceptance.
-- The automation identity's push authorization changes, or the archive job
-  is added, renamed, or removed.
+- The archive executor changes, or a <workflow | job>, command, or label of
+  the request automation is added, renamed, or removed.
+- The rule for when a design is warranted changes.
