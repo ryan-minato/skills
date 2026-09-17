@@ -38,13 +38,15 @@ specification, which nothing in the kit enforces.
 ## Fork safety
 
 - `spec / command` runs the default-branch workflow file and checkout;
-  the head is fetched as git objects (`refs/pull/<n>/head`) and read by
-  the base's script. Comment text reaches the shell only through `env`,
+  the head is fetched by its exact SHA as git objects and read by the
+  base's script. Comment text reaches the shell only through `env`,
   with globbing off, and only as arguments to the script.
 - `spec / labels` uses `pull_request_target`, whose token is writable even
   for a fork; it is safe because the checkout is the base, the head is
-  fetched as objects, and nothing from the head executes. Never add a
-  checkout of the head, an install from it, or a `run:` of its files.
+  fetched by its SHA as objects, and nothing from the head executes. Never
+  add a checkout of the head, an install from it, or a `run:` of its
+  files; a code-scanning finding on the fetch is reviewed against these
+  rules and dismissed by the maintainer, never satisfied by a checkout.
 - Commands need a collaborator or the author; the bot's own comments start
   no workflow run.
 

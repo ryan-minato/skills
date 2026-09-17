@@ -61,15 +61,20 @@ documentation on 2026-09-17:
 ## Fork safety
 
 - `spec / command` runs the default-branch workflow file and checkout;
-  the head is fetched as git objects (`refs/pull/<n>/head`) and read by
-  the base's script. Comment text reaches the shell only through `env`,
+  the head is fetched by its exact SHA as git objects and read by the
+  base's script, so the content read is the content the event named. Comment text reaches the shell only through `env`,
   with globbing off, and only as arguments to the script.
 - `spec / labels` and `spec / archive` use `pull_request_target`, whose
   token is writable even for a fork. Every script and the CLI install come
   from the base checkout. The head is checked out only when the head
   repository is the base repository (its code already runs in the
-  project's own CI); a fork's head is fetched as objects for the status
-  table and never checked out, installed, or executed.
+  project's own CI); a fork's head is fetched by its SHA as objects for
+  the status table and never checked out, installed, or executed.
+- Code scanning may still flag the fetch as an untrusted checkout in a
+  privileged workflow: the rule cannot see that nothing from the head
+  runs. The maintainer reviews the finding against these rules and
+  dismisses it as a false positive; never add a checkout of the head to
+  satisfy it.
 - Invocation gates: labeling needs triage access; commands need a
   collaborator or the author; the bot's own comments start nothing.
 

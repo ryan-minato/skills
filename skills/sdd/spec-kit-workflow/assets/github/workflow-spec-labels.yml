@@ -6,7 +6,8 @@
 # `pull_request_target` runs with a writable token even for a fork, which a
 # plain `pull_request` run does not have; it is safe here because nothing from
 # the head executes: the checkout is the BASE (the event's default), the head
-# is fetched as git objects only, and the base's script reads them. Never add
+# is fetched by its exact SHA as git objects only, and the base's script reads
+# them. Never add
 # a checkout of the head, an install from it, or a `run:` of its files.
 # Replace {{PINNED_SHA}}; `scripts/spec_kit_features.py` is the project's copy of
 # this skill's script.
@@ -36,10 +37,10 @@ jobs:
       - uses: "actions/checkout@{{PINNED_SHA}}"
         with:
           fetch-depth: 0
-      - name: Fetch the head as objects only
+      - name: Fetch the head as objects only, by its SHA
         env:
-          N: ${{ github.event.pull_request.number }}
-        run: git fetch --no-tags origin "+refs/pull/$N/head:refs/remotes/pr/$N"
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: git fetch --no-tags origin "$HEAD"
       - name: Compute the label plan and apply it
         env:
           N: ${{ github.event.pull_request.number }}
