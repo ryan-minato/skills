@@ -52,8 +52,12 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
   spec, whose scenarios (given/when/then) are the acceptance criteria; a
   change to the repository itself (harness, tooling, checks, documents) is
   a `skip_specs` change with a proposal, design, and tasks and no spec.
-  Completed changes are archived inside the pull request until the
-  `spec-archive` workflow can push.
+  The draft pull request opens once the approval package — proposal,
+  delta specs, and design — is written; the task list follows the
+  maintainer's closing. Completed changes are archived inside the pull
+  request (by hand or by the spec/archive label) before it is marked
+  ready; `checks / spec` fails a ready pull request that still carries
+  one.
 - **Publishing**: nothing reaches GitHub (issue, PR, comment, setting)
   without explicit user authorization in the current conversation and a
   `SAFE TO PUBLISH: YES` review of the exact payload.

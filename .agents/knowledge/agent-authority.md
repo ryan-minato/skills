@@ -20,9 +20,8 @@ review; prepare the acceptance-evidence report.
 - the OpenSpec change's discussion on the draft was closed by the
   maintainer in conversation and reconciled with nothing open
   (`.agents/knowledge/spec-workflow.md`), every task in its `tasks.md` is
-  done, and it is archived or — once
-  the `spec-archive` workflow can push — left for that workflow; or the
-  pull request carries `Spec: none — <reason>` (see
+  done, and it is archived inside the pull request with `checks / spec`
+  green; or the pull request carries `Spec: none — <reason>` (see
   `.agents/knowledge/spec-workflow.md`);
 - `just check` passes locally and every required check is green;
 - every scenario of the change passed, with the evidence in the pull

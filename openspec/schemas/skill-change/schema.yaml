@@ -104,12 +104,19 @@ artifacts:
     description: Where each requirement lands in the skill, the description draft, sync obligations, and the verification plan
     template: design.md
     instruction: |
-      Create the design: HOW the requirements land in the skill, or how a
-      repository change lands in the harness, and how either will be
-      verified. Required for every change that touches a skill's description,
-      adds or moves a reference, asset, or script, changes a dependency or
-      handoff, touches a mirrored file, or is a repository change; optional
-      only for a wording change inside one existing section.
+      Create the design: the bounds the implementation works inside — where
+      the requirements land in the skill (or a repository change in the
+      harness), the decisions with their rejected alternatives, the risks,
+      and how the result will be verified. It is part of the approval
+      package: the maintainer reviews it on the draft together with the
+      proposal and the delta specs, so it is written before the draft opens
+      and never lists implementation steps or tasks (those are tasks.md,
+      written after the closing). It is committed and published: no secret,
+      credential, internal hostname, or private datum. Required for every
+      change that touches a skill's description, adds or moves a reference,
+      asset, or script, changes a dependency or handoff, touches a mirrored
+      file, or is a repository change; optional only for a wording change
+      inside one existing section.
 
       Sections:
       - **Context**: the current shape of the skill or harness and the
