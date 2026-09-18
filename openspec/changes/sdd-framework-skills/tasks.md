@@ -41,6 +41,22 @@
 - [x] 5.3 Guidance: both GitLab references refuse the parent-project pipeline as a fork workaround; the archiving bullet says a GitLab label change starts no pipeline; the by-hand command takes the request's target branch; the catalog README pair, the deposited draft rule, the entrypoint pointer, the clarify fallback, and the catalog's adding-a-framework rule match what the skills do — verify `just check-skill` on the four skills and a read of each corrected passage
 - [x] 5.4 Delta specs extended to cover the above and a `meta/meta-agent-authority` delta added for the archive executor it now reads — verify `just spec-validate`
 
-## 6. Finish
+## 6. Direction change: the archive is the lock point
 
-- [x] 6.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, archive both changes inside this pull request by hand
+- [ ] 6.1 Remove the archive bot from both framework skills: the GitHub archive workflow asset, the `spec:archive` job and `SPEC_ARCHIVE_TOKEN` from the GitLab fragment, the trigger label from both label files, and every passage in `SKILL.md` and the two platform references that describes the bot — verify `grep -rn 'spec/archive\|spec-archive\|SPEC_ARCHIVE_TOKEN'` over `skills/` is empty and `just check-skill` passes
+- [ ] 6.2 Move the archive after the implementation discussion in the methodology skill, `references/tracked-work.md`, both framework skills, and the builder's questioning round, contract asset, and both `project-skill-steps.md`; state that approval follows the freeze and that only specification-consistency changes are expected after it — verify a read-through of each passage and `just check-skill`
+- [ ] 6.3 Record the fork executor: the maintainer archives on the contributor's branch after the deliberation, which needs maintainer edits enabled and cannot be done by the platform token; the contributor archiving is the alternative; archiving after the merge stays excluded — verify the passage exists in the framework skill, the contract asset, and the methodology's contract facts
+- [ ] 6.4 Name the Spec-Kit asymmetry: the kit has no archive, so the contract must say what marks the specification locked, and no mechanism enforces it — verify the passage in `spec-kit-workflow/SKILL.md`
+- [ ] 6.5 Harden the comment command: the condition admits only the collaborator associations, and the platform token descends from the job to the steps that use it, in both assets — verify both files parse, job names and permissions are unchanged, and the condition names no author clause
+- [ ] 6.6 Move every behavioral and security claim next to the step or function it constrains, in the five workflow assets, the GitLab fragments, and both scripts; headers keep orientation and placeholder instructions only — verify a read-through pairing each claim with its step, and `just lint`
+- [ ] 6.7 Delta specs rewritten for the new archive point, the removed bot, the collaborator-only command, and the fork executor, across the five domains — verify `just spec-validate`
+
+## 7. Direction-change tests
+
+- [ ] 7.1 Outcome: an agent finishing an implementation publishes to a formal request, waits for the deliberation, and archives only after it closes; it refuses to archive a change with an open task
+- [ ] 7.2 Outcome: asked how a fork's change is archived, the agent names the maintainer as the executor and never offers an after-merge job
+- [ ] 7.3 Readback: a clean context reads the deposited contract and states the archive point, the executor, and the fork rule
+
+## 8. Finish
+
+- [x] 8.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, archive both changes inside this pull request by hand

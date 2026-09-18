@@ -58,6 +58,17 @@ and the repository that ships them say the same thing.
   to `openspec/specs/sdd/` and its title line corrected by hand (the
   narrow hand-edit exception the contract records).
 
+## Direction change: this repository follows the skills
+
+The skill change removes the archive bot, moves the archive to after the
+implementation discussion, hardens the comment command to
+collaborator-only, and moves every behavioral claim next to the code it
+constrains. This repository is the dogfooded copy, so its workflow files,
+its contract, its project skill, and its request template follow in the
+same request. The required checks and the ruleset are untouched: the
+existing `checks / spec` rule — a ready request holding an unarchived
+change fails — is already the lock the new order needs.
+
 ## Skills touched
 
 repository change
