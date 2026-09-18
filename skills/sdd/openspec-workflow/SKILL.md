@@ -25,8 +25,8 @@ compatibility: >-
 Precedence: an explicit user instruction, then the project's specification
 contract (`.agents/knowledge/spec-workflow.md` or the file the agent
 entrypoint points to), then this skill's defaults. Two loop facts hold
-everywhere: the approval package precedes the task list, and archiving
-precedes ready.
+everywhere: the approval package precedes the task list, and the
+approval applies to a version that was frozen first.
 
 ## What the tool generates and assumes
 
@@ -69,13 +69,21 @@ precedes ready.
   change archived later may no longer apply: re-validate when
   implementation starts.
 
-## Archiving before ready
+## Ready, then the freeze
 
-A change is archived inside its own request, so the integration branch
-never holds an unarchived change. The executor is a person on the
-request's branch — every task ticked, then the archive command with its
-confirmation-skipping flag, plus its spec-skipping flag for a change
-marked spec-less, then the strict validator, then a commit.
+The request is marked ready while its change is still open, and the
+deliberation on the finished implementation runs against that. The check
+fails a ready request holding an unarchived related change, so the
+request is red for the whole deliberation; that red is the merge block,
+and it is expected — never work around it, and never archive early to
+clear it.
+
+When the gate owner closes that deliberation, reconcile it, then archive
+inside the request, so the integration branch never holds an unarchived
+change. The executor is a person on the request's branch — every task
+ticked, then the archive command with its confirmation-skipping flag,
+plus its spec-skipping flag for a change marked spec-less, then the
+strict validator, then a commit.
 [`scripts/spec_changes.py`](scripts/spec_changes.py) does this for every
 related change at once and refuses all of them when any has an open task:
 
@@ -89,6 +97,11 @@ that could push to the branch would be the only one needing write access
 to the repository's contents; the command above is what it would have run.
 On a fork, the executor is whoever holds the branch: its author, or the
 maintainer after pulling it locally.
+
+The archive commit is the freeze the approval names. Nothing revokes a
+closing made in conversation, so watch for a spent one: a commit after
+the archive commit means the approved version no longer exists — say so
+before pushing or handing over, and ask for the gate again.
 
 Never tick a task whose verification did not run, never archive a change
 with an open task, and never edit an archived record: a defect review finds
@@ -148,9 +161,10 @@ later edit; the snapshot removes them from the runner instead.
   design is warranted, the archive executor, the request shape → the spec
   workflow builder `meta-spec-workflow` of the `meta` catalog, installed
   whole through the same installing skill. If the user declines, apply the
-  contract as it stands or these defaults — by-hand executor,
-  discussion-closed approval on the complete package — say so, and name
-  the contract update as remaining work.
+  contract as it stands or these defaults — a person archives once the
+  implementation deliberation closes, and both gates close in
+  conversation — say so, and name the contract update as remaining
+  work.
 
 ## Gotchas
 
@@ -161,8 +175,9 @@ later edit; the snapshot removes them from the runner instead.
   copy every existing scenario, or the validator refuses the change.
 - The archive directory name carries the archive date, so the `Spec:` link
   in a request description changes after archiving; both forms are valid.
-- On GitHub, a push made with the platform token starts no check on its
-  own: the runs wait for "Approve workflows to run". Forgetting the click
-  leaves the request blocked, never wrongly green.
+- A ready request is red until the archive commit lands, and that is the
+  design: the red blocks the merge through the deliberation. Reading it
+  as a defect leads to archiving early, which hands the reviewer a frozen
+  record.
 - A related change whose task list has no ticked task is refused as
   incomplete, not archived as empty.

@@ -81,9 +81,9 @@ specification before planning and implementation, and in which mode it
 passes), and the levels below attach to it; its change request shape says
 where that gate sits on the path (on the draft itself under the combined
 shape, on a separate specification change request under split), and its
-archive executor says who archives inside the change request before it is
-marked ready — the agent by hand, or the automation the framework skill
-installs — never a job after merge. Their absence blocks nothing: a project
+archive executor says who freezes the record inside the change request
+once its implementation deliberation closes — a person who holds the
+branch, never a job, and never after the merge. Their absence blocks nothing: a project
 with no tracker still needs an authority policy. Then evidence the project's real
 verification strength yourself — test coverage and trustworthiness, CI
 gates, rollback and revert paths, observability — because these facts price
@@ -106,18 +106,20 @@ default level; a rising level moves an owner downstream, never off the path:
 - **Integration** — the final decision that the change set enters the
   long-lived branch, and with it the engineering responsibility.
 
-A contract may define a third gate that precedes both — the
-contract-defined gate. Under a specification contract it is the
-specification's approval, exercised on the draft (combined shape) or as
-the specification change request's own review (split), and it passes as
-the contract's mode says: under discussion-closed, when the gate owner
-closes the discussion in conversation and the agent's reconciliation of
-the request's threads and record finds nothing open or has the open items
-confirmed; under blocking, when the fixed comment is later than the
-record's last push. A contract-defined gate stays with its recorded owner
-at every level, and no level grants an agent the passing of a gate on an
-artifact it wrote: an agent that may mark ready still waits for that gate
-first.
+A contract may define gates that precede both — contract-defined gates.
+Under a specification contract there are two: the package gate, exercised
+on the draft (combined shape) or as the specification change request's own
+review (split), which precedes review admission; and the freeze gate,
+exercised on the finished implementation *after* the request is marked
+ready, which precedes integration. Each passes as the contract's mode
+says: conversationally, when the gate owner closes the deliberation in
+conversation and the agent's reconciliation of the request's threads and
+record finds nothing open or has the open items confirmed; under a
+recorded approval, when the contract's mark names the version being
+approved. A contract-defined gate stays with its recorded owner at every
+level, and no level grants an agent the passing of a gate on an artifact
+it wrote: an agent that may mark ready still waits for the package gate
+first, and never freezes a record before the freeze gate closes.
 
 Done when: both gates have a named owner at the settled level — a human role
 or person (never "the team"), or the agent under a delegation this policy

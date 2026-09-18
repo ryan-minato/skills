@@ -16,18 +16,23 @@ placeholders).
 | Progress label | `assets/github/workflow-spec-labels.yml` | `.github/workflows/spec-labels.yml` | job `spec / labels` |
 | Labels | `assets/github/labels-spec.json` | rows in the project's label file | keep the project's own extra fields; sync with the project's label tool |
 
-No archive bot: Spec-Kit has no archive operation. Completion is every
-task of every touched feature ticked, which the check enforces once the
-pull request is ready. Placeholder: `{{PINNED_SHA}}` (the commit SHA of
+Nothing here writes to the repository. Spec-Kit has no archive
+operation, so completion is every task of every touched feature ticked,
+which the check enforces once the pull request is ready, and the lock
+the approval names is a declaration the implementer records on the
+request. Placeholder: `{{PINNED_SHA}}` (the commit SHA of
 the current release of the checkout action, with the `# vX.Y.Z` comment
 the project's other workflows use).
 
 ## What the project's contract records
 
-The completion rule (every task ticked before ready), the job names, the
-label names, and the rule that the progress label is workflow-owned; when
-the level is spec-anchored, the project's rule for updating the living
-specification, which nothing in the kit enforces.
+The completion rule (every task ticked before ready), what locks a
+feature for approval (the kit archives nothing, so the default is a
+declaration on the request naming the commit the specification and the
+plan stand at), the job names, the label names, and the rule that the
+progress label is workflow-owned; when the level is spec-anchored, the
+project's rule for updating the living specification, which nothing in
+the kit enforces.
 
 ## Maintainer actions
 

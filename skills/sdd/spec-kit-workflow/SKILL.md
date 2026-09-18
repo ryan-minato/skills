@@ -4,11 +4,13 @@ description: >-
   Runs Spec-Kit features through pull or merge requests — the approval
   package (the specification and the plan; tasks after approval),
   completion before ready as every task ticked since the kit archives
-  nothing, the `/spec show` and `/spec status` comment commands and the
-  progress labels over touched features — and installs that automation on
-  GitHub or GitLab. Use when a project that runs Spec-Kit asks whether the
-  plan is approved before tasks, what must be complete before the PR or MR
-  is ready, what the `/spec` commands or `spec/*` labels do, or to add the
+  nothing, the declaration that locks a feature when the kit gives no
+  artifact to freeze, the `/spec show` and `/spec status` comment commands
+  and the progress labels over touched features — and installs that
+  automation on GitHub or GitLab. Use when a project that runs Spec-Kit
+  asks whether the plan is approved before tasks, what must be complete
+  before the PR or MR is ready, what locks a feature for approval, what
+  the `/spec` commands or `spec/*` labels do, or to add the
   feature check, the comment commands, or the progress labels to a
   repository. Not for running the kit's own commands (`specify`, its
   slash commands) to create or implement one feature, for choosing a spec
@@ -23,8 +25,8 @@ compatibility: >-
 Precedence: an explicit user instruction, then the project's specification
 contract (`.agents/knowledge/spec-workflow.md` or the file the agent
 entrypoint points to), then this skill's defaults. Two loop facts hold
-everywhere: the approval package precedes the task list, and completion
-precedes ready.
+everywhere: the approval package precedes the task list, and the
+approval applies to a version that was locked first.
 
 ## The feature directory and the approval package
 
@@ -54,7 +56,7 @@ before):
   documentation; a feature directory made by hand lacks what the kit's
   later steps read.
 
-## Completion before ready
+## Completion, then the lock
 
 Spec-Kit has no archive operation. A request is ready when every task of
 every feature it touches is ticked, and a task is ticked only when its
@@ -62,6 +64,17 @@ verification ran; the installed check fails a ready request otherwise and
 warns while it is a draft. When the project's level is spec-anchored, the
 project's own rule says how the living specification is updated — nothing
 in the kit enforces it, so name the rule rather than assume it.
+
+Because there is nothing to archive, the lock the approval applies to is
+a **declaration**, not a commit: when the gate owner closes the
+deliberation on the finished implementation, reconcile it, then record on
+the request that the deliberation closed with the specification and the
+plan unchanged, naming the commit they stand at. From there a change to
+either is a new round. Watch for a spent lock the same way an archiving
+tool watches for a stale freeze: a commit after the one the declaration
+names means the approved version no longer exists — say so before
+pushing or handing over, and ask for the gate again. A contract may name
+a different lock; apply the contract's.
 [`scripts/spec_kit_features.py`](scripts/spec_kit_features.py) reports the
 touched features and their state:
 
@@ -92,9 +105,8 @@ on the next pipeline; the platform reference says how.
 Read [references/github.md](references/github.md) when installing or
 changing the automation in a GitHub repository, and
 [references/gitlab.md](references/gitlab.md) in a GitLab project. Both
-place the script, the check, the commands, and the label, list the
-maintainer actions and the fork-safety rules, and say why there is no
-archive bot.
+place the script, the check, the commands, and the label, and list the
+maintainer actions and the fork-safety rules.
 
 One rule governs every job that runs with a writable token on someone
 else's request: **no object authored by the request reaches the runner.**
@@ -116,12 +128,12 @@ later edit; the snapshot removes them from the runner instead.
   Spec-Kit question at hand from the two loop facts above and say the
   practice-level question stays open.
 - Setting or changing the project's rules — the approval mode, the
-  completion rule, the request shape → the spec workflow builder
-  `meta-spec-workflow` of the `meta` catalog, installed whole through the
-  same installing skill. If the user declines, apply the contract as it
-  stands or these defaults — every task ticked before ready,
-  discussion-closed approval on the specification and the plan — say so,
-  and name the contract update as remaining work.
+  completion rule, what locks a feature, the request shape → the spec
+  workflow builder `meta-spec-workflow` of the `meta` catalog, installed
+  whole through the same installing skill. If the user declines, apply the
+  contract as it stands or these defaults — every task ticked before
+  ready, both gates closed in conversation, and the lock declared on the
+  request — say so, and name the contract update as remaining work.
 
 ## Gotchas
 
@@ -135,3 +147,6 @@ later edit; the snapshot removes them from the runner instead.
   at spec-anchored that obligation is a written project rule.
 - A touched feature whose task list has no checkbox at all counts as not
   started, not as done.
+- With no archive step, nothing mechanical marks the moment a feature
+  stops changing. A project that skips the declaration has no version for
+  its approval to name, and the approval silently follows the branch.

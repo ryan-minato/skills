@@ -2,17 +2,19 @@
 name: spec-driven-development
 description: >-
   Spec-driven development (SDD) — writes specifications before code and
-  runs the specify, clarify, approve, tasks, implement, verify loop from
-  them; judges whether the discipline pays and at which level; settles how specs meet tracked work — when the
-  draft opens, what the approval package holds and where the design sits,
-  whether a spec needs its own PR, how a change is archived, what issues
-  and PRs link instead of restate; and converts existing code into a
-  spec-driven project without backfilling specs. Use when adopting or
-  starting SDD, to "write the spec first" or "do this spec-driven", which
-  approach family fits, whether the design is approved before tasks, how
-  issues, PRs, and specs fit together, where a spec is reviewed or when it
-  is archived, when a prototype needs specs, when what was built drifts
-  from what was agreed, or when issues and specs disagree. Not for
+  runs the specify, clarify, approve, tasks, implement, verify, freeze
+  loop from them; judges whether the discipline pays and at which level;
+  settles how specs meet tracked work — when the draft opens, what the
+  approval package holds, whether a spec needs its own PR, when a record
+  is frozen and who approves the frozen version, what issues and PRs link
+  instead of restate; and converts existing code into a spec-driven
+  project without backfilling specs. Use when adopting or starting SDD,
+  to "write the spec first" or "do this spec-driven", which approach
+  family fits, whether the design is approved before tasks, whether an
+  approval must be recorded, how issues, PRs, and specs fit together,
+  where a spec is reviewed or when it is archived, when a prototype needs
+  specs, when what was built drifts from what was agreed, or when issues
+  and specs disagree. Not for
   defining goals, building the platform harness, or a tool's own change
   command.
 license: Apache-2.0
@@ -39,8 +41,8 @@ tool's command or a platform's object.
   cost, or before recommending a tool.
 - Read [references/tracked-work.md](references/tracked-work.md) when a
   loop step meets the platform's tracked work: publishing the draft,
-  waiting for approval, reconciling, drafting the request body, archiving
-  before ready.
+  waiting for either gate, reconciling, drafting the request body, marking
+  the request ready, freezing the record.
 - Read [references/adopting-existing-code.md](references/adopting-existing-code.md)
   when the project already contains code that was not written from a
   specification — a prototype, a vibe-coded app, a brownfield codebase.
@@ -96,13 +98,23 @@ rules below until none of them is unanswered.
    defect with the evidence, and the record is narrowed to what is
    verified — never widened silently. Done when: every scenario has
    passed, is recorded as a spec change, or is filed as a defect.
-7. **Archive or converge, then ready.** Write the delivered behavior back
-   into the source-of-truth spec (spec-anchored) or archive the change
-   record (spec-first) inside the request, through the tool's archive
-   command or the automation the framework skill installed, as the
-   contract's executor says; validate afterwards; only then mark the
-   request ready. Done when: the spec and the code describe the same
-   system and the integration branch will receive no unarchived record.
+7. **Publish the finished implementation.** Mark the change request ready
+   and say what is now open: the implementation, against the package the
+   first gate approved. The record is still unfrozen, so the project's
+   specification check reports the request as unfinished — that red is the
+   merge block for the whole deliberation, not a defect to chase. Done
+   when: the request is ready, the deliberation is asked for, and the
+   agent is waiting and says what it waits for.
+8. **Freeze, then hand the decision over.** When the gate owner closes
+   this deliberation, reconcile it as step 4 reconciles the first one,
+   then write the delivered behavior back into the source-of-truth spec
+   (spec-anchored) or archive the change record (spec-first) inside the
+   request, through the tool's archive command, and validate. The freeze
+   is what the approval applies to: after it, a change to the record is a
+   new round, and a commit pushed after it spends the closing. Done when:
+   the spec and the code describe the same system, the integration branch
+   will receive no unarchived record, and the approval the contract asks
+   for names the frozen version.
 
 ## Tool commands first, then the validator
 
@@ -191,22 +203,28 @@ record them — never run a questioning round of your own:
   moment the package is committed, opens as a draft, and the gate is
   exercised on that draft; split only where consumers depend on a stable
   contract.
-- **Approval**: discussion-closed on the complete package — the gate
-  owner discusses on the draft, directs record changes in conversation,
-  and declares the discussion closed in conversation; the record of
-  approval is that closing plus the request's discussion state, and the
-  reconciliation precedes the task list. A blocking comment is the
-  alternative only where the contract or the user asks for one. A platform
-  review approval is never the record, because later pushes dismiss it.
+- **Approval**: two gates, both closed in conversation — the gate owner
+  declares the package deliberation closed before the task list, and the
+  implementation deliberation closed before the freeze; the agent
+  reconciles each before acting, and the freeze commit is the record that
+  a version was fixed. A **recorded approval** — any mechanism that
+  leaves a durable, attributable mark on a named version, canonically the
+  platform's review approval paired with the setting that dismisses it on
+  a new commit — is added only where someone outside the conversation
+  must verify for themselves that a named person accepted a named
+  version. Recommend it from who reads the record, never from team size
+  or pipeline maturity.
 - **Design**: warranted by the rule above.
-- **Archive executor**: by hand, inside the request before it is marked
-  ready, with the tool's archive command; the automation the framework
-  skill installs (a trigger label whose bot archives, commits, pushes, and
-  removes the label) only when the contract names it. On a fork the author
-  runs the commands the bot posts. The archived record is frozen: a defect
-  review finds afterwards goes to the request's validation section or a
-  follow-up change. Archiving after the merge by an automation that pushes
-  to the integration branch is not proposed.
+- **Archive executor**: a person on the request's branch, with the tool's
+  archive command, once the implementation deliberation closes. No job
+  archives: no platform token can push to a fork, so such a job would
+  never serve an external contribution, and on a branch it can reach it
+  would be the only automation needing write access to the repository's
+  contents. On a fork the executor is whoever holds the branch — its
+  author, or a maintainer who pulled it. The frozen record stays frozen: a
+  defect review finds afterwards goes to the request's validation section
+  or a follow-up change. Archiving after the merge by an automation that
+  pushes to the integration branch is not proposed.
 - **Scope**: specification domains cover the product the project
   delivers; a change to the project's own harness, tooling, checks,
   workflows, or documents is a spec-less change carried by the tool's
@@ -264,13 +282,22 @@ builder's.
 - A drifted spec is an active source of falsehood: when the spec and the
   code disagree, the next agent trusts the spec and builds on a lie. Fix
   the spec or delete it before any other work.
-- A review approval left on a draft does not survive the implementation
-  pushes — removed by default on GitLab, by a stale-approval rule on
-  GitHub, and stale in meaning everywhere; the record of approval is the
-  closing of the discussion or the fixed comment, as the contract says.
+- A platform review approval is dismissed by the next push — by default
+  on GitLab, by an opt-in rule on GitHub. That is the feature, not the
+  flaw: the pair is what makes a review approval a *recorded* approval of
+  one named version. It misleads only when it is taken before the freeze,
+  where it points at a tip the implementation replaces.
+- Nothing revokes a closing made in conversation. A commit pushed after
+  the freeze leaves the request carrying an approval of a version that no
+  longer exists; detect it by comparing the branch tip with the freeze
+  commit, say so before pushing or handing over, and ask for the gate
+  again.
 - Closing the discussion without reading the threads implements the
   record as the author remembers it, not as the discussion left it; the
   reconciliation is what makes the closing an approval.
 - Opening the draft before the design is written, or after the task list
   is, turns the gate into a formality: the reviewer sees either half a
   package or a method.
+- Freezing before the implementation deliberation closes has the same
+  effect on the second gate: the reviewer is handed an archived record
+  and can only ask for a follow-up change.

@@ -3,7 +3,7 @@ name: meta-spec-workflow
 description: >-
   Disposable builder skill (delete after the harness is built): configures
   a project's spec-driven development rules — settles level, tool, request
-  shape, approval package and mode, archive executor, and scope with the
+  shape, approval package and gate modes, the freeze, and scope with the
   user, gives every fact one source of truth, deposits the specification
   contract in the project's platform vocabulary, and hands tool adoption
   and automation to the tool's framework skill; in a second phase, once the
@@ -110,7 +110,8 @@ When no workflow file evidences the platform, establish it from the remote
 and the CI or template directories; if nothing does, ask in step 2 before
 anything else, because no contract is deposited without it. Record also
 whether automation exists (a workflow or pipeline directory): that
-evidence decides the archive executor. Record whether a platform base is already
+evidence decides which read-only automation is worth installing. Record
+whether a platform base is already
 delivered — a project workflow skill, request and intake templates, a
 mechanics section in the workflow file — and whether this contract is
 already deposited: with both present, the run is the second phase and
@@ -147,27 +148,29 @@ recommendation:
    user asks to change it. Record which framework skill of the `sdd`
    catalog owns the tool (`openspec-workflow`, `spec-kit-workflow`), or
    that none exists for it.
-3. **Approval gate, mode, and package** — who approves before the task
-   list and the implementation start, whether an agent may approve its
-   own, how the approval is recorded, and when a design is warranted. The
-   gate is exercised on the complete approval package: the specification
-   plus the design when one is warranted — by default when more than one
-   reasonable approach exists, or the change touches structure,
-   interfaces, dependencies, or files outside the record; a wording change
-   inside one section needs none; the project may fix the rule in its
-   schema. The design bounds the approach and lists no steps; it is
-   committed, so it carries no secret or private data. Recommend the
-   discussion-closed mode: the draft opens with the complete package and
-   the agent stops; the gate owner discusses on the request, directs
-   record changes in conversation, and declares the discussion closed in
-   conversation; the agent reconciles the request's threads and the
-   package before the task list. Offer the blocking alternative once — a
-   fixed-wording comment on the draft covering the package as of the last
-   push before it — and take it only when the user or a project file asks
-   for an explicit token. Both modes are defined in
+3. **Approval gates, mode, and package** — who approves, whether an agent
+   may approve its own, how each approval is recorded, and when a design
+   is warranted. There are two gates: the first on the complete approval
+   package before the task list, the second on the finished
+   implementation before the record is frozen. The package is the
+   specification plus the design when one is warranted — by default when
+   more than one reasonable approach exists, or the change touches
+   structure, interfaces, dependencies, or files outside the record; a
+   wording change inside one section needs none; the project may fix the
+   rule in its schema. The design bounds the approach and lists no steps;
+   it is committed, so it carries no secret or private data. Recommend
+   closing both gates in conversation: the gate owner discusses on the
+   request, directs changes in conversation, and declares each
+   deliberation closed; the agent reconciles the request's threads before
+   acting. Offer a **recorded approval** — a durable, attributable mark
+   naming one version — per gate, and derive the recommendation from who
+   reads the record: propose one only when someone outside the
+   conversation must verify for themselves that a named person accepted a
+   named version, never from team size or pipeline maturity. Both modes
+   are defined in
    [contract-design.md](references/contract-design.md), read before this
-   round. Record the owner, the mode, and the design rule; the authority
-   builder attaches its levels to this gate later.
+   round. Record the owner, the mode of each gate, and the design rule;
+   the authority builder attaches its levels to these gates later.
 4. **Division of labor** — confirm the default: specifications own what,
    why, and acceptance; tracked work owns who, when, and status and links
    the specification. Any deviation is recorded with its reason.
@@ -182,18 +185,26 @@ recommendation:
    any consumer that depends on a stable contract → split. Any project may
    take a single contract-level change through split as a recorded
    deviation.
-6. **Archive executor** — archiving (or converging) always happens inside
-   the change request before it is marked ready, so the integration branch
-   never holds an unarchived record; the question is who runs it: by hand
-   with the tool's archive command, or the automation the framework skill
-   installs — a required check that fails a ready request with an
-   unarchived record, comment commands that show a record and its
-   progress, a trigger label whose bot archives, commits, pushes, and
-   removes the label, and status labels. Derive the recommendation from
-   step 1's evidence: automation exists → the framework skill's automation;
-   otherwise by hand with the request checklist as the gate. Record the
-   fork rule either way: a fork's request is archived by its author from
-   the commands the bot posts. Archiving after the merge by a job that
+6. **Archive executor and the freeze** — archiving (or converging)
+   always happens inside the change request, and it is the freeze the
+   second gate's approval applies to: the request is marked ready with
+   the record still open, the deliberation runs against that, and the
+   freeze follows it. The executor is a person who holds the branch —
+   the implementer, or a maintainer who pulled a fork's branch. No job
+   archives: no platform token can push to a fork, so such a job could
+   never serve an external contribution, and on a branch it could reach
+   it would be the only automation needing write access to the
+   repository's contents. What automation the framework skill does
+   install is read-only and exists for visibility: a required check that
+   fails a ready request holding an unarchived record — the red that
+   blocks the merge through the whole deliberation — comment commands
+   that print a record into the discussion thread, and status labels that
+   make the state legible from the list view. Derive from step 1's
+   evidence which of those the project takes, and record how a spent
+   freeze is detected: a commit after the freeze commit means the
+   approved version no longer exists. Where the tool has no archive
+   operation, the freeze is a declaration on the request naming the
+   commit the record stands at. Archiving after the merge by a job that
    pushes to the integration branch is a rejected alternative, not an
    option.
 7. **Default specification author** — the implementer, or a named planning
@@ -325,20 +336,20 @@ Fill the slots in this order, each from the matching section of
 nothing, never touch the security or sensitivity-review checklist item):
 
 1. Templates and forms: the six template slots, worded for the contract's
-   approval package and mode, and the archive executor.
+   approval package, the mode of each gate, and the freeze.
 2. The project skill: the four step slots, worded for the shape and the
-   modes, including the reconciliation the discussion-closed mode requires.
-3. The archive automation and the validator: hand both to the framework
+   modes, including the reconciliation each gate requires.
+3. The request automation and the validator: hand both to the framework
    skill (the handoff of step 3), which installs the check into the
    command and workflow the base already runs, the comment commands, the
-   label-triggered archive, the status labels, and its script, and records
+   status labels, and its script, and records
    the maintainer actions those need; edit no workflow or pipeline file
    yourself. Without a framework skill, record the by-hand executor, the
    request checklist as the gate, and the automation as remaining work.
 4. Knowledge: `KNOWLEDGE_SECTION` in the platform workflow file, one
    `SYNC_ROW` per insertion, and the `MAINTAINER_ACTION` rows the
-   framework skill names (label sync; the approval click after a bot push
-   where the platform requires it).
+   framework skill names (the label sync, and any token variable its
+   read-only jobs need).
 
 Done when: every slot the contract's shape and modes require is filled;
 `grep -rn '{{[A-Z]'` over the delivered paths returns nothing (the

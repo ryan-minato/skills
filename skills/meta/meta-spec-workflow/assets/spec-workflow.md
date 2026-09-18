@@ -64,26 +64,34 @@ it never restates the fact.
 <States a specification passes through, the event that moves it, and where
 that event is recorded, e.g. proposed (change record committed and the
 draft <pull request | merge request> opened with the complete approval
-package) → approved (<the approval owner closing the discussion on the
-draft in conversation, reconciled with nothing open | the approval owner's
-`<exact text>` comment on the draft, covering the package as of the last
-push before it>, or the merged specification <pull request | merge
-request>) → implemented (the task list written after the closing, every
-task done and every scenario verified, recorded in the <pull request |
-merge request>'s validation section) → archived (delta merged into the
-source-of-truth spec and the record moved to the archive inside the <pull
-request | merge request> before ready, by the executor below).
+package) → approved (<the approval owner closing the package
+deliberation in conversation, reconciled with nothing open | the
+approval owner's recorded mark on the package's last commit>, or the
+merged specification <pull request | merge request>) → implemented (the
+task list written after the closing, every task done and every scenario
+verified, recorded in the <pull request | merge request>'s validation
+section, the request marked ready for the second deliberation) →
+archived (once that deliberation closes: delta merged into the
+source-of-truth spec and the record moved to the archive inside the
+<pull request | merge request>, by the executor below; that commit is
+the freeze the final approval names).
 Name the tool command category for each move without quoting the
 command.>
 
-## Approval gate
+## Approval gates
 
-<Who approves a specification before planning and implementation start —
-a role or a person, never "the team" — and whether an agent may approve a
-specification it wrote. Agent authority levels are governed by
-`.agents/knowledge/agent-authority.md`; this gate is where they attach.>
+<Who owns each gate — a role or a person, never "the team" — and whether
+an agent may approve a record it wrote. Agent authority levels are
+governed by `.agents/knowledge/agent-authority.md`; these gates are where
+they attach.>
 
-The gate is exercised on the approval package: the specification plus
+There are two. The **package gate** releases the task list and the
+implementation; the **freeze gate** releases the freeze, and its approval
+applies to the frozen version. The request is marked ready before the
+freeze, so `<check job name>` is red for the whole second deliberation:
+that red is the merge block, not a defect.
+
+The package gate is exercised on the approval package: the specification plus
 the design when one is warranted — <the project's rule, by default: more
 than one reasonable approach exists, or the change touches structure,
 interfaces, dependencies, or files outside the record; a wording change
@@ -101,24 +109,26 @@ committed, so it carries no secret or private data. The gate never
 reviews the task list: it is the implementer's after approval and is
 judged by implementation review.
 
-<Discussion-closed: <the approval owner> discusses on the draft and
+<Conversational: <the approval owner> discusses on the request and
 directs record changes in conversation; each change is pushed through the
-publish gate. The approval is recorded when <the approval owner> says in
-conversation that the discussion is closed: the agent then reads the
+publish gate. A gate closes when <the approval owner> says in
+conversation that the deliberation is closed: the agent then reads the
 <pull request | merge request>'s comments and review <threads |
 discussions> with their resolution state, lists every unresolved one,
 every requested adjustment the record does not carry, and every pair of
 contradicting conclusions, confirms them with <the approval owner>, and
-starts the task list and the implementation only when nothing is open or
-the open items are confirmed; the closing is noted on the draft's
-`Approval:` line.
-| Blocking: <the approval owner> posts the comment `<exact text>` on the
-draft; it covers the record as of the last push before it, and a later
-push to the record needs a fresh comment unless <the approval owner>
-decided that push in conversation. The same reconciliation of comments
-and review <threads | discussions> runs before the task list.> A platform review
-approval is not the record in either mode, because later pushes dismiss
-it.
+proceeds only when nothing is open or the open items are confirmed; the
+closing is noted on the `Approval:` line. Nothing revokes such a
+closing, so the agent compares the branch tip with the freeze commit
+before pushing or handing over and asks again when they differ.
+| Recorded: the same discussion and the same reconciliation, and then
+<the approval owner> leaves `<the mechanism: the platform's review
+approval with new commits dismissing it, or the comment `<exact text>`>`
+on the version being approved. It names that version only; when a later
+push replaces it, the mark is taken again.> Recorded per gate:
+<which gates, and why someone outside the conversation needs to verify
+the acceptance | neither: everyone who needs the decision is in the
+conversation>.
 
 ## <Pull request | Merge request> shape
 
@@ -150,23 +160,24 @@ publishes the draft; <the approval owner> approves it.
 ## Archive executor
 
 Every change record is archived inside its <pull request | merge request>
-before it is marked ready, so <default branch> never holds an unarchived
-record; the archived record is frozen under review: a defect found in it
+once the freeze gate closes, so <default branch> never holds an
+unarchived record; the frozen record stays frozen: a defect found in it
 is recorded in the request's Validation section or a follow-up change,
-never edited into the archive. Executor: <by hand — every task ticked,
-then the tool's archive command, the validator, and a commit on the
-branch; the request checklist is the gate | the automation the framework
-skill `<framework skill name>` installed: the `<check job name>` check
-fails a ready <pull request | merge request> that still holds an
-unarchived record (a warning while it is a draft); the `<trigger label>`
-label makes the `<archive job name>` <workflow | job> archive every
-complete related record, commit, push to the branch, and remove the label
-— applying the label is an authorized remote write, and <GitHub: after
-the bot's push a user with write access approves the workflow runs the
-push queued | GitLab: the label takes effect on the next pipeline>; a
-<pull request | merge request> from a fork is archived by its author from
-the commands the bot posts>. Selected because <the automation evidence
-that decided it>.
+never edited into the archive.
+
+Executor: a person who holds the branch — <the implementer | role>, or a
+maintainer who pulled a fork's branch. Every task ticked, then the tool's
+archive command, the validator, and a commit. No <workflow | job>
+archives: no platform token can push to a fork, and on a branch one could
+reach it would be the only automation needing write access to
+<repository | project> contents, to save a command the implementer
+already runs.
+
+The `<check job name>` check fails a ready <pull request | merge request>
+that still holds an unarchived record (a warning while it is a draft), so
+the request is red until the freeze. A commit after the freeze commit
+means the approved version no longer exists: say so and ask for the gate
+again.
 
 ## Request automation
 
@@ -177,9 +188,11 @@ that decided it>.
 GitLab as manual jobs>; the `<labels job name>` <workflow | job> keeps the
 status labels `<archived-axis labels>` and `<progress-axis labels>` on
 every <pull request | merge request> from the related records' task lists
-— read them, never set them by hand. Maintainer actions: <label sync | the
-label creation and the token variables>; <the approval click after a bot
-push | "pipelines must succeed">.
+— read them, never set them by hand. All of it is read-only: the commands
+put a record into the discussion thread where it is being discussed, and
+the labels make a request's state legible from the list view. Neither
+drives the process. Maintainer actions: <label sync | the label creation
+and the token variables>; <nothing else | "pipelines must succeed">.
 
 ## Specifications and <issues | work items>
 
@@ -235,6 +248,9 @@ commit with the current one and re-map when they differ.
   it back, do not let it stand.
 - The management model or the authority policy changes in a way that touches
   acceptance.
-- The archive executor changes, or a <workflow | job>, command, or label of
-  the request automation is added, renamed, or removed.
+- The archive executor or the freeze changes, or a <workflow | job>,
+  command, or label of the request automation is added, renamed, or
+  removed.
+- A gate's mode changes, or a recorded approval is added to or dropped
+  from one.
 - The rule for when a design is warranted changes.
