@@ -99,7 +99,7 @@ When asked to install the automation on GitHub, the agent SHALL produce from its
 - **THEN** the agent produces the jobs fragment and states that labels take effect on the next pipeline and that manual jobs replace comment commands
 
 ### Requirement: Handoff: the methodology skill
-The agent SHALL route questions about whether or at which level to adopt spec-driven development, what a good specification is, or the generic loop to the methodology skill of the `sdd` catalog through the installing skill, and when the user declines SHALL answer from the loop facts this skill restates (package before tasks, archive before ready) without teaching the practice.
+The agent SHALL route questions about whether or at which level to adopt spec-driven development, what a good specification is, or the generic loop to the methodology skill of the `sdd` catalog through the installing skill, and when the user declines SHALL answer from the loop facts this skill restates (the package before the task list, the freeze before approval) without teaching the practice.
 
 #### Scenario: Handoff offered
 - **WHEN** the user asks whether the project should adopt spec-driven development at all
@@ -110,7 +110,7 @@ The agent SHALL route questions about whether or at which level to adopt spec-dr
 - **THEN** the agent answers the OpenSpec question at hand and says the practice-level question stays open
 
 ### Requirement: Handoff: the contract builder
-The agent SHALL route setting or changing the project's rules — the approval mode, when a design is warranted, the archive executor, the request shape — to the spec workflow builder of the harness catalog through the installing skill, and when the user declines SHALL apply the contract as it stands or the defaults (the implementer archives after the deliberation, discussion-closed mode on the complete package) and say so.
+The agent SHALL route setting or changing the project's rules — the approval mode, when a design is warranted, the archive executor, the request shape — to the spec workflow builder of the harness catalog through the installing skill, and when the user declines SHALL apply the contract as it stands or the defaults (the implementer archives once the deliberation on the finished implementation closes, and both gates close in conversation) and say so.
 
 #### Scenario: Handoff offered
 - **WHEN** the user wants the project to record a different archive executor or approval mode
