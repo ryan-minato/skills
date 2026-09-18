@@ -5,7 +5,7 @@ builder has delivered its base. The base registers its extension slots in
 its own durable-harness reference (`## Extension slots`): a slot is a
 heading, a step, or a section, never a marker. This file says what to
 insert into each slot for the contract's shape, approval package and
-mode, and archive executor; the exact texts live in `assets/gitlab/`.
+the gate modes, and the freeze; the exact texts live in `assets/gitlab/`.
 Never re-decide a contract fact here.
 
 ## Fill contract
@@ -30,19 +30,19 @@ Never re-decide a contract fact here.
 |---|---|---|---|
 | `RELATED_WORK_LINES` | MR template, `## Related work`, after the reference-syntax comment | the specification block: `Spec:`, `Phase:`, records, `Approval:` in the contract's mode | always |
 | `ACCEPTANCE_ITEM` | MR template, the checklist item beginning "The change satisfies" | ", or the scenarios of the linked change record" | always |
-| `CHECKLIST_ITEMS` | MR template, between the acceptance item and "The documented local checks pass" | the approval item worded for the mode and the package; the archive item worded for the archive executor | always |
+| `CHECKLIST_ITEMS` | MR template, between the acceptance item and "The documented local checks pass" | the approval item worded for each gate's mode and the package; the archive item worded for the freeze | always |
 | `INTAKE_LINK_FIELD` | task template, one section before `## Acceptance criteria` | `## Specification` with its comment | always |
 | `ACCEPTANCE_SOURCE` | task template, the comment under `## Acceptance criteria` | the change-record alternative, "never both" | always |
 | `COMPLETION_SOURCE` | the goal milestone's description, under `## Observable completion` | link the specifications whose scenarios define it | always |
 | `TAKE_WORK_PRECONDITION` | project skill, `## Take and execute work` step 1 | combined: record to the draft first, then stop; split: unmerged specification MR is escalated | always |
 | `DRAFT_FIRST_CONTENT` | project skill, `## Take and execute work` step 3 | combined: the record as first push, `Phase: specification`, reserved sections, stop; the wait and the reconciliation for the mode. Split: a non-closing reference in place of the closing pattern on the specification MR, the record as its only content, the closing pattern on the last implementation MR | always |
 | `CREATE_WORK_RULE` | project skill, a `## Create work` section before `## Publish gate` | items carry no acceptance criteria and link the record; task-derived items optional; a non-closing reference for a specification MR | always |
-| `FINISH_STEP` | project skill, `## Take and execute work` step 6 | `Phase: implementation`, the reserved lines replaced, the spec-side step for the archive executor, the check the framework skill installed | always |
+| `FINISH_STEP` | project skill, `## Take and execute work` step 6 | `Phase: implementation`, the reserved lines replaced, the spec-side step for the freeze, the check the framework skill installed | always |
 | `KNOWLEDGE_SECTION` | `.agents/knowledge/gitlab-workflow.md`, appended `## Specifications` | the contract's location, the slots filled because of it, the framework skill that owns the check, the manual jobs, and the labels, the update trigger "when the spec directory or tool changes, re-check every template link" — never the contract's tables | always |
 | `SYNC_ROW` | `.agents/knowledge/gitlab-workflow.md`, the `## Synchronization` table | one row per insertion above | per insertion |
 | `MAINTAINER_ACTION` | the platform-settings knowledge, one row each | the actions the framework skill names: the label creation, the token variables, "pipelines must succeed" | the framework skill's automation |
 
-The check, the manual jobs, the label-gated archive, the status labels,
+The check, the manual jobs, the status labels,
 and the validator's place in the local check command are the framework
 skill's to install (the handoff of step 3); this builder edits no
 pipeline. Do not add a specification work-item type: a spec is a document

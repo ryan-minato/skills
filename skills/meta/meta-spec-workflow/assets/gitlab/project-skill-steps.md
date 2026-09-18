@@ -9,7 +9,7 @@ leave no placeholder and no comment behind. -->
 
 Combined shape: A work item with no change record yet is taken by
 committing the record to the draft MR first (step 3) and stopping there
-<discussion-closed: "until the gate owner closes the discussion on the draft" | blocking: "until the gate owner's `<exact text>` comment exists">; the record's scenarios are then the acceptance criteria.
+until the gate owner closes the package deliberation <conversational: "in conversation" | recorded: "and leaves `<exact mark>` on the package's last commit">; the record's scenarios are then the acceptance criteria.
 
 Split shape: A work item whose specification MR is not merged is escalated
 to the gate owner, not executed; the merged record's scenarios are the
@@ -32,21 +32,19 @@ spec tool's commands and passing its validator; a task list the tool
 generated alongside them is pushed but marked as after-approval and kept
 out of the review — and
 the description's `Phase:` line reads `specification` while Changes and
-Validation keep their reserved line. Then stop. <discussion-closed: "The gate owner discusses on
+Validation keep their reserved line. Then stop. The gate owner discusses on
 the MR and directs record changes in conversation; push each through the
-publish gate. When the gate owner says in conversation that the discussion
-is closed, read the MR's discussions and their notes (the merge request
-discussions API: resolution lives on each note, `resolvable: true` with
-`resolved: false` is an open one); list every discussion with an open
-note, every adjustment requested that the record
+publish gate. When the gate owner closes the package deliberation
+<conversational: "in conversation" | recorded: "and leaves `<exact mark>`
+on the package's last commit">, read the MR's discussions and their notes
+(the merge request discussions API: resolution lives on each note,
+`resolvable: true` with `resolved: false` is an open one); list every
+discussion with an open note, every adjustment requested that the record
 does not carry, and every pair of conclusions that contradict each other;
 ask the gate owner to confirm them; and start the task list and the
 implementation only when nothing is open or the open items are confirmed.
-Record the closing on the `Approval:` line." | blocking: "Wait for the gate
-owner's `<exact text>` comment; it covers the package as of the last push
-before it, and a later push to the package needs a fresh comment unless
-the gate owner decided that push in conversation. Then run the same
-reconciliation of notes and discussions before the task list.">
+Record the closing on the `Approval:` line. The same reconciliation runs
+again at the implementation deliberation, before the record is frozen.
 
 ## CREATE_WORK_RULE — a `## Create work` section inserted before `## Publish gate`
 
@@ -66,8 +64,10 @@ set the `Phase:` line to `implementation`, replace the reserved line of
 Changes with permalinks to the commits (the exact lines for a local
 change, the whole file or directory for a broad one) and the reserved line
 of Validation with each scenario and its result linking the plan, confirm
-the spec-side step — every task of the change record is ticked and the
-record is archived in this MR before the draft flag is removed <by hand
-with the tool's archive command | "by hand, or by applying the `<trigger
-label>` label and running the pipeline">; the `<check job name>` job the
-framework skill installed fails otherwise — and then
+the spec-side step — every task of the change record is ticked, and the
+record is archived in this MR, with the tool's archive command, once the
+gate owner closes the deliberation on the finished implementation.
+Removing the draft flag is what opens that deliberation, so the
+`<check job name>` job the framework skill installed is red until the
+archive commit lands: that red is the merge block, not a defect, and a
+commit after it spends the closing — and then

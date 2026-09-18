@@ -54,17 +54,17 @@ The deposited file, adapted from the asset, must state:
   point to it.
 - The specification lifecycle (for example proposed, approved, implemented,
   archived) and the event that moves a spec between states.
-- The approval gate: who approves before the task list and the
-  implementation, whether an agent may approve its own, the approval
-  package the gate is exercised on (the specification plus the design when
-  warranted, with the project's rule for when a design is warranted, the
-  design's role as bounds rather than steps, and the rule that it carries
-  no secret or private data), and the mode — discussion-closed (the agent
-  stops after publishing the complete package, the owner closes the
-  discussion in conversation, the agent reconciles threads and package
-  before the task list) or blocking (the fixed comment text, what it
-  covers, when a fresh one is needed) — with the reconciliation step in
-  both.
+- The two approval gates: who owns each, whether an agent may approve
+  its own, the approval package the first is exercised on (the
+  specification plus the design when warranted, with the project's rule
+  for when a design is warranted, the design's role as bounds rather than
+  steps, and the rule that it carries no secret or private data), the
+  finished implementation the second is exercised on, and the mode of
+  each — conversational (the owner closes the deliberation in
+  conversation; the closing plus the request's discussion state, and at
+  the freeze gate the freeze commit, is what stands) or recorded (the
+  mechanism, what version its mark names, and when it must be taken
+  again) — with the reconciliation step in both.
 - The division of labor with tracked work, phrased so an agent can apply it
   to a concrete work item and change request, including when the work item
   opens and what it may not carry.
@@ -72,11 +72,16 @@ The deposited file, adapted from the asset, must state:
   default specification author, where the approval is recorded, what the
   integration branch may hold, and the request body's lines: the
   specification block and the sections reserved until ready.
-- The archive executor — by hand, or the automation the framework skill
-  installs (the check, the comment commands, the trigger label, the status
-  labels), named as the framework skill installed them — with its
-  selecting fact, the fork rule, the freeze that review works under, and
-  the fact that archiving happens inside the request before ready.
+- The archive executor — a person who holds the request's branch, the
+  implementer or a maintainer who pulled a fork's branch — with the fact
+  that archiving happens inside the request once the freeze gate closes,
+  that the request is marked ready before it and the check is red until
+  it, that the frozen record is frozen for review, and how a spent freeze
+  is detected. Where the tool has no archive operation, the declaration
+  that stands in for it, with its wording.
+- The read-only automation the project took from the framework skill
+  (the check, the comment commands, the status labels), named as the
+  framework skill installed them, with what each is for.
 - The framework skill the project uses, as a fact, or that none exists
   for the approach.
 - The specification scope: domains cover the product; the project's own

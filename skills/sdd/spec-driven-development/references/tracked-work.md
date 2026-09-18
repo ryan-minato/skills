@@ -1,8 +1,8 @@
 # Running the Loop Against Tracked Work
 
 Read when a step of the loop meets the project's tracked work: publishing
-the draft, waiting for the approval, reconciling, drafting the change
-request body, archiving before ready. Everything here is stated in
+the draft, waiting for either gate, reconciling, drafting the change
+request body, marking the request ready, freezing the record. Everything here is stated in
 tool-neutral and platform-neutral terms; the project's contract, its
 templates, and the framework skill use the platform's own words (issue,
 pull request, merge request, workflow, job), and they win.
@@ -13,9 +13,10 @@ pull request, merge request, workflow, job), and they win.
 |---|---|---|
 | Level, tool, and framework skill | the contract's header and artifact map | the tool the project already runs; otherwise the family fitting the situation, offered to the user |
 | Change request shape | the contract's shape section | combined |
-| Approval owner and mode | the contract's approval gate | discussion-closed on the complete package: the gate owner closes the discussion in conversation and the agent reconciles before the task list |
+| Approval owner and mode | the contract's approval gate | conversational at both gates: the gate owner closes each deliberation in conversation and the agent reconciles before acting |
+| Whether an approval is recorded | the contract's approval gate | no recorded mechanism; add one only when someone outside the conversation must verify a named person accepted a named version |
 | When a design is warranted | the contract's approval gate | more than one reasonable approach, or structure, interfaces, dependencies, or files outside the record are touched |
-| Archive executor | the contract's archive section | by hand, inside the request, before ready |
+| Archive executor | the contract's archive section | a person on the request's branch, once the implementation deliberation closes |
 | What tracked work links | the contract's tracked-work section | the record's path; acceptance criteria never copied |
 | Specification scope | the contract's scope section | product domains; the project's own harness, tooling, checks, workflows, and documents are spec-less changes under the tool's marker |
 | Request body | the project's request template | the default body below |
@@ -33,17 +34,28 @@ titled per the project's commit convention for specification changes.
 While waiting, write no task list and no code; say what is being waited
 for, per the mode the contract records:
 
-| | Discussion-closed (default) | Blocking comment |
+| | Conversational (default) | Recorded approval |
 |---|---|---|
-| What the gate owner does | Discusses on the draft, directs record changes in conversation, and declares the discussion closed in conversation | Posts the fixed-wording comment the contract names (for example `Specification approved`) on the draft |
-| The record of approval | The closing instruction plus the request's discussion state at that moment | The comment; it covers the package as of the last push before it |
-| A record change directed while waiting | Update the record, publish it through the project's publish gate, keep waiting | The same; a push the gate owner did not decide in conversation needs a fresh comment before the task list, a narrowing the gate owner decided does not |
-| What follows | Reconciliation, then the task list | Reconciliation, then the task list |
+| What the gate owner does | Discusses on the draft, directs record changes in conversation, and declares the deliberation closed in conversation | The same, and then leaves the mark the contract names on the version being approved |
+| What stands as the approval | The closing instruction plus the request's discussion state at that moment, and — at the second gate — the freeze commit | A durable, attributable mark naming one version: canonically the platform's review approval paired with the setting that dismisses it on a new commit; a fixed-wording comment where the platform has no such pair |
+| A record change directed while waiting | Update the record, publish it through the project's publish gate, keep waiting | The same; the mark is spent when the version it named is replaced, so it is taken again after the last change |
+| What follows | Reconciliation, then the next step | Reconciliation, then the next step |
 
-A platform review approval is not the record in either mode, because
-later pushes dismiss it and it then points at a tip the implementation
-replaces. Under split, merging the specification change request is the
-approval.
+**Recorded approval is a category, not one mechanism.** Choose it from
+who reads the record: a conversational closing is legible only to the
+people in the conversation, so it is enough until someone outside it —
+an auditor, a release manager, a compliance reviewer, a downstream team
+— must verify for themselves that a named person accepted a named
+version. Team size and pipeline maturity do not decide this; a large
+team whose reviewers are all in the conversation needs no mark, and a
+solo maintainer shipping under an audit obligation does. Name the
+property the mechanism must provide — durable, attributable, bound to
+one version — check the target platform offers it, and decide per gate
+rather than once for the project: many contracts want the second gate
+recorded and the first one conversational.
+
+Under split, merging the specification change request is the approval at
+the first gate.
 
 ## The two shapes at run time
 
@@ -52,7 +64,7 @@ approval.
 | Publish (loop step 3) | Commit the package; open a draft change request whose first content is the package; stop | Commit the package; open a specification change request carrying only the record; stop |
 | Approval | In the contract's mode, on the draft | The specification change request is approved and merged |
 | Tasks and implementation | On the same branch, after the approval | On one or more implementation change requests, each linking the merged record; re-validate the delta first — a domain spec another change archived since may have moved |
-| Ready | Implementation review of the scenarios against the result, after the record is archived or converged | The same, per implementation change request |
+| Ready | Marked ready with the record still open, for the deliberation on the finished implementation; frozen once that closes | The same, per implementation change request |
 | Merge | Closes the work item | The last implementation change request closes it |
 
 Under split, a record on the integration branch that is approved but has
@@ -74,8 +86,8 @@ of the review.
 
 ## Reconciliation checklist
 
-When the gate owner says the discussion is closed (or the comment is
-posted), before any task list:
+When the gate owner says a deliberation is closed, before the task list
+at the first gate and before the freeze at the second:
 
 1. Read every comment on the request and every review thread with its
    resolution state (on GitHub: the issue comments endpoint and the
@@ -98,11 +110,12 @@ Follow the project's template when one exists. Absent one, the body has:
    the request merges, not the work done.
 2. A section stating the value: why this is worth merging now.
 3. A specification block: `Spec:` as a link to the change record on the
-   branch; `Phase: specification` until the approval, `implementation`
-   after; one link per file of the approval package, with the task list
-   listed as after-approval material; an `Approval:` line stating the
-   mode's state — "discussion open on this draft" and what closes it, or
-   the exact comment text on its own line so it can be copied.
+   branch; `Phase: specification` until the first gate closes,
+   `implementation` after; one link per file of the approval package,
+   with the task list listed as after-approval material; an `Approval:`
+   line naming which gate is open and what closes it — and, where the
+   contract records approvals, the exact mark to leave, on its own line
+   so it can be copied.
 4. Related work: the closing reference to the work item, or the reason
    none exists. A split-shape specification request uses a non-closing
    reference instead; the last implementation request carries the closing
@@ -120,29 +133,35 @@ section, added or default, passes the project's publish gate before it is
 published. Never paste the task list or a diff summary into a draft in
 the specification phase.
 
-## Archiving before ready
+## Ready, then the freeze
 
-The record is archived (spec-first) or converged into the source-of-truth
-spec (spec-anchored) inside the change request before it is marked ready,
-so the integration branch never holds an unarchived record. The contract
-names the executor:
+The request is marked ready while its record is still open, and the
+deliberation on the finished implementation runs against that. The
+project's specification check fails a ready request holding an
+unarchived record, so the request is red for the whole deliberation;
+that red is the merge block, and it is expected — never work around it,
+and never freeze early to clear it.
 
-- **By hand** (the default): every task ticked and verified, then the
-  tool's archive command, then the validator, then a commit on the
-  request's branch.
-- **The automation the framework skill installed**: apply the trigger
-  label the contract names — an authorized remote write — and wait for the
-  bot's commit and summary; pull it; do not archive by hand in parallel.
-  Where the platform holds the bot's checks for a human's approval, the
-  summary says so and the request stays blocked until someone with write
-  access approves them.
-- **On a fork**: the bot pushes nothing; it posts the commands. Run them,
-  validate, commit, push.
+When the gate owner closes this deliberation, reconcile it, then freeze:
+every task ticked and verified, the tool's archive command (spec-first)
+or the write-back into the source-of-truth spec (spec-anchored), the
+validator, a commit on the request's branch. The executor is a person
+who holds the branch — its author, or a maintainer who pulled a fork's
+branch. No job does this: no platform token can push to a fork, so such
+a job could never serve an external contribution, and on a branch it
+could reach it would be the only automation needing write access to the
+repository's contents.
 
-The archived record is frozen: a defect review finds afterwards goes to
+The frozen record stays frozen: a defect review finds afterwards goes to
 the request's validation section or a follow-up change, never into the
 archive. A change with an open task is never archived; a task is never
 ticked before its verification ran.
+
+Nothing revokes a closing made in conversation, so watch for a spent
+one: a commit after the freeze commit means the approved version no
+longer exists. Compare the branch tip with the freeze commit before
+pushing, before marking anything approved, and before handing over; when
+they differ, say so and ask for the gate again.
 
 ## Commands and labels a request may carry
 
@@ -150,8 +169,11 @@ Where the framework skill installed them, a request answers comment
 commands that show a related change's documents and its task progress,
 and carries status labels the platform's automation derives from the
 record — an archived-or-not axis and a not-started, in-progress, done
-axis. Read them as facts; never apply or remove such labels by hand, and
-never treat them as the record's source of truth. A required check fails
-a ready request that still holds an unarchived related change and warns
-while the request is a draft. The framework skill names the commands and
-labels for its tool.
+axis. They exist for visibility: the state of a request is legible from
+the list view without opening it, and the comment commands put the
+record's text into the discussion thread where it is being discussed.
+Neither drives the process. Read the labels as facts; never apply or
+remove such a label by hand, and never treat one as the record's source
+of truth. A required check fails a ready request that still holds an
+unarchived related change and warns while the request is a draft. The
+framework skill names the commands and labels for its tool.

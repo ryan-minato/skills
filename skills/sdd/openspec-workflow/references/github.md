@@ -95,6 +95,12 @@ request needs every related change archived (the check fails otherwise),
 the `Spec:` line (pointing at the change directory or its archive
 directory), and the phase marker the project's template uses.
 
+The request is marked ready before the archive, so `spec / check` is red
+for the whole deliberation on the finished implementation, and the
+archive commit is what turns it green. That red is the merge block by
+design: nobody has to remember to hold the request, and nothing has to
+be configured to stop it.
+
 ## Verification after installing
 
 - Every workflow parses; actions are pinned by commit; `permissions: {}`

@@ -5,7 +5,7 @@ builder has delivered its base. The base registers its extension slots in
 its own durable-harness reference (`## Extension slots`): a slot is a
 heading, a step, or a field id, never a marker. This file says what to
 insert into each slot for the contract's shape, approval package and
-mode, and archive executor; the exact texts live in `assets/github/`.
+the gate modes, and the freeze; the exact texts live in `assets/github/`.
 Never re-decide a contract fact here.
 
 ## Fill contract
@@ -44,11 +44,12 @@ Never re-decide a contract fact here.
 | `FINISH_STEP` | project skill, `## Finish` step 2 | `Phase: implementation`, the reserved lines replaced, the spec-side step for the archive executor, the check the framework skill installed | always |
 | `KNOWLEDGE_SECTION` | `.agents/knowledge/github-workflow.md`, appended `## Specifications` | the contract's location, the slots filled because of it, the framework skill that owns the check, the commands, and the labels, the update trigger "when the spec directory or tool changes, re-check every template link" — never the contract's tables | always |
 | `SYNC_ROW` | `.agents/knowledge/github-workflow.md`, the `## Synchronization` table | one row per insertion above | per insertion |
-| `MAINTAINER_ACTION` | `platform-settings.md`, one row each | the actions the framework skill names: the label sync, the approval click after a bot push | the framework skill's automation |
+| `MAINTAINER_ACTION` | `platform-settings.md`, one row each | the actions the framework skill names, such as the label sync | the framework skill's automation |
 
-The check, the comment commands, the archive bot, the status labels, and
-the validator's place in the local check command are the framework
-skill's to install (the handoff of step 3); this builder edits no workflow.
+The check, the comment commands, the status labels, and the validator's
+place in the local check command are the framework skill's to install
+(the handoff of step 3); this builder edits no workflow. None of them
+archives: that is a person's command on the branch.
 Do not add a "Specification" issue type: a spec is a document in the
 repository, and its lifecycle lives in the tool's layout. The `spec/*`
 status labels are facts a workflow derives from the record and are
@@ -69,11 +70,11 @@ builder's.
 
 ## Bot identity
 
-When the framework skill installs an archive bot, it pushes with the
-platform token, so the runs its push causes wait for a user with write access
-to approve them, and its label and comment events start nothing. The
-framework skill states the facts; this builder records the approval click
-as a maintainer action and nothing else.
+The framework skill's jobs read and comment with the platform token and
+write nothing to the repository, so no push identity and no secret is
+involved and the comment events they cause start no run. The framework
+skill states the facts; this builder records only the maintainer actions
+those need, such as the label sync.
 
 ## Platform-native option
 

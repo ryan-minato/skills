@@ -44,15 +44,47 @@ The task list always follows approval, even when the tool generated it
 with the specification. The framework skill says which files make up the
 package for its tool.
 
+## The two gates
+
+A change passes two deliberations, and each one has its own mode:
+
+| Gate | What it examines | What it releases |
+|---|---|---|
+| The package gate | The specification, and the design when one is warranted | The task list and the implementation |
+| The freeze gate | The finished implementation against that package | The freeze — the archive or the convergence — which the approval then names |
+
+The request is marked ready *before* the freeze, so the specification
+check is red for the whole second deliberation. That red is the merge
+block, and it is expected; never freeze early to clear it.
+
 ## Approval modes
 
-| | Discussion-closed (default) | Blocking comment |
+| | Conversational (default) | Recorded approval |
 |---|---|---|
-| What the gate owner does | Discusses on the draft, directs record changes in conversation, and declares the discussion closed in conversation | Posts a fixed-wording comment on the draft (for example `Specification approved`) |
-| The record of approval | The closing instruction plus the request's discussion state at that moment | The comment; it covers the package as of the last push before it |
-| A later push to the package | Nothing more: the gate owner directed it | A fresh comment, unless the gate owner decided that push in conversation (a narrowing, a dropped scenario) |
-| What the agent does next | Reconciliation, then the task list | The same reconciliation, then the task list |
-| Selecting fact | Default: the package is discussed where it is read, and the closing is a decision the gate owner states | The user or the project wants an explicit token on the request |
+| What the gate owner does | Discusses on the request, directs changes in conversation, and declares the deliberation closed in conversation | The same, and then leaves the mark the contract names on the version being approved |
+| What stands as the approval | The closing instruction plus the request's discussion state at that moment, and — at the freeze gate — the freeze commit | A durable, attributable mark naming one version |
+| A later push | Nothing more: the gate owner directed it. Nothing revokes the closing either, so the agent detects a spent one by comparing the tip with the freeze commit | The mark is spent when the version it named is replaced; take it again after the last change |
+| What the agent does next | Reconciliation, then the next step | The same reconciliation, then the next step |
+| Selecting fact | Default: everyone who needs the decision is in the conversation | Someone outside the conversation must verify for themselves that a named person accepted a named version |
+
+**Recorded approval is a category, not one mechanism.** Its canonical
+form is the platform's review approval paired with the setting that
+dismisses approvals when new commits arrive — GitLab's default, GitHub's
+"dismiss stale pull request approvals" — because the pair is what binds
+the mark to one version. Where a platform offers no such pair, a
+fixed-wording comment covering the record as of the last push before it
+does the same job less cleanly. Name the property the mechanism must
+provide (durable, attributable, bound to one version), check the target
+platform offers it, then choose the mechanism.
+
+Recommend from who reads the record, never from team size or pipeline
+maturity. A conversational closing is legible only to the people in the
+conversation; that is enough until an auditor, a release manager, a
+compliance reviewer, or a downstream team must confirm the acceptance
+without asking anyone. A large team whose reviewers are all in the
+conversation needs no mark; a solo maintainer under an audit obligation
+does. Decide per gate: many contracts want the freeze gate recorded and
+the package gate conversational.
 
 Reconciliation: the agent reads the request's comments and review threads
 with their resolution state; lists every unresolved thread, every
@@ -62,11 +94,8 @@ gate owner to confirm the open items; and starts the task list and the
 implementation only when nothing is open or the open items are confirmed.
 The closing state is recorded on the request's approval line.
 
-Neither mode uses the platform's review-approval state: GitLab removes
-approvals when commits are added by default, GitHub does wherever a
-ruleset dismisses stale approvals, and the approval would point at a tip
-the implementation pushes replace. Under split, merging the specification
-change request is the approval in both modes.
+Under split, merging the specification change request is the approval at
+the package gate in both modes.
 
 The review covers the outcome description — goals and scope, terminology
 and the domain model, behavior, invariants, constraints and rules, states
@@ -108,39 +137,40 @@ pass the publish gate like every other.
 ## Archiving
 
 Every change record is archived (spec-first) or converged into the
-source-of-truth spec (spec-anchored) inside its change request before the
-request is marked ready, so the integration branch never holds an
-unarchived record. The archived record is frozen under review: a defect
-review finds afterwards goes to the request's validation section or a
-follow-up change, never into the archive. A record with an open task is
-never archived.
+source-of-truth spec (spec-anchored) inside its change request, once the
+freeze gate closes, so the integration branch never holds an unarchived
+record. The frozen record stays frozen: a defect review finds afterwards
+goes to the request's validation section or a follow-up change, never
+into the archive. A record with an open task is never archived.
 
-The contract names the **executor**:
+The **executor is a person who holds the request's branch** — the
+implementer, or a maintainer who pulled a fork's branch. Every task
+ticked, then the tool's archive command, the validator, and a commit.
+The contract records that, and how a spent freeze is detected: a commit
+after the freeze commit means the approved version no longer exists.
 
-- **By hand** — every task ticked, then the tool's archive command, the
-  validator, and a commit on the request's branch; the request checklist
-  is the gate. The default when no automation exists.
-- **The framework skill's automation** — recommended when the platform
-  runs CI. It consists of: a required check that fails a ready request
-  holding an unarchived related record (a warning while the request is a
-  draft) and fails a push to the integration branch that carries one;
-  comment commands (or manual jobs) that show a related record's documents
-  and its task progress; a trigger label whose bot archives every complete
-  related record, commits, pushes to the request's own branch, and removes
-  the label; and status labels on two axes — archived or not, and
-  not-started, in-progress, or done — derived from the related records'
-  task lists and applied by the automation, never by hand. A request from
-  a fork is archived by its author from the commands the bot posts. Where
-  the platform holds the bot's checks for a human's approval, that click
-  is a recorded maintainer action. The framework skill installs all of it
-  and names the commands, labels, jobs, and tokens; the contract records
-  them as facts.
+No job archives, and this is not a matter of project size. No platform
+token can push to a fork, so an archiving job could never serve an
+external contribution; on a branch it could reach, it would be the only
+installed automation needing write access to the repository's contents,
+to save one command the implementer is already running. A job that
+archives after the merge by pushing to the integration branch is worse
+still: it needs a push identity with a protected-branch bypass that some
+repositories cannot grant, and it leaves the integration branch holding
+an unarchived record between the merge and the run. Neither is offered.
 
-The rejected alternative — a job that archives after the merge by pushing
-to the integration branch — needs a push identity with a protected-branch
-bypass that some repositories cannot grant and leaves the integration
-branch holding an unarchived record between the merge and the run. It is
-not offered.
+What the framework skill does install is read-only, and it exists for
+visibility rather than for process: a required check that fails a ready
+request holding an unarchived related record (a warning while the
+request is a draft) and fails a push to the integration branch that
+carries one; comment commands (or manual jobs) that print a related
+record's documents and its task progress into the discussion thread;
+and status labels on two axes — archived or not, and not-started,
+in-progress, or done — derived from the related records' task lists and
+applied by the automation, never by hand, so a reviewer reads a
+request's state from the list view. The framework skill installs them
+and names the commands, labels, jobs, and tokens; the contract records
+them as facts, and records which ones the project took.
 
 ## Specification scope
 
@@ -163,6 +193,12 @@ A spec-first kit archives nothing: a feature is complete when every task
 is ticked, and a spec-anchored project's rule is what updates the living
 specification. An IDE's native spec files tick tasks in their own files.
 Committed documents merge the delta into the domain document by hand
-inside the request before ready. For each, the contract records the
-completion criterion in place of an archive command, and the framework
-skill (where one exists) installs the check that enforces it.
+inside the request. For each, the contract records the completion
+criterion in place of an archive command, and the framework skill (where
+one exists) installs the check that enforces it.
+
+Such a tool still needs a freeze, or the approval has no version to
+name. Absent an artifact, the freeze is a **declaration** on the request
+— "the deliberation closed with the record unchanged at `<commit>`" —
+and the contract fixes its wording. A spent declaration is detected the
+same way as a spent archive commit: by a later commit.
