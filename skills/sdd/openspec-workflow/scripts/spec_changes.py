@@ -336,10 +336,24 @@ class Api:
 
 
 def tree_sha_at(api: Api, commit: str, segments: list[str]) -> str | None:
-    """Walk a commit's tree down a path, one tree read per segment."""
+    """Walk a commit's tree down a path, one tree read per segment.
+
+    Returns None when a path segment is absent — a project that does not
+    use the tool looks exactly like that, so it is not an error. The
+    commit's own tree is different: a request whose head cannot be read
+    (a force-push or a deleted fork mid-run) would otherwise be reported
+    as a project with nothing in it, and a label derived from that would
+    say the opposite of the truth.
+    """
+    root = api.tree(commit)
+    if root is None:
+        raise Failure(
+            f"the head commit {commit} is not readable; nothing is reported from a partial snapshot. "
+            "The branch was probably force-pushed or deleted while this ran — retry on the current head."
+        )
     sha = commit
     for segment in segments:
-        data = api.tree(sha)
+        data = api.tree(sha) if sha != commit else root
         if not data:
             return None
         entry = next((e for e in data.get("tree", []) if e.get("path") == segment and e.get("type") == "tree"), None)
