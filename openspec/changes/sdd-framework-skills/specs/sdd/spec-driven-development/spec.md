@@ -1,7 +1,7 @@
 ## ADDED Requirements
 
 ### Requirement: Behavior: The draft opens when the approval package is complete
-The agent SHALL write and clarify the specification, write the design when one is warranted, validate, and commit the change record, and only then publish it as a draft change request (or as the specification change request) whose first content is the complete approval package; SHALL not write tasks or code until the discussion is closed (discussion-closed mode) or the approval comment exists (blocking mode); and while waiting SHALL say what it waits for.
+The agent SHALL write and clarify the specification, write the design when one is warranted, validate, and commit the change record, and only then publish it as a draft change request (or as the specification change request) whose first content is the complete approval package; SHALL not write tasks or code until the gate owner closes the package deliberation in the mode the contract records; and while waiting SHALL say what it waits for.
 
 #### Scenario: Tasks requested before approval
 - **WHEN** the specification and the design are written and the user asks the agent to write the task list next
@@ -120,11 +120,11 @@ The skill description SHALL cause the skill to load for questions about adopting
 - **THEN** the skill does not load
 
 ### Requirement: Behavior: Specification review happens on the published draft with a recorded approval
-The agent SHALL place the approval gate on the draft change request (combined) or on the specification change request (split), exercised on the complete approval package, SHALL apply the approval mode the contract records — discussion-closed (the default): the gate owner discusses on the request and closes the discussion in conversation, and the approval record is that closing plus the request's discussion state; recorded approval (optional, where the project names one): an object the platform keeps, such as a review approval or, where no review object exists, a fixed-wording comment, covering the package as of the last push before it, warranted when someone outside the conversation must be able to verify by themselves that a named person accepted a named version, not by how large the team is or how mature its pipeline — and SHALL warn that a platform review-approval state cannot be the record of this gate, because the implementation pushes that follow it dismiss it wherever stale approvals are dismissed.
+The agent SHALL place the approval gate on the draft change request (combined) or on the specification change request (split), exercised on the complete approval package, SHALL apply the approval mode the contract records — conversational (the default): the gate owner discusses on the request and closes the deliberation in conversation, and what stands as the approval is that closing plus the request's discussion state; recorded approval (optional, where the project names one): an object the platform keeps, such as a review approval or, where no review object exists, a fixed-wording comment, covering the package as of the last push before it, warranted when someone outside the conversation must be able to verify by themselves that a named person accepted a named version, not by how large the team is or how mature its pipeline — and SHALL warn that a platform review-approval state cannot be the record of this gate, because the implementation pushes that follow it dismiss it wherever stale approvals are dismissed.
 
 #### Scenario: Where the spec is reviewed
 - **WHEN** a user on the combined shape asks where the team reviews the specification
-- **THEN** the agent answers the draft change request, states that the review covers the complete package, states the contract's approval mode (or the discussion-closed default), and warns that platform review approvals do not survive the implementation pushes
+- **THEN** the agent answers the draft change request, states that the review covers the complete package, states the contract's approval mode (or the conversational default), and warns that a platform review approval taken at this gate does not survive the implementation pushes
 
 #### Scenario: Push to the record after a blocking approval
 - **WHEN** the contract records the recorded-approval mode, the approval exists, and the author then pushes a change to the package that the gate owner did not decide in conversation
@@ -176,7 +176,7 @@ The agent SHALL take the level, tool and its framework skill, change request sha
 - **THEN** the agent says the draft carries the complete package and that it stops until the discussion is closed (the default), names the harness builder for changing that, and asks no questioning round
 
 ### Requirement: Handoff: the harness builder for spec workflows
-The agent SHALL route setting up or improving a project's specification rules to the spec workflow builder of the harness catalog through the installing skill, which installs that catalog whole; when the user declines or lacks it, the agent SHALL record the defaults it applies (combined shape, discussion-closed approval on the complete package, in-request archiving by hand, product-only domains with spec-less repository changes, a request body that carries no implementation until ready) in the project's knowledge base and list the harness build as remaining work, without editing templates, forms, checks, automation, or a project skill.
+The agent SHALL route setting up or improving a project's specification rules to the spec workflow builder of the harness catalog through the installing skill, which installs that catalog whole; when the user declines or lacks it, the agent SHALL record the defaults it applies (combined shape, both gates closed in conversation on the complete package, in-request archiving by a person once the implementation deliberation closes, product-only domains with spec-less repository changes, a request body that carries no implementation until ready) in the project's knowledge base and list the harness build as remaining work, without editing templates, forms, checks, automation, or a project skill.
 
 #### Scenario: Handoff offered
 - **WHEN** the user asks to set up or improve the project's spec-driven rules
