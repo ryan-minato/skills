@@ -26,7 +26,7 @@
 - [x] 3.9 Script harness for `spec_kit_features.py` — closes SKW Script: Help, Representative run, Repeated run, Bad arguments, Missing plan
 - [x] 3.10 Workflow read-through (YAML parse, pinned SHAs, top-level permissions, no push on the fork branch); record skipped cases and their reasons for the pull request's Validation section
 
-## 4. Zero-trust read path (review amendment)
+## 4. The privileged read path
 
 - [x] 4.1 `spec_changes.py`: a head-source abstraction (git plumbing or `--snapshot`), a `snapshot` subcommand over the GitHub REST API with file, per-file, and total byte caps, `archive` restricted to the git source; verify `just lint`, `--help`, the error matrix, and parity of `status`, `show`, `labels` between the two sources on a live pull request
 - [x] 4.2 `spec_kit_features.py`: the same abstraction, subcommand, and caps; verify `just lint`, `--help`, and source parity in a fixture
@@ -34,14 +34,14 @@
 - [x] 4.4 `spec-kit-workflow` assets: the same for the labels and command workflows; verify YAML parse and the grep
 - [x] 4.5 Both skills' `SKILL.md` and `references/github.md` state the rule (no object authored by the request reaches a privileged runner), the snapshot, the literal same-repository guard, and the caps; the verification lists gain the grep and the parity check; verify `just check-skill` on both
 
-## 5. Review findings (code review of this request)
+## 5. Script, workflow, and guidance corrections
 
 - [x] 5.1 Scripts: a partial read of any kind fails the snapshot (cap, truncated tree, undecodable document); a snapshot built for another changes or specs directory is refused; `show` tells a document that was never written from one the source does not hold; the clean-tree guard before archiving covers every path the tool writes; an unchecked box with no text is an open task; a request touching exactly the file cap is inside it — verify `just lint`, the error matrix, source parity on a live request, and a fixture whose task list ends in a bare checkbox
 - [x] 5.2 Workflows: the comment job grants `pull-requests: read` for the reads it makes; the fork instructions fetch from `upstream` because a fork clone's `origin` is the fork — verify YAML parse, job names and permissions, and a rendering of the fork comment
 - [x] 5.3 Guidance: both GitLab references refuse the parent-project pipeline as a fork workaround; the archiving bullet says a GitLab label change starts no pipeline; the by-hand command takes the request's target branch; the catalog README pair, the deposited draft rule, the entrypoint pointer, the clarify fallback, and the catalog's adding-a-framework rule match what the skills do — verify `just check-skill` on the four skills and a read of each corrected passage
 - [x] 5.4 Delta specs extended to cover the above and a `meta/meta-agent-authority` delta added for the archive executor it now reads — verify `just spec-validate`
 
-## 6. Direction change: the archive is the lock point
+## 6. The archive point and the removed bot
 
 - [ ] 6.1 Remove the archive bot from both framework skills: the GitHub archive workflow asset, the `spec:archive` job and `SPEC_ARCHIVE_TOKEN` from the GitLab fragment, the trigger label from both label files, and every passage in `SKILL.md` and the two platform references that describes the bot — verify `grep -rn 'spec/archive\|spec-archive\|SPEC_ARCHIVE_TOKEN'` over `skills/` is empty and `just check-skill` passes
 - [ ] 6.2 Move the archive after the implementation discussion in the methodology skill, `references/tracked-work.md`, both framework skills, and the builder's questioning round, contract asset, and both `project-skill-steps.md`; state that approval follows the freeze and that only specification-consistency changes are expected after it — verify a read-through of each passage and `just check-skill`
@@ -51,7 +51,7 @@
 - [ ] 6.6 Move every behavioral and security claim next to the step or function it constrains, in the five workflow assets, the GitLab fragments, and both scripts; headers keep orientation and placeholder instructions only — verify a read-through pairing each claim with its step, and `just lint`
 - [ ] 6.7 Delta specs rewritten for the new archive point, the removed bot, the collaborator-only command, and the fork executor, across the five domains — verify `just spec-validate`
 
-## 7. Direction-change tests
+## 7. Tests for the archive point
 
 - [ ] 7.1 Outcome: an agent finishing an implementation publishes to a formal request, waits for the deliberation, and archives only after it closes; it refuses to archive a change with an open task
 - [ ] 7.2 Outcome: asked how a fork's change is archived, the agent names the maintainer as the executor and never offers an after-merge job
