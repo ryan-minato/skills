@@ -196,7 +196,9 @@ gate passed for the final body, remote writes authorized. Then:
    (`blob/<sha>/<path>#L10-L20` for a local change, the whole file or
    directory for a broad one), fill Validation with each scenario's result
    linking the plan in `design.md`, set `Phase: implementation`, replace
-   the approval line with the closing's date, and tick the checklist.
+   the approval line to say the implementation deliberation is open, and
+   tick the checklist — every item is about something true at ready, and
+   the freeze is enforced by `checks / spec`, never by a box.
 2. `gh pr ready <number>`. When the pull request was opened from another
    account, also `gh pr edit <number> --add-reviewer ryan-minato`; GitHub
    silently drops a review request for the author, so on a pull request

@@ -21,7 +21,7 @@ Approval: <the gate that is open and what closes it — conversational: "package
 ## CHECKLIST_ITEMS — between the acceptance item and the security item
 
 - [ ] <conversational: "The package deliberation was closed on this draft before the task list, and the implementation deliberation before the freeze" | recorded: "The gate owner's `<exact mark>` names the version each gate approved">, or this pull request carries the specification only
-- [ ] Every task of the change record is done and the record is archived in this pull request after the implementation deliberation closed, with no commit since, or the specification is updated
+- [ ] Every task of the change record is done and verified, or the specification is updated — the record is frozen after the implementation deliberation closes, and `<check job name>` stays red until it is
 
 Keep the word "secrets" out of these items: the checklist workflow keys the
 security item on it.
