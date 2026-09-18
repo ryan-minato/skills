@@ -184,7 +184,12 @@ recommendation:
    → combined; dependency or inherited propagation, a standards project, or
    any consumer that depends on a stable contract → split. Any project may
    take a single contract-level change through split as a recorded
-   deviation.
+   deviation. Record the answer where the framework skill's check can read
+   it: the shape decides whether any request may merge with an unfrozen
+   record, and under split exactly one may — the specification request,
+   which implements nothing. Under combined none may, so a request that
+   implemented nothing and still holds an unfrozen record is unfinished,
+   not exempt.
 6. **Archive executor and the freeze** — archiving (or converging)
    always happens inside the change request, and it is the freeze the
    second gate's approval applies to: the request is marked ready with

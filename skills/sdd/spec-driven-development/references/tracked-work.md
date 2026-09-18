@@ -64,7 +64,7 @@ the first gate.
 | Publish (loop step 3) | Commit the package; open a draft change request whose first content is the package; stop | Commit the package; open a specification change request carrying only the record; stop |
 | Approval | In the contract's mode, on the draft | The specification change request is approved and merged |
 | Tasks and implementation | On the same branch, after the approval | On one or more implementation change requests, each linking the merged record; re-validate the delta first — a domain spec another change archived since may have moved |
-| Ready | Marked ready with the record still open, for the deliberation on the finished implementation; frozen once that closes | The same, per implementation change request |
+| Ready | Marked ready with the record still open, for the deliberation on the finished implementation; frozen once that closes | The same, per implementation change request — the specification change request merges with the record unfrozen, and is the only request that may |
 | Merge | Closes the work item | The last implementation change request closes it |
 
 Under split, a record on the integration branch that is approved but has
@@ -141,6 +141,14 @@ project's specification check fails a ready request holding an
 unarchived record, so the request is red for the whole deliberation;
 that red is the merge block, and it is expected — never work around it,
 and never freeze early to clear it.
+
+Exactly one request is exempt, and only under the split shape: the
+specification change request, which carries the record and implements
+nothing. A project on the combined shape has no such request and no
+exemption — a request that implemented nothing and still holds an
+unfrozen record is simply unfinished, and the check says so. Tell the
+check which shape the contract records; do not let a request through by
+arguing that it did no work.
 
 When the gate owner closes this deliberation, reconcile it, then freeze:
 every task ticked and verified, the tool's archive command (spec-first)

@@ -39,7 +39,10 @@
           if [ "$EVENT" = "pull_request" ]; then
             flag=""
             [ "$DRAFT" = "true" ] && flag="--draft"
-            python3 scripts/spec_changes.py check --base "$BASE" --head "$HEAD" $flag
+            # `--shape` comes from the contract. Leave it at the combined
+            # default unless the project splits the specification into its
+            # own request; only that request may merge unimplemented.
+            python3 scripts/spec_changes.py check --base "$BASE" --head "$HEAD" $flag --shape combined
           else
             python3 scripts/spec_changes.py check --all
           fi

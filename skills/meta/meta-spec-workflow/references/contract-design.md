@@ -57,6 +57,15 @@ The request is marked ready *before* the freeze, so the specification
 check is red for the whole second deliberation. That red is the merge
 block, and it is expected; never freeze early to clear it.
 
+The shape decides one thing about that check, so record it where the
+framework skill can read it. Under **combined** no request merges with
+an unfrozen record. Under **split** exactly one does — the specification
+change request, which carries the record and implements nothing — so the
+check is configured to admit an unfrozen record with no completed task
+and to fail as soon as one is completed. A combined project gets no such
+exception: a request that implemented nothing and still holds an
+unfrozen record is unfinished, not exempt.
+
 ## Approval modes
 
 | | Conversational (default) | Recorded approval |
