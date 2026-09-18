@@ -67,7 +67,7 @@ SYNC_LABELS = ROOT / "scripts" / "sync_labels.py"
 SYNC_LABELS_ORIGIN = ROOT / "skills" / "meta" / "meta-github-workflow" / "scripts" / "sync_labels.py"
 SPEC_CHANGES = ROOT / "scripts" / "spec_changes.py"
 SPEC_CHANGES_ORIGIN = ROOT / "skills" / "sdd" / "openspec-workflow" / "scripts" / "spec_changes.py"
-SPEC_ARCHIVE_WORKFLOW = WORKFLOWS / "spec-archive.yml"
+SPEC_LABELS_WORKFLOW = WORKFLOWS / "spec-labels.yml"
 
 MANAGED_PREFIXES = ("priority/", "catalog/")
 NEEDS_TRIAGE = "status/needs-triage"
@@ -185,6 +185,10 @@ def check_labels() -> None:
         applier = item.get("applied_by")
         if applier not in APPLIERS:
             error(f'{rel(LABELS)}: label {name!r} needs "applied_by" set to one of {sorted(APPLIERS)}.')
+        # Only the spec status axes are applied by a workflow; anywhere else the
+        # value would claim an automation this repository does not run.
+        if applier == "workflow" and not name.startswith("spec/"):
+            error(f'{rel(LABELS)}: label {name!r} may not claim "applied_by": "workflow" outside the spec/ prefix.')
         labels[name] = applier
 
     form_labels: set[str] = set()
@@ -319,24 +323,36 @@ def check_spec_labels() -> None:
     if result.returncode != 0:
         fail(f"`{rel(SPEC_CHANGES)} labels --taxonomy` failed: {result.stderr.strip()}")
     taxonomy = json.loads(result.stdout)
-    trigger, managed = taxonomy["trigger"], set(taxonomy["managed"])
+    managed = set(taxonomy["managed"])
     labels = {item["name"]: item.get("applied_by") for item in json.loads(read(LABELS))}
-    for name in sorted(managed | {trigger}):
+    for name in sorted(managed):
         if name not in labels:
             error(f"{rel(LABELS)} lacks {name!r}, which {rel(SPEC_CHANGES)} declares; add the row.")
     for name, applier in labels.items():
         if not name.startswith("spec/"):
             continue
-        if name not in managed | {trigger}:
+        if name not in managed:
             error(
                 f"{rel(LABELS)}: {name!r} is not a label {rel(SPEC_CHANGES)} declares; remove it or teach the script."
             )
-        elif name == trigger and applier != "human":
-            error(f"{rel(LABELS)}: the trigger label {name!r} must say applied_by human.")
-        elif name in managed and applier != "workflow":
+        elif applier != "workflow":
             error(f"{rel(LABELS)}: the managed label {name!r} must say applied_by workflow.")
-    if f"'{trigger}'" not in read(SPEC_ARCHIVE_WORKFLOW):
-        error(f"{rel(SPEC_ARCHIVE_WORKFLOW)} does not key on the trigger label {trigger!r} the script declares.")
+    # The labels workflow applies nothing the script did not plan, so its own
+    # literal allow-list has to be the same set the script declares; a label
+    # added to one and not the other would be applied blindly or dropped.
+    allowed = set(re.findall(r"spec/[a-z-]+", labels_case_line(read(SPEC_LABELS_WORKFLOW))))
+    if allowed != managed:
+        error(
+            f"{rel(SPEC_LABELS_WORKFLOW)} admits {sorted(allowed)}, "
+            f"{rel(SPEC_CHANGES)} declares {sorted(managed)}; make the two lists the same."
+        )
+
+
+def labels_case_line(text: str) -> str:
+    match = re.search(r"^\s*(spec/[a-z-]+(?:\|spec/[a-z-]+)*\)).*$", text, re.MULTILINE)
+    if not match:
+        fail(f"{rel(SPEC_LABELS_WORKFLOW)} has no literal `case` list of the labels it may apply.")
+    return match.group(1)
 
 
 def check_checks_doc() -> None:
@@ -373,7 +389,7 @@ def check_openspec() -> None:
             )
     if not OPENSPEC_TARGET.exists() or read(OPENSPEC_TARGET).strip() != OPENSPEC_TARGET_VALUE:
         error(f"{rel(OPENSPEC_TARGET)} must contain {OPENSPEC_TARGET_VALUE!r} (the shared .agents/skills target).")
-    for path in (CHECKS_WORKFLOW, SPEC_ARCHIVE_WORKFLOW, DEVCONTAINER):
+    for path in (CHECKS_WORKFLOW, DEVCONTAINER):
         if "@fission-ai/openspec@" in read(path):
             error(
                 f"{rel(path)} hard-codes the OpenSpec version; "

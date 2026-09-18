@@ -61,7 +61,7 @@ _Reserved: filled in when the pull request is marked ready, naming each scenario
 - [ ] `just check` passes locally
 - [ ] The change record's discussion was closed on this draft by the maintainer and reconciled before implementation, or `Spec: none` is justified
 - [ ] The scenarios of the linked change, or the acceptance criteria of the linked issue, are met and recorded above
-- [ ] Every task of the linked change is done and it is archived in this pull request (by hand, or by the `spec/archive` label) with `checks / spec` green, or `Spec: none` is justified
+- [ ] Every task of the linked change is done and it is archived in this pull request with `checks / spec` green, or `Spec: none` is justified
 - [ ] No secrets, credentials, or personal data in the diff, description, or commits
 - [ ] Documentation and paired `README.zh.md` translations are updated where required
 - [ ] Catalog READMEs and `marketplace.json` are synchronized where a public skill changed

@@ -2,30 +2,23 @@
 # from the project's `.gitlab-ci.yml` (`include: - local: ...`) or paste the
 # jobs in; add the `spec` stage or rename the stage below. Replace every
 # {{PLACEHOLDER}}: the image or the install command for the pinned OpenSpec
-# CLI, the label name if the project renames it. `scripts/spec_changes.py`
-# is the project's copy of this skill's script.
+# CLI. `scripts/spec_changes.py` is the project's copy of this skill's
+# script. No job here writes to the repository: archiving is the
+# implementer's command, run once the deliberation closes.
 #
 # What GitLab does not offer, stated plainly: no pipeline source exists for
 # a merge request note or a label change, so a label takes effect on the
 # next pipeline (a push, the "Run pipeline" button, or the `/run_pipeline`
 # quick action on GitLab 18.7 and later); manual jobs read no chat
 # arguments, so `spec:show` and `spec:status` take theirs from the manual
-# job's variables form; a push to the source branch needs a project access
-# token (`write_repository` and `api` scopes) stored as a masked CI/CD
-# variable that must be UNPROTECTED because merge request pipelines run on
-# unprotected source branches — any job on any branch of the project can
-# read it, so scope it narrowly and rotate it; merge request pipelines from
-# a fork run in the fork without the parent's variables, so archiving,
-# labels, and notes work for a fork only when a parent-project member runs
-# the pipeline in the parent context. A token push starts the merge request
-# pipeline again, which re-runs `spec:check` and `spec:labels` on the archive
-# commit — no approval click, unlike GitHub.
+# job's variables form; merge request pipelines from a fork run in the fork
+# without the parent's variables, so labels and notes work for a fork only
+# when a parent-project member runs the pipeline in the parent context.
 
 variables:
   GIT_DEPTH: "0"
   OPENSPEC_NO_UPDATE_CHECK: "1"
   DO_NOT_TRACK: "1"
-  SPEC_ARCHIVE_LABEL: "spec/archive"
 
 .spec-base:
   image: "{{NODE_IMAGE}}"
@@ -95,49 +88,6 @@ spec:status:
         curl --fail --silent --header "PRIVATE-TOKEN: $SPEC_NOTE_TOKEN" --header "Content-Type: application/json" \
           --data @note.json "$SPEC_API/notes" > /dev/null
       fi
-
-# Runs automatically when the merge request carries the archive label at
-# pipeline time, otherwise manual. Same project: removes the label first
-# (so the pipeline the push starts does not archive again), archives every
-# complete related change, commits, and pushes to the source branch with
-# SPEC_ARCHIVE_TOKEN. Fork: fails with the local commands in the log (and a
-# note when SPEC_NOTE_TOKEN is set). A rejected push fails without retry.
-spec:archive:
-  extends: .spec-base
-  resource_group: spec-archive-$CI_MERGE_REQUEST_IID
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /(^|,)spec\/archive(,|$)/
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: manual
-      allow_failure: true
-  script:
-    - |
-      if [ "$SPEC_FORK" = "true" ]; then
-        {
-          printf 'This merge request comes from a fork, so the pipeline cannot push to it. Archive locally:\n\n'
-          printf '```bash\n%s\npython3 scripts/spec_changes.py archive --base origin/%s --head HEAD\n%s\ngit add openspec\ngit commit -m "%s"\ngit push\n```\n' \
-            "{{INSTALL_COMMAND}}" "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" "{{VALIDATE_COMMAND}}" "{{ARCHIVE_COMMIT_SUBJECT}}"
-        } | tee reply.md
-        if [ -n "$SPEC_NOTE_TOKEN" ]; then
-          jq -Rs '{body: .}' reply.md > note.json
-          curl --fail --silent --header "PRIVATE-TOKEN: $SPEC_NOTE_TOKEN" --header "Content-Type: application/json" \
-            --data @note.json "$SPEC_API/notes" > /dev/null
-        fi
-        exit 1
-      fi
-      test -n "$SPEC_ARCHIVE_TOKEN" || { echo "SPEC_ARCHIVE_TOKEN is not set: add a project access token (write_repository, api) as a masked, unprotected CI/CD variable."; exit 1; }
-      curl --fail --silent --request PUT --header "PRIVATE-TOKEN: $SPEC_ARCHIVE_TOKEN" \
-        --data-urlencode "remove_labels=$SPEC_ARCHIVE_LABEL" "$SPEC_API" > /dev/null || true
-      git fetch --no-tags origin "+refs/heads/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME:refs/remotes/origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
-      git checkout -q -B "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" "$CI_COMMIT_SHA"
-      python3 scripts/spec_changes.py archive --base "origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --head HEAD --json > plan.json
-      names=$(jq -r '.archived | join(", ")' plan.json)
-      if [ -z "$names" ]; then echo "nothing to archive"; exit 0; fi
-      git config user.name "{{BOT_NAME}}"
-      git config user.email "{{BOT_EMAIL}}"
-      git add openspec
-      git commit -q -m "$(jq -r '.archived | if length == 1 then "{{ARCHIVE_COMMIT_PREFIX}} archive the \(.[0]) change" else "{{ARCHIVE_COMMIT_PREFIX}} archive the \(.[:-1] | join(", ")) and \(.[-1]) changes" end' plan.json)"
-      git push "https://oauth2:${SPEC_ARCHIVE_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "HEAD:$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"
 
 # Keeps the two status-label axes; with SPEC_LABELS_TOKEN (api scope) it
 # applies them, otherwise it only prints the plan.

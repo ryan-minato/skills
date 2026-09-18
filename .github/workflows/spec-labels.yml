@@ -1,8 +1,7 @@
 # .github/workflows/spec-labels.yml — keeps two label axes on every pull
 # request from its related OpenSpec changes: `spec/archived` | `spec/unarchived`
 # and `spec/not-started` | `spec/in-progress` | `spec/done`. A pull request
-# with no related change carries none of them. The trigger label
-# `spec/archive` is never touched here.
+# with no related change carries none of them.
 #
 # `pull_request_target` runs with a writable token even for a fork, which a
 # plain `pull_request` run does not have. The rule that makes that safe: no
