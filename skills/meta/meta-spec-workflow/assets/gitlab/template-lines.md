@@ -21,7 +21,7 @@ Approval: <the gate that is open and what closes it — conversational: "package
 ## CHECKLIST_ITEMS — between the acceptance item and "The documented local checks pass."
 
 - [ ] <conversational: "The package deliberation was closed on this draft before the task list, and the implementation deliberation before the freeze" | recorded: "The gate owner's `<exact mark>` names the version each gate approved">, or this merge request carries the specification only.
-- [ ] Every task of the change record is done and the record is archived in this merge request after the implementation deliberation closed, with no commit since, or the specification is updated.
+- [ ] Every task of the change record is done and verified, or the specification is updated — the record is frozen after the implementation deliberation closes, and `<check job name>` stays red until it is.
 
 ## INTAKE_LINK_FIELD — task template, one section before `## Acceptance criteria`
 
