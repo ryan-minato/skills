@@ -39,7 +39,7 @@ skill directory moves catalogs and two are added. Binding constraints:
 | Requirement | File and section | Load trigger (references only) |
 |---|---|---|
 | SDD — Trigger: description | `sdd/spec-driven-development/SKILL.md` frontmatter | — |
-| SDD — The draft opens when the approval package is complete | `SKILL.md` `## The loop` steps 2–3; `references/tracked-work.md` `## Publishing and waiting` | "when a loop step meets the platform: publishing the draft, waiting for approval, reconciling, drafting the body, archiving before ready" |
+| SDD — The draft opens when the approval package is complete | `SKILL.md` `## The loop` steps 2–3; `references/tracked-work.md` `## Publishing and waiting` | "when a loop step meets the platform: publishing the draft, waiting for either gate, reconciling, drafting the body, marking the request ready, freezing the record" |
 | SDD — The approval gate examines the outcome and the approach bounds, never the tasks | `SKILL.md` `## The approval package`; `references/tracked-work.md` `## What the gate examines` | same |
 | SDD — The design bounds the approach and is part of the approval package | `SKILL.md` `## The approval package` (role, warranted rule, bounds, publication rule); gotchas | — |
 | SDD — The approval package is composed per the project's tool | `SKILL.md` `## The approval package` (one line per family) and `## Approach families` pointer to the framework skills | — |

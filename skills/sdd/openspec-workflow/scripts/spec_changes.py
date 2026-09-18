@@ -304,7 +304,16 @@ class Api:
             batch = self.get(f"repos/{self.repo}/pulls/{number}/files?per_page=100&page={page}")
             if not batch:
                 break
-            paths.extend(item["filename"] for item in batch if "filename" in item)
+            for item in batch:
+                if "filename" in item:
+                    paths.append(item["filename"])
+                # `git diff --no-renames` reports a rename as its old path plus
+                # its new one, so the git source sees both. The API reports it as
+                # one entry carrying `previous_filename`; keeping only `filename`
+                # would hide a record moved out of its directory from every
+                # privileged job while the unprivileged check still saw it.
+                if item.get("previous_filename"):
+                    paths.append(item["previous_filename"])
             if len(batch) < 100 or len(paths) > max_files:
                 break
             page += 1

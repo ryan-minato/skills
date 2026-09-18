@@ -60,8 +60,9 @@ and request automation.
   tracked work, fit a team that refuses tooling: the same discipline with
   a hand-run loop, the approval package being the specification with its
   approach section, the delta merged into the domain document by hand
-  inside the request before ready, and a required-headings lint as the
-  only validator. No framework skill exists for it.
+  inside the request once the deliberation on the finished implementation
+  closes — that write-back is the freeze, so it follows the deliberation
+  like any other — and a required-headings lint as the only validator. No framework skill exists for it.
 - **A custom layout** fits only a stated constraint none of the above
   meets, and costs every future agent the tool's validation and
   conventions.

@@ -82,8 +82,9 @@ open decisions, and the user has been told where it is.
 Pick one small, safe, user-visible change and take it through the entire
 loop before touching anything else: the specification with its scenarios,
 clarification, the design when warranted, the draft with the complete
-package, approval, tasks, implementation, verification, archive or
-converge before ready. The pilot exists to expose friction cheaply:
+package, approval, tasks, implementation, verification, ready for the
+deliberation on the finished implementation, then the archive or the
+convergence once that closes. The pilot exists to expose friction cheaply:
 
 - a scenario that cannot be executed reveals missing test infrastructure;
 - a requirement that contradicts the harness or the goal document reveals a

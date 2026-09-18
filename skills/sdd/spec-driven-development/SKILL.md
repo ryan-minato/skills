@@ -109,7 +109,8 @@ rules below until none of them is unanswered.
    this deliberation, reconcile it as step 4 reconciles the first one,
    then write the delivered behavior back into the source-of-truth spec
    (spec-anchored) or archive the change record (spec-first) inside the
-   request, through the tool's archive command, and validate. The freeze
+   request, through the tool's archive command — or, where the tool has
+   none, the lock its framework skill names — and validate. The freeze
    is what the approval applies to: after it, a change to the record is a
    new round, and a commit pushed after it spends the closing. Done when:
    the spec and the code describe the same system, the integration branch

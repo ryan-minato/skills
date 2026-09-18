@@ -12,7 +12,7 @@ GitLab project. The assets under `assets/gitlab/` are raw shapes: every
 | Jobs | `assets/gitlab/ci-spec-jobs.yml` | included from `.gitlab-ci.yml` (or pasted), stage `spec` | `spec:check`, `spec:show`, `spec:status`, `spec:labels` |
 | Labels | `assets/gitlab/labels-spec.json` | the project's label file, synced with its label tool | GitLab colors carry `#` |
 
-Placeholder: `{{PYTHON_IMAGE}}`. No archive job: Spec-Kit has no archive
+Placeholders: `{{PYTHON_IMAGE}}` and `{{REQUEST_SHAPE}}` (`combined` or `split`, from the contract). No archive job: Spec-Kit has no archive
 operation; `spec:check` enforces the ticked task list once the merge
 request is no longer a draft.
 

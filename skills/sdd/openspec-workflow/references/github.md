@@ -20,7 +20,9 @@ Placeholders: `{{PINNED_SHA}}` (the commit SHA of the current release of
 each action — read it from the action's releases page, and keep the
 `# vX.Y.Z` comment the project's other workflows use), `{{NODE_LTS}}` and
 `{{INSTALL_COMMAND}}` (the project's command that installs the pinned
-OpenSpec CLI, so the version pin stays in one place).
+OpenSpec CLI, so the version pin stays in one place), and
+`{{REQUEST_SHAPE}}` (`combined` or `split`, the shape the contract
+records — see the ready-state rules below).
 
 ## What the project's contract records
 

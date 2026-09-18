@@ -71,5 +71,14 @@ jobs:
           while IFS= read -r label; do
             [ -n "$label" ] || continue
             check "$label"
-            gh api -X DELETE "repos/$REPO/issues/$N/labels/$(jq -rn --arg l "$label" '$l | @uri')" > /dev/null || true
+            # A label already absent answers 404, which is not a failure here.
+            # Anything else — a permission regression, a rate limit — must fail
+            # the job: a silently skipped delete leaves a stale label saying the
+            # opposite of the truth, and nothing would prompt a retry.
+            if ! err=$(gh api -X DELETE "repos/$REPO/issues/$N/labels/$(jq -rn --arg l "$label" '$l | @uri')" 2>&1 >/dev/null); then
+              case "$err" in
+                *"HTTP 404"*) ;;
+                *) printf '%s\n' "$err" >&2; exit 1 ;;
+              esac
+            fi
           done < <(jq -r '.remove[]' "$RUNNER_TEMP/plan.json")

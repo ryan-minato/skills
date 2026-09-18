@@ -151,7 +151,8 @@ check which shape the contract records; do not let a request through by
 arguing that it did no work.
 
 When the gate owner closes this deliberation, reconcile it, then freeze:
-every task ticked and verified, the tool's archive command (spec-first)
+every task ticked and verified, the tool's archive command (spec-first) —
+or, where the tool has none, the lock its framework skill names —
 or the write-back into the source-of-truth spec (spec-anchored), the
 validator, a commit on the request's branch. The executor is a person
 who holds the branch — its author, or a maintainer who pulled a fork's

@@ -214,9 +214,9 @@ recommendation:
    option.
 7. **Default specification author** — the implementer, or a named planning
    role. Record who publishes the draft and who approves it (the approval
-   owner of question 3); the record of approval is the mode's closing or
-   comment, never the platform's review-approval state, which later pushes
-   dismiss.
+   owner of question 3); what stands as the approval is the mode question 3
+   settled — a closing in conversation, or the recorded mark the contract
+   names on the version being approved.
 8. **Specification scope** — recommend that domains cover the product the
    project delivers and that a change to the project's own harness,
    tooling, checks, workflows, or documents is a spec-less change carried
