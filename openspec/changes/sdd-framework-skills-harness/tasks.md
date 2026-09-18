@@ -21,8 +21,8 @@
 - [x] 4.1 Catalog scaffold proofs (validate, marketplace drift, symlink listing, README pair reads, spec-sync)
 - [x] 4.2 Automation proofs (files parse, pinned SHAs, no push and no head read in any `spec / *` workflow, `just spec-check` draft and ready verdicts, mirror diff, dry-run label list, the `spec/extra` negative case)
 - [x] 4.3 Contract and project skill proofs (a clean-context read states the draft's first content, when the request is marked ready, who archives and when, and what the archive freezes)
-- [ ] 4.4 This request runs the order it installs: ready for the deliberation with `checks / spec` red, archived once the maintainer closes it, green after
+- [x] 4.4 This request runs the order it installs: ready for the deliberation with `checks / spec` red, archived once the maintainer closes it, green after
 
 ## 5. Finish
 
-- [ ] 5.1 Run `just check`, write the results to the pull request's Validation section, and archive this change inside the pull request after the deliberation closes
+- [x] 5.1 Run `just check`, write the results to the pull request's Validation section, and archive this change inside the pull request after the deliberation closes
