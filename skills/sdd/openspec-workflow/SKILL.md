@@ -71,12 +71,13 @@ approval applies to a version that was frozen first.
 
 ## Ready, then the freeze
 
-The request is marked ready while its change is still open, and the
-deliberation on the finished implementation runs against that. The check
-fails a ready request holding an unarchived related change, so the
-request is red for the whole deliberation; that red is the merge block,
-and it is expected — never work around it, and never archive early to
-clear it.
+When the last task is done and verified, the next move is to **mark the
+request ready** — not to archive. Marking it ready is what opens the
+deliberation on the finished implementation, and the change stays open
+through it. The check fails a ready request holding an unarchived
+related change, so the request is red for that whole deliberation; that
+red is the merge block, and it is expected — never work around it, and
+never archive early to clear it.
 
 When the gate owner closes that deliberation, reconcile it, then archive
 inside the request, so the integration branch never holds an unarchived
