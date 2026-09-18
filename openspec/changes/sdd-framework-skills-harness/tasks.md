@@ -33,6 +33,13 @@
 
 - [x] 5.1 This repository's `spec-command.yml` grants `pull-requests: read` and `spec-archive.yml` posts fork instructions that fetch from `upstream`, both regenerated from the corrected assets; `scripts/spec_changes.py` mirror refreshed — verify YAML parse, `just validate`, and the mirror diff empty
 
-## 6. Finish
+## 6. Direction change: this repository follows
 
-- [x] 6.1 Run `just check`, write the results to the pull request's Validation section, archive this change inside the pull request by hand
+- [ ] 6.1 Delete `.github/workflows/spec-archive.yml` and the `spec/archive` row from `.github/labels.json`; rework `check_spec_labels()` and drop `SPEC_ARCHIVE_WORKFLOW` from `scripts/validate_harness.py`; drop the trigger label from `scripts/spec_changes.py` and its taxonomy output; remove the `spec / archive` row and the approval-click note from `.agents/knowledge/github-checks.md` — verify `just validate` and the mirror diff empty
+- [ ] 6.2 Move the archive after the deliberation in `.agents/knowledge/spec-workflow.md`, the `change-workflow` project skill, `AGENTS.md`, and the pull request template's checklist; state that the required check stays red until the freeze — verify a read-through and `python3 scripts/check_pr_policy.py`
+- [ ] 6.3 Regenerate `.github/workflows/spec-command.yml` and `spec-labels.yml` from the hardened assets, and refresh the `scripts/spec_changes.py` mirror — verify both parse, job names unchanged, and `diff` against the skill copy empty
+- [ ] 6.4 Run this request through the new order: ready for the deliberation with the check red, archive after the maintainer closes it, then green
+
+## 7. Finish
+
+- [x] 7.1 Run `just check`, write the results to the pull request's Validation section, archive this change inside the pull request by hand

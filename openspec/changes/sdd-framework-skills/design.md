@@ -232,6 +232,47 @@ skill directory moves catalogs and two are added. Binding constraints:
   this change is what replaced the archive mode with an executor, so the
   two land together.
 
+- **The archive is the lock point, not the finish line** (serves the loop
+  and both framework skills): archiving before the request was reviewed
+  merged the delta into the main specs at a moment when nobody had looked
+  at the implementation, so a review finding left only two bad options —
+  edit an archived record, which the rules forbid, or merge a known
+  divergence. Moving the archive after the deliberation makes it mean that
+  the specification and the implementation agree. Considered and rejected:
+  keeping the old order and forbidding post-review divergence by
+  convention, which is the same promise without the artifact that records
+  it.
+- **The deliberation runs on a red required check** (serves this
+  repository's gate): the check already fails a ready request that holds an
+  unarchived change, so the merge is blocked for exactly as long as the
+  freeze is missing. A second, dedicated required check would separate "the
+  records are wrong" from "not yet frozen" at the cost of a ruleset change
+  and a check that must live on the integration branch before it can be
+  required; the status label carries that distinction instead, which is
+  what the label axis is for.
+- **Only the archive bot is removed, not the privileged surface** (serves
+  the automation of both framework skills): a fork's `pull_request` run
+  gets a read-only token and no secrets, and the setting that would grant
+  write applies to private repositories only, so labelling and replying on
+  an external contributor's request cannot be done unprivileged. The skills
+  ship to repositories that live on external contributions, so the shape
+  follows the official labeler action — `pull_request_target`, no checkout
+  of the head, REST reads only. Rejected: moving the labels into the
+  unprivileged check job, which works on the maintainer's own branches and
+  fails silently on the contributions where the visibility matters most.
+- **The comment command is collaborator-only** (serves the same): the
+  earlier gate also admitted the request's author, so an external
+  contributor could start a privileged run on demand and, by repeating it,
+  exhaust the platform token's per-repository hourly budget and break the
+  other workflows with it. The command exists for the reviewer, so the
+  author clause bought nothing.
+- **Behavioral and security claims sit next to what they constrain**
+  (serves every asset): a claim collected in a file header cannot be
+  checked against an implementation further down, and this request already
+  shipped a header describing a mechanism the file had stopped using. The
+  header keeps orientation and the placeholder instructions; every claim
+  about what a step does, and why that is safe, moves onto the step.
+
 ## Risks / Trade-offs
 
 - [Behavioral tests across four skills are expensive] → one fixture
@@ -353,6 +394,24 @@ Skipped:
   its five arguments in order.
 - Guidance: `just check-skill` green on the four skills; each corrected
   passage read back against the behavior it describes.
+
+### Direction change
+
+- The loop: an outcome task confirms that the agent publishes the finished
+  implementation to a formal request, waits for the deliberation, archives
+  only after it closes, and refuses to archive a change with an open task;
+  a second confirms the fork rule names the maintainer as the executor.
+- The removal: `grep -rn 'spec/archive\|spec-archive'` over the skills,
+  the workflows, the labels file and the knowledge finds nothing outside
+  the archive directory; `labels --taxonomy` no longer reports a trigger
+  label and `just validate` agrees with the labels file.
+- The hardening: the comment workflow's condition names only the
+  collaborator associations; the platform token appears on steps, not on
+  the job; both assets and both repository copies parse and keep their job
+  names.
+- The comments: every workflow header is orientation and placeholders
+  only, and each behavioral or security claim is on the step it describes;
+  a read-through pairs each claim with its step.
 
 ## Open Questions
 
