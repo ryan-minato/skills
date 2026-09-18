@@ -132,17 +132,11 @@ the result, not the diff: for a skill, the behavioral tests in the
 `skill-authoring` project skill, planned in the change's `design.md` and
 derived from the scenarios; for a repository change, the proofs its
 `design.md` names. Tick each task only when its verification ran. Then
-run `just check`. Archive every change of this PR inside it before it is
-marked ready (`spec-workflow.md`, Archive executor): by hand with the
-archive skill (a skill change's delta lands in `openspec/specs/`; a
-repository change's record only moves under `openspec/changes/archive/`),
-then `just spec-validate` and a commit `docs: archive the <slug> change`;
-or, with the user's authorization for the remote write, apply the
-`spec/archive` label and wait for the bot's commit — after it pushes, the
-maintainer clicks **Approve workflows to run** on the PR, and you pull the
-branch. Never archive by hand while the bot is running. `just spec-check`
-reproduces the `checks / spec` verdict locally; `/spec status` on the PR
-shows the related changes' progress. Record what ran and the outcome for
+run `just check`. Do **not** archive yet: the record stays open through
+the deliberation that marking the PR ready opens (step 7), and
+`checks / spec` is red until then by design. `just spec-check` reproduces
+its verdict locally; `/spec status` on the PR shows the related changes'
+progress. Record what ran and the outcome for
 the PR's Validation section, linking the plan in `design.md` rather than
 restating it; that section and Changes stay reserved until ready (step 7).
 
@@ -185,16 +179,14 @@ specification; keep its body current as evidence changes, and switch
 `Phase:` to `implementation` once the discussion is closed and reconciled. Do not
 publish secrets, private data, or internal context on any surface.
 
-## 7. Review admission (H1)
+## 7. Review admission (H1), the second deliberation, and the freeze
 
 Mark the PR ready and request the maintainer's review yourself only when
-every condition in `agent-authority.md` holds: the change's discussion
+every condition in `agent-authority.md` holds: the package deliberation
 closed on the draft by the maintainer and reconciled with nothing open,
-every task done and every change of the PR archived inside it with
-`checks / spec` green (or `Spec: none` justified), `just check` green
-locally and every
-required check green (`.agents/knowledge/github-checks.md`; digest a red
-run with
+every task done, `just check` green locally and every required check
+green except `checks / spec`, which is red until the freeze
+(`.agents/knowledge/github-checks.md`; digest a red run with
 `python3 .agents/skills/change-workflow/scripts/run_log_digest.py --repo ryan-minato/skills --run-id <id>`
 rather than reading full logs), scenarios verified and recorded, publish
 gate passed for the final body, remote writes authorized. Then:
@@ -212,6 +204,16 @@ gate passed for the final body, remote writes authorized. Then:
 3. Hand over the acceptance-evidence report from `agent-authority.md`:
    goal, tests and check state, actual scope, risks, and the maintainer's
    decisions — request fixes, reject, or merge (rebase; squash for forks).
+4. Wait. Marking the PR ready opens the deliberation on the finished
+   implementation; the red `checks / spec` is what blocks the merge while
+   it runs. When the maintainer closes it in conversation, reconcile it
+   exactly as step 3 reconciles the first one, then freeze: the archive
+   skill (a skill change's delta lands in `openspec/specs/`; a repository
+   change's record only moves under `openspec/changes/archive/`), then
+   `just spec-validate` and a commit `docs: archive the <slug> change`,
+   through the publish gate. Update the approval line with the closing's
+   date and the freeze commit. `checks / spec` turns green; the
+   maintainer merges.
 
 If any condition fails, stop at the draft with the same report and name
 the failing condition. Never approve, merge, or arm auto-merge; merge
@@ -222,11 +224,14 @@ closes the issue through the closing keyword.
 - Authorization is task-scoped; a successful `gh auth status` is not
   permission to publish.
 - Never tick a task that is not done: a fully ticked task list is what
-  the archive (by hand or by the label bot) consumes, and the bot refuses
-  every change of the PR while any has an open task.
-- A push made by the archive bot leaves the PR's checks waiting for the
-  maintainer's **Approve workflows to run**; a blocked PR after a bot push
-  is waiting for that click, not failing.
+  the archive consumes, and `spec_changes.py archive` refuses every
+  change of the PR while any has an open task.
+- A red `checks / spec` on a ready PR is the expected state, not a
+  failure to chase: it says the record is not frozen yet. Freezing early
+  to clear it hands the maintainer an archived record to deliberate on.
+- Nothing revokes the maintainer's closing. A commit after the archive
+  commit spends it — compare the tip with that commit before pushing or
+  handing over, and say so.
 - The draft opens with the complete approval package — proposal, delta
   specs, and design — never at the proposal alone.
 - The draft exists to review the approval package: opening it after

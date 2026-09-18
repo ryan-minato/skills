@@ -27,12 +27,14 @@ Phase: specification
 | [proposal.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/proposal.md) | Why, what changes, skills touched, installed behavior, impact, non-goals |
 | [specs/<catalog>/<skill-name>/spec.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/specs/<catalog>/<skill-name>/spec.md) | Delta spec: requirements and scenarios (omit for a repository change) |
 | [design.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/design.md) | The approach's bounds — placement, decisions, risks — and the verification plan (omit only when the schema does not require one) |
-| tasks.md | Written after the discussion is closed |
+| tasks.md | Written after the package deliberation is closed |
 
-<!-- Keep the approval line while the discussion is open, then replace it
-with "Approval: discussion closed <date>, reconciled with nothing open"
-(or naming the confirmed open items). -->
-Approval: discussion open on this draft — the maintainer discusses the proposal, the delta specs, and the design here (the task list is not part of it), directs record changes in conversation, and closes the discussion in conversation; the agent then reconciles the review threads and the package before writing the task list.
+<!-- The approval line names the deliberation that is open. Replace it with
+"Approval: package deliberation closed <date>, reconciled with nothing open"
+(or naming the confirmed open items) when the first one closes, then with
+the implementation line below, then with "Approval: implementation
+deliberation closed <date>, frozen in <sha>". -->
+Approval: package deliberation open on this draft — the maintainer discusses the proposal, the delta specs, and the design here (the task list is not part of it), directs record changes in conversation, and closes the deliberation in conversation; the agent then reconciles the review threads and the package before writing the task list. Marking this pull request ready opens the second deliberation, on the finished implementation, and `checks / spec` stays red until the maintainer closes it and the record is archived.
 
 ## Related work
 
@@ -59,9 +61,9 @@ _Reserved: filled in when the pull request is marked ready, naming each scenario
 ## Checklist
 
 - [ ] `just check` passes locally
-- [ ] The change record's discussion was closed on this draft by the maintainer and reconciled before implementation, or `Spec: none` is justified
+- [ ] The maintainer closed the package deliberation on this draft and the agent reconciled it before implementation, or `Spec: none` is justified
 - [ ] The scenarios of the linked change, or the acceptance criteria of the linked issue, are met and recorded above
-- [ ] Every task of the linked change is done and it is archived in this pull request with `checks / spec` green, or `Spec: none` is justified
+- [ ] The maintainer closed the deliberation on the finished implementation, every task of the linked change is done, and it is archived in this pull request with no commit since and `checks / spec` green, or `Spec: none` is justified
 - [ ] No secrets, credentials, or personal data in the diff, description, or commits
 - [ ] Documentation and paired `README.zh.md` translations are updated where required
 - [ ] Catalog READMEs and `marketplace.json` are synchronized where a public skill changed
