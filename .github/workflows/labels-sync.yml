@@ -1,0 +1,58 @@
+# Applies .github/labels.json to the repository's labels with
+# scripts/sync_labels.py: creates missing labels and corrects drifted colors
+# and descriptions. It never deletes one — a label absent from the file is
+# reported as a warning, and pruning stays a manual, authorized step
+# (.agents/knowledge/github-settings.md). Runs only code already on main.
+name: labels-sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/labels.json"
+      - "scripts/sync_labels.py"
+      - ".github/workflows/labels-sync.yml"
+  # Weekly, to revert labels edited in the web interface.
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: labels-sync
+  # The script is idempotent, so a queued run finishes what an earlier one
+  # started; cancelling could leave a half-applied plan.
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: labels / sync
+    # A dispatch from another branch must not apply an unmerged taxonomy.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Apply labels.json
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: python3 scripts/sync_labels.py --file .github/labels.json --repo "$REPO" --apply > "$RUNNER_TEMP/plan.json"
+      - name: Report the plan and the prune candidates
+        run: |
+          set -euo pipefail
+          plan="$RUNNER_TEMP/plan.json"
+          cat "$plan"
+          {
+            echo "## Label sync"
+            echo
+            echo "| Created | Updated | Unchanged | Prune candidates |"
+            echo "|---|---|---|---|"
+            jq -r '"| \(.create | length) | \(.update | length) | \(.skip | length) | \(.prune_candidates | length) |"' "$plan"
+            jq -r '(.create + .update)[] | "- applied: `\(.name)`"' "$plan"
+            jq -r '.prune_candidates[] | "- not in labels.json: `\(.)`"' "$plan"
+          } >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.prune_candidates[] | "::warning title=Label not in labels.json::\(.) exists on GitHub but not in .github/labels.json; delete it only after listing the issues that carry it and with authorization."' "$plan"
