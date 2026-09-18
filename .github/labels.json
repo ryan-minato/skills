@@ -22,7 +22,6 @@
   {"name": "catalog/writing", "color": "1d76db", "description": "Touches the writing catalog", "applied_by": "triage"},
   {"name": "catalog/repository", "color": "5319e7", "description": "Touches the repository harness rather than a catalog", "applied_by": "triage"},
   {"name": "status/needs-triage", "color": "ededed", "description": "Awaiting type and priority", "applied_by": "form"},
-  {"name": "spec/archive", "color": "5319e7", "description": "Request: archive this pull request's completed OpenSpec changes (the bot removes the label)", "applied_by": "human"},
   {"name": "spec/unarchived", "color": "fbca04", "description": "A related OpenSpec change is not archived yet (set by the labels workflow)", "applied_by": "workflow"},
   {"name": "spec/archived", "color": "0e8a16", "description": "Every related OpenSpec change is archived (set by the labels workflow)", "applied_by": "workflow"},
   {"name": "spec/not-started", "color": "ededed", "description": "No task of the related OpenSpec changes is done (set by the labels workflow)", "applied_by": "workflow"},

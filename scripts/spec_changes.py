@@ -60,7 +60,6 @@ SKIP_SPECS = re.compile(r"^\s*skip_specs\s*:\s*true\s*$", re.MULTILINE)
 ARCHIVE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}-")
 DOCS = ("proposal", "design", "tasks", "specs")
 
-TRIGGER_LABEL = "spec/archive"
 ARCHIVED_LABELS = ("spec/unarchived", "spec/archived")
 PROGRESS_LABELS = ("spec/not-started", "spec/in-progress", "spec/done")
 MANAGED_LABELS = ARCHIVED_LABELS + PROGRESS_LABELS
@@ -731,7 +730,7 @@ def cmd_check(args, root, changes_dir) -> int:
             if c["state"] == "active":
                 message = (
                     f"unarchived change {c['name']}: {c['tasks']['open']} open task(s) — archive it in this "
-                    f"pull request (by hand, or with the {TRIGGER_LABEL} label) before it is marked ready."
+                    "pull request, once the deliberation on it closes, before it is marked ready."
                 )
                 if args.draft:
                     print(f"warning: {message}")
@@ -809,7 +808,7 @@ def desired_labels(changes: list[dict]) -> list[str]:
 
 def cmd_labels(args, root, changes_dir) -> int:
     if args.taxonomy:
-        print(json.dumps({"trigger": TRIGGER_LABEL, "managed": list(MANAGED_LABELS)}, indent=2))
+        print(json.dumps({"managed": list(MANAGED_LABELS)}, indent=2))
         return 0
     desired = desired_labels(related_changes(args.source, changes_dir))
     current = [label.strip() for label in (args.current or "").split(",") if label.strip()]
@@ -899,7 +898,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("labels", help="compute the archive-axis and progress-axis labels")
     reads(p)
     p.add_argument("--current", default="", help="comma-separated labels currently on the request")
-    p.add_argument("--taxonomy", action="store_true", help="print the trigger and managed label names")
+    p.add_argument("--taxonomy", action="store_true", help="print the managed label names")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=cmd_labels)
     return parser

@@ -3,15 +3,14 @@ name: openspec-workflow
 description: >-
   Runs OpenSpec changes through pull or merge requests — the approval
   package (proposal, delta specs, design when warranted; tasks after
-  approval), the spec-less marker, the validator's moments, archiving
-  inside the request by hand or by the `spec/archive` label bot, the
-  `/spec show` and `/spec status` comment commands, the archived and
-  progress status labels — and installs that automation on GitHub or
-  GitLab. Use when a project that runs OpenSpec asks how a change is
-  approved or archived before its PR or MR merges, what the `/spec`
-  commands or `spec/*` labels do, how to wire the OpenSpec check into CI,
-  or to add the comment commands, the archive label bot, or the status
-  labels to a repository. Not for the
+  approval), the spec-less marker, the validator's moments, the
+  implementer's archive command inside the request, the `/spec show` and
+  `/spec status` comment commands, the archived and progress status
+  labels — and installs that automation on GitHub or GitLab. Use when a
+  project that runs OpenSpec asks how a change is approved or archived
+  before its PR or MR merges, what the `/spec` commands or `spec/*` labels
+  do, how to wire the OpenSpec check into CI, or to add the comment
+  commands or the status labels to a repository. Not for the
   tool's own command that creates, applies, or archives one change, for
   choosing a spec tool or adopting the practice, or for a project on
   another framework.
@@ -72,33 +71,24 @@ precedes ready.
 
 ## Archiving before ready
 
-A change is archived inside its own request before the request is marked
-ready, so the integration branch never holds an unarchived change. The
-contract names the executor:
+A change is archived inside its own request, so the integration branch
+never holds an unarchived change. The executor is a person on the
+request's branch — every task ticked, then the archive command with its
+confirmation-skipping flag, plus its spec-skipping flag for a change
+marked spec-less, then the strict validator, then a commit.
+[`scripts/spec_changes.py`](scripts/spec_changes.py) does this for every
+related change at once and refuses all of them when any has an open task:
 
-- **By hand** (the default): every task ticked, then the archive command
-  with its confirmation-skipping flag, plus its spec-skipping flag for a
-  change marked spec-less; the strict validator; a commit on the request's
-  branch. [`scripts/spec_changes.py`](scripts/spec_changes.py) does this
-  for every related change at once and refuses all of them when any has an
-  open task:
+```bash
+# `<target>` is the branch the request merges into, not always `main`.
+python3 scripts/spec_changes.py archive --base origin/<target> --head HEAD
+```
 
-  ```bash
-  # `<target>` is the branch the request merges into, not always `main`.
-  python3 scripts/spec_changes.py archive --base origin/<target> --head HEAD
-  ```
-
-- **The label bot**: apply `spec/archive` to the request — an authorized
-  remote write — and wait. On a same-repository branch the bot archives,
-  commits, pushes, recomputes the status labels, removes the label, and
-  posts a summary; on GitHub its push leaves the checks in an
-  approval-required state that a user with write access starts with one
-  click, and the summary says so. On GitLab a label change starts no
-  pipeline, so apply the label **and start a pipeline** (the Run pipeline
-  button or the `/run_pipeline` quick action); until one runs, nothing
-  happens. Do not archive by hand in parallel.
-- **A fork**: the bot pushes nothing; it posts the commands. Run them,
-  validate, commit, push.
+No job archives. A platform token cannot push to a fork at all, and a job
+that could push to the branch would be the only one needing write access
+to the repository's contents; the command above is what it would have run.
+On a fork, the executor is whoever holds the branch: its author, or the
+maintainer after pulling it locally.
 
 Never tick a task whose verification did not run, never archive a change
 with an open task, and never edit an archived record: a defect review finds
@@ -138,9 +128,8 @@ One rule governs every job that runs with a writable token on someone
 else's request: **no object authored by the request reaches the runner.**
 Such a job checks out the base and reads the head through
 `spec_changes.py snapshot`, which pulls the file list and the documents
-from the platform's API and parses them. The one job that does need the
-head's working tree, the archive executor, checks it out only under a
-literal same-repository condition on the step. Reading the head with a
+from the platform's API and parses them. No installed job checks the head
+out, fetches it, installs from it, or runs it. Reading the head with a
 `git fetch` of its SHA works and is not exploitable on its own, but it
 leaves the request's objects one command away from being checked out by a
 later edit; the snapshot removes them from the runner instead.

@@ -13,50 +13,44 @@ placeholders).
 | Script | `scripts/spec_changes.py` | the project's `scripts/spec_changes.py` | byte-identical copy; the workflows call it by that path |
 | Check | `assets/github/job-spec-check.yml` | a job in the project's existing checks workflow | add `spec-check` to the aggregator gate's `needs:`; set `on.pull_request.types` to `[opened, synchronize, reopened, ready_for_review, converted_to_draft]` so the verdict follows the draft state; no new required check — the gate is already required |
 | Comment commands | `assets/github/workflow-spec-command.yml` | `.github/workflows/spec-command.yml` | job `spec / command` |
-| Archive bot | `assets/github/workflow-spec-archive.yml` | `.github/workflows/spec-archive.yml` | job `spec / archive` |
 | Status labels | `assets/github/workflow-spec-labels.yml` | `.github/workflows/spec-labels.yml` | job `spec / labels` |
 | Labels | `assets/github/labels-spec.json` | rows in the project's label file | keep the project's own extra fields (an `applied_by` register, say); sync to the remote with the project's label tool |
 
 Placeholders: `{{PINNED_SHA}}` (the commit SHA of the current release of
 each action — read it from the action's releases page, and keep the
-`# vX.Y.Z` comment the project's other workflows use), `{{NODE_LTS}}`,
+`# vX.Y.Z` comment the project's other workflows use), `{{NODE_LTS}}` and
 `{{INSTALL_COMMAND}}` (the project's command that installs the pinned
-OpenSpec CLI, so the version pin stays in one place),
-`{{VALIDATE_COMMAND}}` (the project's strict-validation command, quoted to
-the fork author), `{{ARCHIVE_COMMIT_PREFIX}}` and
-`{{ARCHIVE_COMMIT_SUBJECT}}` (per the project's commit convention, for
-example `docs:` and `docs: archive the <name> change`).
+OpenSpec CLI, so the version pin stays in one place).
 
 ## What the project's contract records
 
-The executor (`the spec/archive label`, with by-hand archiving still
-allowed), the job names, the label names, and the rule that the status
-labels are workflow-owned. The project's checks knowledge lists the three
-jobs with what a healthy run looks like, and the maintainer actions below.
+The archive executor — a person on the request's branch, never a job —
+the job names, the label names, and the rule that the status labels are
+workflow-owned. The project's checks knowledge lists the two jobs with
+what a healthy run looks like, and the maintainer actions below.
 
 ## Maintainer actions
 
-- Sync the six labels to the remote once (a dry run first, then apply).
-- After every bot push: click **Approve workflows to run** in the merge
-  box. The bot's summary comment asks for it each time.
-- Record the observed behavior of the first live run (the approval banner,
-  the label removal, the comment permission) in the checks knowledge.
+- Sync the five labels to the remote once (a dry run first, then apply).
+- Record the observed behavior of the first live run (the comment
+  permission, the applied labels) in the checks knowledge.
 
-## Bot identity
+## What the installed jobs may do
 
-The bot pushes and comments with the platform token (`GITHUB_TOKEN`) as
-`github-actions[bot]`. Consequences, verified against GitHub's
-documentation on 2026-09-17:
+Both privileged jobs read and comment with the platform token
+(`GITHUB_TOKEN`) as `github-actions[bot]`. Neither writes to the
+repository: `contents` stays at `read` everywhere, so nothing installed
+here can push, and archiving stays a person's command. Consequences,
+verified against GitHub's documentation on 2026-09-17:
 
-- A push made with the token puts the resulting `pull_request` runs
-  (`synchronize`) in an approval-required state; a user with write access
-  starts them. Runs left waiting for more than 30 days are deleted.
-- `labeled` events and `issue_comment` events the token causes create no
-  workflow run, so removing the trigger label and posting the summary
-  never recurse.
-- No secret is stored or rotated. An App or personal token would start the
-  runs automatically at the cost of a secret in every project and a user's
-  identity on the archive commit; it is not the default.
+- `issue_comment` events the token causes create no workflow run, so a
+  reply the job posts never re-invokes it.
+- No secret is stored or rotated. Nothing here needs one: an App or
+  personal token buys only the ability to push, which no job does.
+- A fork's own `pull_request` run gets a read-only token and no secrets,
+  and the setting that would grant it write access exists for private
+  repositories only — which is why labelling and replying on an external
+  contribution run under privileged triggers at all.
 
 ## Fork safety
 
@@ -76,19 +70,12 @@ out.
   plan it applies is checked against the literal label taxonomy in the
   workflow before any API call, so a tampered script cannot make it apply
   an arbitrary label.
-- `spec / archive` is the one job that needs the head's working tree,
-  because it runs the CLI over it. It checks the head out only under a
-  literal `github.event.pull_request.head.repo.full_name ==
-  github.repository` condition on the step — such a branch lives in the
-  base repository and its code already runs in the project's own CI. For a
-  fork it reads the snapshot, posts the commands, and pushes nothing.
-  Write the comparison in the `if:` itself rather than behind an `env`
-  variable: the guard is then visible at the step it guards, and code
-  scanning recognizes it. The CLI install and the CLI itself are
-  third-party code, so the token stays out of their reach: no checkout
-  persists credentials, the install runs before the head is checked out,
-  archiving runs in a step without the token, and only the push and API
-  steps receive it (the push through a one-shot header).
+- No installed job runs the CLI, installs anything, or needs the head's
+  working tree, so neither ever checks the head out. Should a later change
+  make one genuinely need it, guard the checkout with a literal
+  `github.event.pull_request.head.repo.full_name == github.repository` in
+  the step's own `if:` rather than behind an `env` variable: the guard is
+  then visible at the step it guards, and code scanning recognizes it.
 - The snapshot fetches only the documents the commands read and caps
   what one request can make a runner read: files touched, bytes per file,
   bytes in total, and API requests (the platform token's REST budget is
@@ -97,8 +84,9 @@ out.
 - Request-authored names, paths, and task text reach a bot comment only
   inside code spans, and the echoed command loses its backticks, so a
   comment cannot carry a link or a mention under the bot's name.
-- Invocation gates: labeling needs triage access; commands need a
-  collaborator or the author; the bot's own comments start nothing.
+- Invocation gates: the label job runs on the request's own events and
+  applies only what the taxonomy allows; the commands admit only a
+  collaborator association; the bot's own comments start nothing.
 
 ## Ready-state rules
 
@@ -110,19 +98,15 @@ directory), and the phase marker the project's template uses.
 ## Verification after installing
 
 - Every workflow parses; actions are pinned by commit; `permissions: {}`
-  at the top of each; the archive workflow's fork step contains no
-  `git push`; its checkouts set `persist-credentials: false`, and
-  `GH_TOKEN` appears only in the `env` of the fork, push, and summary
-  steps, never at the job level.
-- No privileged workflow fetches or checks out the head: `grep -n 'git .*fetch\|checkout'`
-  over the three files finds only the base checkouts and the
-  same-repository checkout guarded by the literal `head.repo.full_name`
-  condition.
+  at the top of each; no job grants `contents: write`; `GH_TOKEN` appears
+  only in the `env` of the steps that call the API, never at the job level.
+- No workflow pushes and none reaches the head:
+  `grep -n 'git push\|git .*fetch\|checkout'` over the files finds only
+  the base checkouts.
 - `python3 scripts/spec_changes.py --help` exits 0; `check --draft` on a
   branch with an unarchived change exits 0 with a warning, `check` exits 1.
 - `snapshot --repo <o/r> --pr <n>` on a real pull request exits 0, and
   `status --snapshot` on its output matches `status --base ... --head ...`
   run against a local clone.
-- A test pull request: `/spec status` gets a reply; applying
-  `spec/archive` on a complete change produces the commit, the summary, and
-  the removed label; the approval banner appears.
+- A test pull request: `/spec status` gets a reply, and the status labels
+  match the change's task list.

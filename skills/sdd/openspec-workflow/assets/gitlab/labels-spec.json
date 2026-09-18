@@ -1,5 +1,4 @@
 [
-  {"name": "spec/archive", "color": "#5319e7", "description": "Request: archive this merge request's completed OpenSpec changes (the archive job removes the label)"},
   {"name": "spec/unarchived", "color": "#fbca04", "description": "A related OpenSpec change is not archived yet (set by the labels job)"},
   {"name": "spec/archived", "color": "#0e8a16", "description": "Every related OpenSpec change is archived (set by the labels job)"},
   {"name": "spec/not-started", "color": "#ededed", "description": "No task of the related OpenSpec changes is done (set by the labels job)"},
