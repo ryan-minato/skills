@@ -301,7 +301,29 @@ skill directory moves catalogs and two are added. Binding constraints:
   changes that restore consistency with the specification" stays a norm
   with no mechanical backstop, since the only available check — refusing
   commits after the archive — would block the very consistency fixes it is
-  meant to allow.
+  meant to allow. What is recovered for free is detection: the archive
+  commit is in the history, so a commit after it means the freeze is
+  stale, and the agent says so before pushing or handing over rather than
+  letting a spent closing stand. That failure — pushing once more and
+  forgetting the freeze — is size-independent, which is why the
+  conversational mode needs the rule even in a one-person project.
+- **A recorded approval is recommended from who reads the record, not from
+  team size or pipeline maturity** (serves the builder's questioning
+  round): the property a recorded approval adds is non-repudiation — a
+  durable, attributable claim that a named person accepted a named
+  version — and it is worth its coordination cost exactly when someone
+  outside the conversation must verify that for themselves. Team size only
+  correlates: a two-person regulated project needs it more than a large
+  internal-tools team, and a pipeline's maturity says nothing about human
+  decisions, so a builder keying on either mis-advises both. The builder
+  also checks availability before recommending: a repository whose author
+  is its only reviewer has no review object to record, because the
+  platform refuses a self-approval. This is the record-shaped instance of a
+  more general way to choose a default, which belongs in the shared
+  harness methodology and is left to a change of its own — the rule has
+  one verified instance so far, and it should be tested against the other
+  builders' existing recommendations before every builder is asked to
+  follow it.
 
 ## Risks / Trade-offs
 
