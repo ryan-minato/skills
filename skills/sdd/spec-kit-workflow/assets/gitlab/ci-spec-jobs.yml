@@ -36,9 +36,9 @@ spec:check:
       if [ -n "$CI_MERGE_REQUEST_IID" ]; then
         flag=""
         case "$CI_MERGE_REQUEST_TITLE" in Draft:*|WIP:*) flag="--draft" ;; esac
-        # `--shape` comes from the contract; only the split shape's
-        # specification request may merge unimplemented.
-        python3 scripts/spec_kit_features.py check --base "$SPEC_BASE" --head "$SPEC_HEAD" $flag --shape combined
+        # {{REQUEST_SHAPE}} is `combined` or `split`, from the contract; only
+        # the split shape's specification request may merge unimplemented.
+        python3 scripts/spec_kit_features.py check --base "$SPEC_BASE" --head "$SPEC_HEAD" $flag --shape {{REQUEST_SHAPE}}
       else
         python3 scripts/spec_kit_features.py check --all
       fi

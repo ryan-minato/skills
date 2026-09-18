@@ -253,7 +253,16 @@ class Api:
             batch = self.get(f"repos/{self.repo}/pulls/{number}/files?per_page=100&page={page}")
             if not batch:
                 break
-            paths.extend(item["filename"] for item in batch if "filename" in item)
+            for item in batch:
+                if "filename" in item:
+                    paths.append(item["filename"])
+                # `git diff --no-renames` reports a rename as its old path plus
+                # its new one, so the git source sees both. The API reports it as
+                # one entry carrying `previous_filename`; keeping only `filename`
+                # would hide a record moved out of its directory from every
+                # privileged job while the unprivileged check still saw it.
+                if item.get("previous_filename"):
+                    paths.append(item["previous_filename"])
             if len(batch) < 100 or len(paths) > max_files:
                 break
             page += 1
@@ -594,11 +603,21 @@ def cmd_check(args, root, specs_dir) -> int:
                 continue
             for m in f["missing"]:
                 findings.append(f"feature {f['name']}: missing {m} — the specification and the plan form the package.")
-            if f["tasks"]["open"]:
-                message = (
-                    f"feature {f['name']}: {f['tasks']['open']} open task(s) — every task is ticked before the "
-                    "pull request is marked ready."
-                )
+            # "Finished" is every task ticked, so a feature with no ticked task
+            # is unfinished even when it has no open one: a missing tasks.md and
+            # a tasks.md with no checkbox both mean nothing was implemented, and
+            # the progress label already reads not-started for them.
+            if f["tasks"]["open"] or f["tasks"]["done"] == 0:
+                if f["tasks"]["open"]:
+                    message = (
+                        f"feature {f['name']}: {f['tasks']['open']} open task(s) — every task is ticked before the "
+                        "pull request is marked ready."
+                    )
+                else:
+                    message = (
+                        f"feature {f['name']}: no completed task — tasks.md is missing or carries no checkbox, so "
+                        "the request implemented nothing and is not finished."
+                    )
                 # The one request that may merge unfinished is the split shape's
                 # specification request: it carries the specification and the plan
                 # and no implementation, and the implementation requests that

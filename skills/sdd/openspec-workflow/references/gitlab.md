@@ -12,7 +12,7 @@ GitLab project. The assets under `assets/gitlab/` are raw shapes: every
 | Jobs | `assets/gitlab/ci-spec-jobs.yml` | included from `.gitlab-ci.yml` (or pasted), stage `spec` | `spec:check`, `spec:show`, `spec:status`, `spec:labels` |
 | Labels | `assets/gitlab/labels-spec.json` | the project's label file, synced with its label tool | GitLab colors carry `#`; on Premium the two axes may become scoped labels for built-in exclusivity |
 
-Placeholders: `{{NODE_IMAGE}}`, `{{INSTALL_COMMAND}}`.
+Placeholders: `{{NODE_IMAGE}}`, `{{INSTALL_COMMAND}}`, `{{REQUEST_SHAPE}}` (`combined` or `split`, from the contract).
 
 ## What GitLab offers, and does not
 

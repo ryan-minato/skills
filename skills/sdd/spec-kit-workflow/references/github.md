@@ -20,7 +20,7 @@ Nothing here writes to the repository. Spec-Kit has no archive
 operation, so completion is every task of every touched feature ticked,
 which the check enforces once the pull request is ready, and the lock
 the approval names is a declaration the implementer records on the
-request. Placeholder: `{{PINNED_SHA}}` (the commit SHA of
+request. Placeholders: `{{REQUEST_SHAPE}}` (`combined` or `split`, from the contract) and `{{PINNED_SHA}}` (the commit SHA of
 the current release of the checkout action, with the `# vX.Y.Z` comment
 the project's other workflows use).
 

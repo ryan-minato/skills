@@ -56,18 +56,24 @@ unchanged.
 State them in the knowledge section: a draft may hold the reserved lines
 and `Phase: specification`; removing the draft flag needs `Phase:
 implementation`, a `Spec:` line, no reserved line in Changes or
-Validation, every checklist item ticked, and the framework skill's check
-green. A pipeline job that checks the description against these rules is
+Validation, and every checklist item ticked. Do not require the
+framework skill's check to be green here: it is red from the moment
+the request is ready until the freeze commit lands, and that red is
+the merge block for the deliberation in between. Green is a
+condition of merging, never of becoming ready. A pipeline job that checks the description against these rules is
 a project asset, not this builder's.
 
 ## Automation identity
 
-When the framework skill installs an archive job, it pushes to the
-request's own source branch with a project access token the maintainer
-creates as a masked variable; the framework skill states what the token
-needs and what GitLab does not offer (no pipeline on a note or a label
-change). This builder records the token creation as a maintainer action
-and nothing else.
+The framework skill's jobs read and comment; none of them archives,
+commits, or pushes, so none needs a token with `write_repository`. Never
+record the creation of one as a maintainer action: a merge request
+pipeline runs on an unprotected source branch, so such a variable must be
+unprotected and any job on any branch of the project can read it. The
+optional note and label tokens carry `api` only, and without them the
+jobs print their plan and change nothing. The framework skill states what
+GitLab does not offer (no pipeline on a note or a label change); this
+builder records only the label creation and those optional variables.
 
 ## Platform-native option
 

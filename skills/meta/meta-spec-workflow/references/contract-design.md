@@ -118,11 +118,12 @@ design's bounds. It never covers the task list.
 |---|---|---|---|---|
 | 1 | Requirement appears (meeting, discussion, request) | The requester | A work item with the raw requirement, owner, priority; no acceptance criteria (an acceptance sketch is marked non-authoritative) | The item exists and links nothing yet |
 | 2 | Specification written and clarified, design written when warranted | The implementer by default, or a named planning role | The change record committed on a branch through the tool's commands; the draft (combined) or specification change request (split) published with the complete package, then the agent stops | No clarification marker remains; the validator passes; the package is complete and public |
-| 3 | Approval — the gate | The gate owner | The closing of the discussion or the fixed comment on the draft; or the merge of the specification change request | The approval is recorded and the reconciliation found nothing open |
+| 3 | The package gate | The gate owner | The closing of the deliberation in conversation, or the recorded mark the contract names on the package's last commit; or the merge of the specification change request | The gate closed and the reconciliation found nothing open |
 | 4 | Task list | The implementer | The change record | Every scenario has a task and every task names its scenarios |
 | 5 | Implementation | The implementer | Commits; a deviation updates the package and returns to step 3 | Every task closed or its deviation approved |
 | 6 | Verification | The implementer, then the reviewer or a reviewing agent | The change request's validation section names each scenario and its result and links the design's verification plan | Every scenario passed or recorded as a spec change |
-| 7 | Archive or converge, inside the request | The executor the contract names | The archive directory and the source-of-truth spec, committed on the request's branch | The spec and the code describe the same system; the request may be marked ready |
+| 6b | Ready, then the freeze gate | The author marks it ready; the gate owner closes it | The request's ready state; the specification check is red for the whole deliberation | The gate closed and the reconciliation found nothing open |
+| 7 | Archive or converge, inside the request | The executor the contract names | The archive directory and the source-of-truth spec, committed on the request's branch | The spec and the code describe the same system; the check turns green and the approval names that commit |
 | 8 | Merge | The integration decision owner | The closing keyword closes the work item | The item is closed by the merge, not by hand |
 
 ## The change request body
@@ -154,7 +155,7 @@ into the archive. A record with an open task is never archived.
 
 The **executor is a person who holds the request's branch** — the
 implementer, or a maintainer who pulled a fork's branch. Every task
-ticked, then the tool's archive command, the validator, and a commit.
+ticked, then the tool's archive command — or, where the tool has none, the lock the framework skill names — the validator, and a commit.
 The contract records that, and how a spent freeze is detected: a commit
 after the freeze commit means the approved version no longer exists.
 

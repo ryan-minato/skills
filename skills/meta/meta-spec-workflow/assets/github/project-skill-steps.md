@@ -62,7 +62,7 @@ Changes with permalinks to the commits (the exact lines for a local
 change, the whole file or directory for a broad one) and the reserved line
 of Validation with each scenario and its result, linking the plan; and
 confirm the spec-side step: every task of the change record is ticked,
-and the record is archived in this PR — with the tool's archive command —
+and the record is frozen in this PR — with the tool's archive command, or the lock the framework skill names where the tool has none —
 once the gate owner closes the deliberation on the finished
 implementation. Marking the PR ready is what opens that deliberation, so
 the `<check job name>` check the framework skill installed is red until

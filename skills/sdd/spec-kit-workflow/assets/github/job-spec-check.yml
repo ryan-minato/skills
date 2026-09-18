@@ -30,10 +30,11 @@
           if [ "$EVENT" = "pull_request" ]; then
             flag=""
             [ "$DRAFT" = "true" ] && flag="--draft"
-            # `--shape` comes from the contract. Leave it at the combined
-            # default unless the project splits the specification into its
-            # own request; only that request may merge unimplemented.
-            python3 scripts/spec_kit_features.py check --base "$BASE" --head "$HEAD" $flag --shape combined
+            # {{REQUEST_SHAPE}} is `combined` or `split`, from the contract.
+            # Only the split shape's specification request may merge
+            # unimplemented, so leaving this unresolved must fail the install's
+            # leftover-placeholder check rather than pick a default silently.
+            python3 scripts/spec_kit_features.py check --base "$BASE" --head "$HEAD" $flag --shape {{REQUEST_SHAPE}}
           else
             python3 scripts/spec_kit_features.py check --all
           fi

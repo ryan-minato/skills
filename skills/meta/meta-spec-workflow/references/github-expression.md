@@ -63,8 +63,11 @@ State them in the knowledge section and, when the project keeps a body
 check, give that check these rules: a draft may hold the reserved lines
 and `Phase: specification`; a ready pull request needs `Phase:
 implementation`, a `Spec:` line, no reserved line in Changes or
-Validation, every checklist item ticked, and the framework skill's check
-green. The base's checklist workflow enforces headings and the security
+Validation, and every checklist item ticked. Do not require the
+framework skill's check to be green here: it is red from the moment
+the request is ready until the freeze commit lands, and that red is
+the merge block for the deliberation in between. Green is a
+condition of merging, never of becoming ready. The base's checklist workflow enforces headings and the security
 item only; a body check that knows the phase is a project asset, not this
 builder's.
 
