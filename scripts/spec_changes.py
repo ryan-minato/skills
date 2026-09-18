@@ -733,7 +733,8 @@ def cmd_check(args, root, changes_dir) -> int:
             if c["state"] == "active":
                 message = (
                     f"unarchived change {c['name']}: {c['tasks']['open']} open task(s) — archive it in this "
-                    "pull request, once the deliberation on it closes, before it is marked ready."
+                    "pull request once the deliberation on the finished implementation closes; "
+                    "the request stays red until then."
                 )
                 if args.draft:
                     print(f"warning: {message}")
