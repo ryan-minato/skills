@@ -61,7 +61,7 @@ install from it, or a `run:` of its files.
 - Request-authored names, paths, and task text reach a bot comment only
   inside code spans, and the echoed command loses its backticks, so a
   comment cannot carry a link or a mention under the bot's name.
-- Commands need a collaborator or the author; the bot's own comments start
+- Commands admit only a collaborator association; the bot's own comments start
   no workflow run.
 
 ## Verification after installing

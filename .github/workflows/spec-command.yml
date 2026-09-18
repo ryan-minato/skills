@@ -5,8 +5,9 @@
 # from there; the pull request's head is read through the REST API, never
 # fetched into the runner's git store, checked out, installed, or executed —
 # which is what makes the job safe for pull requests from forks. Only a
-# collaborator (owner, member, collaborator) or the pull request's author may
-# invoke it. Replies are posted with the platform token, whose comments start
+# collaborator (owner, member, collaborator) may invoke it: the job spends a
+# privileged run and a slice of the repository's shared API budget, so an
+# outside contributor cannot start one on their own request. Replies are posted with the platform token, whose comments start
 # no workflow run, so the job cannot loop. `scripts/spec_changes.py` is the
 # project's copy of the openspec-workflow skill's script.
 name: spec-command
@@ -28,8 +29,7 @@ jobs:
       github.event.issue.pull_request
       && startsWith(github.event.comment.body, '/spec')
       && github.event.comment.user.type != 'Bot'
-      && (contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
-          || github.event.comment.user.login == github.event.issue.user.login)
+      && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,13 +37,14 @@ jobs:
       # pull-request read, and every permission left out of this block is none.
       pull-requests: read
       issues: write
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - id: pr
         name: Resolve the pull request and snapshot its head through the API
         env:
+          # The token reaches only the two steps that call the API, so a step
+          # added later starts without it and has to ask for it on purpose.
+          GH_TOKEN: ${{ github.token }}
           N: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
         run: |
@@ -56,6 +57,7 @@ jobs:
           python3 scripts/spec_changes.py snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
       - name: Run the command and reply
         env:
+          GH_TOKEN: ${{ github.token }}
           COMMENT_BODY: ${{ github.event.comment.body }}
           N: ${{ github.event.issue.number }}
           REPO: ${{ github.repository }}
