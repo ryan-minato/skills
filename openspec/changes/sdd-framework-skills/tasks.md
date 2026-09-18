@@ -36,4 +36,4 @@
 
 ## 6. Finish
 
-- [ ] 6.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, and archive both changes inside this pull request after the deliberation closes
+- [x] 6.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, and archive both changes inside this pull request after the deliberation closes
