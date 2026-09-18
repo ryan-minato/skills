@@ -9,31 +9,10 @@ exists at the head), ``archived`` (an archive directory for it exists at
 the head), or ``removed``.
 
 The head is read through one of two sources, never through a checkout:
-
-* ``--base``/``--head`` reads the two commits with git plumbing. Use it
-  where the head is already trusted or already present: a developer's
-  clone, or an unprivileged pull-request check that checks the head out
-  the ordinary way.
-* ``--snapshot FILE`` reads a document built by the ``snapshot`` command,
-  which pulls the head's file list and contents from the GitHub REST API.
-  Use it in every privileged workflow (``pull_request_target``,
-  ``issue_comment``, ``workflow_run``), so no object authored by the
-  request ever reaches the runner's git store. The snapshot's bytes are
-  parsed and never executed, change names are checked against a strict
-  pattern before they reach a URL, only the documents the commands read
-  are fetched, and the file, byte, and API-call caps below bound what one
-  request can make the workflow read. A snapshot that would be partial (a
-  cap reached, a truncated tree) fails instead of being reported on.
-  Request-authored names, paths, and task text reach the rendered
-  markdown only inside code spans, so they cannot add links or mentions.
-
-``check`` and ``archive`` are the exceptions: both act on the working
-tree, so both keep the git source. ``archive`` edits it through the
-OpenSpec CLI (``openspec archive <name> --yes``, plus ``--skip-specs``
-for a change whose ``.openspec.yaml`` sets ``skip_specs: true``; flags
-verified against OpenSpec 1.12.0 on 2026-09-17) and must only run where
-the head is already trusted. The CLI's own output goes to stderr, so
-``--json`` output on stdout stays machine-readable.
+``--base``/``--head`` with git plumbing (``GitSource``), or
+``--snapshot FILE`` built from the GitHub REST API (``SnapshotSource``).
+Each class says where it belongs. ``archive`` is the one command that
+writes, and it takes the git source only.
 
 Exit codes: 0 success; 1 a failure, a finding, or a refusal; 2 bad
 arguments, an unresolvable ref, or a tree that is not a git repository.
@@ -138,7 +117,12 @@ class Source:
 
 
 class GitSource(Source):
-    """Reads the two commits out of a local git object store."""
+    """Reads the two commits out of a local git object store.
+
+    Use it where the head is already trusted or already present: a
+    developer's clone, or an unprivileged pull-request check that checks
+    the head out the ordinary way.
+    """
 
     def __init__(self, root: Path, base: str, head: str) -> None:
         self.root = root
@@ -191,7 +175,13 @@ class GitSource(Source):
 
 
 class SnapshotSource(Source):
-    """Reads a snapshot document built from the GitHub REST API."""
+    """Reads a snapshot document built from the GitHub REST API.
+
+    Use it in every privileged workflow (``pull_request_target``,
+    ``issue_comment``, ``workflow_run``): the head's bytes arrive as data
+    to parse, so no object authored by the request ever reaches the
+    runner's git store, and nothing it carries is ever executed.
+    """
 
     def __init__(self, doc: dict, changes_dir: str | None = None) -> None:
         if doc.get("schema") != SNAPSHOT_SCHEMA:
@@ -246,7 +236,12 @@ class SnapshotSource(Source):
 
 
 class Api:
-    """The few REST reads the snapshot needs, over the standard library."""
+    """The few REST reads the snapshot needs, over the standard library.
+
+    A fork's head SHA resolves from the base repository, so nothing here
+    needs the fork. ``max_calls`` bounds what one request can spend of the
+    repository's shared REST budget.
+    """
 
     def __init__(self, repo: str, api_url: str, auth: str, max_calls: int = MAX_CALLS) -> None:
         if not SAFE_REPO.match(repo):
@@ -386,6 +381,14 @@ def is_change_doc(relative: str) -> bool:
 
 
 def build_snapshot(api: Api, number: int, changes_dir: str, caps: dict) -> dict:
+    """Read the request's related changes into a document the sources can replay.
+
+    Only the documents the commands read are fetched, change names are
+    checked against ``SAFE_NAME`` before they reach a URL, and a snapshot
+    that would be partial — a cap reached, a truncated tree — raises
+    instead of being reported on: a label or a status derived from half
+    the request is worse than no answer.
+    """
     pull = api.pull(number)
     base_sha = pull["base"]["sha"]
     head_sha = pull["head"]["sha"]
@@ -744,6 +747,16 @@ def cmd_check(args, root, changes_dir) -> int:
 
 
 def cmd_archive(args, root, changes_dir) -> int:
+    """Archive every complete related change, or none of them.
+
+    This is the one command that writes, through the OpenSpec CLI
+    (``openspec archive <name> --yes``, plus ``--skip-specs`` for a change
+    whose ``.openspec.yaml`` sets ``skip_specs: true``; flags verified
+    against OpenSpec 1.12.0 on 2026-09-17). It must only run where the
+    head is already trusted, which is why it refuses any source but git.
+    The CLI's own output goes to stderr, so ``--json`` on stdout stays
+    machine-readable.
+    """
     head_sha = resolve(root, args.head, "--head")
     if git(root, "rev-parse", "HEAD").strip() != head_sha:
         raise Usage("archive edits the working tree, so --head must be the checked-out HEAD; check it out first.")

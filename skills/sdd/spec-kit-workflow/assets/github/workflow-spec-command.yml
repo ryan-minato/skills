@@ -1,16 +1,9 @@
 # .github/workflows/spec-command.yml — answers `/spec` commands posted as
 # pull request comments: `/spec show [<feature>] [spec|plan|tasks|all]`,
-# `/spec status [<feature>]`, `/spec help`. An `issue_comment` run uses the
-# workflow file and the checkout of the DEFAULT branch, so every script comes
-# from there; the pull request's head is read through the REST API, never
-# fetched into the runner's git store, checked out, installed, or executed —
-# which is what makes the job safe for pull requests from forks. Only a
-# collaborator (owner, member, collaborator) may invoke it: the job spends a
-# privileged run and a slice of the repository's shared API budget, so an
-# outside contributor cannot start one on their own request. Replies are posted with the platform token, whose comments start
-# no workflow run, so the job cannot loop. Replace {{PINNED_SHA}} with the
-# checkout action's pinned commit; `scripts/spec_kit_features.py` is the
-# project's copy of this skill's script.
+# `/spec status [<feature>]`, `/spec help`.
+#
+# Replace {{PINNED_SHA}} with the checkout action's pinned commit;
+# `scripts/spec_kit_features.py` is the project's copy of this skill's script.
 name: spec-command
 
 on:
@@ -26,6 +19,10 @@ concurrency:
 jobs:
   command:
     name: spec / command
+    # Only a collaborator (owner, member, collaborator) may invoke it: the job
+    # spends a privileged run and a slice of the repository's shared API
+    # budget, so an outside contributor cannot start one on their own request.
+    # The bot exclusion is what keeps the reply below from answering itself.
     if: >-
       github.event.issue.pull_request
       && startsWith(github.event.comment.body, '/spec')
@@ -39,6 +36,9 @@ jobs:
       pull-requests: read
       issues: write
     steps:
+      # An `issue_comment` run takes its workflow file and its checkout from the
+      # DEFAULT branch, so every script below comes from there, never from the
+      # pull request.
       - uses: "actions/checkout@{{PINNED_SHA}}"
       - id: pr
         name: Resolve the pull request and snapshot its head through the API
@@ -55,6 +55,9 @@ jobs:
             echo "head=$(jq -r .headRefOid "$RUNNER_TEMP/pr.json")"
             echo "state=$(jq -r .state "$RUNNER_TEMP/pr.json")"
           } >> "$GITHUB_OUTPUT"
+          # The head is read through the REST API and parsed: never fetched
+          # into the runner's git store, checked out, installed, or executed.
+          # That is what makes this job safe on a pull request from a fork.
           python3 scripts/spec_kit_features.py snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
       - name: Run the command and reply
         env:
@@ -65,6 +68,8 @@ jobs:
           HEAD: ${{ steps.pr.outputs.head }}
           STATE: ${{ steps.pr.outputs.state }}
         run: |
+          # The comment reaches the shell only through `env`, and `set -f` stops
+          # its words from being expanded as globs when `set --` splits them.
           set -f
           line=$(printf '%s\n' "$COMMENT_BODY" | grep -m1 -E '^/spec( |$)' || true)
           set -- $line
@@ -94,4 +99,7 @@ jobs:
                 ;;
             esac
           } > "$RUNNER_TEMP/reply.md" 2>&1 || true
+          # `--body-file` keeps the reply out of the argument list, and a comment
+          # posted with the platform token starts no workflow run, so the job
+          # cannot answer itself.
           gh pr comment "$N" --repo "$REPO" --body-file "$RUNNER_TEMP/reply.md"

@@ -11,26 +11,10 @@ branch. The kit ships no validator and no archive operation: completion is
 every task ticked.
 
 The head is read through one of two sources, never through a checkout:
-
-* ``--base``/``--head`` reads the two commits with git plumbing. Use it
-  where the head is already trusted or already present: a developer's
-  clone, or an unprivileged pull-request check that checks the head out
-  the ordinary way.
-* ``--snapshot FILE`` reads a document built by the ``snapshot`` command,
-  which pulls the head's file list and contents from the GitHub REST API.
-  Use it in every privileged workflow (``pull_request_target``,
-  ``issue_comment``, ``workflow_run``), so no object authored by the
-  request ever reaches the runner's git store. The snapshot's bytes are
-  parsed and never executed, feature names are checked against the
-  numbered-directory pattern before they reach a URL, only the documents
-  the commands read are fetched, and the file, byte, and API-call caps
-  below bound what one request can make the workflow read. A snapshot
-  that would be partial (a cap reached, a truncated tree) fails instead of
-  being reported on. Request-authored paths and task text reach the
-  rendered markdown only inside code spans, so they cannot add links or
-  mentions.
-
-``check --all`` is the exception: it reads the working tree.
+``--base``/``--head`` with git plumbing (``GitSource``), or
+``--snapshot FILE`` built from the GitHub REST API (``SnapshotSource``).
+Each class says where it belongs. ``check --all`` is the one command that
+reads the working tree instead. No command writes.
 
 Exit codes: 0 success; 1 a finding or a failure; 2 bad arguments, an
 unresolvable ref, or a tree that is not a git repository.
@@ -119,7 +103,12 @@ class Source:
 
 
 class GitSource(Source):
-    """Reads the two commits out of a local git object store."""
+    """Reads the two commits out of a local git object store.
+
+    Use it where the head is already trusted or already present: a
+    developer's clone, or an unprivileged pull-request check that checks
+    the head out the ordinary way.
+    """
 
     def __init__(self, root: Path, base: str, head: str) -> None:
         self.root = root
@@ -153,7 +142,13 @@ class GitSource(Source):
 
 
 class SnapshotSource(Source):
-    """Reads a snapshot document built from the GitHub REST API."""
+    """Reads a snapshot document built from the GitHub REST API.
+
+    Use it in every privileged workflow (``pull_request_target``,
+    ``issue_comment``, ``workflow_run``): the head's bytes arrive as data
+    to parse, so no object authored by the request ever reaches the
+    runner's git store, and nothing it carries is ever executed.
+    """
 
     def __init__(self, doc: dict, specs_dir: str | None = None) -> None:
         if doc.get("schema") != SNAPSHOT_SCHEMA:
@@ -190,7 +185,12 @@ class SnapshotSource(Source):
 
 
 class Api:
-    """The few REST reads the snapshot needs, over the standard library."""
+    """The few REST reads the snapshot needs, over the standard library.
+
+    A fork's head SHA resolves from the base repository, so nothing here
+    needs the fork. ``max_calls`` bounds what one request can spend of the
+    repository's shared REST budget.
+    """
 
     def __init__(self, repo: str, api_url: str, auth: str, max_calls: int = MAX_CALLS) -> None:
         if not SAFE_REPO.match(repo):
@@ -299,6 +299,14 @@ def tree_sha_at(api: Api, commit: str, segments: list[str]) -> str | None:
 
 
 def build_snapshot(api: Api, number: int, specs_dir: str, caps: dict) -> dict:
+    """Read the request's touched features into a document the sources can replay.
+
+    Only the documents the commands read are fetched, feature names are
+    checked against the numbered-directory pattern before they reach a
+    URL, and a snapshot that would be partial — a cap reached, a truncated
+    tree — raises instead of being reported on: a label derived from half
+    the request is worse than no answer.
+    """
     pull = api.pull(number)
     base_sha = pull["base"]["sha"]
     head_sha = pull["head"]["sha"]

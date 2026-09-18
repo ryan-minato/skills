@@ -77,8 +77,10 @@ jobs:
       - if: steps.changed.outputs.run == 'true'
         name: Validate strictly and refuse an unarchived related change
         # A pull request: strict validation, then every related change that
-        # is still unarchived warns on a draft and fails when ready. A push
-        # to main: strict validation, then any change outside archive/ fails.
+        # is still unarchived warns on a draft and fails when ready — the
+        # request stays red through the deliberation, and the freeze is what
+        # turns it green. A push to main: strict validation, then any change
+        # outside archive/ fails.
         env:
           EVENT: ${{ github.event_name }}
           BASE: ${{ github.event.pull_request.base.sha }}

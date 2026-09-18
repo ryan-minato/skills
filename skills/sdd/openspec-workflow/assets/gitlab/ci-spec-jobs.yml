@@ -7,13 +7,12 @@
 # implementer's command, run once the deliberation closes.
 #
 # What GitLab does not offer, stated plainly: no pipeline source exists for
-# a merge request note or a label change, so a label takes effect on the
+# a merge request note or a label change, so nothing here runs until the
 # next pipeline (a push, the "Run pipeline" button, or the `/run_pipeline`
 # quick action on GitLab 18.7 and later); manual jobs read no chat
-# arguments, so `spec:show` and `spec:status` take theirs from the manual
-# job's variables form; merge request pipelines from a fork run in the fork
-# without the parent's variables, so labels and notes work for a fork only
-# when a parent-project member runs the pipeline in the parent context.
+# arguments. Merge request pipelines from a fork run in the fork without
+# the parent's variables, so labels and notes work for a fork only when a
+# parent-project member runs the pipeline in the parent context.
 
 variables:
   GIT_DEPTH: "0"
@@ -49,7 +48,9 @@ spec:check:
 
 # Manual: prints a change's documents (SPEC_CHANGE empty = every related
 # change; SPEC_DOC = proposal|design|tasks|specs|all) to the job log, and
-# posts them as a merge request note when SPEC_NOTE_TOKEN (api scope) is set.
+# posts them as a merge request note when SPEC_NOTE_TOKEN (api scope) is
+# set. A manual job reads no chat arguments, so these come from its
+# variables form.
 spec:show:
   extends: .spec-base
   rules:
@@ -90,7 +91,9 @@ spec:status:
       fi
 
 # Keeps the two status-label axes; with SPEC_LABELS_TOKEN (api scope) it
-# applies them, otherwise it only prints the plan.
+# applies them, otherwise it only prints the plan. A label it applies
+# appears only after the next pipeline, because no pipeline source exists
+# for a label change.
 spec:labels:
   extends: .spec-base
   rules:
