@@ -61,7 +61,11 @@ before):
 Spec-Kit has no archive operation. A request is ready when every task of
 every feature it touches is ticked, and a task is ticked only when its
 verification ran; the installed check fails a ready request otherwise and
-warns while it is a draft. When the project's level is spec-anchored, the
+warns while it is a draft. Under the split shape it passes one such
+request: the specification request, which carries the specification and
+the plan and implements nothing — `--shape split` allows a touched
+feature with no ticked task, and fails the moment one is ticked.
+Combined projects leave the flag at its default and get no exception. When the project's level is spec-anchored, the
 project's own rule says how the living specification is updated — nothing
 in the kit enforces it, so name the rule rather than assume it.
 

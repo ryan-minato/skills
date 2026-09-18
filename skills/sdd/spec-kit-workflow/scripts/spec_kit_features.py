@@ -599,8 +599,18 @@ def cmd_check(args, root, specs_dir) -> int:
                     f"feature {f['name']}: {f['tasks']['open']} open task(s) — every task is ticked before the "
                     "pull request is marked ready."
                 )
+                # The one request that may merge unfinished is the split shape's
+                # specification request: it carries the specification and the plan
+                # and no implementation, and the implementation requests that
+                # follow tick the tasks. A request that implemented something is
+                # not that request, whatever its shape.
                 if args.draft:
                     print(f"warning: {message}")
+                elif args.shape == "split" and f["tasks"]["done"] == 0:
+                    print(
+                        f"warning: feature {f['name']} has no implemented task; "
+                        "allowed for a specification request under the split shape."
+                    )
                 else:
                     findings.append(message)
     for finding in findings:
@@ -699,6 +709,16 @@ def build_parser() -> argparse.ArgumentParser:
     reads(p)
     p.add_argument("--all", action="store_true", help="check every feature's required files in the working tree")
     p.add_argument("--draft", action="store_true", help="report open tasks as warnings")
+    p.add_argument(
+        "--shape",
+        choices=("combined", "split"),
+        default="combined",
+        help=(
+            "the change request shape the project's contract records (default: combined). "
+            "Under split, a touched feature with no implemented task is allowed unfinished: "
+            "that is the specification request, which the implementation requests finish later."
+        ),
+    )
     p.set_defaults(func=cmd_check)
 
     p = sub.add_parser("labels", help="compute the progress label")

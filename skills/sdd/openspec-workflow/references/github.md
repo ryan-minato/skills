@@ -101,6 +101,15 @@ archive commit is what turns it green. That red is the merge block by
 design: nobody has to remember to hold the request, and nothing has to
 be configured to stop it.
 
+The job passes `--shape` from the contract. Under `combined` — the
+default, and what the asset ships — no request merges with an unarchived
+record. Under `split`, one does: the specification request, which carries
+the record and implements nothing. The flag admits exactly that request,
+by allowing an unarchived change with no ticked task, and fails as soon
+as a task is ticked; `check --all` likewise warns instead of failing on
+the integration branch, which under split legitimately holds approved
+records awaiting their implementation requests.
+
 ## Verification after installing
 
 - Every workflow parses; actions are pinned by commit; `permissions: {}`

@@ -737,11 +737,19 @@ def cmd_check(args, root, changes_dir) -> int:
     findings: list[str] = []
     if not args.no_validate:
         run_openspec(root, args.openspec, "validate", "--all", "--strict", "--no-interactive")
+    split = args.shape == "split"
     if args.all:
         live = root / changes_dir
         if live.is_dir():
             for entry in sorted(p for p in live.iterdir() if p.is_dir() and p.name != "archive"):
-                findings.append(f"unarchived change {entry.name}: the integration branch holds only archived changes.")
+                # Under the combined shape the integration branch never holds an
+                # unarchived change. Under split it holds every approved record
+                # whose implementation has not landed yet, by design.
+                message = f"unarchived change {entry.name}: the integration branch holds only archived changes."
+                if split:
+                    print(f"warning: unarchived change {entry.name} on the integration branch (expected under split).")
+                else:
+                    findings.append(message)
     else:
         for c in related_changes(args.source, changes_dir):
             if c["state"] == "active":
@@ -750,8 +758,18 @@ def cmd_check(args, root, changes_dir) -> int:
                     "pull request once the deliberation on the finished implementation closes; "
                     "the request stays red until then."
                 )
+                # The one request that may merge with an unarchived record is the
+                # split shape's specification request: it carries the record and
+                # no implementation, and the implementation requests that follow
+                # archive it. A request that implemented something is not that
+                # request, whatever its shape.
                 if args.draft:
                     print(f"warning: {message}")
+                elif split and c["tasks"]["done"] == 0:
+                    print(
+                        f"warning: unarchived change {c['name']} carries no implemented task; "
+                        "allowed for a specification request under the split shape."
+                    )
                 else:
                     findings.append(message)
             elif c["state"] == "archived" and c["tasks"]["open"]:
@@ -912,6 +930,16 @@ def build_parser() -> argparse.ArgumentParser:
     reads(p)
     p.add_argument("--all", action="store_true", help="fail on any change outside archive/ (integration branch)")
     p.add_argument("--draft", action="store_true", help="report unarchived related changes as warnings")
+    p.add_argument(
+        "--shape",
+        choices=("combined", "split"),
+        default="combined",
+        help=(
+            "the change request shape the project's contract records (default: combined). "
+            "Under split, a related change with no implemented task is allowed unarchived: "
+            "that is the specification request, which the implementation requests archive later."
+        ),
+    )
     p.add_argument("--no-validate", action="store_true", help="skip the OpenSpec validator")
     p.add_argument("--openspec", default="openspec", help="OpenSpec CLI executable (default: openspec)")
     p.set_defaults(func=cmd_check)

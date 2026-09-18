@@ -47,8 +47,9 @@ spec-sync:
     OPENSPEC_NO_UPDATE_CHECK=1 openspec update --force
 
 # Strict validation plus the unarchived-change rule for the changes this branch touches (what `checks / spec` runs on a pull request)
+# This repository is combined-shape: every pull request ends with its record archived, so no request may merge unarchived.
 spec-check BASE="origin/main" HEAD="HEAD" *ARGS:
-    python3 scripts/spec_changes.py check --base {{BASE}} --head {{HEAD}} {{ARGS}}
+    python3 scripts/spec_changes.py check --base {{BASE}} --head {{HEAD}} --shape combined {{ARGS}}
 
 # Related-change tooling for a pull request: related, status, show, check, archive, labels (see --help)
 spec-changes *ARGS:

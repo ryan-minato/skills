@@ -124,7 +124,11 @@ installed automation exposes them as:
   the related changes' task lists. Read them; never apply or remove them by
   hand. A request with no related change carries none. The check fails a
   ready request that still holds an unarchived related change and warns
-  while it is a draft.
+  while it is a draft. Under the split shape it passes one such request:
+  the specification request, which implements nothing — `--shape split`
+  allows an unarchived change whose task list has no ticked task, and
+  fails the moment one is ticked. Combined projects leave the flag at its
+  default and get no exception.
 
 On GitLab the same output comes from manual jobs and the labels take effect
 on the next pipeline; the platform reference says how.

@@ -152,7 +152,13 @@ bypass.
 
 The pull request is marked ready *before* the archive, so `checks / spec`
 is red for the whole second deliberation and the archive commit is what
-turns it green. That red is the merge block by design. Nothing revokes
+turns it green. That red is the merge block by design.
+
+This repository is **combined-shape**, so no pull request may merge with
+an unarchived change — not even one that implemented nothing. The
+`--shape combined` flag in the `spec-check` recipe says so explicitly;
+the exemption it withholds belongs to the split shape's specification
+request, which this repository does not use. Nothing revokes
 the maintainer's closing, so a commit after the archive commit means the
 approved version no longer exists: say so before pushing or handing over,
 and ask again.
