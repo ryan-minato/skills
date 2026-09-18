@@ -36,6 +36,10 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # No step uses git credentials; keep the token out of the git
+          # config so it reaches only the step that sets GH_TOKEN.
+          persist-credentials: false
       - name: Apply labels.json
         env:
           GH_TOKEN: ${{ github.token }}
