@@ -175,10 +175,11 @@ a proposal, design, and tasks only. A
 behavior change goes through `openspec/changes/<slug>/` on the branch of
 the same slug; its draft pull request opens once the approval package
 (proposal, delta specs, design) is written, its scenarios become the
-behavioral tests, and the change is archived inside the pull request —
-by hand or by the spec/archive label bot — so `main` never holds an
-unarchived change; `checks / spec` fails a ready pull request that still
-carries one. Specs exist only for domains a change has touched. The change
+behavioral tests, and the change is archived inside the pull request by
+the implementer, once the maintainer closes the deliberation on the
+finished implementation, so `main` never holds an unarchived change;
+`checks / spec` fails a ready pull request that still carries one, which
+is the expected state until that freeze. Specs exist only for domains a change has touched. The change
 artifacts follow the project schema in `openspec/schemas/skill-change/`
 (requirements named by kind — trigger, behavior, handoff, script — and a
 design that bounds the approach and carries the verification plan). The
@@ -186,7 +187,8 @@ OpenSpec CLI version is pinned in the `justfile`; `just spec-validate`
 runs its strict validator, `just spec-check` adds the unarchived-change
 rule, and `just spec-sync` regenerates the `openspec-*` skills. The
 request automation — the check, the slash-spec comment commands, the
-label bot, the spec status labels — is the `openspec-workflow` skill's,
+spec status labels, all of them read-only — is the `openspec-workflow`
+skill's,
 mirrored into `.github/workflows/` and `scripts/spec_changes.py`.
 
 ## GitHub Workflow

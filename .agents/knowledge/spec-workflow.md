@@ -87,17 +87,25 @@ link; it never restates the fact.
    data contracts, edge cases, security, acceptance — and the design's
    bounds; never `tasks.md`, which the author writes after the closing. A
    design that reads as an implementation procedure is rewritten as
-   bounds before the draft opens. A pull request review approval is not
-   the record: later pushes dismiss it. An agent never closes the
-   discussion on a change it wrote.
+   bounds before the draft opens. An agent never closes a deliberation on
+   a change it wrote.
 3. **Implemented** — the task list written after the closing, every task
    done, and every scenario passed: for a skill, the behavioral tests in
    the `skill-authoring` project skill, derived from the scenarios and
    planned in the change's `design.md`. The body's phase becomes
-   `implementation` once the record is archived; ready follows.
-4. **Archived** — inside the pull request before it is marked ready, by
-   the executor below; `main` never holds an unarchived change, and the
-   `checks / spec` job fails a ready pull request that still carries one.
+   `implementation`, and the pull request is marked ready — which is what
+   opens the second deliberation, on the finished implementation. The
+   record is still open at this point, so `checks / spec` is red; that
+   red is the merge block and stays until the freeze.
+4. **Archived** — once the maintainer closes that second deliberation and
+   the agent has reconciled it the same way, the record is archived
+   inside the pull request by the executor below. `main` never holds an
+   unarchived change, `checks / spec` turns green, and the archive commit
+   is the version the approval names. This repository records no approval
+   beyond the maintainer's word: everyone who needs the decision is in the
+   conversation, so nothing here has to be verifiable by someone outside
+   it. A pull request review approval would be a recorded approval only
+   paired with a rule that dismisses it on a new commit.
 
 Deviation found during implementation: stop, revise the change (the
 update skill), have the maintainer discuss and close the revision on the
@@ -109,40 +117,45 @@ Combined: one pull request carries the whole lifecycle. Selected because
 this repository ships skills feature by feature and no consumer depends on
 a stable contract (installed copies are never updated in place, so a
 change reaches nobody until they reinstall). The pull request opens as a
-draft when the approval package is committed, the approval gate is
-exercised on that draft by closing its discussion, the task list follows
-the reconciled closing, and marking it ready requests implementation
-review. A change that also needs harness work
+draft when the approval package is committed, the package gate is
+exercised on that draft by closing its deliberation in conversation, the
+task list follows the reconciled closing, and marking it ready opens the
+second deliberation — on the finished implementation — which the
+maintainer closes the same way before the record is frozen. A change that also needs harness work
 carries a companion repository change `<slug>-harness` on the same
 branch. The default specification author is the implementing agent; the
 maintainer approves.
 
-## Archive executor
+## Archive executor and the freeze
 
-Every change is archived inside its own pull request before the pull
-request is marked ready, so `main` never holds an unarchived change; the
-archived record is frozen under review, and a defect found in it goes to
-the pull request's Validation section or a follow-up change, never into
-the archive. The executor is either:
+Every change is archived inside its own pull request, once the maintainer
+closes the deliberation on the finished implementation, so `main` never
+holds an unarchived change. The archive commit is the freeze the approval
+applies to: the frozen record stays frozen, and a defect found in it goes
+to the pull request's Validation section or a follow-up change, never
+into the archive.
 
-- **By hand** — every task ticked (never before its verification ran),
-  then the archive skill (a skill change's delta lands in
-  `openspec/specs/`; a repository change's record only moves under
-  `openspec/changes/archive/`), `just spec-validate`, and a commit
-  `docs: archive the <slug> change` on the branch.
-- **The `spec/archive` label** — applying it (an authorized remote write)
-  makes the `spec / archive` workflow archive every related change whose
-  tasks are all ticked, commit as the Actions bot, push to the branch,
-  recompute the status labels, remove the label, and post a summary; it
-  refuses everything when any related change has an open task. Its push
-  leaves the pull request's checks in an approval-required state until the
-  maintainer clicks **Approve workflows to run**. A pull request from a
-  fork gets the local commands in a comment instead and archives by hand.
+The executor is the implementing agent, on the branch: every task ticked
+(never before its verification ran), then the archive skill (a skill
+change's delta lands in `openspec/specs/`; a repository change's record
+only moves under `openspec/changes/archive/`), `just spec-validate`, and
+a commit `docs: archive the <slug> change`. On a fork it is whoever holds
+the branch — its author, or the maintainer after pulling it.
 
-Selected because the repository runs Actions and a bot that pushes to the
-pull request's own branch needs no ruleset bypass. Archiving after the
-merge by a job pushing to `main` was tried and dropped: a user-owned
-repository cannot grant the Actions app a bypass.
+No workflow archives. A platform token cannot push to a fork, so such a
+job would never serve an external contribution; on a branch it could
+reach, it would be the only installed job needing `contents: write`, to
+save one command the agent already runs. Archiving after the merge by a
+job pushing to `main` was tried and dropped earlier for a different
+reason: a user-owned repository cannot grant the Actions app a ruleset
+bypass.
+
+The pull request is marked ready *before* the archive, so `checks / spec`
+is red for the whole second deliberation and the archive commit is what
+turns it green. That red is the merge block by design. Nothing revokes
+the maintainer's closing, so a commit after the archive commit means the
+approved version no longer exists: say so before pushing or handing over,
+and ask again.
 
 ## Request automation
 
@@ -154,12 +167,15 @@ ready pull request holding an unarchived related change (a warning while
 it is a draft); on a push to `main` any change outside `archive/` fails.
 `/spec show [<slug>] [proposal|design|tasks|specs|all]` and
 `/spec status [<slug>]` posted as pull request comments by a collaborator
-or the author get a reply from `spec / command`. `spec / labels` keeps
+— owner, member, or collaborator association — get a reply from
+`spec / command`. `spec / labels` keeps
 `spec/archived` | `spec/unarchived` and `spec/not-started` |
 `spec/in-progress` | `spec/done` on every pull request from its related
-changes' task lists; read them, never set them by hand. Locally,
-`just spec-check` reproduces the check and `just spec-changes <command>`
-the rest.
+changes' task lists; read them, never set them by hand. All of it is
+read-only: `contents` stays at `read` in every job, the commands put a
+record into the discussion thread, and the labels make a pull request's
+state legible from the list view. Locally, `just spec-check` reproduces
+the check and `just spec-changes <command>` the rest.
 
 ## Specifications and tracked work
 
@@ -171,9 +187,10 @@ the rest.
   `Spec:` line linking the change directory on its branch —
   `[openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`
   — so a reviewer reaches the record in one click, a `Phase:` line
-  (`specification` until the discussion is closed, `implementation` once
-  the record is archived), one link per file of the approval package with
-  `tasks.md` marked as written after the closing, and the approval state;
+  (`specification` until the package deliberation is closed,
+  `implementation` from then on), one link per file of the approval
+  package with `tasks.md` marked as written after the closing, and which
+  deliberation is open;
   it ticks the two specification items in its checklist. The body opens with the goal and
   states the value under `Why`; Changes (permalinks to the commits) and
   Validation (scenario results) are filled only when the pull request is

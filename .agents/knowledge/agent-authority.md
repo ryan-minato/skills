@@ -17,13 +17,15 @@ review; prepare the acceptance-evidence report.
 
 `gh pr ready` is permitted only when all of these hold:
 
-- the OpenSpec change's discussion on the draft was closed by the
-  maintainer in conversation and reconciled with nothing open
-  (`.agents/knowledge/spec-workflow.md`), every task in its `tasks.md` is
-  done, and it is archived inside the pull request with `checks / spec`
-  green; or the pull request carries `Spec: none — <reason>` (see
-  `.agents/knowledge/spec-workflow.md`);
-- `just check` passes locally and every required check is green;
+- the OpenSpec change's package deliberation on the draft was closed by
+  the maintainer in conversation and reconciled with nothing open
+  (`.agents/knowledge/spec-workflow.md`), and every task in its
+  `tasks.md` is done; or the pull request carries `Spec: none — <reason>`
+  (see `.agents/knowledge/spec-workflow.md`). The change is **not**
+  archived yet: marking the pull request ready is what opens the
+  deliberation that precedes the freeze;
+- `just check` passes locally and every required check is green except
+  `checks / spec`, which stays red until the freeze;
 - every scenario of the change passed, with the evidence in the pull
   request's Validation section;
 - the publish gate in the `change-workflow` project skill returned
@@ -93,4 +95,5 @@ maintainer.
 - The verification strength this level was priced against degrades: a
   required check is removed, behavioral tests are skipped by default, or
   revert stops being a complete rollback.
-- The specification workflow changes what "approved" or "archived" means.
+- The specification workflow changes what "approved", "frozen", or
+  "archived" means, or a gate gains a recorded approval.

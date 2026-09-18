@@ -31,26 +31,25 @@ name live on `main` before the ruleset requires it.
    `python3 .agents/skills/change-workflow/scripts/run_log_digest.py --repo ryan-minato/skills --run-id <id>`.
 3. Never weaken, skip, or delete a check to make it pass; changing a
    check's strictness is a maintainer decision recorded here first.
-4. A push made by `spec / archive` (the Actions bot with `GITHUB_TOKEN`)
-   leaves the pull request's `checks`, `pr-policy`, and `secret` runs in
-   an approval-required state: click **Approve workflows to run** in the
-   merge box. A pull request that stays blocked after a bot push is
-   waiting for that click, not failing.
-5. The three `spec / *` jobs run with a writable token on content the
+4. A red `checks / spec` on a ready pull request whose change is not
+   archived yet is the expected state, not a failure: the record is
+   frozen only after the maintainer closes the deliberation on the
+   finished implementation, and that red is what blocks the merge until
+   then (`.agents/knowledge/spec-workflow.md`).
+5. The two `spec / *` jobs run with a privileged token on content the
    request's author controls. The rule that keeps them safe is structural:
    no object authored by the request reaches the runner. They check out
    the base and read the head through `spec_changes.py snapshot`, which
-   pulls the file list and the documents from the REST API. `spec /
-   archive` is the only one that needs the head's working tree, and it
-   checks it out only under a literal
+   pulls the file list and the documents from the REST API. Neither needs
+   the head's working tree, and neither may grant `contents: write`.
+   Never add a checkout or a `git fetch` of the head to either, and if
+   one ever genuinely needs it, guard it with a literal
    `github.event.pull_request.head.repo.full_name == github.repository`
-   condition written in the step's `if:`. Never add a checkout or a `git
-   fetch` of the head to any of them, and never move that comparison
-   behind an `env` variable.
+   in the step's own `if:`, never behind an `env` variable.
 
 ## Tool pins
 
-`checks / quality`, `checks / spec`, and `spec / archive` install the same versions
+`checks / quality` and `checks / spec` install the same versions
 the dev container and pre-commit use: `ruff==0.16.4` (pre-commit rev
 `v0.16.4`), `rust-just` and `pre-commit` pinned in the workflows, and
 `@fission-ai/openspec` at the `openspec_version` of the `justfile`
