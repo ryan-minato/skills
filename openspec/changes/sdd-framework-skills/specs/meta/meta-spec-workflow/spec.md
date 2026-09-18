@@ -18,6 +18,33 @@ The builder SHALL route tool installation or adoption (step 3) and the installat
 - **WHEN** the user declines the framework skill
 - **THEN** the builder adopts the tool under the generic rule, records the by-hand executor, and lists the automation as remaining work
 
+### Requirement: Behavior: Shape, archive executor, and author are settled with a reasoned recommendation
+The builder SHALL ask the change request shape, the archive executor, the default specification author, the approval mode with the approval package and the rule for when a design is warranted, and the specification scope in the same round as the level and approach, each with one reasoned recommendation; SHALL derive the shape recommendation from the change propagation mode recorded in the project's workflow file when one exists; SHALL recommend the discussion-closed approval mode for both gates unless the user or the project asks for a recorded approval, and SHALL describe a recorded approval as an object the platform keeps — a review approval where one exists, a fixed-wording comment where none does — noting that a review approval cannot carry the specification gate wherever stale approvals are dismissed; SHALL always record that archiving happens inside the change request once the deliberation on the finished implementation closes, and that it is the freeze the approval applies to; SHALL record the implementer as the executor and a maintainer on the contributor's branch for a request from a fork, and SHALL never offer an automation as the executor, because no platform token can push to a fork and a job that archives needs write access to the repository's contents for a benefit one command already gives; and SHALL recommend product-only domains with a spec-less change kind for the project's own harness, tooling, checks, workflows, and documents.
+
+#### Scenario: Propagation recorded as Dependency
+- **WHEN** the project's workflow file records dependency-style change propagation and the builder reaches its questioning round
+- **THEN** the builder recommends the split shape and cites that line as the selecting fact
+
+#### Scenario: CI exists
+- **WHEN** the inspection finds a workflow or pipeline directory
+- **THEN** the builder still records the implementer as the archive executor, and offers the framework skill's automation only for the check, the comment commands, and the status labels
+
+#### Scenario: Automation asked for as the executor
+- **WHEN** the user asks for a label or job that archives the request automatically
+- **THEN** the builder declines, gives the two reasons, and records the implementer with the fork rule
+
+#### Scenario: No CI
+- **WHEN** the inspection finds no automation
+- **THEN** the builder records the implementer as the executor and the request checklist as the gate
+
+#### Scenario: Approval mode left unspecified
+- **WHEN** neither the user nor any project file names an approval mechanism
+- **THEN** the builder asks once whether a recorded approval is wanted, recommends the discussion-closed mode on the complete package for both gates, and records the answer
+
+#### Scenario: Tooling beside the product
+- **WHEN** the inspection finds the project's own scripts, CI, and harness beside product code
+- **THEN** the builder recommends product-only domains and a spec-less change kind for the rest, naming the tool's marker
+
 ## MODIFIED Requirements
 
 ### Requirement: Trigger: description
@@ -39,35 +66,8 @@ The skill description SHALL cause the skill to load when a project's spec-driven
 - **WHEN** the user says "add the /spec comment commands and the status labels to our repository"
 - **THEN** the skill does not load
 
-### Requirement: Behavior: Shape, archive executor, and author are settled with a reasoned recommendation
-The builder SHALL ask the change request shape, the archive executor, the default specification author, the approval mode with the approval package and the rule for when a design is warranted, and the specification scope in the same round as the level and approach, each with one reasoned recommendation; SHALL derive the shape recommendation from the change propagation mode recorded in the project's workflow file when one exists; SHALL recommend the discussion-closed approval mode unless the user or the project asks for a blocking comment; SHALL always record that archiving happens inside the change request once the deliberation on the finished implementation closes, and that it is the freeze the approval applies to; SHALL record the implementer as the executor and a maintainer on the contributor's branch for a request from a fork, and SHALL never offer an automation as the executor, because no platform token can push to a fork and a job that archives needs write access to the repository's contents for a benefit one command already gives; and SHALL recommend product-only domains with a spec-less change kind for the project's own harness, tooling, checks, workflows, and documents.
-
-#### Scenario: Propagation recorded as Dependency
-- **WHEN** the project's workflow file records dependency-style change propagation and the builder reaches its questioning round
-- **THEN** the builder recommends the split shape and cites that line as the selecting fact
-
-#### Scenario: CI exists
-- **WHEN** the inspection finds a workflow or pipeline directory
-- **THEN** the builder still records the implementer as the archive executor, and offers the framework skill's automation only for the check, the comment commands, and the status labels
-
-#### Scenario: Automation asked for as the executor
-- **WHEN** the user asks for a label or job that archives the request automatically
-- **THEN** the builder declines, gives the two reasons, and records the implementer with the fork rule
-
-#### Scenario: No CI
-- **WHEN** the inspection finds no automation
-- **THEN** the builder records the implementer as the executor and the request checklist as the gate
-
-#### Scenario: Approval mode left unspecified
-- **WHEN** neither the user nor any project file names an approval mechanism
-- **THEN** the builder asks once whether a blocking comment is wanted, recommends the discussion-closed mode on the complete package, and records the answer
-
-#### Scenario: Tooling beside the product
-- **WHEN** the inspection finds the project's own scripts, CI, and harness beside product code
-- **THEN** the builder recommends product-only domains and a spec-less change kind for the rest, naming the tool's marker
-
 ### Requirement: Behavior: The deposited contract carries the new facts in platform vocabulary
-The deposited specification contract SHALL state the change request shape, in-request archiving after the deliberation with its executor (the implementer, and a maintainer on the contributor's branch for a request from a fork), the freeze it creates and that approval applies to the frozen version, the automation the framework skill may install alongside it (a required check, comment commands, and status labels — nothing that archives or pushes), the default specification author, the approval mode with its record (the closing of the discussion plus the reconciliation the agent performs, or the blocking comment's fixed text and what it covers) exercised on the complete approval package, the specification scope with the spec-less change kind, the specification lines the change request body carries and the sections it reserves until ready, what the integration branch may hold, the framework skill the project uses, and the artifact operations — the categories of operation performed through the tool's commands (verified from its help, none quoted), the rule that hand edits are limited to the record's text, the validator with its strict mode, its place in the project's local check command, and when it runs (after each artifact edit, before publishing the draft, before ready, after archiving), or the structural check the project adopts when the tool has no validator — and SHALL use the project's platform vocabulary for work items, change requests, and automation, with no builder-only model noun appearing without its definition and no framework command or script named.
+The deposited specification contract SHALL state the change request shape, in-request archiving after the deliberation with its executor (the implementer, and a maintainer on the contributor's branch for a request from a fork), the freeze it creates and that approval applies to the frozen version, the automation the framework skill may install alongside it (a required check, comment commands, and status labels — nothing that archives or pushes), the default specification author, the approval mode for each of the two gates with its record (the closing of the discussion plus the reconciliation the agent performs, the archive commit standing as the record of the second closing; or, where the project names a recorded approval, the object that carries it and what it covers) exercised on the complete approval package, the specification scope with the spec-less change kind, the specification lines the change request body carries and the sections it reserves until ready, what the integration branch may hold, the framework skill the project uses, and the artifact operations — the categories of operation performed through the tool's commands (verified from its help, none quoted), the rule that hand edits are limited to the record's text, the validator with its strict mode, its place in the project's local check command, and when it runs (after each artifact edit, before publishing the draft, before ready, after archiving), or the structural check the project adopts when the tool has no validator — and SHALL use the project's platform vocabulary for work items, change requests, and automation, with no builder-only model noun appearing without its definition and no framework command or script named.
 
 #### Scenario: Generated task list in the draft
 - **WHEN** the deposited project skill states what the first draft carries
@@ -162,3 +162,7 @@ The project skill steps the builder inserts SHALL, under the discussion-closed m
 ### Requirement: Script: archive_completed_changes.py
 **Reason**: the job it served is withdrawn.
 **Migration**: `Script: spec_changes.py` in the `sdd/openspec-workflow` domain.
+
+### Requirement: Behavior: Shape, archive mode, and author are settled with a reasoned recommendation
+**Reason**: an archive mode is no longer chosen; the question is who runs the archive inside the change request, so the requirement is renamed and rewritten.
+**Migration**: "Shape, archive executor, and author are settled with a reasoned recommendation".
