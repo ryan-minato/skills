@@ -14,7 +14,7 @@ skill directory moves catalogs and two are added. Binding constraints:
   pairing between its skills or with `meta-spec-workflow` is an optional
   handoff through `ryan-minato-skills-installing` with a fallback.
 - Self-containment: a framework skill restates the two loop facts it
-  needs (package before tasks, archive or complete before ready) instead
+  needs (the package before the task list, the freeze before approval) instead
   of referencing the methodology skill's files.
 - Reserved names: `openspec-*` project skills under `.agents/skills/` are
   CLI-generated; `scripts/validate_harness.py` ignores symlinks there, so
@@ -43,7 +43,7 @@ skill directory moves catalogs and two are added. Binding constraints:
 | SDD — The approval gate examines the outcome and the approach bounds, never the tasks | `SKILL.md` `## The approval package`; `references/tracked-work.md` `## What the gate examines` | same |
 | SDD — The design bounds the approach and is part of the approval package | `SKILL.md` `## The approval package` (role, warranted rule, bounds, publication rule); gotchas | — |
 | SDD — The approval package is composed per the project's tool | `SKILL.md` `## The approval package` (one line per family) and `## Approach families` pointer to the framework skills | — |
-| SDD — Archiving happens inside the request, by hand or by the automation the framework skill installs | `SKILL.md` `## The loop` step 7 and `## Project rules live in the contract` (default executor); `references/tracked-work.md` `## Archiving before ready` (executor, label, fork, freeze); `references/adoption-decision.md` `## Rejected alternatives` (after-merge job) | tracked-work: same; adoption-decision: "when the user asks whether, at which level, or with which approach family to adopt, or before recommending a tool" |
+| SDD — The record is frozen inside the request once the deliberation on the finished implementation closes | `SKILL.md` `## The loop` steps 7–8 and `## Project rules live in the contract` (default executor); `references/tracked-work.md` `## Ready, then the freeze` (executor, fork, freeze, spent freeze); `references/adoption-decision.md` `## Rejected alternatives` (after-merge job) | tracked-work: same; adoption-decision: "when the user asks whether, at which level, or with which approach family to adopt, or before recommending a tool" |
 | SDD — Handoff: the framework skill for the project's spec tool | `SKILL.md` `## The framework skill` | — |
 | SDD — Specification review happens on the published draft with a recorded approval | `references/tracked-work.md` `## Approval modes` | same |
 | SDD — Closing the discussion reconciles the request before implementation | `SKILL.md` `## The loop` step 3; `references/tracked-work.md` `## Reconciliation checklist` | same |
@@ -68,13 +68,13 @@ skill directory moves catalogs and two are added. Binding constraints:
 | OSW — Comment commands and status labels are read and used as the project installed them | `SKILL.md` `## Commands and labels on a request` (related-change definition included) | — |
 | OSW — The automation is installed per platform from the skill's assets | `references/github.md` (check job into the checks workflow, the two privileged workflows, labels, fork safety, maintainer actions), `references/gitlab.md` (jobs fragment, tokens, limitations); `assets/github/{job-spec-check.yml,workflow-spec-command.yml,workflow-spec-labels.yml,labels-spec.json}`, `assets/gitlab/{ci-spec-jobs.yml,labels-spec.json}` | "when installing or changing the automation in a GitHub repository" / "… in a GitLab project" |
 | OSW — Handoff: the methodology skill; Handoff: the contract builder | `SKILL.md` `## Handoffs` | — |
-| OSW — Script: spec_changes.py | `scripts/spec_changes.py`, linked at first mention in `## Archiving before ready` | — |
+| OSW — Script: spec_changes.py | `scripts/spec_changes.py`, linked at first mention in `## Ready, then the freeze` | — |
 | SKW — Trigger: description | `sdd/spec-kit-workflow/SKILL.md` frontmatter | — |
 | SKW — The approval package is the specification and the plan | `SKILL.md` `## The feature directory and the approval package` | — |
-| SKW — Completion before ready replaces archiving | `SKILL.md` `## Completion before ready` | — |
+| SKW — Completion replaces archiving, and a declaration locks the feature | `SKILL.md` `## Completion, then the lock` | — |
 | SKW — The automation is installed per platform from the skill's assets | `references/github.md`, `references/gitlab.md`; `assets/github/{job-spec-check.yml,workflow-spec-command.yml,workflow-spec-labels.yml,labels-spec.json}`, `assets/gitlab/{ci-spec-jobs.yml,labels-spec.json}` | as above |
 | SKW — Handoffs | `SKILL.md` `## Handoffs` | — |
-| SKW — Script: spec_kit_features.py | `scripts/spec_kit_features.py`, linked in `## Completion before ready` | — |
+| SKW — Script: spec_kit_features.py | `scripts/spec_kit_features.py`, linked in `## Completion, then the lock` | — |
 
 ## Description
 
