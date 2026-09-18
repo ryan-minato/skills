@@ -53,7 +53,7 @@ The agent SHALL name, for the project's specification tool, which files the gate
 - **THEN** the agent pushes it as a draft, lists it on the request as after-approval material, and keeps it out of the review
 
 ### Requirement: Behavior: Archiving freezes the record inside the request, after the deliberation and before approval
-The agent SHALL publish the finished implementation to a formal (non-draft) change request so the team can deliberate on it, SHALL archive (or converge) the change record inside that request only once the deliberation closes, and SHALL treat the archive as the freeze: it records that the specification and the implementation agree, approval applies to the frozen version, and only changes that restore consistency with the specification are expected after it. The agent SHALL run the executor the contract records — the implementer by default, with the tool's archive command — and on a request from a fork SHALL state that a maintainer archives on the contributor's branch, because no automation can push to a fork; SHALL state that the archived record is frozen, so a defect review finds goes to the request's validation section or a follow-up change; and SHALL never propose archiving after the merge, nor an automation that pushes an archive commit.
+The agent SHALL publish the finished implementation to a formal (non-draft) change request so the team can deliberate on it, SHALL archive (or converge) the change record inside that request only once the gate owner closes that deliberation in the mode the contract records — by default a statement in conversation, which the agent reconciles against the request's comments and review threads exactly as it reconciles the specification gate, every item resolved or deliberately dropped with its reason recorded — and SHALL treat the archive commit as the record of the closing, so no platform approval object is required, and SHALL treat the archive as the freeze: it records that the specification and the implementation agree, approval applies to the frozen version, and only changes that restore consistency with the specification are expected after it. The agent SHALL run the executor the contract records — the implementer by default, with the tool's archive command — and on a request from a fork SHALL state that a maintainer archives on the contributor's branch, because no automation can push to a fork; SHALL state that the archived record is frozen, so a defect review finds goes to the request's validation section or a follow-up change; and SHALL never propose archiving after the merge, nor an automation that pushes an archive commit.
 
 #### Scenario: No contract
 - **WHEN** the project has no specification contract and the change's tasks are all done
@@ -66,6 +66,14 @@ The agent SHALL publish the finished implementation to a formal (non-draft) chan
 #### Scenario: Fork
 - **WHEN** the request comes from a fork and its deliberation has closed
 - **THEN** the agent names the maintainer as the executor on the contributor's branch, states that the platform's own token cannot push there, and offers the contributor the commands as the alternative
+
+#### Scenario: Permission to archive given in conversation
+- **WHEN** the gate owner says in conversation that the deliberation is over and the agent may archive
+- **THEN** the agent reads the request's comments and review threads with their resolution state, lists every item that is neither resolved nor already carried by the implementation, asks the gate owner to confirm or drop each one, records each dropped item with its reason in the request, and archives only when nothing is left open
+
+#### Scenario: Unresolved thread at the freeze
+- **WHEN** the gate owner grants permission to archive while a review thread is unresolved
+- **THEN** the agent names the thread, asks the gate owner to confirm or resolve it, and archives nothing until it is settled
 
 #### Scenario: Change requested after the freeze
 - **WHEN** review asks for a behavior change after the record was archived in the request
@@ -108,19 +116,19 @@ The skill description SHALL cause the skill to load for questions about adopting
 - **THEN** the skill does not load
 
 ### Requirement: Behavior: Specification review happens on the published draft with a recorded approval
-The agent SHALL place the approval gate on the draft change request (combined) or on the specification change request (split), exercised on the complete approval package, SHALL apply the approval mode the contract records — discussion-closed: the gate owner discusses on the request and closes the discussion in conversation, and the approval record is that closing plus the request's discussion state; blocking: the gate owner's fixed-wording comment on the draft, naming no commit, covering the package as of the last push before it, with a later push to the package needing a fresh comment unless the gate owner decided that push in conversation — and SHALL warn that a platform review-approval state is not the record in either mode because later pushes dismiss it.
+The agent SHALL place the approval gate on the draft change request (combined) or on the specification change request (split), exercised on the complete approval package, SHALL apply the approval mode the contract records — discussion-closed (the default): the gate owner discusses on the request and closes the discussion in conversation, and the approval record is that closing plus the request's discussion state; recorded approval (optional, where the project names one): an object the platform keeps, such as a review approval or, where no review object exists, a fixed-wording comment, covering the package as of the last push before it — and SHALL warn that a platform review-approval state cannot be the record of this gate, because the implementation pushes that follow it dismiss it wherever stale approvals are dismissed.
 
 #### Scenario: Where the spec is reviewed
 - **WHEN** a user on the combined shape asks where the team reviews the specification
 - **THEN** the agent answers the draft change request, states that the review covers the complete package, states the contract's approval mode (or the discussion-closed default), and warns that platform review approvals do not survive the implementation pushes
 
 #### Scenario: Push to the record after a blocking approval
-- **WHEN** the contract records the blocking mode, the approval comment exists, and the author then pushes a change to the package that the gate owner did not decide in conversation
-- **THEN** the agent asks for a fresh approval comment before writing tasks
+- **WHEN** the contract records the recorded-approval mode, the approval exists, and the author then pushes a change to the package that the gate owner did not decide in conversation
+- **THEN** the agent asks for a fresh approval before writing tasks
 
 #### Scenario: Narrowing decided by the gate owner
 - **WHEN** the gate owner decides in conversation to drop a scenario from an approved record and the author pushes that narrowing
-- **THEN** the agent proceeds without a fresh comment and records the decision in the request
+- **THEN** the agent proceeds without a fresh approval and records the decision in the request
 
 ### Requirement: Behavior: Closing the discussion reconciles the request before implementation
 When the gate owner says in conversation that the discussion on the draft is closed, the agent SHALL read the request's comments and review threads with their resolution state, SHALL check for unresolved threads, adjustments requested in the discussion that the package does not yet carry, and conclusions that contradict each other, SHALL list every open item and ask the gate owner to confirm before proceeding, and SHALL start the task list and the implementation only when nothing is open or the gate owner confirmed the open items; the agent SHALL record the closing state in the request's specification block.

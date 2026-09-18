@@ -279,6 +279,30 @@ skill directory moves catalogs and two are added. Binding constraints:
   header keeps orientation and the placeholder instructions; every claim
   about what a step does, and why that is safe, moves onto the step.
 
+- **Both gates close in conversation by default, and neither depends on a
+  platform approval object** (serves the approval requirements): the
+  specification gate already worked that way, and applying the same shape
+  to the freeze means one mechanism learned once and a contract that holds
+  on a platform with no review object. What makes it a gate is not the
+  object but the reconciliation: the agent reads the request's comments and
+  review threads, lists what is neither resolved nor already carried, and
+  archives only when every item is settled or deliberately dropped with its
+  reason recorded. The archive commit is then the record of the closing.
+  A project that wants an object may name a recorded approval instead — a
+  review approval where one exists, a fixed-wording comment where none
+  does; "blocking comment" is retired as a name because it described one
+  mechanism rather than the category, and because inventing a comment
+  protocol imitates an affordance both platforms already have. Considered
+  and rejected for this repository: a review approval with stale-approval
+  dismissal, which would mechanically re-open the decision after any push
+  past the freeze — it cannot carry the specification gate (implementation
+  pushes dismiss it), and with no second approver it cannot carry the
+  freeze either. The cost is accepted knowingly: after the freeze, "only
+  changes that restore consistency with the specification" stays a norm
+  with no mechanical backstop, since the only available check — refusing
+  commits after the archive — would block the very consistency fixes it is
+  meant to allow.
+
 ## Risks / Trade-offs
 
 - [Behavioral tests across four skills are expensive] → one fixture
