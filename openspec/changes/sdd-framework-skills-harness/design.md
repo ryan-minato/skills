@@ -26,10 +26,12 @@ name). `checks / gate` is the only ruleset-required check from
 `labels.json` rows carry `applied_by` ∈ {form, triage, human}
 (`APPLIERS`); a label nothing applies is an error.
 
-Platform facts (verified 2026-09-17): a push made with `GITHUB_TOKEN`
-puts the resulting `pull_request` runs in an approval-required state;
-`labeled` and `issue_comment` events the token causes create no runs;
-`issue_comment` runs the default-branch workflow file.
+Platform facts (verified 2026-09-17): a fork's `pull_request` run holds a
+read-only token and no secrets, and the setting that would grant it write
+exists for private repositories only, so a label or a reply on an external
+contribution needs a privileged trigger; `issue_comment` runs the
+default-branch workflow file; comments the platform token posts create no
+workflow run, so a reply cannot loop.
 
 ## Placement
 
@@ -37,9 +39,9 @@ puts the resulting `pull_request` runs in an approval-required state;
 |---|---|---|
 | Catalog scaffold | `skills/sdd/README.md`, `README.zh.md`, `CONTEXT.md`; `ARCHITECTURE.md` `## Catalogs`; root `README.md` + `README.zh.md`; `.github/labels.json` `catalog/sdd`; `.github/ISSUE_TEMPLATE/{bug-report,feature-request,task}.yml`; `.claude-plugin/marketplace.json`; `.agents/skills/{spec-driven-development,openspec-workflow,spec-kit-workflow}`; `skills/engineering/{README.md,README.zh.md,CONTEXT.md}`; `skills/machine-learning/CONTEXT.md`; `.agents/knowledge/harness-maintenance.md` last-run date | `just validate`; `just gen-marketplace` then `git diff --exit-code .claude-plugin/marketplace.json`; `ls -l .agents/skills | grep -E 'spec-driven|openspec-workflow|spec-kit'`; a read of both files of each README pair; `just spec-sync` leaves `.agents/skills/openspec-workflow` in place |
 | Spec domain move | `openspec/specs/sdd/spec-driven-development/spec.md` (moved, title line corrected) | `just spec-validate`; `git log --follow` shows the history |
-| Archive automation — workflows | `.github/workflows/spec-archive.yml` (replaced), `spec-command.yml`, `spec-labels.yml`, `checks.yml` (types, `checks / spec` steps) | YAML parses; `grep -rn '{{[A-Z]' .github/` empty; `just validate` (`check_checks_doc`, hard-coded-version scan) |
-| Archive automation — script and recipes | `scripts/spec_changes.py` (mirror), `scripts/archive_completed_changes.py` deleted, `justfile` `spec-check` and `spec-changes` | `diff scripts/spec_changes.py skills/sdd/openspec-workflow/scripts/spec_changes.py` empty; `just spec-check` on this branch (draft mode warns, exit 0); `just spec-changes --help`; `just lint` |
-| Archive automation — labels and validator | `.github/labels.json` six `spec/*` rows; `scripts/validate_harness.py` (mirror pair, `workflow` applier, `check_spec_labels()`, scan set) | `just validate`; `python3 scripts/sync_labels.py --file .github/labels.json --repo ryan-minato/skills` dry run lists `catalog/sdd` and the six `spec/*` labels to create |
+| Request automation — workflows | `.github/workflows/spec-archive.yml` deleted; `spec-command.yml`, `spec-labels.yml` added; `checks.yml` (types, `checks / spec` steps) | YAML parses; `grep -rn '{{[A-Z]' .github/` empty; `grep -rn 'git .*fetch\|actions/checkout' .github/workflows/spec-*.yml` finds only base checkouts; `just validate` (`check_checks_doc`, hard-coded-version scan) |
+| Request automation — script and recipes | `scripts/spec_changes.py` (mirror), `scripts/archive_completed_changes.py` deleted, `justfile` `spec-check` and `spec-changes` | `diff scripts/spec_changes.py skills/sdd/openspec-workflow/scripts/spec_changes.py` empty; `just spec-check` on this branch (draft mode warns, exit 0); `just spec-changes --help`; `just lint` |
+| Request automation — labels and validator | `.github/labels.json` five `spec/*` rows; `scripts/validate_harness.py` (mirror pair, `workflow` applier, `check_spec_labels()`, scan set) | `just validate`; `python3 scripts/sync_labels.py --file .github/labels.json --repo ryan-minato/skills` dry run lists `catalog/sdd` and the five `spec/*` labels to create |
 | Approval gate and executor — contract and skill | `.agents/knowledge/spec-workflow.md`, `.agents/skills/change-workflow/SKILL.md` | read-through; a clean-context read of the project skill can state what the draft's first content is, the stop, the archive executor, and the finish step |
 | Approval gate and executor — templates and schema | `.github/PULL_REQUEST_TEMPLATE.md`, `openspec/config.yaml`, `openspec/schemas/skill-change/schema.yaml` | `just validate` (template headings, `Spec:` line); `python3 scripts/check_pr_policy.py` over a body built from the template with every item ticked passes; `just spec-validate` |
 | Approval gate and executor — knowledge and maps | `AGENTS.md`, `ARCHITECTURE.md`, `.agents/knowledge/{agent-authority,github-workflow,github-checks,github-settings,harness-maintenance}.md` | `just validate` (pointers, recipe names, check table, mirror register); read-through |
@@ -56,9 +58,8 @@ puts the resulting `pull_request` runs in an approval-required state;
   `scripts/sync_labels.py --apply`; recorded as a maintainer action in
   the pull request handover. The `checks / gate` requirement is unchanged,
   so no ruleset edit.
-- The first bot archive run happens on a later pull request; its observed
-  behavior (approval banner, label removal) is recorded in
-  `github-checks.md` then.
+- The first live run of the comment and label workflows happens on a later
+  pull request; what is observed is recorded in `github-checks.md` then.
 
 ## Decisions
 
@@ -126,22 +127,24 @@ puts the resulting `pull_request` runs in an approval-required state;
 - Spec domain move: `just spec-validate` green; `git log --follow --oneline
   openspec/specs/sdd/spec-driven-development/spec.md` lists the pre-move
   commits.
-- Workflows: YAML parse of the four files; `grep -rn '{{[A-Z]' .github/`
-  empty; actions pinned by SHA (`grep -c '@[0-9a-f]\{40\}'` per file ≥ the
-  `uses:` count); `spec-archive.yml`'s fork branch has no `git push`.
+- Workflows: YAML parse of `checks.yml`, `spec-command.yml` and
+  `spec-labels.yml`; `grep -rn '{{[A-Z]' .github/` empty; actions pinned by
+  SHA (`grep -c '@[0-9a-f]\{40\}'` per file ≥ the `uses:` count); no
+  `spec / *` workflow contains a `git push`, a `git fetch` of the head, or a
+  checkout of it; `.github/workflows/spec-archive.yml` no longer exists.
 - Script and recipes: mirror diff empty; `just spec-changes --help` exits
   0; `just spec-check` on this branch before archiving reports the two
   changes as warnings (draft) and exits 0, and as failures with a ready
   flag; after archiving exits 0; `just lint` green.
 - Labels and validator: `just validate` green; the `sync_labels.py` dry
-  run lists exactly `catalog/sdd` and the six `spec/*` labels to create;
+  run lists exactly `catalog/sdd` and the five `spec/*` labels to create;
   `--apply` is not run; a scratch copy of `labels.json` with a
   `spec/extra` label `applied_by: workflow` makes `just validate` fail.
 - Contract and project skill: a clean-context subagent reads
   `.agents/knowledge/spec-workflow.md` and `change-workflow/SKILL.md`
   and answers: what the draft's first content is, what the maintainer
-  reviews, who archives and how, what happens after a bot
-  push.
+  reviews, when the request is marked ready, who archives and when, and
+  what the archive freezes.
 - Templates and schema: `python3 scripts/check_pr_policy.py` over a
   ready-shaped body built from the new template passes and over a draft
   body with reserved lines passes; `just spec-validate` accepts the schema
