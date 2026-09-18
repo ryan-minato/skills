@@ -60,7 +60,7 @@ jobs:
           HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
           if [ "$EVENT" != "pull_request" ] || git diff --name-only "$BASE" "$HEAD" \
-             | grep -Eq '^(openspec/|\.agents/skills/openspec-|\.agents/skills/\.openspec-target|justfile$)'; then
+             | grep -Eq '^(openspec/|\.agents/skills/openspec-|\.agents/skills/\.openspec-target|scripts/spec_changes\.py$|justfile$)'; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "No spec-related paths changed; nothing to validate."
