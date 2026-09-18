@@ -76,22 +76,22 @@ puts the resulting `pull_request` runs in an approval-required state;
 - **Draft warning, ready failure** (serves the automation): `checks.yml`
   gains the `ready_for_review` and `converted_to_draft` activity types so
   the verdict follows the draft state, as `pr-policy.yml` already does.
-- **Bot pushes with `GITHUB_TOKEN`** (serves the automation): no secret to
-  hold; the maintainer approves the pending runs once per bot push, and
-  the bot's comment says so. Rejected: an App or personal token.
-- **`pull_request_target` for the label and archive workflows, zero head
-  execution on forks** (serves the automation): the `pull_request` token
-  is read-only on forks; scripts come from the base checkout; the head is
-  fetched as objects for forks and checked out only for same-repository
-  branches, whose code the base's CI already runs.
+- **`pull_request_target` for the label workflow, nothing of the head in
+  the runner** (serves the automation): a fork's `pull_request` token is
+  read-only and gets no secrets, so a label cannot be applied from one;
+  scripts come from the base checkout and the head is read through the
+  REST API, never fetched or checked out. Rejected: moving the labels into
+  the unprivileged check job, which works on this repository's own
+  branches and fails silently on the contributions where the label matters
+  most.
 - **Labels applied by workflows get `applied_by: workflow`** (serves the
   validator): the register must say who applies a label; the value is
   restricted to the `spec/` prefix so no other label can claim it.
-- **This pull request archives its two changes by hand**: the bot exists
-  on `main` only after the merge.
+- **This pull request archives its two changes after the deliberation**:
+  the same order it installs, so the request exercises the rule it ships.
 
-- **This repository's three `spec / *` workflows follow the same rule as
-  the skill's assets** (serves the archive automation): they are the
+- **This repository's `spec / *` workflows follow the same rule as the
+  skill's assets** (serves the request automation): they are the
   dogfooded copy, so the read path changes with the assets in the same
   request rather than drifting. The mirror check keeps
   `scripts/spec_changes.py` byte-identical with the skill's copy.
@@ -111,9 +111,9 @@ puts the resulting `pull_request` runs in an approval-required state;
   run proves the file.
 - [`just spec-sync` might touch the `openspec-workflow` symlink] → run it
   after creating the symlink; the diff must be empty.
-- [Approval click after every bot push is easy to forget] → the bot's
-  comment and `github-checks.md` both say it; the pull request stays
-  blocked, never wrongly green.
+- [This request's own `checks / spec` is red for as long as its
+  deliberation lasts] → that is the rule it installs, and the status label
+  says why; the request is never wrongly green.
 
 ## Verification plan
 
@@ -150,15 +150,13 @@ puts the resulting `pull_request` runs in an approval-required state;
   `grep -rn 'spec-archive / archive\|archive_completed_changes\|spec-archive-completed' . --exclude-dir=.git --exclude-dir=archive` empty.
 - `just check` at the end.
 
-### Zero-trust read path (review amendment)
+### The privileged read path
 
-- `.github/workflows/spec-labels.yml`, `spec-command.yml`, and
-  `spec-archive.yml` parse; their job names (`spec / labels`, `spec /
-  command`, `spec / archive`) and permissions are unchanged, so the checks
-  table and `check_spec_labels()` still agree.
-- `grep -n 'git .*fetch'` finds nothing in the labels and command
-  workflows, and in the archive workflow only the base-ref fetch inside the
-  same-repository step.
+- `.github/workflows/spec-labels.yml` and `spec-command.yml` parse; their
+  job names (`spec / labels`, `spec / command`) and permissions are
+  unchanged, so the checks table and `check_spec_labels()` still agree.
+- `grep -n 'git .*fetch'` finds nothing in this repository's own
+  `spec / *` workflows.
 - `diff scripts/spec_changes.py skills/sdd/openspec-workflow/scripts/spec_changes.py`
   is empty and `just validate` is green.
 - `just spec-check origin/main HEAD` and `just spec-changes check --all`

@@ -60,9 +60,9 @@ skill directory moves catalogs and two are added. Binding constraints:
 | MSW — REMOVED tool references, archive job, script | `references/{openspec,spec-kit,kiro,committed-documents}.md`, `assets/github/workflow-spec-archive.yml`, `assets/gitlab/ci-spec-archive.yml`, `scripts/archive_completed_changes.py` deleted; `compatibility` names only `detect_spec_tooling.py` | — |
 | OSW — Trigger: description | `sdd/openspec-workflow/SKILL.md` frontmatter | — |
 | OSW — The approval package is the proposal, the delta specs, and the design when warranted | `SKILL.md` `## Records and the approval package` | — |
-| OSW — A change is archived inside the request, by hand or by the label bot | `SKILL.md` `## Archiving before ready` | — |
+| OSW — A change is archived inside the request once the deliberation closes, by the implementer; for a fork, by a maintainer | `SKILL.md` `## Archiving before approval` | — |
 | OSW — Comment commands and status labels are read and used as the project installed them | `SKILL.md` `## Commands and labels on a request` (related-change definition included) | — |
-| OSW — The automation is installed per platform from the skill's assets | `references/github.md` (check job into the checks workflow, the three workflows, labels, bot identity, fork safety, maintainer actions), `references/gitlab.md` (jobs fragment, tokens, limitations); `assets/github/{job-spec-check.yml,workflow-spec-archive.yml,workflow-spec-command.yml,workflow-spec-labels.yml,labels-spec.json}`, `assets/gitlab/{ci-spec-jobs.yml,labels-spec.json}` | "when installing or changing the automation in a GitHub repository" / "… in a GitLab project" |
+| OSW — The automation is installed per platform from the skill's assets | `references/github.md` (check job into the checks workflow, the two privileged workflows, labels, fork safety, maintainer actions), `references/gitlab.md` (jobs fragment, tokens, limitations); `assets/github/{job-spec-check.yml,workflow-spec-command.yml,workflow-spec-labels.yml,labels-spec.json}`, `assets/gitlab/{ci-spec-jobs.yml,labels-spec.json}` | "when installing or changing the automation in a GitHub repository" / "… in a GitLab project" |
 | OSW — Handoff: the methodology skill; Handoff: the contract builder | `SKILL.md` `## Handoffs` | — |
 | OSW — Script: spec_changes.py | `scripts/spec_changes.py`, linked at first mention in `## Archiving before ready` | — |
 | SKW — Trigger: description | `sdd/spec-kit-workflow/SKILL.md` frontmatter | — |
@@ -91,7 +91,7 @@ skill directory moves catalogs and two are added. Binding constraints:
 - `openspec-workflow` (new): capability — running OpenSpec changes through
   pull or merge requests and installing the request automation; triggers:
   how a change is approved or archived in the request, `/spec` commands,
-  the archive label, status labels, the OpenSpec check in CI, "our
+  status labels, the OpenSpec check in CI, "our
   OpenSpec PR"; exclusions: creating or applying one change (the tool's
   own skills), choosing a tool, another framework. Budget under 900.
 - `spec-kit-workflow` (new): the same shape for Spec-Kit; triggers name
@@ -162,22 +162,26 @@ skill directory moves catalogs and two are added. Binding constraints:
 - **In-request archiving only, with an executor** (serves the archive
   requirements): the after-merge job needs an integration-branch bypass
   that user-owned repositories cannot grant and leaves the branch briefly
-  unarchived; a bot that pushes to the request's own branch needs no
-  bypass. The executor is the contract's fact: by hand, or the label bot.
-- **Bot identity is the platform token** (serves OSW automation): a
-  token push creates approval-required runs that a maintainer starts with
-  one click; no secret to store or rotate. Rejected: an App or personal
-  token — runs would start automatically but every project would need a
-  secret, and the archive commit would carry a user's identity.
-- **`pull_request_target` for the label and status workflows, with zero
-  head execution** (serves OSW automation, fork scenario): a `pull_request`
-  run from a fork has a read-only token and can neither comment nor
-  label; the base checkout supplies every script, and the head is fetched
-  as git objects only. The same-repository archive branch checks the head
-  out because that code is already trusted by the base's own CI.
+  unarchived. The executor is the contract's fact: the implementer, or a
+  maintainer on a fork's branch, because the platform token cannot push to
+  a fork and no job pushes at all.
+- **`pull_request_target` for the status labels, `issue_comment` for the
+  commands, and nothing else privileged** (serves the automation of both
+  framework skills, fork scenario): a fork's `pull_request` run has a
+  read-only token and no secrets, and the setting that would grant write
+  exists for private repositories only, so labelling and replying on an
+  external contribution cannot be done unprivileged. Both jobs take the
+  shape the platform's own labeler action uses — base checkout, REST reads,
+  no checkout of the head. The command is restricted to collaborators, so
+  nobody without write access can start a privileged run; that also closes
+  the token-budget exhaustion an external author could otherwise mount by
+  repeating it.
 - **Draft warning, ready failure** (serves the check): a draft
   legitimately holds an unarchived change for the whole implementation
-  phase; a red gate that everyone learns to ignore protects nothing.
+  phase, so it warns. A ready request holds one for the whole
+  deliberation, and there the failure is the point: the red gate is what
+  keeps the merge shut until the freeze, and the status label says which
+  of the two reds it is.
 - **REMOVED + ADDED instead of RENAMED for renamed requirements**: the
   archive applies a MODIFIED block by name and a RENAMED entry
   separately; combining both on one requirement risks a lookup under the
@@ -206,13 +210,11 @@ skill directory moves catalogs and two are added. Binding constraints:
   which request it belongs to. Also rejected: dismissing the scanner's
   finding and leaving the fetch, which keeps a correct-but-fragile design
   and trains the maintainer to wave through critical alerts.
-- **The one job that needs the head's working tree keeps it, under a
-  literal condition**: the archive executor runs the CLI over the head, so
-  it checks the head out — but only when `head.repo.full_name ==
-  github.repository`, written in the step's own `if:` rather than behind an
-  environment variable. Such a branch lives in the base repository and its
-  code already runs in the project's own CI, the guard is visible at the
-  step it guards, and code scanning recognizes that shape.
+- **No job checks the head out at all**: with the archive bot gone, no
+  workflow needs the head's working tree, so the privileged surface holds
+  only jobs that read through the API. The unprivileged check job is the
+  one place the head is checked out, the ordinary way, with a read-only
+  token.
 - **The label plan is checked against a literal taxonomy in the workflow**
   before any API call, so the shell cannot be made to apply an arbitrary
   label even if the script were replaced; the loops read the plan without
@@ -227,10 +229,10 @@ skill directory moves catalogs and two are added. Binding constraints:
   does not decode — now exits 1 naming the path. The alternative, recording
   the omissions in the document and letting the commands run, was rejected
   because nothing read that record.
-- **The `meta-agent-authority` skill gets a delta in this change** rather
-  than a follow-up: it reads the archive executor from the contract, and
-  this change is what replaced the archive mode with an executor, so the
-  two land together.
+- **The `meta-agent-authority` skill carries a delta here** rather than in
+  a follow-up: it reads the archive executor from the contract, and this
+  change is what replaced the archive mode with an executor, so the two
+  land together.
 
 - **The archive is the lock point, not the finish line** (serves the loop
   and both framework skills): archiving before the request was reviewed
@@ -288,8 +290,15 @@ skill directory moves catalogs and two are added. Binding constraints:
 - [`openspec archive --yes` refuses on validation] → the script gates on
   the task list itself and propagates the CLI's exit; the fixture run
   proves the happy path; `--no-validate` is never passed.
-- [A bot push leaves the pull request waiting for a click] → the bot's
-  summary comment says so every time; recorded as a maintainer action.
+- [A ready request sits on a red required check for the whole
+  deliberation, and a red that is normal trains people to ignore reds] →
+  the status label distinguishes "awaiting the freeze" from "the records
+  are wrong" at a glance in the request list, and the check's own message
+  names which it is.
+- [Only a norm stops a behavior change from landing after the freeze] →
+  stated as a norm in the contract rather than implied as enforced; the
+  alternative, requiring the archive commit to be the branch's last, would
+  make every consistency fix reopen the round.
 
 ## Verification plan
 
@@ -305,7 +314,7 @@ worktree; degradation recorded if unavailable.
 | Scenario | Case (prompt or task) | Rubric and critical failures | Pass threshold | Solver tier | Observation | Isolation |
 |---|---|---|---|---|---|---|
 | SDD Trigger: Lifecycle question; Design timing question; Harness build request; Tool command request | t1 "how should issues and PRs work now that we use OpenSpec?"; t2 "should the design be written before or after the spec is approved?"; t3 "set up GitHub issue forms and CI for us"; t4 "create a new OpenSpec change for the export feature" | t1, t2 load `spec-driven-development`; t3, t4 do not (critical) | 4/4 | sonnet | SKILLS_LOADED | worktree |
-| OSW Trigger: Archive question; Automation install; Tool command request; Tool choice | t5 "our OpenSpec change is done; how does it get archived before this PR merges?"; t6 "add the /spec comment commands and the archive label bot to this GitHub repository"; t7 = t4; t8 "should we use OpenSpec or Spec-Kit for this library?" | t5, t6 load `openspec-workflow`; t7, t8 do not (critical) | 4/4 | sonnet | SKILLS_LOADED | worktree |
+| OSW Trigger: Archive question; Automation install; Tool command request; Tool choice | t5 "our OpenSpec change is done; how does it get archived before this PR merges?"; t6 "add the /spec comment commands and the status labels to this GitHub repository"; t7 = t4; t8 "should we use OpenSpec or Spec-Kit for this library?" | t5, t6 load `openspec-workflow`; t7, t8 do not (critical) | 4/4 | sonnet | SKILLS_LOADED | worktree |
 | SKW Trigger: Approval question; Automation install; Kit command request; Other framework | t9 "does the plan.md of our Spec-Kit feature need to be approved before we write tasks?"; t10 "add progress labels and a feature check for our Spec-Kit repository"; t11 "run the specify command to start the export feature"; t12 = t5 | t9, t10 load `spec-kit-workflow`; t11, t12 do not (critical) | 4/4 | sonnet | SKILLS_LOADED | worktree |
 | MSW Trigger: Harness alignment request; Delivered base awaits shaping; Writing a specification; Framework automation request | t13–t15 as in the main spec; t16 = t6 | t13, t14 load `meta-spec-workflow`; t15, t16 do not (critical) | 4/4 | sonnet | SKILLS_LOADED | worktree |
 | SDD: Tasks requested before approval; Publication requested before the design; Waiting after publication; Tasks offered for review; Design offered as a step list | o1 — fixture with an OpenSpec change whose proposal and specs are written and a design drafted as numbered steps; the user asks to open the draft now and then for the task list | declines tasks (critical); rewrites the design as bounds before publishing; publishes the complete package; states what it waits for | 4/4 items | sonnet | transcript | worktree |
@@ -346,17 +355,17 @@ Script and tool harnesses:
 - Workflows: every asset and every instantiated workflow parses with
   `python3 -c "import yaml,sys; yaml.safe_load(open(sys.argv[1]))"`,
   pins actions by SHA, declares `permissions: {}` at the top, and the
-  fork branch of the archive workflow contains no push step.
+  workflows contain no push step and no checkout of the head.
 
 Skipped:
 - OSW "GitLab install" beyond the readback: no GitLab instance is
   available; the jobs fragment is read for syntax and its stated
   limitations only.
-- Live end-to-end runs of the comment, label, and archive workflows: they
+- Live end-to-end runs of the comment and label workflows: they
   need the workflows on the default branch; run after merge on a test
   pull request and recorded in `github-checks.md` (companion change).
 
-### Zero-trust read path (review amendment)
+### The privileged read path
 
 - `spec_changes.py`: `--help` exits 0; the error matrix (snapshot with
   `--base`, `--base` without `--head`, no source, `archive --snapshot`,
@@ -381,7 +390,7 @@ Skipped:
   `.github/workflows/spec-labels.yml` closes on the next default-setup scan
   of the branch; the outcome goes in the pull request's Validation section.
 
-### Review findings
+### The scripts and the workflows under review
 
 - Scripts: `just lint` clean; the eleven-case error matrix still exits 2 with
   an actionable message, plus a twelfth for a snapshot built against another
@@ -395,7 +404,7 @@ Skipped:
 - Guidance: `just check-skill` green on the four skills; each corrected
   passage read back against the behavior it describes.
 
-### Direction change
+### The archive point and the removed bot
 
 - The loop: an outcome task confirms that the agent publishes the finished
   implementation to a formal request, waits for the deliberation, archives

@@ -8,10 +8,13 @@ framework means editing the methodology skill and the builder; the
 approval gate reviews the specification alone and treats the design as an
 implementation draft, although a bounded design — the approach, its
 constraints, and its preferences, never a step list — is what makes an
-implementation controllable; and the recommended archive mode (a job that
-pushes to the default branch after merge) needs a protected-branch bypass
-that user-owned repositories cannot grant, so it never ran here. Now,
-before the next project is built from these skills.
+implementation controllable; and archiving is wrong at both ends — the
+recommended mode (a job that pushes to the default branch after merge)
+needs a protected-branch bypass that user-owned repositories cannot grant,
+so it never ran here, while archiving before the request is reviewed merges
+the delta into the main specs at a moment when nobody has looked at the
+implementation, leaving a review finding no honest option. Now, before the
+next project is built from these skills.
 
 ## What Changes
 
@@ -30,81 +33,46 @@ before the next project is built from these skills.
   waits for the complete approval package — the specification plus the
   design when one is warranted — and reviews the outcome and the approach
   bounds, never tasks; tasks and code follow approval. Archiving happens
-  inside the request only, by hand or by the automation the framework
-  skill installs; the after-merge mode is a rejected alternative. The
-  skill hands the project's framework to the matching `sdd` skill through
-  the installing skill.
+  inside the request, after the deliberation on the finished implementation
+  closes and before approval: it freezes the agreement between the
+  specification and the implementation, so approval applies to a frozen
+  version and only specification-consistency changes follow it. The
+  after-merge mode is a rejected alternative. The skill hands the project's
+  framework to the matching `sdd` skill through the installing skill.
 - `meta-spec-workflow` — **BREAKING**: becomes framework-agnostic. The
   four tool references, the archive script, and the archive workflow and
   job assets leave; tool adoption (step 3) and the automation (step 7)
   are handed to the framework skill through the installing skill. The
   questioning round settles the approval package (and when a design is
-  warranted) and the archive executor (by hand, or the framework skill's
-  automation) instead of an archive mode; the deposited contract and the
+  warranted) and the archive executor — who runs it inside the request
+  after the deliberation, and who does it for a fork — instead of an
+  archive mode; the deposited contract and the
   slot texts carry the package and the executor in platform vocabulary
   with no framework name, command, or script. `references/tracked-work-lifecycle.md`
   becomes `references/contract-design.md`.
 - `openspec-workflow` (new, `sdd`): running OpenSpec changes through pull
   or merge requests — the approval package (`proposal.md`, delta specs,
   `design.md` when warranted; `tasks.md` after approval), the spec-less
-  marker, the validator moments, archiving inside the request by hand or
-  by a label-triggered bot, the `/spec show` and `/spec status` comment
-  commands and the `spec/*` labels — plus, per platform, the automation
-  that installs them: a required check that fails on an invalid structure
-  or an unarchived related change, the comment-command workflow, the
-  label-triggered archive workflow (same-repository branch: archive,
-  commit, push with the platform token, remove the label; fork: mention
-  the author with the commands to run), the status-label workflow, and
-  GitLab CI equivalents with their limitations stated. Ships
+  marker, the validator moments, archiving inside the request by the
+  implementer after the deliberation (for a fork, by a maintainer on the
+  contributor's branch, which the platform token cannot do), the
+  `/spec show` and `/spec status` comment commands and the `spec/*`
+  labels — plus, per platform, the automation that installs them: a
+  required check that fails on an invalid structure or on a ready request
+  that still holds an unarchived change, the comment-command workflow
+  restricted to collaborators, the status-label workflow, and GitLab CI
+  equivalents with their limitations stated. No job pushes: a fork's
+  unprivileged run cannot label or reply, so the two workflows that do hold
+  a writable token read the head through the API and check nothing out, the
+  shape the platform's own labeler action uses. Ships
   `scripts/spec_changes.py`.
 - `spec-kit-workflow` (new, `sdd`): the same shape for Spec-Kit — the
   approval package is `spec.md` plus `plan.md`, `tasks.md` follows
-  approval, completion before ready is every task ticked, no archive
-  operation exists — with the check, the comment commands, and the
-  progress labels per platform. Ships `scripts/spec_kit_features.py`.
-
-## Direction change: the archive is the lock point, and the bot goes
-
-The maintainer reconsidered the request automation after the code review.
-Three decisions replace what the earlier rounds settled:
-
-- **The archive moves to after the implementation discussion.** The agent
-  publishes the finished implementation to a formal (non-draft) request,
-  the team deliberates on it, and only when that deliberation closes does
-  the implementer archive. Archiving stops meaning "I am finished" and
-  starts meaning "the specification and the implementation agree, and I am
-  freezing that agreement"; approval follows the freeze, and only
-  specification-consistency changes are expected after it. The mechanical
-  gate needs no change: the check already fails a ready request that holds
-  an unarchived change, so the request sits red for the whole deliberation
-  and the red is what blocks the merge.
-- **The label-triggered archive bot is removed.** It is the only job that
-  needs write access to contents and actually pushes, it carries the
-  largest share of the privileged surface, and it cannot work at all on a
-  fork because the platform token cannot push to one. Its benefit — saving
-  one command the agent already runs — does not pay for that.
-- **The check, the status labels, and the comment commands stay.** They
-  serve visibility in the request list and review ergonomics in the
-  discussion, not process automation. GitHub grants a fork's
-  `pull_request` run a read-only token and no secrets, and the setting that
-  would change this exists for private repositories only, so labelling and
-  replying on an external contributor's request genuinely require a
-  privileged trigger. The skills ship to repositories that live on external
-  contributions, so the calibration is theirs, not this repository's. The
-  privileged jobs keep the shape the official labeler action uses: the base
-  is checked out, the head is read through the API, and nothing authored by
-  the request reaches the runner.
-
-Two hardenings land with them: the comment command becomes
-collaborator-only, so nobody without write access can start a privileged
-run, which also closes the token-budget exhaustion that followed from it;
-and the platform token descends from the job to the steps that use it.
-
-A fourth change is editorial but load-bearing: every behavioral and
-security claim moves next to the step or function it constrains. A claim
-collected in a file header cannot be checked against an implementation
-eighty lines below, and this request already shipped one header that
-described a mechanism the file had stopped using.
+  approval, completion is every task ticked — with the check, the comment
+  commands, and the progress labels per platform. The kit has no archive
+  operation, so it has no lock event: the contract says what marks the
+  specification locked, and nothing enforces it. Ships
+  `scripts/spec_kit_features.py`.
 
 ## Skills touched
 
@@ -131,6 +99,11 @@ described a mechanism the file had stopped using.
   framework skill → `fix` for the gate, `refactor!` for the removed
   tool references and archive assets.
 - `openspec-workflow`, `spec-kit-workflow`: new capabilities → `feat`.
+
+- Every asset and script keeps its behavioral and security claims next to
+  the step or function they constrain; a file header carries orientation
+  and the placeholder instructions only, because a claim collected at the
+  top cannot be checked against an implementation further down.
 
 ## Impact
 

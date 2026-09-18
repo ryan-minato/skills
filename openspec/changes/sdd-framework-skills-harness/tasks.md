@@ -21,7 +21,7 @@
 - [x] 3.3 Contract, project skill, template, and schema proofs (clean-context readback, `check_pr_policy.py` runs, `just spec-validate`)
 - [x] 3.4 Record skipped cases (live bot runs after merge) for the pull request's Validation section
 
-## 4. Zero-trust read path (review amendment)
+## 4. The privileged read path
 
 - [x] 4.1 `.github/workflows/spec-labels.yml` and `spec-command.yml` regenerated from the updated assets: base checkout only, the head read through `scripts/spec_changes.py snapshot`, the label plan checked against the literal taxonomy; verify YAML parse, job names unchanged, and `grep -n 'git .*fetch'` empty in both
 - [x] 4.2 `.github/workflows/spec-archive.yml` regenerated: the fork branch reads the snapshot, the same-repository steps carry the literal `head.repo.full_name == github.repository` condition, the `SAME_REPO` and `OPEN` environment variables are gone; verify YAML parse and `just validate` (`check_spec_labels`)
@@ -29,11 +29,11 @@
 - [x] 4.4 `.agents/knowledge/github-checks.md` records the rule, the snapshot in the two job rows, and the standing instruction never to add a head checkout or fetch; verify a read-through and `just validate`
 - [x] 4.5 The open CodeQL alert on `spec-labels.yml` closes on the next default-setup scan of the branch; record the outcome in the pull request's Validation section
 
-## 5. Review findings (code review of this request)
+## 5. Workflow and knowledge corrections
 
 - [x] 5.1 This repository's `spec-command.yml` grants `pull-requests: read` and `spec-archive.yml` posts fork instructions that fetch from `upstream`, both regenerated from the corrected assets; `scripts/spec_changes.py` mirror refreshed — verify YAML parse, `just validate`, and the mirror diff empty
 
-## 6. Direction change: this repository follows
+## 6. This repository follows the skills
 
 - [ ] 6.1 Delete `.github/workflows/spec-archive.yml` and the `spec/archive` row from `.github/labels.json`; rework `check_spec_labels()` and drop `SPEC_ARCHIVE_WORKFLOW` from `scripts/validate_harness.py`; drop the trigger label from `scripts/spec_changes.py` and its taxonomy output; remove the `spec / archive` row and the approval-click note from `.agents/knowledge/github-checks.md` — verify `just validate` and the mirror diff empty
 - [ ] 6.2 Move the archive after the deliberation in `.agents/knowledge/spec-workflow.md`, the `change-workflow` project skill, `AGENTS.md`, and the pull request template's checklist; state that the required check stays red until the freeze — verify a read-through and `python3 scripts/check_pr_policy.py`
