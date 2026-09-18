@@ -6,11 +6,6 @@
 # commit SHA of each action, the Node LTS line, and the project's command that
 # installs the pinned OpenSpec CLI (the version pin stays in one place).
 # `scripts/spec_changes.py` is the project's copy of this skill's script.
-#
-# On a pull request: strict validation, then every related change that is
-# still unarchived is a warning while the pull request is a draft and a
-# failure once it is ready. On a push to the default branch: strict
-# validation, then any change outside archive/ fails.
   spec-check:
     name: spec / check
     runs-on: ubuntu-latest
@@ -28,6 +23,12 @@
           node-version: "{{NODE_LTS}}"
       - name: Install the pinned OpenSpec CLI
         run: "{{INSTALL_COMMAND}}"
+      # On a pull request: strict validation, then every related change that is
+      # still unarchived is a warning while the pull request is a draft and a
+      # failure once it is ready — the request stays red through the
+      # deliberation, and the freeze is what turns it green. On a push to the
+      # default branch: strict validation, then any change outside archive/
+      # fails, so the integration branch never holds an unarchived change.
       - name: Validate strictly and refuse an unarchived related change
         env:
           EVENT: ${{ github.event_name }}

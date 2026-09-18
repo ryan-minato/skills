@@ -6,11 +6,6 @@
 # action's pinned commit. `scripts/spec_kit_features.py` is the project's copy
 # of this skill's script; Spec-Kit ships no validator, so the check is the
 # script alone.
-#
-# On a pull request: every touched feature has its specification and plan;
-# an open task is a warning while the pull request is a draft and a failure
-# once it is ready. On a push to the default branch: every feature directory
-# has its required files.
   spec-check:
     name: spec / check
     runs-on: ubuntu-latest
@@ -20,6 +15,11 @@
       - uses: "actions/checkout@{{PINNED_SHA}}"
         with:
           fetch-depth: 0
+      # On a pull request: every touched feature has its specification and
+      # plan; an open task is a warning while the pull request is a draft and
+      # a failure once it is ready, so the request stays red until the feature
+      # is finished. On a push to the default branch: every feature directory
+      # has its required files.
       - name: Check the touched features
         env:
           EVENT: ${{ github.event_name }}

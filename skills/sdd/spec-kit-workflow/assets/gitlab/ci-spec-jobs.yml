@@ -2,19 +2,14 @@
 # from the project's `.gitlab-ci.yml` (`include: - local: ...`) or paste the
 # jobs in; add the `spec` stage or rename the stage below. Replace
 # {{PYTHON_IMAGE}}. `scripts/spec_kit_features.py` is the project's copy of
-# this skill's script. Spec-Kit has no archive operation, so there is no
-# archive job: completion is every task ticked, which `spec:check` enforces
-# once the merge request is no longer a draft.
+# this skill's script. No job here writes to the repository.
 #
-# GitLab offers no pipeline source for a merge request note or a label
-# change: `spec:show` and `spec:status` are manual jobs whose arguments come
-# from the manual job's variables form; their output goes to the job log
-# and, with SPEC_NOTE_TOKEN (api scope, masked), to a merge request note;
-# `spec:labels` applies the progress label with SPEC_LABELS_TOKEN (api
-# scope) or only prints the plan. Merge request pipelines from a fork run in
-# the fork without the parent's variables, so notes and labels work for a
-# fork only when a parent-project member runs the pipeline in the parent
-# context. Enforcement is the project setting "Pipelines must succeed".
+# What GitLab does not offer, stated plainly: no pipeline source exists for
+# a merge request note or a label change, so a label a job applies appears
+# only after the next pipeline runs, and manual jobs read no chat arguments.
+# Merge request pipelines from a fork run in the fork without the parent's
+# variables, so notes and labels work for a fork only when a parent-project
+# member runs the pipeline in the parent context.
 
 variables:
   GIT_DEPTH: "0"
@@ -26,6 +21,11 @@ variables:
     - export SPEC_BASE="$CI_MERGE_REQUEST_DIFF_BASE_SHA" SPEC_HEAD="$CI_COMMIT_SHA"
     - export SPEC_API="$CI_API_V4_URL/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID"
 
+# Fails the pipeline when a touched feature is missing its specification or
+# plan and, once the merge request is no longer a draft, when a task of a
+# touched feature is still open — Spec-Kit has no archive operation, so this
+# is what completion means. Enforce with the project setting "Pipelines must
+# succeed" (a maintainer action).
 spec:check:
   extends: .spec-base
   rules:
@@ -41,6 +41,10 @@ spec:check:
         python3 scripts/spec_kit_features.py check --all
       fi
 
+# Manual: prints a feature's documents (SPEC_FEATURE empty = every touched
+# feature; SPEC_DOC = spec|plan|tasks|all) to the job log, and posts them as a
+# merge request note when SPEC_NOTE_TOKEN (api scope, masked) is set. A manual
+# job reads no chat arguments, so these come from its variables form.
 spec:show:
   extends: .spec-base
   rules:
@@ -61,6 +65,7 @@ spec:show:
           --data @note.json "$SPEC_API/notes" > /dev/null
       fi
 
+# Manual: the progress table, same note behavior.
 spec:status:
   extends: .spec-base
   rules:
@@ -79,6 +84,9 @@ spec:status:
           --data @note.json "$SPEC_API/notes" > /dev/null
       fi
 
+# Keeps the progress label; with SPEC_LABELS_TOKEN (api scope) it applies it,
+# otherwise it only prints the plan. A label a job applies appears only after
+# the next pipeline, because no pipeline source exists for a label change.
 spec:labels:
   extends: .spec-base
   rules:

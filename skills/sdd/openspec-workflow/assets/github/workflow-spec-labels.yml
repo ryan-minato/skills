@@ -3,18 +3,15 @@
 # and `spec/not-started` | `spec/in-progress` | `spec/done`. A pull request
 # with no related change carries none of them.
 #
-# `pull_request_target` runs with a writable token even for a fork, which a
-# plain `pull_request` run does not have. The rule that makes that safe: no
-# object authored by the request ever reaches this runner. The checkout is the
-# BASE (the event's default), and the head is read through the REST API by the
-# base's own script, which parses it and never executes it. Never add a
-# checkout of the head, a `git fetch` of it, an install from it, or a `run:`
-# of its files.
 # Replace {{PINNED_SHA}}; `scripts/spec_changes.py` is the project's copy of
 # this skill's script.
 name: spec-labels
 
 on:
+  # `pull_request_target` runs with a writable token even for a fork, which a
+  # plain `pull_request` run does not have — and a fork cannot be labelled
+  # without one, because the setting that grants a fork's own run write access
+  # exists for private repositories only.
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
 
@@ -32,17 +29,24 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    env:
-      GH_TOKEN: ${{ github.token }}
     steps:
+      # No object authored by the request ever reaches this runner: the
+      # checkout is the BASE (the event's default), and the head is read
+      # through the REST API by the base's own script, which parses it and
+      # never executes it. Never add a checkout of the head, a `git fetch`
+      # of it, an install from it, or a `run:` of its files.
       - uses: "actions/checkout@{{PINNED_SHA}}"
       - name: Snapshot the head through the API
         env:
+          # The token reaches only the two steps that call the API, so a step
+          # added later starts without it and has to ask for it on purpose.
+          GH_TOKEN: ${{ github.token }}
           N: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
         run: python3 scripts/spec_changes.py snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
       - name: Compute the label plan and apply it
         env:
+          GH_TOKEN: ${{ github.token }}
           N: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
           CURRENT: ${{ join(github.event.pull_request.labels.*.name, ',') }}
