@@ -52,20 +52,24 @@ The agent SHALL name, for the project's specification tool, which files the gate
 - **WHEN** the tool's propose step generated the task list together with the specification and the design
 - **THEN** the agent pushes it as a draft, lists it on the request as after-approval material, and keeps it out of the review
 
-### Requirement: Behavior: Archiving happens inside the request, by hand or by the automation the framework skill installs
-The agent SHALL archive (or converge) the change record inside the change request before it is marked ready, so the integration branch never holds an unarchived record; SHALL run the executor the contract records — by hand with the tool's archive command by default, or the framework skill's automation (a trigger label whose bot archives, commits, pushes, and removes the label) when the contract names it, applying the label only as an authorized remote write and waiting for the bot's commit; on a fork, SHALL run the commands the bot posts and push them; SHALL state that the archived record is frozen so a defect review finds goes to the request's validation section or a follow-up change; and SHALL never propose archiving after the merge by an automation that pushes to the integration branch.
+### Requirement: Behavior: Archiving freezes the record inside the request, after the deliberation and before approval
+The agent SHALL publish the finished implementation to a formal (non-draft) change request so the team can deliberate on it, SHALL archive (or converge) the change record inside that request only once the deliberation closes, and SHALL treat the archive as the freeze: it records that the specification and the implementation agree, approval applies to the frozen version, and only changes that restore consistency with the specification are expected after it. The agent SHALL run the executor the contract records — the implementer by default, with the tool's archive command — and on a request from a fork SHALL state that a maintainer archives on the contributor's branch, because no automation can push to a fork; SHALL state that the archived record is frozen, so a defect review finds goes to the request's validation section or a follow-up change; and SHALL never propose archiving after the merge, nor an automation that pushes an archive commit.
 
 #### Scenario: No contract
 - **WHEN** the project has no specification contract and the change's tasks are all done
-- **THEN** the agent archives inside the request with the tool's archive command before marking it ready and says the framework skill's automation is the alternative the contract could name
+- **THEN** the agent marks the request ready for the deliberation, archives with the tool's archive command only after the deliberation closes, and says approval follows the archive
 
-#### Scenario: Contract names the label
-- **WHEN** the contract records the trigger label and the user authorizes the remote write
-- **THEN** the agent applies the label, waits for the bot's commit, pulls it, and does not archive by hand in parallel
+#### Scenario: Asked to archive before the deliberation
+- **WHEN** the agent finishes the implementation and is asked to archive and request approval in one step
+- **THEN** it archives nothing yet, publishes the implementation for deliberation, and says the freeze comes after it
 
 #### Scenario: Fork
-- **WHEN** the request comes from a fork and the bot has posted the commands
-- **THEN** the agent runs them locally, validates, commits, and pushes; the bot pushes nothing
+- **WHEN** the request comes from a fork and its deliberation has closed
+- **THEN** the agent names the maintainer as the executor on the contributor's branch, states that the platform's own token cannot push there, and offers the contributor the commands as the alternative
+
+#### Scenario: Change requested after the freeze
+- **WHEN** review asks for a behavior change after the record was archived in the request
+- **THEN** the agent says the freeze is broken by it, reopens the record rather than editing the archived one, and the deliberation resumes
 
 #### Scenario: Review finds a defect after archiving
 - **WHEN** review finds an error in a record already archived inside the request
@@ -201,4 +205,4 @@ When the project uses a specification tool, the agent SHALL perform every operat
 
 ### Requirement: Behavior: Archive mode is recommended from the automation available
 **Reason**: only in-request archiving remains; the after-merge automation mode is withdrawn.
-**Migration**: "Archiving happens inside the request, by hand or by the automation the framework skill installs".
+**Migration**: "Archiving freezes the record inside the request, after the deliberation and before approval".

@@ -33,8 +33,8 @@ The agent SHALL treat the feature's `spec.md` and `plan.md` together as the appr
 - **WHEN** the plan reads as an ordered implementation procedure
 - **THEN** the agent rewrites it as approach, constraints, and preferences before publishing the draft
 
-### Requirement: Behavior: Completion before ready replaces archiving
-The agent SHALL state that Spec-Kit has no archive operation, SHALL require every task of every feature the request touches to be ticked before the request is marked ready, SHALL name the project's rule for updating the living specification when the level is spec-anchored, and SHALL refuse to tick a task whose verification did not run.
+### Requirement: Behavior: Completion replaces archiving, and the contract says what locks the specification
+The agent SHALL state that Spec-Kit has no archive operation, SHALL require every task of every feature the request touches to be ticked before the request is marked ready for the deliberation on the finished implementation, and SHALL refuse to tick a task whose verification did not run. Because the kit has no archive, it has no lock event: the agent SHALL say that what marks the specification frozen before approval is whatever the project's contract declares — by default the deliberation closing with no further change to the specification or the plan — and that nothing in the kit enforces it. The agent SHALL name the project's rule for updating the living specification when the level is spec-anchored.
 
 #### Scenario: Ready with an open task
 - **WHEN** the user asks to mark the request ready while a touched feature's task list has an open item
@@ -44,20 +44,28 @@ The agent SHALL state that Spec-Kit has no archive operation, SHALL require ever
 - **WHEN** the user asks how to archive the feature
 - **THEN** the agent says the kit archives nothing, completion is the ticked task list, and a spec-anchored project updates its living specification per its rule
 
+#### Scenario: What locks the specification
+- **WHEN** the user asks what the approval applies to, given that nothing is archived
+- **THEN** the agent names the contract's lock declaration, says the default is the deliberation closing with the specification and the plan unchanged, and says no mechanism enforces it
+
 ### Requirement: Behavior: The automation is installed per platform from the skill's assets
-When asked to install the automation on GitHub, the agent SHALL produce from its assets a check job that joins the base's existing checks workflow and its gate (required files present for every touched feature; an open task as a warning on a draft and a failure when ready), the comment-command workflow (`/spec show` and `/spec status` over touched features), and the progress-label workflow, SHALL add the three progress labels to the project's label file, SHALL copy `scripts/spec_kit_features.py` into the project's scripts, SHALL grant each job only the scopes its own reads and writes need, remembering that a permission left out of the block is none, SHALL keep every workflow fork-safe by one structural rule — no object authored by the request reaches a privileged runner: scripts run from the base ref and the head is read through the script's API snapshot rather than fetched into the runner's git store, and SHALL say that no archive bot exists because the kit has no archive operation; on GitLab the agent SHALL produce the jobs fragment, state its limitations, and refuse running a fork's pipeline in the parent project as a workaround, because that runs the fork's configuration with the parent's token.
+When asked to install the automation on GitHub, the agent SHALL produce from its assets a check job that joins the base's existing checks workflow and its gate (required files present for every touched feature; an open task as a warning on a draft and a failure when ready), the comment-command workflow (`/spec show` and `/spec status` over touched features), and the progress-label workflow, SHALL add the three progress labels to the project's label file, SHALL copy `scripts/spec_kit_features.py` into the project's scripts, SHALL grant each job only the scopes its own reads and writes need, remembering that a permission left out of the block is none, SHALL keep every workflow fork-safe by one structural rule — no object authored by the request reaches a privileged runner: scripts run from the base ref, no job checks the head out or fetches it, and the head is read through the script's API snapshot, SHALL restrict the comment command to the collaborator associations so nobody without write access can start a privileged run, SHALL explain that a fork's unprivileged run holds a read-only token and no secrets and that the setting which would grant write exists for private repositories only, which is why labelling and replying need a privileged trigger at all, and SHALL say that no job archives or pushes, both because the kit has no archive operation and because the executor of a freeze is a person; on GitLab the agent SHALL produce the jobs fragment, state its limitations, and refuse running a fork's pipeline in the parent project as a workaround, because that runs the fork's configuration with the parent's token.
 
 #### Scenario: GitHub install
 - **WHEN** the user asks to install the automation in a GitHub repository whose base has a checks workflow with a gate
-- **THEN** the agent adds the check job to that workflow and its gate's dependencies, adds the two workflows and the labels, copies the script, and says no archive bot is installed
+- **THEN** the agent adds the check job to that workflow and its gate's dependencies, adds the two privileged workflows and the labels, copies the script, and says nothing it installs archives or pushes
 
 #### Scenario: Privileged job reads the head
 - **WHEN** a produced workflow that runs with a writable token needs a touched feature's documents
-- **THEN** it checks out the base and reads them through the script's API snapshot, and no step fetches or checks out the head
+- **THEN** it checks out the base and reads them through the script's API snapshot, and no step of any produced workflow fetches or checks the head out
 
 #### Scenario: Ready with an open task
 - **WHEN** a ready pull request touches a feature whose task list has an open item
 - **THEN** the produced check fails and names the feature and the task
+
+#### Scenario: Command invoked by the request's author
+- **WHEN** a comment command is posted by someone who is not a collaborator, including the request's own author
+- **THEN** the produced workflow does not run
 
 ### Requirement: Handoff: the methodology skill
 The agent SHALL route questions about whether or at which level to adopt spec-driven development, what a good specification is, or the generic loop to the methodology skill of the `sdd` catalog through the installing skill, and when the user declines SHALL answer from the loop facts this skill restates (package before tasks, completion before ready) without teaching the practice.
