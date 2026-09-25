@@ -69,8 +69,9 @@ to the disposable `meta` catalog, not here.
 
 Default shape for methodology skills (`code-refactoring`, `goal-alignment`).
 The brownfield suite's members take the suite prefix `brownfield-`
-followed by one action noun (`brownfield-investigation`); the prefix marks
-suite membership, is not a catalog prefix, and binds no other skill here.
+followed by one noun naming its role (`brownfield-investigation`); the
+prefix marks suite membership, is not a catalog prefix, and binds no other
+skill here.
 Artifact-authoring skills take the `-authoring` suffix
 (`devcontainer-authoring`); `design-md` is the format's proper noun and
 `gitmoji` the convention's, and both stand as they are.
@@ -87,8 +88,8 @@ in `core`; clarifying ambiguous requirements while already coding →
 the approval package, the approach families, converting a prototype or an
 existing codebase into a spec-driven project — → the `sdd` catalog's
 `spec-driven-development` (a goal document from `goal-alignment` precedes
-any spec), and one framework's
-records, archive, and request automation → that framework's `sdd` skill;
+any spec), and one framework's records, archive, and request automation →
+that framework's `sdd` skill;
 settling and recording the project's rules — level, tool, change request
 shape, approval mode and package, archive executor, scope — → the `meta`
 catalog's `meta-spec-workflow` · understanding an existing codebase with
@@ -115,9 +116,9 @@ agent-facing text is written — pointers, pruning, one source of truth — →
 project's complete agent harness — entrypoints, knowledge trees, sync
 mechanisms — → the `meta` catalog's `meta-harness-building`
 (`session-retrospective` and `knowledge-deposition` only evolve an
-existing setup incrementally during normal work); authoring a public or substantial Agent Skill →
-`great-skill-writing` in `core`, plus the `skill-authoring` project skill
-for skills in this repository.
+existing setup incrementally during normal work); authoring a public or
+substantial Agent Skill → `great-skill-writing` in `core`, plus the
+`skill-authoring` project skill for skills in this repository.
 
 ## References
 
