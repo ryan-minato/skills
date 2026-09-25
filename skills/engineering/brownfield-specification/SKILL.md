@@ -154,10 +154,12 @@ then present that evidence and ask for an explicit revision.
 
 1. Gather the evidence and classify every candidate (below). Write nothing
    into the project.
-2. Put the decision round in your reply — one item per candidate, in the
-   shape above — and end your turn there. In this turn, draft no
-   specification, add no tests, and create no workspace the user has not
-   agreed to.
+2. Put the decision round in your reply and end your turn there: one item
+   per SPECIFICATION, COMPATIBILITY, and UNKNOWN row — the obvious ones
+   included — in the shape above, with an impact after every option.
+   Before sending, count the rows against the items and check every option
+   for its impact. In this turn, draft no specification, add no tests, and
+   create no workspace the user has not agreed to.
 3. When the rulings arrive, record them, then take each CONFIRMED_CONTRACT
    through the promotion gate. An approved contract without a verified
    guardrail goes to the baseline only.
@@ -199,9 +201,10 @@ consumer found is UNKNOWN, not IMPLEMENTATION, until consumers can be ruled
 out. Behavior that exists for a transition — a legacy identifier, an old
 client, an import from a previous system — is COMPATIBILITY, not
 SPECIFICATION, even when a named consumer relies on it today. Classify
-each field and behavior on its own: a transitional field inside an event
-or response that is a SPECIFICATION candidate gets its own COMPATIBILITY
-row. List the
+each field and behavior on its own row: split an event or a response into
+its fields, and give a transitional field inside it its own COMPATIBILITY
+row even when the event or response as a whole is a SPECIFICATION
+candidate. List the
 structural facts you set aside (the storage engine, internal calls,
 frameworks) with class ARCHITECTURE or IMPLEMENTATION, so the user sees
 they were considered. Read
