@@ -31,6 +31,7 @@ npx skills add ryan-minato/skills \
 
 | Skill | Description |
 |---|---|
+| [brownfield-investigation](brownfield-investigation/) | Investigate an existing codebase with evidence: choose the lenses a question needs (documentation against code, repository map, domain model, runtime flow, data and state, contract candidates, test safety map, history) and a depth (ORIENT, ESTABLISH, EXHAUSTIVE) at a pinned revision; record each finding with its source, confidence, counter-evidence, and unknowns; report drift and suspected bugs without editing or fixing anything; fan independent lenses out to subagents where the host allows, sequentially otherwise. |
 | [code-refactoring](code-refactoring/) | Restructure existing code in small behavior-preserving steps verified by tests: separate structural change from behavior change, decide when to refactor (and when not to), diagnose code smells, and execute the standard named refactoring techniques safely. |
 | [devcontainer-authoring](devcontainer-authoring/) | Author, test, and publish Dev Container artifacts — Features (install.sh contract, idempotency and base-image quality bar, independence rule), Templates (option substitution, payload design, smoke-test loop), and prebuilt images (devcontainer build --push, metadata merge semantics) — with bundled repo scaffolds and shared-action CI. |
 | [design-md](design-md/) | Author and validate a durable, agent-readable DESIGN.md visual-design specification with optional YAML design tokens, prose guidance, upstream format checks, and an OKLCH calculator. |
