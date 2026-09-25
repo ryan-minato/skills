@@ -29,6 +29,7 @@ npx skills add ryan-minato/skills \
 |---|---|
 | [brownfield-investigation](brownfield-investigation/) | 以证据调查既存代码库：按问题选取所需视角（文档与代码核对、仓库地图、领域模型、运行时流程、数据与状态、候选契约、测试安全网、历史）与深度（ORIENT、ESTABLISH、EXHAUSTIVE），并固定 revision；每条发现都记录来源、置信度、反证与未知项；报告文档漂移与疑似 bug，但不编辑、不修复任何内容；宿主支持时把相互独立的视角并行交给子代理，否则顺序执行。 |
 | [brownfield-onboarding](brownfield-onboarding/) | 为加入既存代码库的工程师编写入职材料：构建一个最小充分、可信的心智模型（目的、如何运行、组件、术语、架构、代表性流程、改什么去哪里、风险与未知项），以调查得到的证据为基础，复用经核实的文档，把观察到的惯例描述为当前做法而非规则，并验证给出的每个路径与命令。 |
+| [brownfield-specification](brownfield-specification/) | 只经由决策把既存系统的观察行为转化为规范：用重写测试与消费者测试给候选契约分类（规范、兼容、架构、实现、未知），分批把裁决交给人类，只有在护栏被证明对当前系统通过、对违例失败时才提升已批准的契约，写契约而非实现，并且只把已批准的规则固化为检查。 |
 | [code-refactoring](code-refactoring/) | 以测试保障的小步、保持行为不变的方式重构既有代码：把结构调整与行为变更分离，判断何时重构（何时不重构），诊断代码坏味道，并安全地执行标准的具名重构手法。 |
 | [devcontainer-authoring](devcontainer-authoring/) | 创作、测试与发布 Dev Container 工件——Feature（install.sh 契约、幂等性与多基础镜像质量标准、独立性规则）、Template（选项替换、载荷设计、冒烟测试循环）与预构建镜像（devcontainer build --push、metadata 合并语义）——附带仓库脚手架与共享 action CI。 |
 | [design-md](design-md/) | 创作并校验持久化、供 agent 读取的 DESIGN.md 视觉设计规范，包含可选 YAML 设计 token、正文指导、上游格式检查和 OKLCH 计算器。 |
