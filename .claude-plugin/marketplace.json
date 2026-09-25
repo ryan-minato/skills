@@ -30,6 +30,7 @@
       "source": "./",
       "strict": false,
       "skills": [
+        "./skills/engineering/brownfield-intelligence",
         "./skills/engineering/brownfield-investigation",
         "./skills/engineering/brownfield-migration",
         "./skills/engineering/brownfield-onboarding",
