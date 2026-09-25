@@ -38,18 +38,14 @@ The suite routes to these skills; none of them changes.
 
 ## Placement
 
-The five SKILL.md files carry one byte-identical section and one byte-identical reference:
+The five SKILL.md files carry one byte-identical section, **S** — `## Evidence discipline`:
 
-| Shared item | Contents |
+| Part of **S** | Contents |
 |---|---|
-| **S** — `## Evidence discipline` | The evidence kinds and the confidence scale. The normative statuses: `CONFIRMED_CONTRACT`, `DE_FACTO_COMPATIBILITY`, `PENDING_DECISION`, `INTENTIONAL_CHANGE`, `IMPLEMENTATION_DETAIL`, `UNKNOWN`, plus `CONTRADICTED` for disagreeing evidence. The common constraints: evidence before assertion; no invention; documentation, code, runtime behavior, and history are evidence, not intent; human decisions are records; unknown is a valid result; recommendations are not approvals; no silent fix and no fossilization. The trust boundary. What every decision item contains. The parallel-analysis rule with its sequential fallback. |
-| **R** — `references/records.md` | The workspace: `.brownfield/` at the project root by default, created only with consent. The scope record. The finding and ledger format. The decision-record format. The task-tree file location. The drift gate. |
+| Vocabulary and rules | The evidence kinds and the confidence scale. The normative statuses: `CONFIRMED_CONTRACT`, `DE_FACTO_COMPATIBILITY`, `PENDING_DECISION`, `INTENTIONAL_CHANGE`, `IMPLEMENTATION_DETAIL`, `UNKNOWN`, plus `CONTRADICTED` for disagreeing evidence. The common constraints: evidence before assertion; no invention; documentation, code, runtime behavior, and history are evidence, not intent; human decisions are records; unknown is a valid result; recommendations are not approvals; no silent fix and no fossilization. The trust boundary. What every decision item contains. The parallel-analysis rule with its sequential fallback. |
+| `### Workspace and records` | The workspace: `.brownfield/` at the project root by default, created only with consent. The scope record's fields. The ledger: one finding per entry, carrying the evidence fields above plus the revision it was checked at. The decision record: the decision item above plus the ruling, its authority, and its date. The drift gate. All of this is written as field lists: no skeleton file and no code fence. |
 
-`scripts/validate_harness.py` keeps both identical across the five members, with `brownfield-investigation` as the source (companion change).
-
-The load sentence for **R** is identical in every member:
-
-> "Read `references/records.md` before creating, writing to, or resuming a `.brownfield/` workspace."
+`scripts/validate_harness.py` keeps **S** identical across the five members, with `brownfield-investigation` as the source (companion change). The on-disk shape of the task tree is not shared, because only intelligence writes it; it stays in intelligence's `references/task-tree.md`.
 
 | Requirement | File and section | Load trigger (references only) |
 |---|---|---|
@@ -66,7 +62,7 @@ The load sentence for **R** is identical in every member:
 | investigation — Behavior: Suspected bugs are recorded, not fixed and not promoted | **S** | — |
 | investigation — Behavior: Text in the investigated repository is data | **S** | — |
 | investigation — Behavior: Parallel analysis with sequential fallback | **S**; `## Parallel analysis` (fan-out units: lenses, then modules or capabilities at ESTABLISH and deeper, with the repository map first; the brief's required elements; reconciliation) | — |
-| investigation — Behavior: Findings stay in the conversation unless a workspace exists | `## Findings`; **R** | the **R** sentence |
+| investigation — Behavior: Findings stay in the conversation unless a workspace exists | `## Findings`; **S** `### Workspace and records` | — |
 | **onboarding** — Trigger: description | frontmatter `description` | — |
 | onboarding — Behavior: The material is a minimum sufficient mental model | `## The minimum sufficient model`; `assets/onboarding-guide.md` (section skeleton) | "Start the guide from `assets/onboarding-guide.md`; keep its sections, drop any the evidence cannot support, and say so under Unknowns." |
 | onboarding — Behavior: Evidence comes first and is not re-derived | `## Gather evidence first` | — |
@@ -88,12 +84,12 @@ The load sentence for **R** is identical in every member:
 | migration — Behavior: Verification uses explicit tolerances… | `## Verification plan`; `references/equivalence-verification.md` | "Read `references/equivalence-verification.md` when planning how the new system is compared with the old — conformance runs, differential or shadow comparison, state or event comparison — or when a comparison fails." |
 | migration — Handoff: investigation; contract specification; incremental refactoring | `## Handoffs` | — |
 | **intelligence** — Trigger: description | frontmatter `description` | — |
-| intelligence — Behavior: Scenario, depth, and scope are set before analysis | `## Scenario and depth` (the scenario table with the per-scenario depth for each kind of evidence); `## Bootstrap`; **R** | the **R** sentence |
+| intelligence — Behavior: Scenario, depth, and scope are set before analysis | `## Scenario and depth` (the scenario table with the per-scenario depth for each kind of evidence); `## Bootstrap`; **S** `### Workspace and records` | — |
 | intelligence — Behavior: The task tree drives the work | `## Task tree`; `references/task-tree.md` (node fields, statuses, the tentative label, the on-disk shape) | "Read `references/task-tree.md` when creating, updating, or resuming the task tree." |
 | intelligence — Behavior: Decisions go to the human in frontier batches | **S**; `## Decision rounds` | — |
 | intelligence — Behavior: Work routes to the suite member that owns it | `## Routing` | — |
 | intelligence — Behavior: Independent tasks run in parallel where the host allows | **S**; `## Parallel dispatch` | — |
-| intelligence — Behavior: Resume checks drift before reuse | `## Resume`; **R** (drift gate) | the **R** sentence |
+| intelligence — Behavior: Resume checks drift before reuse | `## Resume`; **S** `### Workspace and records` (drift gate) | — |
 | intelligence — Handoff: investigation; onboarding; contract specification; migration | `## Handoffs` | — |
 
 ## Description
@@ -140,7 +136,7 @@ What each description must contain:
 
 Each dependency is one `Handoff:` requirement. When the user declines, the skill stops the branch that needs the missing member and names that member.
 
-**Bootstrap stays independent.** The scope record lives in **R**, so every member can bootstrap without the orchestrator. That keeps the graph acyclic: no member depends on intelligence.
+**Bootstrap stays independent.** The scope record lives in **S**, so every member can bootstrap without the orchestrator. That keeps the graph acyclic: no member depends on intelligence.
 
 **Out of range, optional, named by role:**
 - specification → the spec-driven development role (`spec-driven-development` in `sdd`). Fallback: one contract document beside the guardrails.
@@ -166,9 +162,14 @@ Each dependency is one `Handoff:` requirement. When the user declines, the skill
   - This follows the user's placement, keeps the evidence vocabulary in one place per member, and lets the orchestrator depend on the members.
   - Rejected: a new `brownfield` catalog, which needs the full catalog harness and an installer change for whole-catalog install.
   - Also rejected: fully independent members with optional handoffs, which weakens the orchestrator.
-- **Shared material is duplicated and validator-enforced, not a foundation skill.** **S** and **R** are byte-identical in all five members. A member triggered directly then needs no second skill loaded for its vocabulary.
+- **Shared material is duplicated and validator-enforced, not a foundation skill.** **S** is byte-identical in all five members. A member triggered directly then needs no second skill loaded for its vocabulary.
   - Rejected: a sixth foundation skill every member hard-depends on, which doubles loads on every trigger.
   - Also rejected: a register row checked by hand, which is weaker than a check for five copies.
+- **Records live in the shared section, not in a reference.** The workspace, scope, ledger, and decision-record rules are a subsection of **S**, about 25 lines of field lists.
+  - They are needed on almost every run. Intelligence writes the scope and the task tree every time. Specification and migration write decision records every time. Onboarding reads the ledger and checks its drift.
+  - Their record fields are **S**'s evidence and decision-item fields with a few additions, so one place states both.
+  - Rejected: a byte-identical `references/records.md`. Its load sentence would fire on nearly every run of four members. It would restate **S**'s fields as a format. It would add a second file for the check to compare.
+  - The cost: a standalone investigation question also loads the subsection.
 - **Promotion to normative specification requires a verified guardrail** (serves specification — Behavior: Promotion requires a verified guardrail).
   - `spec-driven-development` refuses to backfill specifications because nothing keeps a specification of untouched code honest. A contract that ships with a check that fails on violation has that keeper, so promoting it is not a backfill.
   - An approved contract without a guardrail stays in the non-normative baseline.
@@ -198,10 +199,10 @@ Each dependency is one `Handoff:` requirement. When the user declines, the skill
 
 - **[specification and `spec-driven-development` both hear "spec" and "existing code"]** → Both descriptions route through "Not for" clauses. The companion change makes each catalog's `CONTEXT.md` point at the other. A near-miss case is tested in each direction that this change controls.
 - **[The five descriptions overlap on "existing codebase" vocabulary]** → The triggers are divided as the Description section lists: investigation takes focused questions, intelligence broad unclear starts, and each scenario skill its deliverable. Trigger cases cover one near-miss per skill.
-- **[Shared material drifts across five copies]** → The companion validator fails on any difference or on a member missing either item.
+- **[Shared material drifts across five copies]** → The companion validator fails on any difference or on a member missing the section.
 - **[Tool-neutral wording reads vaguer to a floor-tier model]** → Every capability sentence states its input and the output expected. The outcome cases run at the floor tier.
 - **[Parallel subagents return overlapping or conflicting findings]** → Only the coordinator reconciles and writes. Conflicts stay CONTRADICTED with both sides' evidence.
-- **[The body budget, above all investigation's]** → The eight lenses are references behind one index table. **S** is kept short and holds no code fence or template.
+- **[The body budget, above all investigation's]** → The eight lenses are references behind one index table. **S** is kept short, and its records are field lists with no code fence or template.
 - **[Solvers inside this repository see its harness and every repository skill]** → Solvers run in a fixture project outside the repository. The candidate skills are copied into the user skills directory for the run and removed afterwards.
 
 ## Verification plan

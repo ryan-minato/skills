@@ -38,18 +38,18 @@ See proposal.md for motivation, and `openspec/changes/brownfield-suite/design.md
   - The synchronization register says that mechanically checked pairs live in `validate_harness.py` and are listed in its docstring.
   - Rejected: placing it beside `check_meta_harness_methodology`. It would be as undocumented as that check is.
 - **What the check compares** (serves the check bullet):
-  - It compares the `## Evidence discipline` section by exact heading and **R** as a whole file.
+  - It compares one item: the `## Evidence discipline` section, found by its exact heading. The workspace and record rules are a `###` subsection inside it, so they fall inside the compared text.
   - The source is `brownfield-investigation`, the first member to land.
   - The member set is every directory `skills/engineering/brownfield-*`.
-  - A missing section, a missing file, or members present without the source is an error, never a skip. With no members present, the check passes, so this commit is valid on its own.
-  - The section is cut at the next level-2 heading. The skill design keeps code fences out of the shared section, so a `## ` line inside a fence cannot end the comparison early.
+  - A missing section, or members present without the source, is an error, never a skip. With no members present, the check passes, so this commit is valid on its own.
+  - The section is cut at the next level-2 heading. Level-3 headings do not end it. The skill design keeps code fences out of the shared section, records included, so a `## ` line inside a fence cannot end the comparison early.
   - The error names the member file to overwrite and the source to copy from.
 - **No register row** (serves the check bullet). The register already defers mechanically checked pairs to the validator docstring. Adding a row would state the pair twice.
 - **`sdd/CONTEXT.md` changes in two places only** (serves the pointer bullet). The user asked that both catalogs point at each other. `spec-driven-development` itself stays untouched, because its adoption reference remains correct for adopting the loop.
 
 ## Risks / Trade-offs
 
-- [The check's section cut misreads a fence] → The skill design forbids fences and templates in the shared section, and the check compares the whole **R** file byte for byte.
+- [The check's section cut misreads a fence] → The skill design forbids fences and templates in the shared section and writes its records as field lists. Verification step 2 edits the last subsection, which proves that the cut reaches the end of the section.
 - [The grant weakens the "installed one at a time" rule for other engineering skills] → The grant names five skills explicitly, and the default bullet stays as it is for every other skill.
 - [`ARCHITECTURE.md` names paths that do not exist yet] → The bullet names the suite by its prefix in prose, never as a backticked path.
 
@@ -63,8 +63,8 @@ Per What Changes bullet:
   - `just validate` passes.
 - **Shared-material check,** run in a disposable worktree of the branch after the five skills exist:
   1. `just validate` passes.
-  2. Change one line in `brownfield-onboarding`'s `## Evidence discipline` section. `just validate` exits non-zero, and the error names `skills/engineering/brownfield-onboarding/SKILL.md` and the source. Revert.
-  3. Delete `brownfield-migration/references/records.md`. The error names the missing file. Revert.
+  2. Change one line in the `### Workspace and records` subsection of `brownfield-onboarding`'s `## Evidence discipline` section. `just validate` exits non-zero, and the error names `skills/engineering/brownfield-onboarding/SKILL.md` and the source. Revert.
+  3. Rename the `## Evidence discipline` heading in `brownfield-migration/SKILL.md`. The error names the missing section and the file. Revert.
   4. Rename `brownfield-investigation` out of the way while other members exist. The error names the missing source. Revert.
   5. On the harness commit alone, before any member exists, `just validate` passes.
   6. `just lint` passes on the edited script.
