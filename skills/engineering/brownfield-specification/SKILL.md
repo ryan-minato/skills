@@ -156,11 +156,11 @@ then present that evidence and ask for an explicit revision.
    into the project.
 2. Put the decision round in your reply and end your turn there: one item
    per SPECIFICATION, COMPATIBILITY, and UNKNOWN row — the obvious ones
-   included — in the shape above. Under each item, write every option on
-   its own line as `- <option> — impact: <what changes, and who notices>`;
-   confirming or keeping the current behavior is an option too and gets
-   its impact. Before sending, count the rows against the items and check
-   that every option line has its impact. In this turn, draft no
+   included — in the shape above, with the five standard options of
+   Decision rounds. Write each option on its own line as
+   `- <option> — impact: <what changes, and who notices>`. Before sending,
+   count the rows against the items, and check that every item lists all
+   five options and every option line has its impact. In this turn, draft no
    specification, add no tests, and create no workspace the user has not
    agreed to.
 3. When the rulings arrive, record them, then take each CONFIRMED_CONTRACT
@@ -228,16 +228,26 @@ records where each behavior stands.
 
 Every SPECIFICATION, COMPATIBILITY, and UNKNOWN candidate needs a human
 ruling, the strongest candidates included, and each goes into the round as
-a decision item with its evidence, a recommended class, the options, and
-the impact of each. Run the rounds as the `plan-clarification` skill does when it is
-available; otherwise follow the decision-item rules above and say that it
-was absent. Map each ruling onto a status: kept as a contract →
-CONFIRMED_CONTRACT; kept for current consumers → DE_FACTO_COMPATIBILITY,
-with its end condition; to be changed → INTENTIONAL_CHANGE; free to change
-→ IMPLEMENTATION_DETAIL. Record each ruling in the decision records with
-its authority, and leave every unanswered item PENDING_DECISION and
-unpromoted. Record a ruling the user gives exactly as given, even when you
-cannot find the behavior it names: mark the contract approved but
+a decision item with its evidence and a recommended option. Run the rounds
+as the `plan-clarification` skill does when it is available; otherwise
+follow the decision-item rules above and say that it was absent.
+
+Offer all five standard options on every item, in this order: add any
+other option the item needs, never drop one. Adapt each impact to the item
+by naming who notices and what changes for them.
+
+| Option | Status it records | Impact to adapt |
+|---|---|---|
+| Keep as a contract | CONFIRMED_CONTRACT | every rebuild must keep it; it enters the specification once its guardrail is proven |
+| Keep for current consumers until an end condition | DE_FACTO_COMPATIBILITY | kept until the condition holds, then free to change |
+| Change it | INTENTIONAL_CHANGE | the consumers who rely on it see new behavior; coordinate with them first |
+| Free to change | IMPLEMENTATION_DETAIL | a rewrite may alter or drop it; a consumer relying on it breaks |
+| Leave undecided | PENDING_DECISION | not promoted and not guarded; it returns in the next round |
+
+Record each ruling in the decision records with its authority, and leave
+every unanswered item PENDING_DECISION and unpromoted. Record a ruling
+the user gives exactly as given, even when you cannot find the behavior it
+names: mark the contract approved but
 unguarded in the baseline, name the missing guardrail — the check that
 would hold the contract once the behavior exists, such as a latency test
 or a monitor, even when nothing can be built today — and raise what you
