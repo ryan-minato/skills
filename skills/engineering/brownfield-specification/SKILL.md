@@ -156,10 +156,13 @@ then present that evidence and ask for an explicit revision.
    into the project.
 2. Put the decision round in your reply and end your turn there: one item
    per SPECIFICATION, COMPATIBILITY, and UNKNOWN row — the obvious ones
-   included — in the shape above, with an impact after every option.
-   Before sending, count the rows against the items and check every option
-   for its impact. In this turn, draft no specification, add no tests, and
-   create no workspace the user has not agreed to.
+   included — in the shape above. Under each item, write every option on
+   its own line as `- <option> — impact: <what changes, and who notices>`;
+   confirming or keeping the current behavior is an option too and gets
+   its impact. Before sending, count the rows against the items and check
+   that every option line has its impact. In this turn, draft no
+   specification, add no tests, and create no workspace the user has not
+   agreed to.
 3. When the rulings arrive, record them, then take each CONFIRMED_CONTRACT
    through the promotion gate. An approved contract without a verified
    guardrail goes to the baseline only.
