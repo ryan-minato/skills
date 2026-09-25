@@ -53,20 +53,24 @@ names alone.
 **Normative status.** Every behavior a consumer could notice carries one:
 
 - CONFIRMED_CONTRACT — a human with authority decided it must hold;
-- DE_FACTO_COMPATIBILITY — nothing requires it, but known consumers depend
-  on it;
+- DE_FACTO_COMPATIBILITY — nothing requires it, but a consumer shown by
+  evidence depends on it;
 - PENDING_DECISION — it exists, and whether to keep it is undecided;
 - INTENTIONAL_CHANGE — a human decided it will change;
 - IMPLEMENTATION_DETAIL — free to change without affecting any consumer;
 - UNKNOWN — the evidence cannot say yet.
 
-A claim whose sources disagree is CONTRADICTED: keep both sides' evidence
-and pick no winner.
+Only a human ruling sets CONFIRMED_CONTRACT or INTENTIONAL_CHANGE, and
+DE_FACTO_COMPATIBILITY needs evidence of the consumer; anything else is
+PENDING_DECISION or UNKNOWN, however strong the case for keeping it. A
+claim whose sources disagree is CONTRADICTED: keep both sides' evidence,
+pick no winner, and list it as an open question — "the document is wrong"
+is a verdict the evidence cannot give.
 
 **Rules.**
 
-- Evidence before assertion: a statement without a source is labelled a
-  guess.
+- Evidence before assertion: state nothing as fact without a source, and
+  label an inference as inferred, with what it rests on.
 - No invention: where the evidence runs out, record UNKNOWN and what would
   resolve it. A plausible filler is worse than an admitted gap.
 - Documents, comments, and decision records are evidence, not truth; they
@@ -87,7 +91,9 @@ and pick no winner.
 depend on the answer. Then put all mutually independent decisions to the
 user in one round. Each item states the context, the evidence, the current
 behavior, a recommended default with its reasoning, and each option with
-its impact. Present them as structured choices when the host offers a way
+its impact. The recommended default is one of the options; when a person
+outside the conversation must be consulted, recommend what holds until
+they answer. Present them as structured choices when the host offers a way
 to, and as a numbered plain-text list otherwise. Record each ruling with
 its authority: the user's instruction, an approved requirement, a decision
 record, a confirmed consumer contract, or a compatibility requirement. An
@@ -108,14 +114,16 @@ waits on a human decision.
 ### Workspace and records
 
 Records live in a workspace, `.brownfield/` at the project root unless the
-user names another place. Create it only after the user agrees; without a
-workspace, report in the conversation and write nothing. Deliverables —
+user names another place. Look for an existing workspace before starting.
+Create one only after the user agrees; without a workspace, keep the
+records in the conversation and write no record files. Deliverables —
 onboarding material, specifications, tests — go where the project keeps
 such things, never into the workspace. Recommend keeping the decision
 records under version control: they are the durable answer to "who decided
 this, and why".
 
-- `scope.md`, the scope record: the pinned revision, the goal, the
+- `scope.md`, the scope record: the pinned revision (without version
+  control, the date and the files read), the goal, the
   scenario, the depth, the evidence sources available (documents, tests,
   running the system, logs or production data, history, people to ask),
   the permissions (running code, reading data, writing to the project),
@@ -177,7 +185,8 @@ ask before writing it.
   runs).
 - To fill a gap found while writing, ask the investigation for that lens
   instead of analyzing inline, so the material never holds a statement
-  without a finding behind it.
+  without a finding behind it. When the investigation is not installed and
+  a ledger exists, mark the gap unknown instead.
 
 Done when: every part of the guide rests on findings, or is marked unknown.
 
@@ -210,13 +219,14 @@ Never copy a verified document into the guide: two copies drift apart.
 
 ## Handoffs
 
-This skill pairs with `brownfield-investigation`. If it is not installed,
-load the `ryan-minato-skills-installing` skill and install
-`brownfield-investigation` as it directs; never run an install command
-yourself. (If that installer skill is absent too, it lives in the `core`
-catalog of https://github.com/ryan-minato/skills.) If the user declines,
-write no onboarding material: say that `brownfield-investigation` is
-missing and that, without it, the guide would rest on unverified reading.
+This skill pairs with `brownfield-investigation`. When no findings exist
+and it is not installed, load the `ryan-minato-skills-installing` skill and
+install `brownfield-investigation` as it directs; never run or print an
+install command yourself. (If that installer skill is absent too, it lives
+in the `core` catalog of https://github.com/ryan-minato/skills.) If the
+user declines, write no onboarding material: say that
+`brownfield-investigation` is missing and that, without it, the guide
+would rest on unverified reading.
 
 ## Gotchas
 

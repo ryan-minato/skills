@@ -8,10 +8,11 @@ description: >
   revision, recording findings with sources, confidence, and unknowns and
   changing nothing it examines. Use when asked to trace a capability end
   to end, map an unfamiliar repository, recover domain terms, states, or
-  data ownership, check whether docs still match the code, find important
-  behavior no test protects, or explain from history why code is the way
-  it is — "nobody trusts the docs", "where is this actually handled", "is
-  this still used". Not for explaining one snippet, fixing what it finds,
+  data ownership, check whether docs still match the code, find which
+  important behavior no test protects, or explain from history why code
+  is the way it is — "nobody trusts the docs", "what here has no tests",
+  "where is this actually handled", "is this still used". Not for
+  explaining one snippet or function, fixing what it finds,
   reviewing a diff, or reconciling approved specs with their
   implementation.
 license: Apache-2.0
@@ -55,20 +56,24 @@ names alone.
 **Normative status.** Every behavior a consumer could notice carries one:
 
 - CONFIRMED_CONTRACT — a human with authority decided it must hold;
-- DE_FACTO_COMPATIBILITY — nothing requires it, but known consumers depend
-  on it;
+- DE_FACTO_COMPATIBILITY — nothing requires it, but a consumer shown by
+  evidence depends on it;
 - PENDING_DECISION — it exists, and whether to keep it is undecided;
 - INTENTIONAL_CHANGE — a human decided it will change;
 - IMPLEMENTATION_DETAIL — free to change without affecting any consumer;
 - UNKNOWN — the evidence cannot say yet.
 
-A claim whose sources disagree is CONTRADICTED: keep both sides' evidence
-and pick no winner.
+Only a human ruling sets CONFIRMED_CONTRACT or INTENTIONAL_CHANGE, and
+DE_FACTO_COMPATIBILITY needs evidence of the consumer; anything else is
+PENDING_DECISION or UNKNOWN, however strong the case for keeping it. A
+claim whose sources disagree is CONTRADICTED: keep both sides' evidence,
+pick no winner, and list it as an open question — "the document is wrong"
+is a verdict the evidence cannot give.
 
 **Rules.**
 
-- Evidence before assertion: a statement without a source is labelled a
-  guess.
+- Evidence before assertion: state nothing as fact without a source, and
+  label an inference as inferred, with what it rests on.
 - No invention: where the evidence runs out, record UNKNOWN and what would
   resolve it. A plausible filler is worse than an admitted gap.
 - Documents, comments, and decision records are evidence, not truth; they
@@ -89,7 +94,9 @@ and pick no winner.
 depend on the answer. Then put all mutually independent decisions to the
 user in one round. Each item states the context, the evidence, the current
 behavior, a recommended default with its reasoning, and each option with
-its impact. Present them as structured choices when the host offers a way
+its impact. The recommended default is one of the options; when a person
+outside the conversation must be consulted, recommend what holds until
+they answer. Present them as structured choices when the host offers a way
 to, and as a numbered plain-text list otherwise. Record each ruling with
 its authority: the user's instruction, an approved requirement, a decision
 record, a confirmed consumer contract, or a compatibility requirement. An
@@ -110,14 +117,16 @@ waits on a human decision.
 ### Workspace and records
 
 Records live in a workspace, `.brownfield/` at the project root unless the
-user names another place. Create it only after the user agrees; without a
-workspace, report in the conversation and write nothing. Deliverables —
+user names another place. Look for an existing workspace before starting.
+Create one only after the user agrees; without a workspace, keep the
+records in the conversation and write no record files. Deliverables —
 onboarding material, specifications, tests — go where the project keeps
 such things, never into the workspace. Recommend keeping the decision
 records under version control: they are the durable answer to "who decided
 this, and why".
 
-- `scope.md`, the scope record: the pinned revision, the goal, the
+- `scope.md`, the scope record: the pinned revision (without version
+  control, the date and the files read), the goal, the
   scenario, the depth, the evidence sources available (documents, tests,
   running the system, logs or production data, history, people to ask),
   the permissions (running code, reading data, writing to the project),
@@ -204,9 +213,19 @@ then cross-check where a second source exists.
 
 ## Findings
 
-- With no workspace, report the findings in the conversation, each with
-  the ledger fields above, followed by the open questions and the UNKNOWN
-  items with what would resolve each. Create no file.
+Open the report with the pinned revision, the depth, and the lenses used.
+Then give each finding with its fields, in this order: the claim; its
+evidence kind; its confidence; its source locations; its counter-evidence;
+its unknowns; and, for behavior, its normative status. A finding without
+its evidence kind and confidence is incomplete.
+
+A document that disagrees with the code is reported as CONTRADICTED, with
+both locations, and which side is intended goes to the open questions. Do
+not declare the document wrong or the code wrong; a person decides that.
+
+- With no workspace, report the findings in the conversation, followed by
+  the open questions and the UNKNOWN items with what would resolve each.
+  Create no file.
 - With a workspace, apply the drift gate to the entries you rely on, then
   append new findings to the ledger with the pinned revision.
 - Running the system or its tests is part of investigating when the user
