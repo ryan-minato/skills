@@ -22,6 +22,7 @@ from people. The absence of evidence is not the absence of a consumer.
 | An event is visible to consumers only after the order is persisted | SPECIFICATION | consumers read the order when the event arrives |
 | Missing and null fields mean different things in a request | SPECIFICATION | clients send both and get different results |
 | A legacy ID format still accepted for one known client until it migrates | COMPATIBILITY | needed now, with an end condition |
+| A field carrying an identifier from a system being retired, inside an event other teams consume | COMPATIBILITY, on its own row; the event itself may still be a SPECIFICATION candidate | the field exists for the transition, not for the event's lasting purpose |
 | Orders are stored in a relational database | ARCHITECTURE | a structural choice; no consumer sees the engine |
 | The order service calls the pricing service | ARCHITECTURE or IMPLEMENTATION | internal collaboration, invisible at the boundary |
 | A helper caches prices for sixty seconds | IMPLEMENTATION, unless consumers observe stale prices and rely on the window | the consumer test decides |
