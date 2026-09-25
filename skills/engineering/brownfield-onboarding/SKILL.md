@@ -91,9 +91,12 @@ is a verdict the evidence cannot give.
 depend on the answer. Then put all mutually independent decisions to the
 user in one round. Each item states the context, the evidence, the current
 behavior, a recommended default with its reasoning, and each option with
-its impact. The recommended default is one of the options; when a person
-outside the conversation must be consulted, recommend what holds until
-they answer. Present them as structured choices when the host offers a way
+its impact. Write each item as: the id and the question; the current
+behavior with its evidence; "Recommended:" one of the options, with the
+reason; then every option with its impact. Before sending the round, check
+that every item has its "Recommended:" line. A business or policy call
+still gets one: recommend what should hold until the owner decides —
+usually keeping the current behavior — and say who decides. Present them as structured choices when the host offers a way
 to, and as a numbered plain-text list otherwise. Record each ruling with
 its authority: the user's instruction, an approved requirement, a decision
 record, a confirmed consumer contract, or a compatibility requirement. An
@@ -171,8 +174,9 @@ write code is out of scope; say so if asked.
 
 Start the guide from [assets/onboarding-guide.md](assets/onboarding-guide.md);
 keep its sections, drop any the evidence cannot support, and say so under
-Unknowns. Put the material where the project keeps its documentation, and
-ask before writing it.
+Unknowns. Until the user names or confirms where the guide goes, deliver
+it in your reply and write nothing into the project; then ask where to put
+it, proposing the place the project keeps its documentation.
 
 ## Gather evidence first
 

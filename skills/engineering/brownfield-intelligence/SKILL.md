@@ -92,9 +92,12 @@ is a verdict the evidence cannot give.
 depend on the answer. Then put all mutually independent decisions to the
 user in one round. Each item states the context, the evidence, the current
 behavior, a recommended default with its reasoning, and each option with
-its impact. The recommended default is one of the options; when a person
-outside the conversation must be consulted, recommend what holds until
-they answer. Present them as structured choices when the host offers a way
+its impact. Write each item as: the id and the question; the current
+behavior with its evidence; "Recommended:" one of the options, with the
+reason; then every option with its impact. Before sending the round, check
+that every item has its "Recommended:" line. A business or policy call
+still gets one: recommend what should hold until the owner decides —
+usually keeping the current behavior — and say who decides. Present them as structured choices when the host offers a way
 to, and as a numbered plain-text list otherwise. Record each ruling with
 its authority: the user's instruction, an approved requirement, a decision
 record, a confirmed consumer contract, or a compatibility requirement. An
@@ -167,7 +170,8 @@ Raise the depth for an area whose risk demands it, and say why.
    reading code to learn how it behaves is the investigation member's
    work, and nothing is run until running code is permitted.
 2. Propose the scenario, the goal, and the depth by name (ORIENT,
-   ESTABLISH, or EXHAUSTIVE), and lay out the task tree.
+   ESTABLISH, or EXHAUSTIVE), and show them in your reply together with
+   the task tree.
 3. Run now every node that waits on no answer and writes nothing: the
    read-only evidence nodes through `brownfield-investigation`, and any
    member step that only proposes, such as classifying contract candidates
@@ -274,6 +278,8 @@ need a missing member blocked, name the member, and deliver what exists:
   answers most of it, and the user's patience goes to questions only they
   can answer.
 - Doing a member's work here skips that member's evidence rules. Route it.
+- Running the test suite is running code: ask before it, like any other
+  run.
 - A decision asked before the independent work is done is answered on
   less evidence than it could have had.
 - Resuming without the drift gate reuses findings about code that has
