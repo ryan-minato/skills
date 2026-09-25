@@ -94,9 +94,12 @@ is a verdict the evidence cannot give.
 depend on the answer. Then put all mutually independent decisions to the
 user in one round. Each item states the context, the evidence, the current
 behavior, a recommended default with its reasoning, and each option with
-its impact. The recommended default is one of the options; when a person
-outside the conversation must be consulted, recommend what holds until
-they answer. Present them as structured choices when the host offers a way
+its impact. Write each item as: the id and the question; the current
+behavior with its evidence; "Recommended:" one of the options, with the
+reason; then every option with its impact. Before sending the round, check
+that every item has its "Recommended:" line. A business or policy call
+still gets one: recommend what should hold until the owner decides —
+usually keeping the current behavior — and say who decides. Present them as structured choices when the host offers a way
 to, and as a numbered plain-text list otherwise. Record each ruling with
 its authority: the user's instruction, an approved requirement, a decision
 record, a confirmed consumer contract, or a compatibility requirement. An
@@ -174,7 +177,10 @@ A class is a proposal until a human rules on it; no candidate is
 consumer found is UNKNOWN, not IMPLEMENTATION, until consumers can be ruled
 out. Behavior that exists for a transition — a legacy identifier, an old
 client, an import from a previous system — is COMPATIBILITY, not
-SPECIFICATION, even when a named consumer relies on it today. List the
+SPECIFICATION, even when a named consumer relies on it today. Classify
+each field and behavior on its own: a transitional field inside an event
+or response that is a SPECIFICATION candidate gets its own COMPATIBILITY
+row. List the
 structural facts you set aside (the storage engine, internal calls,
 frameworks) with class ARCHITECTURE or IMPLEMENTATION, so the user sees
 they were considered. Read
@@ -198,7 +204,10 @@ CONFIRMED_CONTRACT; kept for current consumers → DE_FACTO_COMPATIBILITY,
 with its end condition; to be changed → INTENTIONAL_CHANGE; free to change
 → IMPLEMENTATION_DETAIL. Record each ruling in the decision records with
 its authority, and leave every unanswered item PENDING_DECISION and
-unpromoted.
+unpromoted. Record a ruling the user gives exactly as given, even when you
+cannot find the behavior it names: mark the contract approved but
+unguarded, name the missing guardrail, and raise what you could not find
+as an open question. Never downgrade a given ruling to PENDING_DECISION.
 
 ## The promotion gate
 
@@ -232,6 +241,9 @@ misleads everyone who trusts it; the guardrail is what keeps it true.
 - State the guarantee at the boundary: inputs, outputs, errors, observable
   side effects, ordering, consistency, idempotency, compatibility, and
   invariants. Name the guardrail and the decision id beside it.
+- Write the contract as it was ruled. Behavior you observed beyond the
+  ruling is a separate candidate for the next round, not an extra clause,
+  and the guardrail must check every clause you write.
 - Name no class, function, framework, storage engine, or internal call
   path unless it is itself the contract. Rewrite each sentence until it
   would survive a reimplementation.

@@ -10,13 +10,14 @@ the reason is given.
 
 ## Running it
 
-| Task | Command or steps | Verified |
-|---|---|---|
-| Build | <command> | <yes / unverified: reason> |
-| Run | <command> | <yes / unverified: reason> |
-| Test | <command> | <yes / unverified: reason> |
+<Link the setup section of the project's documentation when it checked
+out; list below only what it lacks or gets wrong.>
 
-<Prerequisites, and a link to the setup document when it checked out.>
+| Task | Where documented, or the command when it is not | Verified |
+|---|---|---|
+| Build | <link, or command> | <yes / unverified: reason / fails: evidence> |
+| Run | <link, or command> | <yes / unverified: reason / fails: evidence> |
+| Test | <link, or command> | <yes / unverified: reason / fails: evidence> |
 
 ## Components
 
