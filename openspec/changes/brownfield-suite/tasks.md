@@ -42,10 +42,10 @@
 
 - [x] 3.1 Build the `order-service` fixture and its resume variant in the session scratch directory, as the verification plan describes, and copy the five candidate skills to the user skills directory.
 - [x] 3.2 Run the fifteen Trigger cases, one fresh Sonnet-class subagent per prompt, and record the load decisions. Closes the Trigger scenarios named in the plan's Trigger table.
-- [ ] 3.3 Run the eleven outcome cases, one fresh Sonnet-class subagent each. Grade each with an independent clean-context grader against the rubric and threshold. Closes the Behavior scenarios named in the plan's outcome table.
+- [x] 3.3 Run the eleven outcome cases, one fresh Sonnet-class subagent each. Grade each with an independent clean-context grader against the rubric and threshold. Closes the Behavior scenarios named in the plan's outcome table.
 - [x] 3.4 Run the readback cases, one clean-context subagent per skill. Fix the skill on any gap and rerun. Closes every scenario in the plan's readback list.
-- [ ] 3.5 Record the skipped solver-executed scenarios, with the budget reason, and every isolation degradation for the pull request's Validation section. Then remove the fixture, the copied skills, and all outputs.
+- [x] 3.5 Record the skipped solver-executed scenarios, with the budget reason, and every isolation degradation for the pull request's Validation section. Then remove the fixture, the copied skills, and all outputs.
 
 ## 4. Finish
 
-- [ ] 4.1 Run `just check`. Write the results to the pull request's Validation section, linking this change's verification plan, and fill Changes with permalinks. Once the maintainer closes the deliberation on the finished implementation, archive this change inside the pull request with `just spec-changes archive` and run `just spec-validate`.
+- [x] 4.1 Run `just check`. Write the results to the pull request's Validation section, linking this change's verification plan, and fill Changes with permalinks. Once the maintainer closes the deliberation on the finished implementation, archive this change inside the pull request with `just spec-changes archive` and run `just spec-validate`.

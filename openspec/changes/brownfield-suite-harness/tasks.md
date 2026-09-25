@@ -27,4 +27,4 @@
 
 ## 4. Finish
 
-- [ ] 4.1 Run `just check` and write the results to the pull request's Validation section, linking this plan. Once the maintainer closes the deliberation on the finished implementation, archive this change beside `brownfield-suite` and run `just spec-validate`.
+- [x] 4.1 Run `just check` and write the results to the pull request's Validation section, linking this plan. Once the maintainer closes the deliberation on the finished implementation, archive this change beside `brownfield-suite` and run `just spec-validate`.
