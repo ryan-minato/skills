@@ -31,6 +31,7 @@
       "strict": false,
       "skills": [
         "./skills/engineering/brownfield-investigation",
+        "./skills/engineering/brownfield-onboarding",
         "./skills/engineering/code-refactoring",
         "./skills/engineering/design-md",
         "./skills/engineering/devcontainer-authoring",
