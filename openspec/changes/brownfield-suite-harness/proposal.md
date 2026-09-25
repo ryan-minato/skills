@@ -10,7 +10,7 @@ The `brownfield-suite` change adds five `engineering` skills that must depend on
 
 - **`skills/engineering/CONTEXT.md`:**
   - The class list names the brownfield suite.
-  - `## Dependencies` grants the five `brownfield-*` members dependencies on one another by name. The grant overrides the "installed one at a time" rule for them. A missing member is installed by name through `ryan-minato-skills-installing`, and a handoff names every missing member. The section records the shared `## Evidence discipline` section and `references/records.md` as validator-enforced duplication, not a dependency.
+  - `## Dependencies` grants the five `brownfield-*` members dependencies on one another by name. The grant overrides the "installed one at a time" rule for them. A missing member is installed by name through `ryan-minato-skills-installing`, and a handoff names every missing member. The section records the shared `## Evidence discipline` section as validator-enforced duplication, not a dependency.
   - `## Naming` records `brownfield-` as a suite prefix, not a catalog prefix.
   - `## Disambiguation` splits the current "converting a … brownfield codebase → `spec-driven-development`" route:
     - understanding, onboarding, contract recovery, and migration equivalence for an existing codebase go to the suite;
@@ -21,7 +21,7 @@ The `brownfield-suite` change adds five `engineering` skills that must depend on
 - **`.agents/knowledge/skill-quality.md`:** the current-grants sentence names the `engineering` brownfield suite's grant. The synchronization register row for a `## Dependencies` grant requires this.
 - **`ARCHITECTURE.md`:** the `engineering` bullet in `## Catalogs` names the brownfield suite and its internal grant, which is the same register row's second mirror.
 - **`skills/engineering/README.md` and `README.zh.md`:** the introduction names the suite and shows one install line with all five members. The two files stay content-identical.
-- **`scripts/validate_harness.py`:** a new check, listed in the module docstring, fails when a `skills/engineering/brownfield-*` member's `## Evidence discipline` section or its `references/records.md` differs from `brownfield-investigation`'s. The check also fails when a member lacks either item, or when members exist without the source member. It passes when no member exists yet.
+- **`scripts/validate_harness.py`:** a new check, listed in the module docstring, fails when a `skills/engineering/brownfield-*` member's `## Evidence discipline` section differs from `brownfield-investigation`'s. The check also fails when a member lacks the section, or when members exist without the source member. It passes when no member exists yet.
 
 ## Skills touched
 
