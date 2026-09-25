@@ -149,6 +149,26 @@ locations changed, mark the finding stale and verify it again before use.
 A settled decision is not asked again unless new evidence contradicts it;
 then present that evidence and ask for an explicit revision.
 
+## Workflow
+
+1. Gather the evidence and classify every candidate (below). Write nothing
+   into the project.
+2. Put the decision round in your reply — one item per candidate, in the
+   shape above — and end your turn there. In this turn, draft no
+   specification, add no tests, and create no workspace the user has not
+   agreed to.
+3. When the rulings arrive, record them, then take each CONFIRMED_CONTRACT
+   through the promotion gate. An approved contract without a verified
+   guardrail goes to the baseline only.
+4. Harden approved policies.
+
+When the request already carries rulings, record those first and run
+step 3 for them in the same turn; the round for the remaining candidates
+closes that reply.
+
+Done when (at step 2): every candidate is either a decision item in the
+reply or set aside with its class, and nothing new exists in the project.
+
 ## Classify candidates
 
 Start from the contract candidates of an investigation at ESTABLISH depth.
@@ -187,6 +207,11 @@ they were considered. Read
 [references/contract-classification.md](references/contract-classification.md)
 when classifying a candidate, or when a candidate fits two classes.
 
+Before the rulings, write nothing into the project — no draft
+specification, no new tests, no workspace the user has not agreed to. The
+classification and the decision round go in your reply; a document labelled
+"proposed" is still a specification someone will trust.
+
 Keep the classified candidates in the workspace as `contract-baseline.md`:
 one row per candidate with its class, normative status, decision id, and
 guardrail (its location, or missing). The baseline is non-normative; it
@@ -206,8 +231,8 @@ with its end condition; to be changed → INTENTIONAL_CHANGE; free to change
 its authority, and leave every unanswered item PENDING_DECISION and
 unpromoted. Record a ruling the user gives exactly as given, even when you
 cannot find the behavior it names: mark the contract approved but
-unguarded, name the missing guardrail, and raise what you could not find
-as an open question. Never downgrade a given ruling to PENDING_DECISION.
+unguarded in the baseline, name the missing guardrail, and raise what you
+could not find as an open question. Never downgrade a given ruling to PENDING_DECISION.
 
 ## The promotion gate
 
@@ -229,7 +254,8 @@ part of the contract can be guarded, keep the whole contract approved but
 unguarded, and offer the narrower contract as a new decision item.
 
 An approved contract that lacks a guardrail stays in the baseline marked
-approved but unguarded, with the missing guardrail named. A specification
+approved but unguarded, with the missing guardrail named, and gets no entry
+in the specification document — not even one marked unguarded. A specification
 nothing checks drifts from the system the day it is written and then
 misleads everyone who trusts it; the guardrail is what keeps it true.
 

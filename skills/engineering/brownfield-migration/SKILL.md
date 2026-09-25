@@ -186,8 +186,9 @@ then present that evidence and ask for an explicit revision.
   written into a specification.
 - A user's instruction to change a behavior ("the new service should return
   400 here") is a ruling: record INTENTIONALLY_CHANGE with the user as its
-  authority and the affected consumers noted, and move the behavior from
-  the equivalence set to the planned changes.
+  authority, write the affected consumers into the decision record itself
+  — the known ones by name, or "none known" with what was searched — and
+  move the behavior from the equivalence set to the planned changes.
 
 ## Characterization tests
 
@@ -205,7 +206,8 @@ when writing, running, or tagging characterization tests.
 
 ## Equivalence envelope
 
-Give every baseline row one category:
+Give every baseline row exactly one of these categories; when you cannot
+choose, the row is Unknown and says what blocks it:
 
 | Category | Meaning | Must state |
 |---|---|---|
