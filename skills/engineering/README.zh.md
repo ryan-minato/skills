@@ -27,6 +27,7 @@ npx skills add ryan-minato/skills \
 
 | Skill | 说明 |
 |---|---|
+| [brownfield-intelligence](brownfield-intelligence/) | 从不明确的起点带领继承来的或遗留的代码库工作：识别场景（入职引导、契约规范化、迁移或仅调查）及其深度，建立固定 revision 的范围并只询问仓库无法回答的问题，维护任务树，先完成独立工作再提问，在依赖前沿批量交给人类决策，把每个任务路由给负责的套件成员（宿主允许时并行），并在跨会话续做前检查漂移。 |
 | [brownfield-investigation](brownfield-investigation/) | 以证据调查既存代码库：按问题选取所需视角（文档与代码核对、仓库地图、领域模型、运行时流程、数据与状态、候选契约、测试安全网、历史）与深度（ORIENT、ESTABLISH、EXHAUSTIVE），并固定 revision；每条发现都记录来源、置信度、反证与未知项；报告文档漂移与疑似 bug，但不编辑、不修复任何内容；宿主支持时把相互独立的视角并行交给子代理，否则顺序执行。 |
 | [brownfield-migration](brownfield-migration/) | 在重写、换平台或拆分服务时保持消费者依赖的行为：建立边界行为的兼容基线，并为每一项给出裁决（提升为规范、暂时保留、有意改变），用标注为 normative、compatibility 或 pending-decision 的特征测试钉住它，约定只比较边界而非内部的等价范围，并规划带明确容差的一致性与差分验证——不悄悄修复，也不意外固化。 |
 | [brownfield-onboarding](brownfield-onboarding/) | 为加入既存代码库的工程师编写入职材料：构建一个最小充分、可信的心智模型（目的、如何运行、组件、术语、架构、代表性流程、改什么去哪里、风险与未知项），以调查得到的证据为基础，复用经核实的文档，把观察到的惯例描述为当前做法而非规则，并验证给出的每个路径与命令。 |
