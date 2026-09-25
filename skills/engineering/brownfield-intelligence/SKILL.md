@@ -54,20 +54,24 @@ names alone.
 **Normative status.** Every behavior a consumer could notice carries one:
 
 - CONFIRMED_CONTRACT — a human with authority decided it must hold;
-- DE_FACTO_COMPATIBILITY — nothing requires it, but known consumers depend
-  on it;
+- DE_FACTO_COMPATIBILITY — nothing requires it, but a consumer shown by
+  evidence depends on it;
 - PENDING_DECISION — it exists, and whether to keep it is undecided;
 - INTENTIONAL_CHANGE — a human decided it will change;
 - IMPLEMENTATION_DETAIL — free to change without affecting any consumer;
 - UNKNOWN — the evidence cannot say yet.
 
-A claim whose sources disagree is CONTRADICTED: keep both sides' evidence
-and pick no winner.
+Only a human ruling sets CONFIRMED_CONTRACT or INTENTIONAL_CHANGE, and
+DE_FACTO_COMPATIBILITY needs evidence of the consumer; anything else is
+PENDING_DECISION or UNKNOWN, however strong the case for keeping it. A
+claim whose sources disagree is CONTRADICTED: keep both sides' evidence,
+pick no winner, and list it as an open question — "the document is wrong"
+is a verdict the evidence cannot give.
 
 **Rules.**
 
-- Evidence before assertion: a statement without a source is labelled a
-  guess.
+- Evidence before assertion: state nothing as fact without a source, and
+  label an inference as inferred, with what it rests on.
 - No invention: where the evidence runs out, record UNKNOWN and what would
   resolve it. A plausible filler is worse than an admitted gap.
 - Documents, comments, and decision records are evidence, not truth; they
@@ -88,7 +92,9 @@ and pick no winner.
 depend on the answer. Then put all mutually independent decisions to the
 user in one round. Each item states the context, the evidence, the current
 behavior, a recommended default with its reasoning, and each option with
-its impact. Present them as structured choices when the host offers a way
+its impact. The recommended default is one of the options; when a person
+outside the conversation must be consulted, recommend what holds until
+they answer. Present them as structured choices when the host offers a way
 to, and as a numbered plain-text list otherwise. Record each ruling with
 its authority: the user's instruction, an approved requirement, a decision
 record, a confirmed consumer contract, or a compatibility requirement. An
@@ -109,14 +115,16 @@ waits on a human decision.
 ### Workspace and records
 
 Records live in a workspace, `.brownfield/` at the project root unless the
-user names another place. Create it only after the user agrees; without a
-workspace, report in the conversation and write nothing. Deliverables —
+user names another place. Look for an existing workspace before starting.
+Create one only after the user agrees; without a workspace, keep the
+records in the conversation and write no record files. Deliverables —
 onboarding material, specifications, tests — go where the project keeps
 such things, never into the workspace. Recommend keeping the decision
 records under version control: they are the durable answer to "who decided
 this, and why".
 
-- `scope.md`, the scope record: the pinned revision, the goal, the
+- `scope.md`, the scope record: the pinned revision (without version
+  control, the date and the files read), the goal, the
   scenario, the depth, the evidence sources available (documents, tests,
   running the system, logs or production data, history, people to ask),
   the permissions (running code, reading data, writing to the project),
@@ -152,20 +160,31 @@ Raise the depth for an area whose risk demands it, and say why.
 
 ## Bootstrap
 
-1. Find out everything the repository can tell before asking anything: the
-   revision, the documents, the tests and whether they run, the entry
-   points, the build and run commands, the languages and frameworks, and
-   which evidence sources exist (history, logs, a runnable instance).
-2. Propose the scenario, the goal, and the depth.
-3. Ask, in one round, only what the repository cannot answer: the goal
-   when it is unclear, the permissions (running the system, reading
-   production data or logs, writing to the project), people who can
-   confirm intent, limits of scope or time, and consent for the workspace.
-4. Write the scope record once the user agrees to a workspace; without
+1. Survey what the repository holds before asking anything: the revision,
+   the documents, the tests, the entry points, the build and run commands,
+   the languages and frameworks, and which evidence sources exist
+   (history, logs, a runnable instance). A survey lists what exists;
+   reading code to learn how it behaves is the investigation member's
+   work, and nothing is run until running code is permitted.
+2. Propose the scenario, the goal, and the depth by name (ORIENT,
+   ESTABLISH, or EXHAUSTIVE), and lay out the task tree.
+3. Run now every node that waits on no answer and writes nothing: the
+   read-only evidence nodes through `brownfield-investigation`, and any
+   member step that only proposes, such as classifying contract candidates
+   through `brownfield-specification` — in parallel where the host allows.
+   Reading needs no permission and no workspace; findings stay in the
+   conversation until a workspace exists.
+4. Then ask, in one round: what the repository cannot answer (the goal when
+   it is unclear, the permissions for running the system and reading
+   production data or logs, people who can confirm intent, limits of scope
+   or time, consent for the workspace) and every decision the evidence has
+   already put on the frontier, each as a decision item with a recommended
+   default.
+5. Write the scope record once the user agrees to a workspace; without
    one, state the scope in the conversation.
 
-Done when: the scope record exists, or the user declined a workspace and
-the scope is stated in the conversation.
+Done when: the evidence nodes that needed no answer are done, and the scope
+record exists or the scope is stated in the conversation.
 
 ## Task tree
 
@@ -183,7 +202,9 @@ or resuming the task tree.
 When the remaining nodes wait on decisions, collect the decisions whose
 prerequisites are all settled — the frontier — and ask all of them in one
 round, as the `plan-clarification` skill does when it is available and by
-the decision-item rules above otherwise. Record each ruling in the decision
+the decision-item rules above otherwise. Every item carries its
+recommended default; a question without one is not ready to ask. Record
+each ruling in the decision
 records, unblock the nodes it settles, recompute the frontier, and continue
 the tree. A decision left unanswered stays PENDING_DECISION, and its nodes
 stay blocked; its recommended default is never recorded as approved.
@@ -233,15 +254,15 @@ This skill pairs with the four other suite members:
 `brownfield-specification`, and `brownfield-migration`. When the scenario
 needs members that are not installed, name all of them in one handoff:
 load the `ryan-minato-skills-installing` skill and install them as it
-directs; never run an install command yourself. (If that installer skill
-is absent too, it lives in the `core` catalog of
+directs; never run or print an install command yourself. (If that
+installer skill is absent too, it lives in the `core` catalog of
 https://github.com/ryan-minato/skills.) If the user declines, keep the
 scope record, the task tree, and the decision records, mark the nodes that
 need a missing member blocked, name the member, and deliver what exists:
 
 - without `brownfield-investigation`, no evidence nodes run;
-- without `brownfield-onboarding`, the findings as they stand, and no
-  onboarding material;
+- without `brownfield-onboarding`, the findings as they stand, with a
+  statement that no onboarding material was written;
 - without `brownfield-specification`, the contract candidates as findings,
   and nothing promoted;
 - without `brownfield-migration`, the findings as they stand, and no

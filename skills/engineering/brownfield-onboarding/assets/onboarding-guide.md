@@ -1,7 +1,8 @@
 # <Project name>: onboarding guide
 
-Describes revision <revision> as of <date>. Statements marked unverified
-were not checked; everything else cites the evidence behind it.
+Describes revision <revision> as of <date>. Every statement cites the
+finding behind it; a command marked unverified could not be run here, and
+the reason is given.
 
 ## Purpose
 

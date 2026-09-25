@@ -56,20 +56,24 @@ names alone.
 **Normative status.** Every behavior a consumer could notice carries one:
 
 - CONFIRMED_CONTRACT — a human with authority decided it must hold;
-- DE_FACTO_COMPATIBILITY — nothing requires it, but known consumers depend
-  on it;
+- DE_FACTO_COMPATIBILITY — nothing requires it, but a consumer shown by
+  evidence depends on it;
 - PENDING_DECISION — it exists, and whether to keep it is undecided;
 - INTENTIONAL_CHANGE — a human decided it will change;
 - IMPLEMENTATION_DETAIL — free to change without affecting any consumer;
 - UNKNOWN — the evidence cannot say yet.
 
-A claim whose sources disagree is CONTRADICTED: keep both sides' evidence
-and pick no winner.
+Only a human ruling sets CONFIRMED_CONTRACT or INTENTIONAL_CHANGE, and
+DE_FACTO_COMPATIBILITY needs evidence of the consumer; anything else is
+PENDING_DECISION or UNKNOWN, however strong the case for keeping it. A
+claim whose sources disagree is CONTRADICTED: keep both sides' evidence,
+pick no winner, and list it as an open question — "the document is wrong"
+is a verdict the evidence cannot give.
 
 **Rules.**
 
-- Evidence before assertion: a statement without a source is labelled a
-  guess.
+- Evidence before assertion: state nothing as fact without a source, and
+  label an inference as inferred, with what it rests on.
 - No invention: where the evidence runs out, record UNKNOWN and what would
   resolve it. A plausible filler is worse than an admitted gap.
 - Documents, comments, and decision records are evidence, not truth; they
@@ -90,7 +94,9 @@ and pick no winner.
 depend on the answer. Then put all mutually independent decisions to the
 user in one round. Each item states the context, the evidence, the current
 behavior, a recommended default with its reasoning, and each option with
-its impact. Present them as structured choices when the host offers a way
+its impact. The recommended default is one of the options; when a person
+outside the conversation must be consulted, recommend what holds until
+they answer. Present them as structured choices when the host offers a way
 to, and as a numbered plain-text list otherwise. Record each ruling with
 its authority: the user's instruction, an approved requirement, a decision
 record, a confirmed consumer contract, or a compatibility requirement. An
@@ -111,14 +117,16 @@ waits on a human decision.
 ### Workspace and records
 
 Records live in a workspace, `.brownfield/` at the project root unless the
-user names another place. Create it only after the user agrees; without a
-workspace, report in the conversation and write nothing. Deliverables —
+user names another place. Look for an existing workspace before starting.
+Create one only after the user agrees; without a workspace, keep the
+records in the conversation and write no record files. Deliverables —
 onboarding material, specifications, tests — go where the project keeps
 such things, never into the workspace. Recommend keeping the decision
 records under version control: they are the durable answer to "who decided
 this, and why".
 
-- `scope.md`, the scope record: the pinned revision, the goal, the
+- `scope.md`, the scope record: the pinned revision (without version
+  control, the date and the files read), the goal, the
   scenario, the depth, the evidence sources available (documents, tests,
   running the system, logs or production data, history, people to ask),
   the permissions (running code, reading data, writing to the project),
@@ -161,8 +169,15 @@ Then give it one class:
 | IMPLEMENTATION | free to change without affecting a consumer | nowhere |
 | UNKNOWN | undecided, or consumers cannot be ruled out | the next decision round |
 
-A candidate with no consumer found is UNKNOWN, not IMPLEMENTATION, until
-consumers can be ruled out. Read
+A class is a proposal until a human rules on it; no candidate is
+"confirmed" because the evidence for it is strong. A candidate with no
+consumer found is UNKNOWN, not IMPLEMENTATION, until consumers can be ruled
+out. Behavior that exists for a transition — a legacy identifier, an old
+client, an import from a previous system — is COMPATIBILITY, not
+SPECIFICATION, even when a named consumer relies on it today. List the
+structural facts you set aside (the storage engine, internal calls,
+frameworks) with class ARCHITECTURE or IMPLEMENTATION, so the user sees
+they were considered. Read
 [references/contract-classification.md](references/contract-classification.md)
 when classifying a candidate, or when a candidate fits two classes.
 
@@ -174,7 +189,9 @@ records where each behavior stands.
 ## Decision rounds
 
 Every SPECIFICATION, COMPATIBILITY, and UNKNOWN candidate needs a human
-ruling. Run the rounds as the `plan-clarification` skill does when it is
+ruling, the strongest candidates included, and each goes into the round as
+a decision item with its evidence, a recommended class, the options, and
+the impact of each. Run the rounds as the `plan-clarification` skill does when it is
 available; otherwise follow the decision-item rules above and say that it
 was absent. Map each ruling onto a status: kept as a contract →
 CONFIRMED_CONTRACT; kept for current consumers → DE_FACTO_COMPATIBILITY,
@@ -196,6 +213,11 @@ hold:
    restore the code, run it again and see it pass. Record how it was
    broken and what failed, and confirm the working copy is back to its
    original state.
+
+The guardrail checks the contract as it was ruled. Never narrow or restate
+an approved contract so that an available check can cover it: when only
+part of the contract can be guarded, keep the whole contract approved but
+unguarded, and offer the narrower contract as a new decision item.
 
 An approved contract that lacks a guardrail stays in the baseline marked
 approved but unguarded, with the missing guardrail named. A specification
@@ -240,9 +262,10 @@ say what was left out.
 
 ## Handoffs
 
-This skill pairs with `brownfield-investigation` for its evidence. If it
-is not installed, load the `ryan-minato-skills-installing` skill and
-install `brownfield-investigation` as it directs; never run an install
+This skill pairs with `brownfield-investigation` for its evidence. When no
+findings exist and it is not installed, load the
+`ryan-minato-skills-installing` skill and install
+`brownfield-investigation` as it directs; never run or print an install
 command yourself. (If that installer skill is absent too, it lives in the
 `core` catalog of https://github.com/ryan-minato/skills.) If the user
 declines, classify nothing: say that `brownfield-investigation` is missing.
