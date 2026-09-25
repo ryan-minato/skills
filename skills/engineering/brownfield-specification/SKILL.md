@@ -231,7 +231,9 @@ with its end condition; to be changed → INTENTIONAL_CHANGE; free to change
 its authority, and leave every unanswered item PENDING_DECISION and
 unpromoted. Record a ruling the user gives exactly as given, even when you
 cannot find the behavior it names: mark the contract approved but
-unguarded in the baseline, name the missing guardrail, and raise what you
+unguarded in the baseline, name the missing guardrail — the check that
+would hold the contract once the behavior exists, such as a latency test
+or a monitor, even when nothing can be built today — and raise what you
 could not find as an open question. Never downgrade a given ruling to PENDING_DECISION.
 
 ## The promotion gate
@@ -245,8 +247,8 @@ hold:
 4. The guardrail was shown to fail when the contract is violated: break
    the behavior in the working copy, run the guardrail and see it fail,
    restore the code, run it again and see it pass. Record how it was
-   broken and what failed, and confirm the working copy is back to its
-   original state.
+   broken and the failure you actually saw — after running it, never in
+   advance — and confirm the working copy is back to its original state.
 
 The guardrail checks the contract as it was ruled. Never narrow or restate
 an approved contract so that an available check can cover it: when only
