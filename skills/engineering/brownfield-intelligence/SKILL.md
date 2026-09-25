@@ -175,7 +175,10 @@ Raise the depth for an area whose risk demands it, and say why.
 3. Run now every node that waits on no answer and writes nothing: the
    read-only evidence nodes through `brownfield-investigation`, and any
    member step that only proposes, such as classifying contract candidates
-   through `brownfield-specification` — in parallel where the host allows.
+   through `brownfield-specification`. When the host can dispatch
+   clean-context subagents, send these nodes out as parallel briefs instead
+   of running them yourself; run them yourself only when it cannot or the
+   user says not to.
    Reading needs no permission and no workspace; findings stay in the
    conversation until a workspace exists.
 4. Then ask, in one round: what the repository cannot answer (the goal when
@@ -187,8 +190,9 @@ Raise the depth for an area whose risk demands it, and say why.
 5. Write the scope record once the user agrees to a workspace; without
    one, state the scope in the conversation.
 
-Done when: the evidence nodes that needed no answer are done, and the scope
-record exists or the scope is stated in the conversation.
+Done when: the evidence nodes that needed no answer are done; the reply
+names the scenario, the goal, and the depth, and shows the task tree; and
+the scope record exists or the scope is stated in the conversation.
 
 ## Task tree
 

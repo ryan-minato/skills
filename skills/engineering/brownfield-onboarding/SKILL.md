@@ -211,7 +211,9 @@ Never copy a verified document into the guide: two copies drift apart.
 ## Write and verify
 
 - Describe observed conventions as current practice ("modules currently
-  follow…"), never with must, shall, or always. State a rule only where an
+  follow…"), never with must, shall, or always — in "where to change what"
+  too, which says what currently depends on a piece of code, not what a
+  change must keep. State a rule only where an
   approved policy or specification exists, and cite it.
 - Give every unknown a next step: where to look, or whom to ask.
 - Verify that every path the guide names exists at the pinned revision, and
