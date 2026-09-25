@@ -99,8 +99,9 @@ behavior with its evidence; "Recommended:" one of the options, with the
 reason; then every option with its impact. Before sending the round, check
 that every item has its "Recommended:" line. A business or policy call
 still gets one: recommend what should hold until the owner decides —
-usually keeping the current behavior — and say who decides. Present them as structured choices when the host offers a way
-to, and as a numbered plain-text list otherwise. Record each ruling with
+usually keeping the current behavior — and say who decides. Present them
+as structured choices when the host offers a way to, and as a numbered
+plain-text list otherwise. Record each ruling with
 its authority: the user's instruction, an approved requirement, a decision
 record, a confirmed consumer contract, or a compatibility requirement. An
 unanswered item stays PENDING_DECISION.
@@ -314,8 +315,8 @@ When the user wants the promoted contracts maintained through a
 spec-driven workflow the project does not have yet, this skill pairs with
 the spec-driven development skill, `spec-driven-development` in the `sdd`
 catalog. If it is not installed, load the `ryan-minato-skills-installing`
-skill and install `spec-driven-development` as it directs; never run an
-install command yourself. (If that installer skill is absent too, it lives
+skill and install `spec-driven-development` as it directs; never run or
+print an install command yourself. (If that installer skill is absent too, it lives
 in the `core` catalog of https://github.com/ryan-minato/skills.) If the
 user declines, write the promoted
 contracts to one contract document beside their guardrails, marked as the

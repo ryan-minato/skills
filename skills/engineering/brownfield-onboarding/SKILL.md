@@ -96,8 +96,9 @@ behavior with its evidence; "Recommended:" one of the options, with the
 reason; then every option with its impact. Before sending the round, check
 that every item has its "Recommended:" line. A business or policy call
 still gets one: recommend what should hold until the owner decides —
-usually keeping the current behavior — and say who decides. Present them as structured choices when the host offers a way
-to, and as a numbered plain-text list otherwise. Record each ruling with
+usually keeping the current behavior — and say who decides. Present them
+as structured choices when the host offers a way to, and as a numbered
+plain-text list otherwise. Record each ruling with
 its authority: the user's instruction, an approved requirement, a decision
 record, a confirmed consumer contract, or a compatibility requirement. An
 unanswered item stays PENDING_DECISION.
