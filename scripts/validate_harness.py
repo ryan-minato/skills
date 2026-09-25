@@ -22,6 +22,9 @@ Checks (errors unless marked warning):
              byte-identical to their origins in the meta-github-workflow
              and openspec-workflow skills unless one carries a
              `# DIVERGENCE:` line explaining why
+  suite      every skills/engineering/brownfield-* member carries the
+             `## Evidence discipline` section of its SKILL.md byte-identical
+             to brownfield-investigation's, the source
   spec       the spec/* labels are exactly the trigger and managed labels
              scripts/spec_changes.py declares, the managed ones applied by
              a workflow, and the archive workflow keys on the trigger
@@ -68,6 +71,10 @@ SYNC_LABELS_ORIGIN = ROOT / "skills" / "meta" / "meta-github-workflow" / "script
 SPEC_CHANGES = ROOT / "scripts" / "spec_changes.py"
 SPEC_CHANGES_ORIGIN = ROOT / "skills" / "sdd" / "openspec-workflow" / "scripts" / "spec_changes.py"
 SPEC_LABELS_WORKFLOW = WORKFLOWS / "spec-labels.yml"
+ENGINEERING = ROOT / "skills" / "engineering"
+SUITE_PREFIX = "brownfield-"
+SUITE_SOURCE = ENGINEERING / "brownfield-investigation" / "SKILL.md"
+SUITE_HEADING = "## Evidence discipline"
 
 MANAGED_PREFIXES = ("priority/", "catalog/")
 NEEDS_TRIAGE = "status/needs-triage"
@@ -316,6 +323,42 @@ def check_copies() -> None:
         )
 
 
+def markdown_section(text: str, heading: str) -> str | None:
+    """One level-2 section, heading included, up to the next level-2 heading."""
+    match = re.search(rf"^{re.escape(heading)}[ \t]*$.*?(?=^## (?!#)|\Z)", text, re.MULTILINE | re.DOTALL)
+    return match.group(0).rstrip() if match else None
+
+
+def check_suite() -> None:
+    members = sorted(path / "SKILL.md" for path in ENGINEERING.glob(f"{SUITE_PREFIX}*") if path.is_dir())
+    if not members:
+        return
+    if not SUITE_SOURCE.is_file():
+        error(
+            f"{rel(SUITE_SOURCE)} is missing while other brownfield suite members exist; it is the source of the "
+            f"shared `{SUITE_HEADING}` section. Restore it before adding or keeping other members."
+        )
+        return
+    source = markdown_section(read(SUITE_SOURCE), SUITE_HEADING)
+    if source is None:
+        error(f"{rel(SUITE_SOURCE)} has no `{SUITE_HEADING}` section; the suite's shared section starts there.")
+        return
+    for member in members:
+        if member == SUITE_SOURCE:
+            continue
+        if not member.is_file():
+            error(f"{rel(member)} is missing; every brownfield suite member needs a SKILL.md.")
+            continue
+        section = markdown_section(read(member), SUITE_HEADING)
+        if section is None:
+            error(f"{rel(member)} has no `{SUITE_HEADING}` section; copy it from {rel(SUITE_SOURCE)}.")
+        elif section != source:
+            error(
+                f"{rel(member)}: the `{SUITE_HEADING}` section differs from {rel(SUITE_SOURCE)}. Edit the source "
+                "first, then copy its section over this one (all five members share it byte for byte)."
+            )
+
+
 def check_spec_labels() -> None:
     result = subprocess.run(
         [sys.executable, str(SPEC_CHANGES), "labels", "--taxonomy"], capture_output=True, text=True, cwd=ROOT
@@ -434,6 +477,7 @@ def main() -> int:
         check_intake,
         check_pointers,
         check_copies,
+        check_suite,
         check_spec_labels,
         check_checks_doc,
         check_openspec,

@@ -41,7 +41,10 @@ Public skills are grouped into catalogs under `skills/`:
 - `engineering` — general programming methodology skills, plus narrowly
   scoped artifact-authoring workflows (e.g. Dev Container Features,
   Templates, image prebuilds, and durable visual-design specifications)
-  that do not warrant a catalog of their own.
+  that do not warrant a catalog of their own. It also holds the brownfield
+  suite — five skills prefixed brownfield- for understanding, specifying,
+  and migrating existing codebases — the catalog's only members granted
+  dependencies on one another.
 - `sdd` — durable skills for spec-driven development: the framework-
   agnostic methodology (`spec-driven-development`) and one skill per
   framework (`openspec-workflow`, `spec-kit-workflow`) carrying that

@@ -12,6 +12,17 @@ catalog。
 npx skills add ryan-minato/skills --skill <skill-name>
 ```
 
+**brownfield 套件**——五个以 `brownfield-` 为前缀的 skill——面向既存代码库：
+以证据理解代码库、为新工程师做入职引导、判定哪些行为是契约并为其加上护栏，
+以及在重写中保持边界行为。套件成员相互依赖，请一起安装：
+
+```bash
+npx skills add ryan-minato/skills \
+  --skill brownfield-intelligence --skill brownfield-investigation \
+  --skill brownfield-onboarding --skill brownfield-specification \
+  --skill brownfield-migration
+```
+
 ## Skill 列表
 
 | Skill | 说明 |

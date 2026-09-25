@@ -89,7 +89,8 @@ is installed, and it cannot assume any other skill was installed beside it.
   catalog, which users install globally. Dependencies inside the skill's
   own catalog or on another catalog are allowed only when the catalog's
   `CONTEXT.md` grants them in its `## Dependencies` section (today: `meta`
-  builders on one another, `scaffold` builders on `meta`). Default: not
+  builders on one another, `scaffold` builders on `meta`, the five
+  `engineering` brownfield-suite members on one another). Default: not
   granted. An in-range dependency may be hard — "load it alongside; do not
   work from this skill alone".
 - A skill outside the allowed range may only be an *optional handoff*: the
