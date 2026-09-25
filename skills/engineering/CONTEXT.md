@@ -3,11 +3,18 @@
 Rules, notes, and references that apply only to skills in this catalog.
 (Repo-wide standards live in `.agents/knowledge/skill-quality.md`.)
 
-The catalog holds two classes of skills:
+The catalog holds three classes of skills:
 
 - **Methodology skills** (code-refactoring, gitmoji, goal-alignment,
   knowledge-deposition, session-retrospective):
   approaches that transfer across languages and frameworks.
+- **The brownfield suite** (brownfield-intelligence,
+  brownfield-investigation, brownfield-onboarding,
+  brownfield-specification, brownfield-migration): methodology skills
+  built to work together on an existing codebase — understanding it with
+  evidence, onboarding engineers, deciding and guarding its contracts, and
+  preserving its boundary behavior through a rewrite. The methodology
+  requirements apply to them.
 - **Artifact-authoring skills** (devcontainer-authoring, design-md): the full
   design→test→publish lifecycle of a specific engineering artifact
   ecosystem that is too narrow to justify its own catalog. Also exempt
@@ -36,17 +43,34 @@ to the disposable `meta` catalog, not here.
 
 ## Dependencies
 
-- Default range only: skills here may depend on `core` skills. No grant for
+- Default range: skills here may depend on `core` skills. No grant for
   other engineering skills or other catalogs — they are installed one at a
   time per project, so co-presence is never guaranteed. A pairing between
   two engineering skills is an optional handoff with a fallback, routed
-  through `ryan-minato-skills-installing`.
+  through `ryan-minato-skills-installing`. The brownfield suite below is
+  the one exception.
+- The brownfield suite: `brownfield-intelligence`,
+  `brownfield-investigation`, `brownfield-onboarding`,
+  `brownfield-specification`, and `brownfield-migration` may depend on one
+  another by name, hard dependencies included. A missing member is
+  installed by name through `ryan-minato-skills-installing`, with the
+  handoff naming every missing member so one run installs them — never
+  with an install command. The grant covers exactly these five names; a
+  new `brownfield-` skill enters it only by editing this list. A member's
+  pairing with any other engineering skill stays an optional handoff.
+- The suite's `## Evidence discipline` section is byte-identical in all
+  five members, with `brownfield-investigation` as the source, and
+  `scripts/validate_harness.py` enforces it. That is duplication, not a
+  dependency: each member works from its own copy.
 - No dependency on or recommendation of skills from other repositories; no
   exemptions.
 
 ## Naming
 
 Default shape for methodology skills (`code-refactoring`, `goal-alignment`).
+The brownfield suite's members take the suite prefix `brownfield-`
+followed by one action noun (`brownfield-investigation`); the prefix marks
+suite membership, is not a catalog prefix, and binds no other skill here.
 Artifact-authoring skills take the `-authoring` suffix
 (`devcontainer-authoring`); `design-md` is the format's proper noun and
 `gitmoji` the convention's, and both stand as they are.
@@ -60,13 +84,22 @@ down a plan, idea, or decision already on the table → `plan-clarification`
 in `core`; clarifying ambiguous requirements while already coding →
 `programming-guidelines` in `core`; implementation planning → none of them
 (out of catalog scope) · working from written specifications — the loop,
-the approval package, the approach families, converting a prototype or
-brownfield codebase — → the `sdd` catalog's `spec-driven-development` (a
-goal document from `goal-alignment` precedes any spec), and one framework's
+the approval package, the approach families, converting a prototype or an
+existing codebase into a spec-driven project — → the `sdd` catalog's
+`spec-driven-development` (a goal document from `goal-alignment` precedes
+any spec), and one framework's
 records, archive, and request automation → that framework's `sdd` skill;
 settling and recording the project's rules — level, tool, change request
 shape, approval mode and package, archive executor, scope — → the `meta`
-catalog's `meta-spec-workflow` · building or systematically
+catalog's `meta-spec-workflow` · understanding an existing codebase with
+evidence, onboarding engineers to it, deciding which of its behaviors are
+contracts and guarding them, or preserving its boundary behavior through
+a rewrite → the brownfield suite: `brownfield-intelligence` for broad
+work with an unclear starting point, `brownfield-investigation` for a
+focused question, and `brownfield-onboarding`,
+`brownfield-specification`, or `brownfield-migration` for their
+deliverables; small-step restructuring of working code →
+`code-refactoring` · building or systematically
 repairing a GitHub or GitLab project's complete lifecycle harness —
 including its conventions, community files, and day-to-day platform
 workflows — → the `meta` catalog's `meta-github-workflow` /
@@ -80,9 +113,9 @@ knowledge base, or skills → `knowledge-deposition`; how the deposited
 agent-facing text is written — pointers, pruning, one source of truth — →
 `agentic-writing` in `core`; building, auditing, or restructuring a
 project's complete agent harness — entrypoints, knowledge trees, sync
-mechanisms — → the `meta` catalog's `meta-harness-building` (the two
-skills here only evolve an existing setup incrementally during normal
-work); authoring a public or substantial Agent Skill →
+mechanisms — → the `meta` catalog's `meta-harness-building`
+(`session-retrospective` and `knowledge-deposition` only evolve an
+existing setup incrementally during normal work); authoring a public or substantial Agent Skill →
 `great-skill-writing` in `core`, plus the `skill-authoring` project skill
 for skills in this repository.
 

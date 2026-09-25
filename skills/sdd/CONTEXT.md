@@ -76,7 +76,10 @@ filling the platform base's generic slots belongs to the `meta` catalog's
 lifecycle harness to `meta-github-workflow` / `meta-gitlab-workflow`;
 defining what something should achieve before any spec to the
 `engineering` catalog's `goal-alignment`; a machine-learning research
-task's spec to the `machine-learning` catalog's `research-workflow`.
+task's spec to the `machine-learning` catalog's `research-workflow`;
+understanding an existing codebase with evidence, deciding which of its
+behaviors are contracts, and preserving its boundary behavior through a
+rewrite to the `engineering` catalog's brownfield suite.
 
 ## Disambiguation
 
@@ -89,7 +92,10 @@ framework skill for the tool · settling or changing the project's rules
 and the generic template, form, and project-skill slots → the `meta`
 catalog's `meta-spec-workflow` · a tool's own command that creates,
 applies, or archives one change → the tool's own agent commands, not
-this catalog.
+this catalog · recovering an existing system's contracts from its
+behavior and guarding the approved ones → the `engineering` catalog's
+`brownfield-specification`; adopting the loop in that system afterwards
+→ `spec-driven-development`.
 
 ## References
 

@@ -14,6 +14,19 @@ workflows included — belongs to the disposable `meta` catalog.
 npx skills add ryan-minato/skills --skill <skill-name>
 ```
 
+The **brownfield suite** — five skills prefixed `brownfield-` — works on
+an existing codebase: understanding it with evidence, onboarding
+engineers, deciding which behaviors are contracts and guarding them, and
+preserving boundary behavior through a rewrite. Its members depend on one
+another, so install them together:
+
+```bash
+npx skills add ryan-minato/skills \
+  --skill brownfield-intelligence --skill brownfield-investigation \
+  --skill brownfield-onboarding --skill brownfield-specification \
+  --skill brownfield-migration
+```
+
 ## Skills
 
 | Skill | Description |
