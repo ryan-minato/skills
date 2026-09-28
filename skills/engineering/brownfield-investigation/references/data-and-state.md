@@ -13,9 +13,14 @@ ownership, or state shared across components.
    CONTRADICTED, with the live schema winning when it exists.
 3. **Writers and readers.** Record which components write and which read
    each table or field, with the code locations.
-4. **Ownership.** A store with one writer is owned by it. A store written
-   by several components, or by a system outside the repository, is a
-   contract boundary: its shape is something another party may depend on.
+4. **Ownership.** One writer found in the repository is a lead, not
+   ownership: another system may write the store or be its system of
+   record, and a search of this repository cannot rule that out. Record
+   the ownership as inferred until a person, a decision record, or the
+   store's access grants confirm it; with nothing to go on, record it as
+   UNKNOWN. A store written by several components, or by a system outside
+   the repository, is a contract boundary: its shape is something another
+   party may depend on.
 5. **Lifecycle.** How records are created, updated, and deleted (soft or
    hard), how long they are kept, and which invariants hold — and where
    each invariant is enforced: a database constraint, code, or both.
@@ -26,7 +31,7 @@ ownership, or state shared across components.
 
 | Depth | Covers |
 |---|---|
-| ORIENT | the main stores and which component owns each |
+| ORIENT | the main stores and each one's likely owner, marked inferred unless confirmed |
 | ESTABLISH | tables and fields in scope, with writers, readers, and constraints |
 | EXHAUSTIVE | every field in scope, including null versus missing semantics, retention, and the migrations that shaped it |
 
