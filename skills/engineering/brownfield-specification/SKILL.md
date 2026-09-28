@@ -165,10 +165,14 @@ then present that evidence and ask for an explicit revision.
 2. Put the decision round in your reply and end your turn there: one item
    per SPECIFICATION, COMPATIBILITY, and UNKNOWN row — the obvious ones
    included — in the shape above, with the five standard options of
-   Decision rounds. Write each option on its own line as
-   `- <option> — impact: <what changes, and who notices>`. Before sending,
-   count the rows against the items, and check that every item lists all
-   five options and every option line has its impact. In this turn, draft no
+   Decision rounds. Add one policy item for each recurring structural
+   pattern you found that no approved policy covers (most modules sharing
+   a layout, a dependency direction nearly everything follows), shaped as
+   Conventions, policies, and hardening describes. Write each option on its
+   own line as `- <option> — impact: <what changes, and who notices>`.
+   Before sending, count the rows against the contract items, and check
+   that every contract item lists all five standard options, every policy
+   item its three, and every option line its impact. In this turn, draft no
    specification, add no tests, and create no workspace the user has not
    agreed to.
 3. When the rulings arrive, record them, then take each CONFIRMED_CONTRACT
@@ -181,7 +185,8 @@ step 3 for them in the same turn; the round for the remaining candidates
 closes that reply.
 
 Done when (at step 2): every candidate is either a decision item in the
-reply or set aside with its class, and nothing new exists in the project.
+reply or set aside with its class, every recurring structural pattern is a
+policy item, and nothing new exists in the project.
 
 ## Classify candidates
 
@@ -240,9 +245,10 @@ a decision item with its evidence and a recommended option. Run the rounds
 as the `plan-clarification` skill does when it is available; otherwise
 follow the decision-item rules above and say that it was absent.
 
-Offer all five standard options on every item, in this order: add any
-other option the item needs, never drop one. Adapt each impact to the item
-by naming who notices and what changes for them.
+Offer all five standard options on every contract item, in the order of
+the table below; add any other option the item needs, never drop one.
+Adapt each impact to the item by naming who notices and what changes for
+them.
 
 | Option | Status it records | Impact to adapt |
 |---|---|---|
@@ -310,9 +316,12 @@ Three things look alike and are not:
 - an **architecture policy** — an approved rule about structure;
 - a **normative contract** — an approved behavioral guarantee.
 
-A pattern becomes a policy only by a decision: put it to the user with its
-evidence ("nine of ten modules share this layout") and write no rule,
-check, or instruction for it meanwhile. Harden only approved rules, and
+A pattern becomes a policy only by a decision: put it to the user as a
+policy item with its evidence ("nine of ten modules share this layout"),
+its exceptions, a recommended option, and three options with their
+impact — adopt it as a policy, keep it an observed convention, or leave it
+undecided — and write no rule, check, or instruction for it meanwhile.
+Harden only approved rules, and
 prefer a check that fails with a non-zero exit code over prose. Show every
 check failing on a deliberate violation before relying on it, then remove
 the violation. Read [references/guardrails.md](references/guardrails.md)
