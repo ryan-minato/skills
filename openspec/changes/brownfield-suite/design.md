@@ -299,6 +299,10 @@ After the second Copilot review, the envelope rule and the read-permission rule 
 - O9, with the rubric above.
 - One readback covering intelligence's "Production data before permission", investigation's "Live database without permission", and migration's envelope rule applied to every text in the envelope.
 
+After the final review, O9 had failed its internal-names item twice, so the envelope rule moves into structure: a header in the envelope and baseline assets, and a self-check before the envelope is marked awaiting approval. Specification's contract round also stays in text when the host offers a question tool. These run again:
+- O8 and O9, with the rubrics above; the grader reads every envelope file for old-system identifiers.
+- One readback covering specification's "Host offers a question tool" and the migration header and self-check.
+
 **Skipped** (recorded in the Validation section with the reason): every Trigger scenario outside the table above. The maintainer set the budget at the testing floor — two load prompts and one near-miss per skill, and two outcome cases per skill — so these scenarios are covered by the readback cases instead. The same applies to every Behavior and Handoff scenario that the outcome cases do not name.
 
 ## Open Questions
