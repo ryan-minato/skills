@@ -38,7 +38,8 @@ Per component: name, responsibility, location, entry points, runtime unit,
 inbound and outbound dependencies, data it owns. Per boundary: the two
 sides, the protocol, and where it is configured. Label an architectural
 reading ("a layered design") as inferred unless a document or a person
-states it.
+states it, and data ownership as inferred unless a person, a decision
+record, or the store's access grants confirm it.
 
 ## Gotchas
 
