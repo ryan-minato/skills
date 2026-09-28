@@ -90,6 +90,8 @@ is a verdict the evidence cannot give.
   would write to a resource other people or systems use, such as a shared
   database, a queue, or an external service. A local instance or file
   created for the task is not shared.
+- Read production data, logs, or a live system only with the permission
+  of the user or the scope record. Reading the repository needs none.
 - A recommendation is not an approval. Only a human ruling changes a
   normative status, and "the code does it" is never the authority for one.
 

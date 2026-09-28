@@ -91,6 +91,8 @@ is a verdict the evidence cannot give.
   would write to a resource other people or systems use, such as a shared
   database, a queue, or an external service. A local instance or file
   created for the task is not shared.
+- Read production data, logs, or a live system only with the permission
+  of the user or the scope record. Reading the repository needs none.
 - A recommendation is not an approval. Only a human ruling changes a
   normative status, and "the code does it" is never the authority for one.
 
@@ -188,8 +190,9 @@ Raise the depth for an area whose risk demands it, and say why.
    clean-context subagents, send these nodes out as parallel briefs instead
    of running them yourself; run them yourself only when it cannot or the
    user says not to.
-   Reading needs no permission and no workspace; findings stay in the
-   conversation until a workspace exists.
+   Reading the repository needs no permission and no workspace;
+   production data, logs, and live systems wait for the permission step 4
+   asks for. Findings stay in the conversation until a workspace exists.
 4. Then ask, in one round: what the repository cannot answer (the goal when
    it is unclear, the permissions for running the system and reading
    production data or logs, people who can confirm intent, limits of scope
