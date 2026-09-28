@@ -201,8 +201,9 @@ then present that evidence and ask for an explicit revision.
 - A user's instruction to change a behavior ("the new service should return
   400 here") is a ruling: record INTENTIONALLY_CHANGE with the user as its
   authority, write the affected consumers into the decision record itself
-  — the known ones by name, or "none known" with what was searched — and
-  move the behavior from the equivalence set to the planned changes.
+  — the known ones by name, or "none known" with what was searched —
+  move the behavior from the equivalence set to the planned changes, and
+  retag the tests that pin it intentional-change.
 
 ## Characterization tests
 
@@ -210,7 +211,11 @@ Pin the baseline with tests at the boundaries — requests and responses,
 errors, persisted state, emitted events, external calls — that run against
 the existing system and record what it does, not what is right. Tag every
 test normative, compatibility, or pending-decision, matching its row's
-status. Pin behavior that looks like a bug and tag it; do not correct it.
+status, and retag it whenever a ruling changes that status. A test whose
+row is ruled INTENTIONALLY_CHANGE keeps its expected value against the
+existing system and is retagged intentional-change with the decision id;
+never delete it or tag it normative. Pin behavior that looks like a bug
+and tag it; do not correct it.
 Control nondeterminism or scrub volatile fields instead of loosening
 assertions, and rely on the suite only after it passes twice in a row. Put
 the suite where the project keeps its tests, driving the boundary so the
@@ -248,8 +253,8 @@ Plan how the new system is checked against the approved envelope:
 
 - **Conformance** — the characterization suite runs against the new
   system. Normative and compatibility tests must pass; pending-decision
-  tests block until ruled on; tests of intentionally changed behavior are
-  replaced by tests of the new behavior, citing the decision.
+  tests block until ruled on; intentional-change tests are replaced by
+  tests of the ruled new behavior, citing the same decision.
 - **Differential or shadow comparison** — the same inputs go to both
   systems and the outputs are compared under each row's envelope rule.
 - **State and event comparison** — persisted state after the same

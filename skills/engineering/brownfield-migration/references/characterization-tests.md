@@ -34,12 +34,19 @@ Every test carries exactly one tag, matching its baseline row:
 - **compatibility** — pins DE_FACTO_COMPATIBILITY or a PRESERVE_TEMPORARILY
   ruling;
 - **pending-decision** — pins behavior not yet ruled on, including
-  behavior that looks like a bug.
+  behavior that looks like a bug;
+- **intentional-change** — pins the old behavior of a row ruled
+  INTENTIONALLY_CHANGE, with the decision id. It keeps its expected value
+  and still runs against the existing system as the record of what
+  changes; the conformance run against the new system replaces it with a
+  test of the ruled new behavior citing the same decision.
 
 Put the tag and the baseline row's id in the test's name or metadata, so a
-failing test leads straight to its decision. Behavior that looks like a bug
+failing test leads straight to its decision. When a ruling changes a row's
+status, retag its tests in the same step; never delete a pinning test or
+edit its expected value to follow a ruling. Behavior that looks like a bug
 keeps its current expected value and its pending-decision tag until a
-ruling says otherwise.
+ruling retags it.
 
 ## Nondeterminism
 
