@@ -294,6 +294,11 @@ Outcome cases (floor: two per skill; three for investigation, to exercise both s
 - O9 (migration, envelope and plan), continuing from O8's records, with one added critical item for "Ruling changes a pinned behavior": the malformed-ID test keeps its expected 500, is retagged intentional-change with the decision id, and is neither deleted nor tagged normative. Threshold: all (C) and ≥ 5/6.
 - One readback covering migration's "Preservation ruled with no known consumer" and "Ruling changes a pinned behavior", specification's "Majority pattern", and the two passages without a scenario of their own: investigation's single-writer ownership rule and the shared section's shared-resource rule.
 
+After the second Copilot review, the envelope rule and the read-permission rule change as well, and these run again:
+- O8, with its rubric unchanged, to rebuild the records that O9 continues from.
+- O9, with the rubric above.
+- One readback covering intelligence's "Production data before permission", investigation's "Live database without permission", and migration's envelope rule applied to every text in the envelope.
+
 **Skipped** (recorded in the Validation section with the reason): every Trigger scenario outside the table above. The maintainer set the budget at the testing floor — two load prompts and one near-miss per skill, and two outcome cases per skill — so these scenarios are covered by the readback cases instead. The same applies to every Behavior and Handoff scenario that the outcome cases do not name.
 
 ## Open Questions

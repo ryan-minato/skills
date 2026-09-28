@@ -23,11 +23,15 @@ The skill description SHALL cause the skill to load when the request is broad, m
 - **THEN** the skill does not load
 
 ### Requirement: Behavior: Scenario, depth, and scope are set before analysis
-The agent SHALL identify the scenario (onboarding, specification, migration, or investigation only) and propose a depth; SHALL write a scope record holding the pinned revision, the goal, the scenario, the depth, the available evidence sources, the permissions (running the system, access to production data or logs, writing to the project), and the initial unknowns; and SHALL find out for itself everything the repository can tell it, asking the user only what it cannot discover.
+The agent SHALL identify the scenario (onboarding, specification, migration, or investigation only) and propose a depth; SHALL write a scope record holding the pinned revision, the goal, the scenario, the depth, the available evidence sources, the permissions (running the system, access to production data or logs, writing to the project), and the initial unknowns; SHALL find out for itself everything the repository can tell it, asking the user only what it cannot discover; and SHALL read no production data, logs, or live system before the user grants that permission.
 
 #### Scenario: Inherited order service
 - **WHEN** the user says "we inherited this order service" in a small repository with a README, tests, and a start command
 - **THEN** the agent finds the revision, the documents, the tests, and the entry points itself, proposes a scenario and a depth, and asks nothing the repository already answers, such as the language or the framework
+
+#### Scenario: Production data before permission
+- **WHEN** the environment holds a connection string for the production database and the user has not yet answered the permission question
+- **THEN** the bootstrap reads only the repository, reads no production data or logs, and asks for that permission in its question round
 
 #### Scenario: Ambiguous scenario
 - **WHEN** the request fits both onboarding and migration
