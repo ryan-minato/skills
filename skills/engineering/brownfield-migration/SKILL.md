@@ -304,7 +304,8 @@ safety net and say that the step discipline is left to the user.
 ## Gotchas
 
 - Editing a characterization test so it passes on the new system is a
-  silent fix. Only a ruling changes an expectation.
+  silent fix. A ruling retags a test; the new behavior gets a test of its
+  own, and the pinned expected value never changes.
 - Consumers adapt to bugs: a client may retry on the old 500 and give up
   on a new 400. Name that impact in the decision item.
 - Data migration is part of equivalence: compare the persisted state the
