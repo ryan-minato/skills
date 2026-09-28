@@ -23,11 +23,15 @@ The skill description SHALL cause the skill to load when an existing system or c
 - **THEN** the skill does not load
 
 ### Requirement: Behavior: The compatibility baseline separates contract, compatibility, and pending behavior
-The agent SHALL record, for each boundary behavior in scope, the current behavior, its evidence, the consumers found, and its normative status, and SHALL present every behavior without a decision as PENDING_DECISION with the options PROMOTE_TO_SPEC, PRESERVE_TEMPORARILY, and INTENTIONALLY_CHANGE, a recommended default, and the impact of each option.
+The agent SHALL record, for each boundary behavior in scope, the current behavior, its evidence, the consumers found, and its normative status, and SHALL present every behavior without a decision as PENDING_DECISION with the options PROMOTE_TO_SPEC, PRESERVE_TEMPORARILY, and INTENTIONALLY_CHANGE, a recommended default, and the impact of each option; and SHALL record each ruling as given, so that a PRESERVE_TEMPORARILY ruling sets DE_FACTO_COMPATIBILITY even when no consumer was found.
 
 #### Scenario: Error that looks accidental
 - **WHEN** the legacy service returns HTTP 500 for a malformed legacy order ID
 - **THEN** the baseline records the current behavior as 500 with status PENDING_DECISION, notes that external clients may depend on it, and offers the three options with a recommended default, and it does not state that the specification requires a 500
+
+#### Scenario: Preservation ruled with no known consumer
+- **WHEN** the user rules PRESERVE_TEMPORARILY, until the old clients are retired, for a response field whose consumers are UNKNOWN
+- **THEN** the baseline records the field as DE_FACTO_COMPATIBILITY with the user as its authority and that end condition, its test carries the compatibility tag, and the row is not left PENDING_DECISION
 
 ### Requirement: Behavior: No silent fix and no accidental fossilization
 The agent SHALL not plan or implement a difference from baseline behavior without a recorded INTENTIONALLY_CHANGE decision, and SHALL not declare a baseline behavior a permanent requirement without a recorded PROMOTE_TO_SPEC decision; a behavior that looks like a bug and has no decision SHALL stay in the baseline as pending-decision and be put to the user.
@@ -41,11 +45,15 @@ The agent SHALL not plan or implement a difference from baseline behavior withou
 - **THEN** the agent records an INTENTIONALLY_CHANGE decision with the user as its authority and the affected consumers noted, and moves the behavior from the equivalence set to the planned changes
 
 ### Requirement: Behavior: Characterization tests pin boundary behavior with a class tag
-The agent SHALL write characterization tests at the system's boundaries — requests and responses, errors, persisted state, emitted events, and external calls — each tagged normative, compatibility, or pending-decision; SHALL pin behavior that looks like a bug and tag it rather than correct it; SHALL control nondeterminism (clock, randomness, generated identifiers, ordering) or scrub volatile fields rather than loosening assertions; and SHALL rely on the suite only after it passes twice in a row against the existing system.
+The agent SHALL write characterization tests at the system's boundaries — requests and responses, errors, persisted state, emitted events, and external calls — each tagged normative, compatibility, or pending-decision; SHALL retag a test intentional-change, citing the decision, once a ruling changes the behavior it pins, and have the conformance run replace it with a test of the new behavior; SHALL pin behavior that looks like a bug and tag it rather than correct it; SHALL control nondeterminism (clock, randomness, generated identifiers, ordering) or scrub volatile fields rather than loosening assertions; and SHALL rely on the suite only after it passes twice in a row against the existing system.
 
 #### Scenario: Suite for an order API
 - **WHEN** the agent builds characterization tests for a small order API
 - **THEN** the tests exercise the HTTP boundary, include the malformed-ID 500 case tagged pending-decision, carry a tag on every test, and pass in two consecutive runs against the existing service
+
+#### Scenario: Ruling changes a pinned behavior
+- **WHEN** the malformed-ID 500 is pinned by a pending-decision test and the user rules that the new service returns 400
+- **THEN** the test keeps its expected 500 against the existing service and is retagged intentional-change with the decision id, the verification plan replaces it with a test of the 400 for the new service, and the test is neither deleted nor tagged normative
 
 #### Scenario: Timestamp in the response
 - **WHEN** each response carries a creation timestamp
