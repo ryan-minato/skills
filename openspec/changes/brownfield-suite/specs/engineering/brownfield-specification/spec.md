@@ -40,6 +40,10 @@ The agent SHALL put normative decisions to the user in batched rounds, each item
 - **WHEN** three candidates need rulings that do not depend on one another
 - **THEN** the agent puts all three to the user in one round, each with evidence, current behavior, a recommended default, and options with impact
 
+#### Scenario: Host offers a question tool
+- **WHEN** the host offers a structured question tool that allows at most four options per question
+- **THEN** the agent writes the contract round as text in its reply, every contract item keeping all five standard options in the table's order, rather than dropping, reordering, or splitting options to fit the tool
+
 #### Scenario: Item left unanswered
 - **WHEN** the user rules on two of the three items and says nothing about the third
 - **THEN** the third stays PENDING_DECISION and appears in no normative specification
