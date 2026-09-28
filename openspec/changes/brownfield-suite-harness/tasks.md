@@ -28,3 +28,7 @@
 ## 4. Finish
 
 - [x] 4.1 Run `just check` and write the results to the pull request's Validation section, linking this plan. Once the maintainer closes the deliberation on the finished implementation, archive this change beside `brownfield-suite` and run `just spec-validate`.
+
+## 5. Implementation deliberation
+
+- [ ] 5.1 `scripts/validate_harness.py`: compare the shared section exactly as matched, without trimming, so that trailing spaces or blank lines at its end count as drift (Copilot review). Verify in a disposable worktree: steps 1–4 of the plan again, plus two extra blank lines at the end of a member's section, which must fail and name the file; then `just lint`.

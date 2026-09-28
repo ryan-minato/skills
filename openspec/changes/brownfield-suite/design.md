@@ -288,6 +288,12 @@ Outcome cases (floor: two per skill; three for investigation, to exercise both s
   A readback also confirms that no instruction depends on a specific command.
 - **Shared-material identity.** The companion change's validator check passes. Its failure cases are proven in the companion design.
 
+**Implementation-deliberation re-verification.** The fixes directed when the implementation deliberation closed change skills after their passing results, so the affected cases run again with the same fixture, tier, isolation, and grading:
+- O6 (specification, no rulings), with its rubric unchanged; the five standard options must survive the change that scopes them to contract items.
+- O8 (migration, baseline and characterization tests), with its rubric unchanged; the new shared-resource rule must not stop a run against a local instance.
+- O9 (migration, envelope and plan), continuing from O8's records, with one added critical item for "Ruling changes a pinned behavior": the malformed-ID test keeps its expected 500, is retagged intentional-change with the decision id, and is neither deleted nor tagged normative. Threshold: all (C) and ≥ 5/6.
+- One readback covering migration's "Preservation ruled with no known consumer" and "Ruling changes a pinned behavior", specification's "Majority pattern", and the two passages without a scenario of their own: investigation's single-writer ownership rule and the shared section's shared-resource rule.
+
 **Skipped** (recorded in the Validation section with the reason): every Trigger scenario outside the table above. The maintainer set the budget at the testing floor — two load prompts and one near-miss per skill, and two outcome cases per skill — so these scenarios are covered by the readback cases instead. The same applies to every Behavior and Handoff scenario that the outcome cases do not name.
 
 ## Open Questions

@@ -49,3 +49,13 @@
 ## 4. Finish
 
 - [x] 4.1 Run `just check`. Write the results to the pull request's Validation section, linking this change's verification plan, and fill Changes with permalinks. Once the maintainer closes the deliberation on the finished implementation, archive this change inside the pull request with `just spec-changes archive` and run `just spec-validate`.
+
+## 5. Implementation deliberation
+
+The maintainer's directions of 2026-09-28, from the review of the finished implementation and the Copilot review.
+
+- [ ] 5.1 The shared section, edited in `brownfield-investigation` and copied to the four members: a PRESERVE ruling stands as the consumer evidence DE_FACTO_COMPATIBILITY needs, and every ruling is recorded as given; a run that would write to a shared resource is asked first (moved out of investigation's Findings). Migration's baseline step names the PRESERVE_TEMPORARILY ruling. Verify with `just validate` and the re-verification readback. Closes: Preservation ruled with no known consumer.
+- [ ] 5.2 `brownfield-migration`: a test whose behavior a ruling changes is retagged intentional-change with the decision id and replaced in the conformance run. Verify by re-running O8 and O9 as the plan's re-verification describes. Closes: Ruling changes a pinned behavior.
+- [ ] 5.3 `brownfield-specification`: the round also asks, for each recurring structural pattern, whether it becomes an architecture policy; the five standard options apply to contract items, in the table's order. Verify by re-running O6 and by the re-verification readback of Majority pattern.
+- [ ] 5.4 `brownfield-investigation` `references/data-and-state.md`: one writer found in the repository is a lead, recorded as inferred, until a person, a decision record, or the store's access grants confirm ownership. Verify by the re-verification readback.
+- [ ] 5.5 Run `just check`, `just spec-validate`, and the tool-name scan; record the results in the pull request's Validation section.
