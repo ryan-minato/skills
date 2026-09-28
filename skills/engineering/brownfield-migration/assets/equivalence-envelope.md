@@ -1,5 +1,11 @@
 # Equivalence envelope: <old system> → <new system>
 
+<Write every cell in consumer terms: what a consumer sends, sees, or
+reads. No function, class, constant, exception type, module, library,
+table, or column name of the old system appears in any cell, reasons and
+blockers included, unless a consumer sees that name directly. Remove this
+paragraph once a search of the envelope finds none.>
+
 Status: awaiting approval. <When approved: approved by <authority> on
 <date>, decision <id>.>
 
