@@ -167,7 +167,8 @@ then present that evidence and ask for an explicit revision.
    contract candidates, test safety map, and history for behavior whose
    origin matters.
 2. Record one row per boundary behavior — the boundary, the behavior as
-   input → output, error, or effect, the evidence, the consumers, the tests
+   input → output, error, or effect in consumer terms (code locations and
+   internal names go in the evidence), the evidence, the consumers, the tests
    that pin it, the normative status, and the decision id. Record the
    baseline in [assets/compatibility-baseline.md](assets/compatibility-baseline.md)'s
    shape, in the workspace.
@@ -240,22 +241,34 @@ choose, the row is Unknown and says what blocks it:
 | Intentionally changed | the new behavior replaces the old | the decision id and the new behavior |
 | Unknown | not yet decided | what blocks it; it blocks acceptance |
 
-Compare boundaries, never internals: internal calls, class structure,
-module names, internal data structures, and algorithms stay out unless one
-is itself a contract. State each rule in boundary terms ("an order id that
-is neither a positive integer nor an `L-` reference"), never by the old
-system's parsing or functions. This holds for every text in the envelope —
-rules, scope notes, blockers, and tolerance reasons: define equivalence
-and its exceptions by what a consumer sends and sees, never by the old
-system's parser, library calls, or storage engine. The verification
-section may name where the old system's inputs and state are read from,
-but never uses them to define what counts as equal. Whenever you write or
-revise the envelope, check every row and every note — those drafted
-earlier included — against the five categories and this rule. Draft the
-envelope in
-[assets/equivalence-envelope.md](assets/equivalence-envelope.md)'s shape and
-mark it awaiting approval. Only the envelope the user approved, recorded as
-a decision, is acceptance for the new system.
+Compare boundaries, never internals. Every text in the envelope — row
+descriptions, rules, scope notes, blockers, and tolerance reasons — says
+what a consumer sends, sees, or reads: requests, responses, errors,
+events, calls to other systems, and stored records as their readers see
+them ("an order id that is neither a positive integer nor an `L-`
+reference"). It names none of the old system's functions, classes,
+constants, exception types, modules, libraries, parser, storage engine,
+tables, or columns, unless a consumer sees that name directly (a table
+another system reads, a field in a response); such names belong in the
+baseline's Evidence column. The verification section may name where the
+old system's inputs and state are read from, but never uses them to
+define what counts as equal.
+
+Draft the envelope in
+[assets/equivalence-envelope.md](assets/equivalence-envelope.md)'s shape.
+Restate each baseline row in consumer terms rather than copying its
+description. Then, whenever you write or revise the envelope:
+
+1. Check every row and note, those drafted earlier included, against the
+   five categories.
+2. Search the envelope for identifiers from the old code: every function,
+   class, constant, exception, module, table, and column name that the
+   baseline's Evidence column or the code itself uses. Rewrite each cell
+   that holds one in consumer terms, and search again until none is left.
+3. Mark it awaiting approval.
+
+Only the envelope the user approved, recorded as a decision, is acceptance
+for the new system.
 
 ## Verification plan
 
