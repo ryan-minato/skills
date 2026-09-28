@@ -166,7 +166,10 @@ then present that evidence and ask for an explicit revision.
 
 1. Gather the evidence and classify every candidate (below). Write nothing
    into the project.
-2. Put the decision round in your reply and end your turn there: one item
+2. Put the decision round in your reply as text and end your turn there,
+   even when the host offers a structured question tool: such tools cap
+   the options per question below five, and a round is never split
+   between a tool and text. One item
    per SPECIFICATION, COMPATIBILITY, and UNKNOWN row — the obvious ones
    included — in the shape above, with the five standard options of
    Decision rounds. Add one policy item for each recurring structural
@@ -246,8 +249,12 @@ records where each behavior stands.
 Every SPECIFICATION, COMPATIBILITY, and UNKNOWN candidate needs a human
 ruling, the strongest candidates included, and each goes into the round as
 a decision item with its evidence and a recommended option. Run the rounds
-as the `plan-clarification` skill does when it is available; otherwise
-follow the decision-item rules above and say that it was absent.
+as the `plan-clarification` skill does when it is available, with one
+exception: the round stays in text in your reply (Workflow, step 2), not
+in a question tool, and each item keeps the table's order below rather
+than moving its recommendation first; the "Recommended:" line names it.
+Without that skill, follow the decision-item rules above and say that it
+was absent.
 
 Offer all five standard options on every contract item, in the order of
 the table below; add any other option the item needs, never drop one.
