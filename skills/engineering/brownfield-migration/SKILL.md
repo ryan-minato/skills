@@ -242,9 +242,15 @@ Compare boundaries, never internals: internal calls, class structure,
 module names, internal data structures, and algorithms stay out unless one
 is itself a contract. State each rule in boundary terms ("an order id that
 is neither a positive integer nor an `L-` reference"), never by the old
-system's parsing or functions. Whenever you write or revise the envelope,
-check every row — rows drafted earlier included — against the five
-categories and this rule. Draft the envelope in
+system's parsing or functions. This holds for every text in the envelope —
+rules, scope notes, blockers, and tolerance reasons: define equivalence
+and its exceptions by what a consumer sends and sees, never by the old
+system's parser, library calls, or storage engine. The verification
+section may name where the old system's inputs and state are read from,
+but never uses them to define what counts as equal. Whenever you write or
+revise the envelope, check every row and every note — those drafted
+earlier included — against the five categories and this rule. Draft the
+envelope in
 [assets/equivalence-envelope.md](assets/equivalence-envelope.md)'s shape and
 mark it awaiting approval. Only the envelope the user approved, recorded as
 a decision, is acceptance for the new system.
