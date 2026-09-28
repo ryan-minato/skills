@@ -93,6 +93,8 @@ is a verdict the evidence cannot give.
   would write to a resource other people or systems use, such as a shared
   database, a queue, or an external service. A local instance or file
   created for the task is not shared.
+- Read production data, logs, or a live system only with the permission
+  of the user or the scope record. Reading the repository needs none.
 - A recommendation is not an approval. Only a human ruling changes a
   normative status, and "the code does it" is never the authority for one.
 
@@ -207,11 +209,11 @@ then cross-check where a second source exists.
 
 | Claim type | Authoritative source | Cross-check |
 |---|---|---|
-| Structure of persisted data | the live schema when reachable; otherwise migrations and models that agree | models, queries; disagreement is a CONTRADICTED finding |
+| Structure of persisted data | the live schema when reachable and reading it is permitted; otherwise migrations and models that agree | models, queries; disagreement is a CONTRADICTED finding |
 | Current mechanics | the code at the pinned revision, traced from entry point to effect | tests, a run |
 | Configuration in effect | the configuration the deployment loads, with its precedence | defaults in code |
 | Pinned behavior | tests that assert it and are confirmed to run | the code they exercise |
-| Actual behavior | running the system, its logs, or data samples | the code path |
+| Actual behavior | running the system, its logs, or data samples, as permitted | the code path |
 | Consumers | call sites, subscriptions, published interfaces, consumer lists | runtime traffic when visible |
 | Intent | people with authority, approved requirements, decision records | history |
 | Origin | version-control history and the reviews and issues it links | people |
