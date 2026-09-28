@@ -40,11 +40,11 @@
 
 ## 3. Tests
 
-- [x] 3.1 Build the `order-service` fixture and its resume variant in the session scratch directory, as the verification plan describes, and copy the five candidate skills to the user skills directory.
+- [x] 3.1 Build the `order-service` fixture and its resume variant in the session scratch directory, as the verification plan describes. Degraded: the five candidate skills were not copied to the user skills directory; the solvers loaded them in place through this repository's project skills directory, where its other project skills were also visible. The pull request's Validation section records this under isolation degradations.
 - [x] 3.2 Run the fifteen Trigger cases, one fresh Sonnet-class subagent per prompt, and record the load decisions. Closes the Trigger scenarios named in the plan's Trigger table.
-- [x] 3.3 Run the eleven outcome cases, one fresh Sonnet-class subagent each. Grade each with an independent clean-context grader against the rubric and threshold. Closes the Behavior scenarios named in the plan's outcome table.
+- [x] 3.3 Run the eleven outcome cases, one fresh Sonnet-class subagent each. Grade each with an independent clean-context grader against the rubric and threshold. Closes the Behavior scenarios named in the plan's outcome table. Degraded: the two parallel-analysis investigation cases never observed the skill loading in three attempts each; they are recorded as skipped under 3.5 and their scenarios rest on readback.
 - [x] 3.4 Run the readback cases, one clean-context subagent per skill. Fix the skill on any gap and rerun. Closes every scenario in the plan's readback list.
-- [x] 3.5 Record the skipped solver-executed scenarios, with the budget reason, and every isolation degradation for the pull request's Validation section. Then remove the fixture, the copied skills, and all outputs.
+- [x] 3.5 Record the skipped solver-executed scenarios, with the budget reason, and every isolation degradation for the pull request's Validation section. Then remove the fixture and all outputs.
 
 ## 4. Finish
 
