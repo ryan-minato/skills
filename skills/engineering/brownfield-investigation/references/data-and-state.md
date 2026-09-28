@@ -8,9 +8,11 @@ ownership, or state shared across components.
 1. **Stores.** List every place state lives: databases, caches, queues,
    files, object storage, search indexes, and external systems of record.
 2. **Structure.** For each table or collection in scope, take the structure
-   from the live schema when it is reachable and reading it is permitted;
+   from the live schema when reading it is permitted and it is reachable;
    otherwise from migrations and models that agree, noting that the live
-   schema was not checked. Report every disagreement between them as
+   schema was not checked, and ask for permission to read it. Do not probe
+   a live system to learn whether it is reachable before that permission.
+   Report every disagreement between them as
    CONTRADICTED, with the live schema winning when it was read.
 3. **Writers and readers.** Record which components write and which read
    each table or field, with the code locations.
