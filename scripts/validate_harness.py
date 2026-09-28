@@ -324,9 +324,9 @@ def check_copies() -> None:
 
 
 def markdown_section(text: str, heading: str) -> str | None:
-    """One level-2 section, heading included, up to the next level-2 heading."""
+    """One level-2 section, heading included, up to the next level-2 heading, untrimmed."""
     match = re.search(rf"^{re.escape(heading)}[ \t]*$.*?(?=^## (?!#)|\Z)", text, re.MULTILINE | re.DOTALL)
-    return match.group(0).rstrip() if match else None
+    return match.group(0) if match else None
 
 
 def check_suite() -> None:
