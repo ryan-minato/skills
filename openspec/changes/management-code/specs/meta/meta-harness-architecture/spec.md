@@ -56,7 +56,7 @@ The builder SHALL apply fail-fast as a design philosophy that guides judgment, n
 - **THEN** it treats null as empty text and adds no guard to fields the platform guarantees
 
 ### Requirement: Behavior: Shell in management code does not lose a failure
-The builder SHALL keep the shell it writes from losing a failure that matters — a command's failure is not read as a false condition, swallowed by `|| true`, or hidden behind a pipe — so that the step or job ends failed, whether at the failing command or when the step ends, and SHALL treat strict mode (`set -euo pipefail`) and a workflow-level `defaults.run.shell: bash` as tools it may use where they make that simplest, not as rules every step must follow.
+The builder SHALL keep the shell it writes from losing a failure that matters — a command's failure is not read as a false condition, swallowed by `|| true`, or hidden behind a pipe — so that the step or job ends failed, whether at the failing command or when the step ends.
 
 #### Scenario: Command inside a condition
 - **WHEN** a generated step decides from a command's output whether a check must run
@@ -64,4 +64,4 @@ The builder SHALL keep the shell it writes from losing a failure that matters �
 
 #### Scenario: Status checked when the step ends
 - **WHEN** a generated step pipes the output of a command whose failure matters into another command
-- **THEN** the step ends failed when that command failed, either through `pipefail` or through a status the step checks before it ends, and neither form is treated as a defect
+- **THEN** the step ends failed when that command failed, whether it stops at once or checks the status before it ends, and either form is accepted
