@@ -24,11 +24,11 @@ Per skill:
   - delivered workflows set `defaults.run.shell: bash`, and the aggregator gate no longer passes when its output pipe breaks.
 - `meta-gitlab-workflow`: the same for its deliveries: a new `pipeline_log_digest.py` asset, `next_version.py` moved to `assets/`, the commit check rewritten, and job scripts that fail on the failing command.
 - `openspec-workflow`:
-  - the automation deposits a management script, `assets/spec_request.py`, as the project's own `scripts/spec_request.py`, in place of a byte-identical copy of the bundled `scripts/spec_changes.py`. It holds only what the workflows call: `snapshot`, `check`, `show`, `status`, `labels`.
+  - the automation deposits a management asset, `assets/spec_changes.py`, at the path the delivered workflows already call, the project's `scripts/spec_changes.py`, in place of a byte-identical copy of the bundled script. It holds only what the workflows call: `snapshot`, `check`, `show`, `status`, `labels`.
   - an unknown change name in a comment command is answered with the related changes, every name rendered as code.
   - the comment workflow posts the reply and fails the run on a crash, passing only on a bad argument.
   - delivered workflows run under `bash` with pipefail. The bundled script and its local commands stay as they are.
-- `spec-kit-workflow`: the same, with `assets/spec_kit_request.py` in place of a copy of `scripts/spec_kit_features.py`.
+- `spec-kit-workflow`: the same, with `assets/spec_kit_features.py` deposited at the project's `scripts/spec_kit_features.py` in place of a copy of the bundled script.
 - `scaffold-ml`: the sealed image build runs the git reads it depends on before testing their result, so an unreadable tree stops the build instead of passing the dirty-tree guard.
 
 ## Skills touched
@@ -50,14 +50,13 @@ Per skill:
 
 ## Impact
 
-- `skills/sdd/README.md` and `README.zh.md`: the `openspec-workflow` and `spec-kit-workflow` rows name the deposited management script beside the bundled one.
 - `skills/meta/meta-spec-workflow`: the deposited contract's sentence that the framework skill "owns the request automation and its script" becomes "supplies"; the project owns the deposited script. The wording changes and the observable behavior does not, so the skill gets no delta spec.
-- `ruff.toml` target versions for the moved and new assets, and the lint scope that covers them, belong to the companion repository change `management-code-harness`. That change also carries:
+- The lint scope that covers the moved and new assets belongs to the companion repository change `management-code-harness`; the global py310 target already matches their 3.10 floor. That change also carries:
   - this repository's own rewrite of `scripts/spec_changes.py` and `scripts/sync_labels.py`;
   - the removal of the byte-identical copies check;
   - the management-code rules in the knowledge base and the review skill;
   - the `meta` catalog rule that script assets are working code.
-- No symlink, `marketplace.json` entry, or skill description changes.
+- No symlink, `marketplace.json` entry, skill description, or catalog README row changes: the `sdd` rows say the skills ship `spec_changes.py` and `spec_kit_features.py`, which stays true.
 
 ## Non-goals
 

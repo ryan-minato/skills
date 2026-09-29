@@ -7,7 +7,7 @@ The `management-code` change makes the harness-producing skills deliver manageme
 - **Copies check removed.** `scripts/validate_harness.py` drops the `copies` check, its docstring entry, and the constants only it uses. This is a policy change the user decided in issue #94: a management script need not match a product script, and no check keeps the two identical; they may still match where the role needs the same code. It is not a check weakened to make a change pass.
 - **Synchronization register.** In `.agents/knowledge/harness-maintenance.md`:
   - the `spec_changes.py` row names this repository's own script as the source that the archive executor and the freeze in `spec-workflow.md` follow;
-  - the workflow-assets row states that this repository's workflows call their own script at a different path, and registers the pair a reader can no longer assume: the asset's CI-facing command line and this repository's script.
+  - the workflow-assets row keeps the same steps and the same script path, and registers the pair a reader can no longer assume: the asset's CI-facing command line and this repository's script.
 - **`scripts/spec_changes.py` rewritten for readability and fail-fast.**
   - It keeps every subcommand this repository calls: `snapshot`, `show`, `status`, `labels` (with `--taxonomy`), `check`, and `archive`. It drops `related`, which nothing calls.
   - Each external interface — the GitHub REST API, git plumbing, the snapshot file, the OpenSpec CLI — is checked once, and a failure there is reported at once with the interface named.

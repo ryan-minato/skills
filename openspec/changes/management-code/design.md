@@ -47,9 +47,9 @@ See proposal.md for motivation. The companion repository change `management-code
 | MGH — Behavior: Delivered workflows and the taxonomy check… | every `assets/workflow-*.yml` with a `run:` step gets a top-level `defaults.run.shell: bash`; the gate step of `workflow-checks.yml` greps a here-string; the inline scripts of `workflow-pr-checklist.yml` and `workflow-triage.yml` drop fallbacks on data the API guarantees and fail on an unexpected shape; `assets/check_taxonomy.py` gets a PEP 723 header, `assets/workflow-taxonomy.yml` uses setup-uv and `uv run`; `references/commits-and-contributions.md` and the `compatibility` field describe the uv prerequisite and point locking at the risk rule | existing load sentences |
 | MGL — Behavior: Scripts delivered… from management assets | SKILL.md step 4 (lines 161–168); new `assets/pipeline_log_digest.py`; `assets/next_version.py` moved from `scripts/`; `references/commits-and-contributions.md`, `durable-harness.md`, `assets/project-skill.md`; step 5's disposal test | existing load sentences |
 | MGL — Behavior: Delivered job scripts fail on the failing command | `references/ci-and-runners.md`: job scripts set `errexit` and `pipefail`, handle an expected nonzero exit at the command, and run commands outside conditions; `references/commits-and-contributions.md`: the commit-check job shape | existing load sentences |
-| OSW — MODIFIED installation requirement | `references/github.md` and `gitlab.md` `## What lands where` (the script row names the asset and the project path, with no copy); `## Fork safety`; `## Verification after installing`. SKILL.md `## Installing the automation`. SKILL.md `## Ready, then the freeze`: the archive command names the skill's own script by its skill-relative link. Every asset: header, `run:` lines, top-level (or, for the job fragment, job-level) `defaults.run.shell: bash`, and the reply status handling in `workflow-spec-command.yml`. `assets/gitlab/ci-spec-jobs.yml`: explicit strict mode, keep-then-fail around `tee`, and a before-script precondition that names a missing `python3` or `jq` in the image. | existing load sentences |
-| OSW — Script: spec_request.py | new `assets/spec_request.py` | — |
-| SKW — MODIFIED installation requirement; Script: spec_kit_request.py | the same places in `spec-kit-workflow`; new `assets/spec_kit_request.py` | existing load sentences |
+| OSW — MODIFIED installation requirement | `references/github.md` and `gitlab.md` `## What lands where` (the script row names the asset and the project path, with no copy); `## Fork safety`; `## Verification after installing`. SKILL.md `## Installing the automation`. SKILL.md `## Ready, then the freeze`: the archive command names the skill's own script by its skill directory, and says the project's `scripts/spec_changes.py` is the CI script and has no `archive`. Every asset: header, `run:` lines, top-level (or, for the job fragment, job-level) `defaults.run.shell: bash`, and the reply status handling in `workflow-spec-command.yml`. `assets/gitlab/ci-spec-jobs.yml`: explicit strict mode, keep-then-fail around `tee`, and a before-script precondition that names a missing `python3` or `jq` in the image. | existing load sentences |
+| OSW — Script: assets/spec_changes.py | new `assets/spec_changes.py` | — |
+| SKW — MODIFIED installation requirement; Script: assets/spec_kit_features.py | the same places in `spec-kit-workflow`; new `assets/spec_kit_features.py` | existing load sentences |
 | SML — MODIFIED container recipe requirement | `references/containers.md` `## Task-runner recipes`: `docker-build` becomes a shebang recipe under `set -euo pipefail` that reads the tree status and the commit into variables before testing them | existing load sentence |
 
 ## Dependencies and handoffs
@@ -58,15 +58,14 @@ No new handoff and no new skill name in any installed skill. `meta-harness-archi
 
 ## External impact
 
-- **`skills/sdd/README.md` and `README.zh.md`.** The two framework rows name the deposited management script beside the bundled one. Proof: readback and a content-identity comparison of the pair.
 - **`skills/meta/meta-spec-workflow/assets/spec-workflow.md` and `SKILL.md`.** "owns the request automation and its script" becomes "supplies the request automation and its management script; the project owns the deposited copy". Proof: readback. The wording changes and the behavior does not, so there is no delta. The precedent is `ml-catalog-asset-cleanup`.
 - **Companion change `management-code-harness`:**
   - the `meta/CONTEXT.md` carve-out for script assets;
-  - `ruff.toml` target versions (3.10) for the moved and new assets, and the lint scope that covers `skills/meta/*/assets` and `skills/sdd/*/assets`;
-  - the register row that pairs the sdd GitHub workflow assets with this repository's workflows. That row now states the script path differs, and pairs the asset's CI-facing CLI with this repository's `scripts/spec_changes.py`.
+  - the lint scope that covers `skills/meta/*/assets` and `skills/sdd/*/assets` (the global py310 target already matches the assets' 3.10 floor);
+  - the register row that pairs the sdd GitHub workflow assets with this repository's workflows. The workflows keep the same steps and the same script path, and the row gains the pair it relied on implicitly: the asset's CI-facing CLI and this repository's `scripts/spec_changes.py`.
 
   Proof: `just check`, and the companion's verification plan.
-- **No change to** symlinks, `marketplace.json`, or descriptions. Proof: `just validate`.
+- **No change to** symlinks, `marketplace.json`, descriptions, or the `sdd` README rows, which say the skills ship `spec_changes.py` and `spec_kit_features.py`. Proof: `just validate`.
 
 ## Decisions
 
@@ -79,13 +78,16 @@ No new handoff and no new skill name in any installed skill. `meta-harness-archi
   - `sync_labels.py`, `run_log_digest.py`, and `pipeline_log_digest.py` stay in `scripts/` for the builder and get separate assets for the target.
   - Rejected: a second asset beside a script that nothing else uses (two files for one job).
   - Rejected: dropping the digest in favor of a documented one-line command. `gh run view --log-failed | tail` keeps only the last failed job, and the per-job tail is the point of the digest.
-- **The sdd CI assets hold only what the workflows call, under their own names** (OSW, SKW; user decision).
-  - `spec_request.py` and `spec_kit_request.py` offer `snapshot`, `check`, `show`, `status`, and `labels`, the last with `--taxonomy`. They keep both head sources, because the GitLab jobs use the git source.
+- **The sdd CI assets hold only what the workflows call, and keep the path the workflows call** (OSW, SKW; the subset is the user's decision).
+  - `assets/spec_changes.py` and `assets/spec_kit_features.py` offer `snapshot`, `check`, `show`, `status`, and `labels`, the last with `--taxonomy`. They keep both head sources, because the GitLab jobs use the git source.
   - They have no `archive` and no `related`: the archive executor runs the skill's bundled script or the tool, never CI.
-  - A distinct file name keeps `python3 scripts/spec_changes.py archive`, run from a target's root, from landing on a project script that has no archive.
-  - Rejected: the same file name (confusion in the target). Rejected: a full-featured copy (the size, and a second archive implementation to keep correct).
+  - They are deposited at the project's `scripts/spec_changes.py` and `scripts/spec_kit_features.py`. The workflow assets, this repository's workflows, and projects that installed the automation earlier all call those paths, and R1 asks only that nothing binds the deposit to the bundled script, not that its name differ.
+  - The one hazard of the shared name, `python3 scripts/spec_changes.py archive` run from a target's root reaching the project's copy, ends at once with exit 2 and argparse's list of valid subcommands. SKILL.md names the skill's own script for the archive and says the project's copy has none.
+  - Each asset's requirement is named by its path (`Script: assets/spec_changes.py`), because the bundled script's `Script: spec_changes.py` shares the file name in the same domain.
+  - Rejected: a new file name such as `spec_request.py`. Every workflow asset, both references, this repository's workflows, and earlier adopters would change path to prevent a mistake that already fails fast.
+  - Rejected: a full-featured copy (the size, and a second archive implementation to keep correct).
 - **The CI-facing CLI matches this repository's own script** (OSW, SKW).
-  - Same subcommand names, flags, and output, so the asset workflows and this repository's workflows keep the same steps apart from the script path.
+  - Same subcommand names, flags, and output, so the asset workflows and this repository's workflows keep the same steps and the same script path.
   - The companion registers that pair. It is a documentation mirror between two management scripts, not a binding to a product script.
 - **Assets are Python 3.10+, standard library first, delivered as they are** (all asset requirements; user decision).
   - R2's project-language rule governs code the agent writes. A tested asset is delivered in Python, and the target may port its copy.
@@ -156,8 +158,8 @@ Each rubric item scores 1. Critical items are marked (C), and any critical failu
 | MHA: Bundled script available; Node project dependency; External command output; Documented null; Generated workflow | O4 in `web-shop` with `meta-harness-architecture` among the candidates: "Build the harness piece that checks pull requests: read the PR with `gh pr view --json body,labels`, apply `.github/pr-rules.yaml`, and wire it into CI." | the YAML package added to `devDependencies` (C); gh's exit status and the parsed JSON shape checked where gh is called, with a failure naming the command (C); a null body treated as empty text (C); no `?? {}`, `\|\| {}`, or catch-all fallback on guaranteed fields (C); no rule, check, or instruction binding the project's check to the installed skill's script, and the handoff says the project owns the check (C); workflow sets `defaults.run.shell: bash` | all (C) and ≥ 5/6 | same | transcript + diff + `cmp` | same |
 | MPD: Dependency with uv everywhere; Error-handling convention recorded; Privileged job; Read-only check | O5 in `py-labels`: "Settle our conventions for management scripts. We need a script that parses .github/labels.yaml in the labeling workflow, and one that reads `git log` output as JSON in the PR check." | YAML script: PEP 723 header and `uv run` (C); the convention names interface checks that exit with a message, and forbids blind, silent, and restating handlers (C); locking recommended as the default for the `pull_request_target` job, with both options named (C); locking called optional for the `pull_request` job; no lock written before the user decides (C) | all (C) and ≥ 4/5 | same | transcript + diff | same |
 | MGH: Label taxonomy committed; Durable project skill with CI diagnosis; SemVer not chosen; Workflows delivered; Taxonomy check without local uv | O6 in `gh-base`: "The design is approved. Build step 4: commit the taxonomy, deliver the label sync, the project skill, and the checks, commit-check, taxonomy, and tag-check workflows. Approvals for local files are granted; do no remote writes." | label sync delivered from the asset (`cmp` against it after its marked settings), and no delivered rule, check, or instruction binds a delivered script to a builder `scripts/` file (C); the project skill's digest is the asset and runs from the project path (C); no next-version or project-field helper delivered (C); every delivered workflow with a `run:` step sets `defaults.run.shell: bash` (C); uv recommended for the taxonomy check and locking called optional for its read-only job, with no lock written (C) | all (C) | same | transcript + diff + `cmp` | same |
-| OSW: GitHub install (modified); Privileged job reads the head | O7 in `gh-openspec`: "Install the OpenSpec request automation in this repository." | `scripts/spec_request.py` deposited from `assets/spec_request.py` (`cmp` against the asset), with no instruction to keep it identical to the bundled script (C); the check job joins the gate's `needs:` (C); every workflow sets bash as its shell, the privileged workflows check out only the base and read the head through `spec_request.py snapshot` (C); the label sync named; nothing pushes | all (C) and ≥ 4/5 | same | transcript + diff + `cmp` | same |
-| SKW: GitHub install (modified); Privileged job reads the head | O8 in `gh-speckit`: "Install the Spec-Kit request automation in this repository." | `scripts/spec_kit_request.py` deposited from `assets/spec_kit_request.py` (`cmp` against the asset), with no instruction to keep it identical to the bundled script (C); the check job joins the gate (C); every workflow sets bash as its shell, and the privileged workflows read the head through the snapshot (C); says nothing archives or pushes | all (C) and ≥ 3/4 | same | transcript + diff + `cmp` | same |
+| OSW: GitHub install (modified); Privileged job reads the head | O7 in `gh-openspec`: "Install the OpenSpec request automation in this repository." | `scripts/spec_changes.py` deposited from `assets/spec_changes.py` (`cmp` against the asset), with no instruction to keep it identical to the bundled script (C); the check job joins the gate's `needs:` (C); every workflow sets bash as its shell, the privileged workflows check out only the base and read the head through the deposited script's `snapshot` (C); the label sync named; nothing pushes | all (C) and ≥ 4/5 | same | transcript + diff + `cmp` | same |
+| SKW: GitHub install (modified); Privileged job reads the head | O8 in `gh-speckit`: "Install the Spec-Kit request automation in this repository." | `scripts/spec_kit_features.py` deposited from `assets/spec_kit_features.py` (`cmp` against the asset), with no instruction to keep it identical to the bundled script (C); the check job joins the gate (C); every workflow sets bash as its shell, and the privileged workflows read the head through the snapshot (C); says nothing archives or pushes | all (C) and ≥ 3/4 | same | transcript + diff + `cmp` | same |
 
 **Readback cases.** A clean-context subagent reads the finished skill files. For each scenario it quotes the passage that produces the scenario's THEN, and says whether that passage is present, precise, and unconditional. A scenario with no passage is a critical failure. Threshold: every scenario has a passage.
 - R1:
@@ -171,7 +173,7 @@ Each rubric item scores 1. Critical items are marked (C), and any critical failu
 
 **Script and tool harnesses.** These are untracked scratch repositories and stubs under the session scratch directory, run with `bash`.
 
-- **`spec_request.py`:**
+- **`assets/spec_changes.py`:**
   - The scratch repository runs `openspec init` with the pinned CLI and has a base commit. On a branch it holds three changes: one archived with every task ticked, one unarchived with an open task, and one unarchived with no ticked task.
   - `--help` exits 0 and names the five subcommands.
   - `check --base main --head HEAD` exits 1, naming the unarchived change. With `--draft` it exits 0 with a warning. With `--shape split` it admits the no-task change and fails the open-task one.
@@ -183,7 +185,7 @@ Each rubric item scores 1. Critical items are marked (C), and any critical failu
     - `--max-files 1`, a tree with `truncated: true`, and a non-UTF-8 document each exit 1, name the path, and write no file (Partial read refused).
     - A list where an object is expected, and a 404 on a tree the listing named, each fail at once naming the endpoint (Unexpected API response).
   - The same `snapshot` also runs read-only against this change's draft pull request on GitHub, and `status` on its output matches the git source over the branch.
-- **`spec_kit_request.py`:**
+- **`assets/spec_kit_features.py`:**
   - The scratch repository has `specs/001-export/` (spec, plan, and a ticked task list) and `specs/002-import/` (no plan).
   - The same sequence as above. `check` on a diff touching 002 exits 1, naming the feature and `plan.md` (Missing plan).
   - The stub server serves the same endpoints.
