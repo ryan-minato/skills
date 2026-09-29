@@ -146,9 +146,9 @@ The script the workflows call is deposited from
 [`assets/spec_changes.py`](assets/spec_changes.py) as the project's own
 `scripts/spec_changes.py`: a management script written for them, which the
 project owns and nothing keeps identical to the bundled one. No produced
-step hides an unexpected failure behind a fallback; the comment command
-posts its output even when the script fails, then fails the run for every
-exit but a bad argument's 2.
+step hides an unexpected failure behind a fallback; on GitHub the comment
+command posts its output even when the script fails, then fails the run for
+every exit but a bad argument's 2.
 
 One rule governs every job that runs with a writable token on someone
 else's request: **no object authored by the request reaches the runner.**

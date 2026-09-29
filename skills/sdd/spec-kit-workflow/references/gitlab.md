@@ -18,6 +18,10 @@ request is no longer a draft.
 
 ## What GitLab offers, and does not
 
+Tell the user these limitations when installing: a label a job applies
+takes effect on the next pipeline, and manual jobs replace comment
+commands.
+
 Verified against GitLab's documentation on 2026-09-17: no pipeline source
 exists for a merge request note or a label change, so `spec:show` and
 `spec:status` are manual jobs (arguments from the manual job's variables

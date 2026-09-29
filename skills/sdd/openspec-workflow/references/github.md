@@ -87,9 +87,11 @@ out.
   inside code spans, and the echoed command loses its backticks, so a
   comment cannot carry a link or a mention under the bot's name.
 - No step hides an unexpected failure behind a fallback. The comment
-  command posts the script's output as the reply even when the script
-  fails — a deliberate deferral — and then fails the run for every exit
-  but 2, a bad argument such as a change name the request does not touch.
+  command posts the output of `show` or `status` as the reply even when
+  that run fails — a deliberate deferral — and then fails the run for
+  every exit but 2, a bad argument such as a change name the request does
+  not touch. A `snapshot` that fails fails the run before any reply, in
+  the step that reads the head.
   The label loops read `jq` output written to files first, so a `jq`
   failure fails the job instead of reading as an empty plan.
 - Invocation gates: the label job runs on the request's own events and

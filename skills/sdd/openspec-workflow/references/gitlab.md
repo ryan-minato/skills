@@ -16,6 +16,10 @@ Placeholders: `{{NODE_IMAGE}}`, `{{INSTALL_COMMAND}}`, `{{REQUEST_SHAPE}}` (`com
 
 ## What GitLab offers, and does not
 
+Tell the user the two limitations below when installing: a label a job
+applies takes effect on the next pipeline, and manual jobs replace comment
+commands.
+
 Verified against GitLab's documentation on 2026-09-17:
 
 - No pipeline source exists for a merge request note or a label change.
