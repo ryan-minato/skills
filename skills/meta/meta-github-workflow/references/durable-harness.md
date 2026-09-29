@@ -31,6 +31,10 @@ create a competing entrypoint beside an existing one.
 - `.github/` — issue forms, `ISSUE_TEMPLATE/config.yml`, the PR template,
   workflows, `dependabot.yml`, `release.yml`, CODEOWNERS at one chosen
   location, and health files at one consistent precedence level.
+- `scripts/` — the delivered management scripts the workflows and people
+  run (`check_commits.py`, `check_taxonomy.py`, `sync_labels.py`), and the
+  project skill's own `scripts/` for its helpers. Each comes from this
+  builder's `assets/`, and the target owns it from then on.
 
 If the framework cannot load project skills, place the recurring procedure
 in an existing workflow document reachable from the entrypoint. Never
@@ -50,7 +54,9 @@ the plan upgrades, enable the ruleset with these exact job names").
 
 ## Synchronization ownership
 
-Register every copied pair with an owner and update trigger in a
+Delivered scripts are owned, not mirrored: nothing keeps them identical
+to this builder's files, so they get no row. Register every copied pair
+with an owner and update trigger in a
 `## Synchronization` table of `.agents/knowledge/github-workflow.md` — and
 prefer deriving over copying wherever possible (a checklist workflow parses
 the PR template's headings; a tag check reads its pattern from one

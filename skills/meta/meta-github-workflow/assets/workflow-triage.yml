@@ -6,9 +6,12 @@
 #
 # Reads the native issue type and the organization's Priority issue field
 # first, falling back to labels where those do not exist. On a personal
-# account delete the ORG_PRIORITY_FIELD line and keep the label path; in an
-# organization set it to the field's exact name. A form can set the type but
-# can never pre-fill a field value, so priority always starts empty here.
+# account, or on an instance that does not serve issue field values, set
+# ORG_PRIORITY_FIELD to '' and keep the label path; in an organization that
+# has the field, set it to the field's exact name — a failed read of the
+# field then fails the run instead of passing for "no priority". A form can
+# set the type but can never pre-fill a field value, so priority always
+# starts empty here.
 name: triage
 
 on:
@@ -32,7 +35,7 @@ jobs:
         with:
           script: |
             const ORG_PRIORITY_FIELD = '{{PRIORITY_FIELD_NAME_OR_EMPTY}}';
-            const labels = (context.payload.issue.labels || []).map((l) => l.name);
+            const labels = context.payload.issue.labels.map((l) => l.name);
             const issue_number = context.payload.issue.number;
             const { owner, repo } = context.repo;
 
@@ -45,28 +48,22 @@ jobs:
             const priorities = labels.filter((n) => n.startsWith('priority/'));
             let hasPriority = priorities.length === 1;
             if (ORG_PRIORITY_FIELD) {
-              try {
-                const { data } = await github.request(
-                  'GET /repos/{owner}/{repo}/issues/{issue_number}/issue-field-values',
-                  { owner, repo, issue_number },
-                );
-                // The endpoint returns a bare array; each entry names its
-                // field in issue_field_name, and a single-select answer
-                // arrives in single_select_option, not in `value`.
-                const values = Array.isArray(data) ? data : [];
-                hasPriority = values.some((v) => {
-                  if (v.issue_field_name !== ORG_PRIORITY_FIELD) return false;
-                  if (v.single_select_option) return true;
-                  if (Array.isArray(v.multi_select_options)) {
-                    return v.multi_select_options.length > 0;
-                  }
-                  return v.value !== null && v.value !== undefined && v.value !== '';
-                });
-              } catch (error) {
-                // Field values are unreadable on a personal account or an
-                // older GHES; the label fallback already answered.
-                if (error.status !== 404 && error.status !== 403) throw error;
+              const endpoint = 'GET /repos/{owner}/{repo}/issues/{issue_number}/issue-field-values';
+              const { data } = await github.request(endpoint, { owner, repo, issue_number });
+              // The endpoint returns a bare array; each entry names its
+              // field in issue_field_name, and a single-select answer
+              // arrives in single_select_option, not in `value`.
+              if (!Array.isArray(data)) {
+                throw new Error(`${endpoint} returned ${JSON.stringify(data).slice(0, 200)}, not an array`);
               }
+              hasPriority = data.some((v) => {
+                if (v.issue_field_name !== ORG_PRIORITY_FIELD) return false;
+                if (v.single_select_option) return true;
+                if (Array.isArray(v.multi_select_options)) {
+                  return v.multi_select_options.length > 0;
+                }
+                return v.value !== null && v.value !== undefined && v.value !== '';
+              });
             }
 
             if (context.payload.action === 'labeled' && priorities.length > 1) {

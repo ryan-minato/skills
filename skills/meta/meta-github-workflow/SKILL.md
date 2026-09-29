@@ -13,12 +13,12 @@ description: >-
   to meta-git-branching.
 license: Apache-2.0
 compatibility: >-
-  Bundled tools require Python 3.9+ and use only the standard library, except
-  `assets/check_taxonomy.py`, which needs PyYAML to parse the four YAML
-  dialects it checks and installs it in the CI job that runs it. Live GitHub
-  discovery requires network access; remote inspection or writes require an
-  authenticated gh CLI or a GitHub MCP capability, adequate permissions, and
-  explicit user approval.
+  Bundled tools require Python 3.9+ and the standard library. Script assets
+  delivered to the target need Python 3.10+; `assets/check_taxonomy.py`
+  declares PyYAML inline and runs through uv. Live GitHub discovery requires
+  network access; remote inspection or writes require an authenticated gh
+  CLI or a GitHub MCP capability, adequate permissions, and explicit user
+  approval.
 ---
 
 # GitHub Lifecycle Harness
@@ -225,12 +225,20 @@ same sequence for organization issue types and fields, but its approval is
 a separate and larger one: organization settings reach every repository in
 the organization, so say that before asking. Use
 [`scripts/rest_read.py`](scripts/rest_read.py) only for minimal read-only
-fallback access. Copy
-[`scripts/run_log_digest.py`](scripts/run_log_digest.py) into the durable
-project skill by default; copy
-[`scripts/next_version.py`](scripts/next_version.py) only when the project
-chose SemVer, and [`scripts/project_fields.py`](scripts/project_fields.py)
-only when Projects was opted into.
+fallback access.
+
+This skill's `scripts/` serve the build alone; every script the target gets
+comes from a management asset. Deliver
+[`assets/sync_labels.py`](assets/sync_labels.py) as the target's
+`scripts/sync_labels.py`. Into the project skill's `scripts/`, deliver
+[`assets/run_log_digest.py`](assets/run_log_digest.py) by default (the
+project skill runs it from there),
+[`assets/next_version.py`](assets/next_version.py) only when the project
+chose SemVer, and [`assets/project_fields.py`](assets/project_fields.py)
+only when Projects was opted into. Script assets are working management
+code: change only their marked settings (such as the commit check's
+`CONFIG`), never bind a delivered script to this skill's files, and tell
+the user the target owns them and later fixes here do not reach them.
 
 Read [publish-review.md](references/publish-review.md) before the first
 remote or publishable write. For every such write, use this sequence:
@@ -254,7 +262,7 @@ Verify local links, documented commands, every workflow's YAML, selected
 remote settings by readback, and knowledge reachability from the entrypoint
 bidirectionally: every knowledge file has a when-to-read pointer and every
 pointer resolves. Confirm no durable target file contains this skill's
-disposable marker, name, or paths. Confirm every extension slot listed in
+disposable marker, name, or paths, or binds a delivered script to them. Confirm every extension slot listed in
 [durable-harness.md](references/durable-harness.md) exists by its heading,
 step, or field id, so a paradigm builder can fill it later without
 guessing.

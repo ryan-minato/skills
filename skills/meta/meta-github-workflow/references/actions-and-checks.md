@@ -52,6 +52,12 @@ repository — dead files mislead future agents.
   forks: never check out PR code under it, never run repository scripts,
   never install dependencies; any use is a reviewed, owner-listed
   exception.
+- No delivered `run:` step or inline script hides an unexpected failure:
+  no command tested inside a condition, no `|| true` wider than the exit it
+  was meant for, no default standing in for API data. A deliberate
+  deferral — an advisory `continue-on-error`, an `if: always()` report
+  step, the aggregator gate deciding on its dependencies' results — is
+  marked where it is written, with a comment saying why.
 - First-party actions only (`actions/*`, `github/*`). A third-party action
   is a supply-chain decision: explicit user opt-in, full commit-SHA pin,
   and a recorded review date and update owner — a pin also freezes
@@ -77,8 +83,9 @@ run.
 ## Debugging discipline
 
 Validate workflow YAML locally before pushing. Never fetch a full run log —
-use `scripts/run_log_digest.py` (failed jobs only,
-tail-limited). Cap the push-wait-read loop and report instead of iterating
+during the build, use this skill's `scripts/run_log_digest.py` (failed jobs
+only, tail-limited); the target's project skill carries its own digest,
+delivered from `assets/run_log_digest.py`. Cap the push-wait-read loop and report instead of iterating
 indefinitely. Never weaken, skip, or delete a check to make it pass:
 changing a check's strictness is a separate, human-approved decision, not
 part of fixing a failure.

@@ -75,7 +75,9 @@ this gate.
 
 1. Run {{LOCAL_CHECK_COMMAND}}; all checks green
    ({{KNOWLEDGE_PATH}}/checks.md maps jobs to commands — diagnose with
-   {{DIGEST_COMMAND_IF_COPIED}}; never fetch full logs, never weaken a
+   {{DIGEST_COMMAND — e.g. "python3 .agents/skills/github-project-workflow/scripts/run_log_digest.py
+   --repo OWNER/REPO --run-id ID", this skill's own copy; delete the clause
+   when no digest was delivered}}; never fetch full logs, never weaken a
    check).
 2. Complete the PR checklist and update the final description. Then follow
    {{AUTHORITY_POLICY_PATH — e.g. .agents/knowledge/agent-authority.md}}:
@@ -92,6 +94,6 @@ this gate.
    closed. {{RELEASE_POINTER — when and how releases are cut, per
    knowledge}}.
 
-<!-- Add project-specific routed references and copied scripts only for
-selected planning, Projects, release, guardrail, Actions-diagnosis, or ML
-branches. -->
+<!-- Add project-specific routed references and scripts delivered from the
+builder's assets only for selected planning, Projects, release, guardrail,
+Actions-diagnosis, or ML branches. -->

@@ -43,7 +43,8 @@ jobs:
               core.setFailed('The PR template has no "## " headings to enforce; fix .github/pull_request_template.md.');
               return;
             }
-            const body = context.payload.pull_request.body || '';
+            // The API documents a null body for an empty description.
+            const body = context.payload.pull_request.body ?? '';
             const missing = required.filter((heading) => !body.includes(heading));
             if (missing.length > 0) {
               core.setFailed('PR body is missing template sections: ' + missing.join(', ') + '. Restore them from .github/pull_request_template.md.');
@@ -51,7 +52,7 @@ jobs:
             }
             // Fail-closed security checkbox: unchecked fails, deleted fails.
             const lines = body.split('\n').map((line) => line.trim());
-            const keyword = (process.env.SECURITY_KEYWORD || 'secrets').toLowerCase();
+            const keyword = process.env.SECURITY_KEYWORD.toLowerCase();
             const isSecurityItem = (line) => line.toLowerCase().includes(keyword);
             if (lines.some((l) => l.startsWith('- [ ]') && isSecurityItem(l))) {
               core.setFailed('The security checklist item is unchecked. Verify the diff and description, then tick it.');

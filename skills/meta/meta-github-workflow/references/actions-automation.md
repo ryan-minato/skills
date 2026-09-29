@@ -62,6 +62,15 @@ the `assets/` directory). Recipes only, adopt on explicit request:
 | `area/*` labels track changed paths | PR labeler + `labeler.yml`, sharing its path map with CODEOWNERS |
 | Triage lifecycle (`status/needs-triage` on/off, one priority) | triage workflow — issue events only, comment-not-remove |
 
+The taxonomy check declares PyYAML in its PEP 723 header and its workflow
+runs it with `uv run`, installing uv from PyPI at the current release
+(`{{UV_VERSION}}` in the asset). When the target's developers do not have
+uv, recommend adding it to the target's harness (the dev container, the
+setup instructions) rather than bundling a YAML parser. Locking the
+check's dependency is the user's decision: its job is read-only with no
+secrets, so say that locking is optional there and write no lock the user
+did not choose (`meta-python-defaults` carries the two locking options).
+
 Every automated comment or failure message names the file to edit. Scale
 by the proportionality rule in [durable-harness.md](durable-harness.md):
 none of this ships to a solo repository by default.

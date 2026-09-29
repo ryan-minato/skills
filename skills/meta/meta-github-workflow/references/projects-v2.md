@@ -42,10 +42,10 @@ the separate `project` token scope, which default tokens lack.
 
 ## Deterministic tooling
 
-Copy `scripts/project_fields.py` into the durable
-project skill: moving an item programmatically requires GraphQL node IDs
-that no human-facing `gh project` command surfaces, and the resolution is
-deterministic. It is the only bundled script gated on this branch.
+Deliver `assets/project_fields.py` into the durable project skill's
+`scripts/`: moving an item programmatically requires GraphQL node IDs that
+no human-facing `gh project` command surfaces, and the resolution is
+deterministic. It is the only delivered script gated on this branch.
 
 ## Durability
 
