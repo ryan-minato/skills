@@ -109,13 +109,20 @@ on the next pipeline; the platform reference says how.
 Read [references/github.md](references/github.md) when installing or
 changing the automation in a GitHub repository, and
 [references/gitlab.md](references/gitlab.md) in a GitLab project. Both
-place the script, the check, the commands, and the label, and list the
-maintainer actions and the fork-safety rules.
+place the check, the commands, and the label, and list the maintainer
+actions and the fork-safety rules. The script the workflows call is
+deposited from [`assets/spec_kit_features.py`](assets/spec_kit_features.py)
+as the project's own `scripts/spec_kit_features.py`: a management script
+written for them, which the project owns and nothing keeps identical to the
+bundled one. No produced step hides an unexpected failure behind a
+fallback; the comment command posts its output even when the script fails,
+then fails the run for every exit but a bad argument's 2. Nothing installed
+archives or pushes.
 
 One rule governs every job that runs with a writable token on someone
 else's request: **no object authored by the request reaches the runner.**
-Such a job checks out the base and reads the head through
-`spec_kit_features.py snapshot`, which pulls the file list and the
+Such a job checks out the base and reads the head through the deposited
+script's `snapshot`, which pulls the file list and the
 documents from the platform's API and parses them. Reading the head with
 a `git fetch` of its SHA works and is not exploitable on its own, but it
 leaves the request's objects one command away from being checked out by a
