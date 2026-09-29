@@ -12,9 +12,9 @@
 
 ## 2. External impact
 
-- [ ] 2.1 `skills/meta/meta-spec-workflow/assets/spec-workflow.md` and `SKILL.md`: "owns the request automation and its script" becomes "supplies the request automation and its management script; the project owns the deposited copy". Verify `just check-skill skills/meta/meta-spec-workflow` and readback R2.
-- [ ] 2.2 The companion change's lint scope, `meta/CONTEXT.md` carve-out, and register row are in place (companion tasks 1.1, 1.5, 1.7). Verify `just check`.
-- [ ] 2.3 No symlink, `marketplace.json` entry, description, or `sdd` README row changes. Verify `just validate` and `git diff --stat origin/main...HEAD -- .claude-plugin skills/*/README*.md .agents/skills`.
+- [x] 2.1 `skills/meta/meta-spec-workflow/assets/spec-workflow.md` and `SKILL.md`: "owns the request automation and its script" becomes "supplies the request automation and its management script; the project owns the deposited copy". Verify `just check-skill skills/meta/meta-spec-workflow` and readback R2.
+- [x] 2.2 The companion change's lint scope, `meta/CONTEXT.md` carve-out, and register row are in place (companion tasks 1.1, 1.5, 1.7). Verify `just check`.
+- [x] 2.3 No symlink, `marketplace.json` entry, description, or `sdd` README row changes. Verify `just validate` and `git diff --stat origin/main...HEAD -- .claude-plugin skills/*/README*.md .agents/skills`.
 
 ## 3. Tests
 
@@ -30,8 +30,8 @@
 - [ ] 3.10 Outcome O5 — closes MPD: Dependency with uv everywhere; Error-handling convention recorded; Privileged job; Read-only check.
 - [ ] 3.11 Outcome O6 — closes MGH: Label taxonomy committed; Durable project skill with CI diagnosis; SemVer not chosen; Workflows delivered; Taxonomy check without local uv.
 - [ ] 3.12 Outcomes O7 and O8 — closes OSW and SKW: GitHub install; Privileged job reads the head.
-- [ ] 3.13 Readback R1 — closes MH: Audit finds a bound script; MPD: No uv in CI.
-- [ ] 3.14 Readback R2 — closes MGL: Durable project skill with CI diagnosis; SemVer not chosen; Commit check job; OSW: Command answered when the script fails; GitLab install; SKW: Command answered when the script fails; and the `meta-spec-workflow` sentence.
+- [x] 3.13 Readback R1 — closes MH: Audit finds a bound script; MPD: No uv in CI.
+- [x] 3.14 Readback R2 — closes MGL: Durable project skill with CI diagnosis; SemVer not chosen; Commit check job; OSW: Command answered when the script fails; GitLab install; SKW: Command answered when the script fails; and the `meta-spec-workflow` sentence.
 - [x] 3.15 Identity and hygiene: the `byte-identical` and `identical copy` search read hit by hit; every workflow and CI asset parses as YAML; the placeholder grep; `just check-skill` for each touched skill.
 - [ ] 3.16 Record the skipped cases and their reasons for the pull request's Validation section.
 
