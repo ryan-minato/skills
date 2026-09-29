@@ -140,8 +140,8 @@ their input is repository content, not adversarial traffic.
 `just check` already enforces frontmatter limits, name/directory match,
 symlinks, marketplace sync, path self-containment, catalog files, the
 `## Harness Methodology` copy between `core/meta-harness` and
-`meta-harness-architecture`, the `scripts/sync_labels.py` copy, label and
-form consistency, knowledge-file pointers, and strict OpenSpec validation
+`meta-harness-architecture`, label and form consistency, knowledge-file
+pointers, and strict OpenSpec validation
 (`scripts/validate_skills.py`, `scripts/validate_harness.py`, `just
 spec-validate`). Run it (or trust its CI result) and spend review attention
 only on what it cannot see. A name that departs from the
