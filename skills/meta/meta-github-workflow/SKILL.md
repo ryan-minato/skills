@@ -238,7 +238,9 @@ chose SemVer, and [`assets/project_fields.py`](assets/project_fields.py)
 only when Projects was opted into. Script assets are working management
 code: change only their marked settings (such as the commit check's
 `CONFIG`), never bind a delivered script to this skill's files, and tell
-the user the target owns them and later fixes here do not reach them.
+the user the target owns them. The taxonomy check runs through `uv run`:
+where developers lack uv, recommend adding it to the target's harness, and
+say locking is optional for its read-only job; write no unchosen lock.
 
 Read [publish-review.md](references/publish-review.md) before the first
 remote or publishable write. For every such write, use this sequence:
