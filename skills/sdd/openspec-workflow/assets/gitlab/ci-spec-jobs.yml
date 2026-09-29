@@ -2,9 +2,12 @@
 # from the project's `.gitlab-ci.yml` (`include: - local: ...`) or paste the
 # jobs in; add the `spec` stage or rename the stage below. Replace every
 # {{PLACEHOLDER}}: the image or the install command for the pinned OpenSpec
-# CLI. `scripts/spec_changes.py` is the project's copy of this skill's
-# script. No job here writes to the repository: archiving is the
-# implementer's command, run once the deliberation closes.
+# CLI. `scripts/spec_changes.py` is the project's own management script;
+# nothing keeps it identical to a skill's script. No job here writes to the
+# repository: archiving is the implementer's command, run once the
+# deliberation closes. GitLab Runner runs each script with `errexit`, and
+# `pipefail` where the shell supports it, so a failing script fails its job
+# and its output stays in the log.
 #
 # What GitLab does not offer, stated plainly: no pipeline source exists for
 # a merge request note or a label change, so nothing here runs until the
@@ -23,6 +26,12 @@ variables:
   image: "{{NODE_IMAGE}}"
   stage: spec
   before_script:
+    # The jobs run python3 and jq; an image without them fails here, by name,
+    # instead of midway through a job.
+    - |
+      for tool in python3 jq; do
+        command -v "$tool" > /dev/null || { echo "The spec jobs need $tool, which the image $CI_JOB_IMAGE lacks; choose an image that has it, or install it here." >&2; exit 1; }
+      done
     - "{{INSTALL_COMMAND}}"
     - export SPEC_BASE="$CI_MERGE_REQUEST_DIFF_BASE_SHA" SPEC_HEAD="$CI_COMMIT_SHA"
     - export SPEC_FORK="$([ "$CI_MERGE_REQUEST_SOURCE_PROJECT_ID" != "$CI_MERGE_REQUEST_PROJECT_ID" ] && echo true || echo false)"
@@ -100,6 +109,8 @@ spec:labels:
   extends: .spec-base
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      # Advisory: a failed label update shows in the pipeline without
+      # blocking the merge, which spec:check alone decides.
       allow_failure: true
   script:
     - |

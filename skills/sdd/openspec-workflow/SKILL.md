@@ -84,13 +84,15 @@ inside the request, so the integration branch never holds an unarchived
 change. The executor is a person on the request's branch — every task
 ticked, then the archive command with its confirmation-skipping flag,
 plus its spec-skipping flag for a change marked spec-less, then the
-strict validator, then a commit.
+strict validator, then a commit. This skill's bundled
 [`scripts/spec_changes.py`](scripts/spec_changes.py) does this for every
-related change at once and refuses all of them when any has an open task:
+related change at once and refuses all of them when any has an open task.
+Run it by its path inside this skill's directory: the project's own
+`scripts/spec_changes.py` is the CI script and has no `archive`.
 
 ```bash
 # `<target>` is the branch the request merges into, not always `main`.
-python3 scripts/spec_changes.py archive --base origin/<target> --head HEAD
+python3 <this skill's directory>/scripts/spec_changes.py archive --base origin/<target> --head HEAD
 ```
 
 No job archives. A platform token cannot push to a fork at all, and a job
@@ -138,14 +140,20 @@ on the next pipeline; the platform reference says how.
 Read [references/github.md](references/github.md) when installing or
 changing the automation in a GitHub repository, and
 [references/gitlab.md](references/gitlab.md) in a GitLab project. Both
-place the script, the check, the commands, the archive executor, and the
-labels, and list the maintainer actions and the fork-safety rules the
-files rely on.
+place the check, the commands, the archive executor, and the labels, and
+list the maintainer actions and the fork-safety rules the files rely on.
+The script the workflows call is deposited from
+[`assets/spec_changes.py`](assets/spec_changes.py) as the project's own
+`scripts/spec_changes.py`: a management script written for them, which the
+project owns and nothing keeps identical to the bundled one. No produced
+step hides an unexpected failure behind a fallback; the comment command
+posts its output even when the script fails, then fails the run for every
+exit but a bad argument's 2.
 
 One rule governs every job that runs with a writable token on someone
 else's request: **no object authored by the request reaches the runner.**
-Such a job checks out the base and reads the head through
-`spec_changes.py snapshot`, which pulls the file list and the documents
+Such a job checks out the base and reads the head through the deposited
+script's `snapshot`, which pulls the file list and the documents
 from the platform's API and parses them. No installed job checks the head
 out, fetches it, installs from it, or runs it. Reading the head with a
 `git fetch` of its SHA works and is not exploitable on its own, but it

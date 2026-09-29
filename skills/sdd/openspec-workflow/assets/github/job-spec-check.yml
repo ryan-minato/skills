@@ -5,7 +5,8 @@
 # verdict follows the draft state. Replace every {{PLACEHOLDER}}: the pinned
 # commit SHA of each action, the Node LTS line, and the project's command that
 # installs the pinned OpenSpec CLI (the version pin stays in one place).
-# `scripts/spec_changes.py` is the project's copy of this skill's script.
+# `scripts/spec_changes.py` is the project's own management script; nothing
+# keeps it identical to a skill's script.
   spec-check:
     name: spec / check
     runs-on: ubuntu-latest
