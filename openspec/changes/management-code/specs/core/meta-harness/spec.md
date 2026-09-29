@@ -4,7 +4,7 @@ Governs what an agent that loaded the `meta-harness` methodology observably does
 ## ADDED Requirements
 
 ### Requirement: Behavior: Management code belongs to the project
-The agent SHALL treat code that never ships in the product — quality checks, environment preparation, CI and administration scripts, git hooks, inline workflow shell, and scripts inside project skills — as the project's own management code: written for its role, readable first, failing as early as possible with a message that names what to fix, and never bound to a skill's runtime script: no rule, check, or instruction requires it to stay identical to one, although its content may match one where the role needs the same code.
+The agent SHALL treat code that never ships in the product — quality checks, environment preparation, CI and administration scripts, git hooks, inline workflow shell, and scripts inside project skills — as the project's own management code: written for its role, readable first, guided by the fail-fast philosophy — a failure it cannot handle surfaces as a failure with a message that names what to fix, never as a pass or a wrong answer — and never bound to a skill's runtime script: no rule, check, or instruction requires it to stay identical to one, although its content may match one where the role needs the same code.
 
 #### Scenario: Skill script offered as the project's check
 - **WHEN** the user asks the agent to add a CI check to a project, and an installed skill's bundled script already performs that check

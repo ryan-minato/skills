@@ -15,11 +15,11 @@ The builder SHALL record that a Python management script with third-party depend
 - **THEN** the recorded convention keeps the script standard-library-only and runs it with the Python interpreter, not with `uv run`
 
 ### Requirement: Behavior: Python management scripts check their interfaces and hide no failure
-The builder SHALL record an error-handling idiom for Python management scripts in which each subprocess, HTTP, and file-read interface is checked for what the code relies on and exits with a message naming the interface and the value received; data checked there is read directly afterwards; and no bare or blind `except`, no `try`/`except`/`pass`, and no handler that only restates the exception is written.
+The builder SHALL record an error-handling idiom for Python management scripts, presented as the fail-fast philosophy rather than a fixed procedure, in which each subprocess, HTTP, and file-read interface the script relies on is checked and a mismatch exits with a message naming the interface and the value received; data checked there is read directly afterwards; and a bare or blind `except`, a `try`/`except`/`pass`, or a handler that only restates the exception is an exception that needs a stated reason, never a default habit.
 
 #### Scenario: Error-handling convention recorded
 - **WHEN** the builder records the conventions for the project's management scripts
-- **THEN** the convention names the interface checks that exit with a message, and forbids blind handlers, silent handlers, and handlers that only restate the exception
+- **THEN** the convention names the interface checks that exit with a message, and treats blind handlers, silent handlers, and handlers that only restate the exception as exceptions that need a stated reason
 
 ### Requirement: Behavior: Locking a CI script's dependencies is the user's decision, defaulted by the job's risk
 When a PEP 723 script with third-party dependencies runs in a CI job, the builder SHALL present locking its dependencies — `uv lock --script`, or an `exclude-newer` cutoff — as a recommendation whose default follows the job's actual risk: recommended for a job with a privileged trigger, a writable token, or secrets, and not required for a read-only job without secrets; and SHALL apply no lock the user did not choose.
