@@ -26,4 +26,4 @@
 
 ## 4. Finish
 
-- [ ] 4.1 Run `just check` and `git diff --stat origin/main...HEAD`, write the results to the pull request's Validation section linking this plan, and, once the maintainer closes the deliberation on the finished implementation, archive this change beside `management-code` and run `just spec-validate`.
+- [x] 4.1 Run `just check` and `git diff --stat origin/main...HEAD`, write the results to the pull request's Validation section linking this plan, and, once the maintainer closes the deliberation on the finished implementation, archive this change beside `management-code` and run `just spec-validate`.
