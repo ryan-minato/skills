@@ -3,8 +3,8 @@
 # `spec/not-started` | `spec/in-progress` | `spec/done`. A pull request that
 # touches no feature carries none of them.
 #
-# Replace {{PINNED_SHA}}; `scripts/spec_kit_features.py` is the project's copy of
-# this skill's script.
+# Replace {{PINNED_SHA}}. `scripts/spec_kit_features.py` is the project's own
+# management script; nothing keeps it identical to a skill's script.
 name: spec-labels
 
 on:
@@ -63,22 +63,29 @@ jobs:
               *) echo "refusing unexpected label: $1" >&2; exit 1 ;;
             esac
           }
+          # jq writes both lists before the loops run: fed through a process
+          # substitution, a jq failure would read as an empty plan.
+          jq -r '.add[]' "$RUNNER_TEMP/plan.json" > "$RUNNER_TEMP/add.txt"
+          jq -r '.remove[]' "$RUNNER_TEMP/plan.json" > "$RUNNER_TEMP/remove.txt"
           while IFS= read -r label; do
             [ -n "$label" ] || continue
             check "$label"
             gh api -X POST "repos/$REPO/issues/$N/labels" -f "labels[]=$label" > /dev/null
-          done < <(jq -r '.add[]' "$RUNNER_TEMP/plan.json")
+          done < "$RUNNER_TEMP/add.txt"
           while IFS= read -r label; do
             [ -n "$label" ] || continue
             check "$label"
+            # Encoded outside the `if` below, so a failure stops the step
+            # rather than sending a DELETE for an empty label name.
+            encoded=$(jq -rn --arg l "$label" '$l | @uri')
             # A label already absent answers 404, which is not a failure here.
             # Anything else — a permission regression, a rate limit — must fail
             # the job: a silently skipped delete leaves a stale label saying the
             # opposite of the truth, and nothing would prompt a retry.
-            if ! err=$(gh api -X DELETE "repos/$REPO/issues/$N/labels/$(jq -rn --arg l "$label" '$l | @uri')" 2>&1 >/dev/null); then
+            if ! err=$(gh api -X DELETE "repos/$REPO/issues/$N/labels/$encoded" 2>&1 >/dev/null); then
               case "$err" in
                 *"HTTP 404"*) ;;
                 *) printf '%s\n' "$err" >&2; exit 1 ;;
               esac
             fi
-          done < <(jq -r '.remove[]' "$RUNNER_TEMP/plan.json")
+          done < "$RUNNER_TEMP/remove.txt"

@@ -8,7 +8,7 @@ GitLab project. The assets under `assets/gitlab/` are raw shapes: every
 
 | Piece | From | To | Notes |
 |---|---|---|---|
-| Script | `scripts/spec_kit_features.py` | the project's `scripts/spec_kit_features.py` | byte-identical copy |
+| Script | `assets/spec_kit_features.py` | the project's `scripts/spec_kit_features.py` | the project's own management script for the jobs; nothing keeps it identical to this skill's bundled script |
 | Jobs | `assets/gitlab/ci-spec-jobs.yml` | included from `.gitlab-ci.yml` (or pasted), stage `spec` | `spec:check`, `spec:show`, `spec:status`, `spec:labels` |
 | Labels | `assets/gitlab/labels-spec.json` | the project's label file, synced with its label tool | GitLab colors carry `#` |
 
@@ -43,6 +43,10 @@ with the parent's variables and tokens. Enforcement is the project setting
 
 - The fragment parses; `grep -n '{{' .gitlab-ci.yml <fragment>` returns
   nothing.
+- The image carries `python3` and `jq`: the fragment's `before_script`
+  names either one when it is missing, and a failing script fails its job
+  with its output in the log (GitLab Runner runs job scripts with `errexit`,
+  and `pipefail` where the shell supports it).
 - A test merge request: `spec:check` runs on each push and fails on a
   touched feature without a plan; the manual jobs print the documents and
   the table.
