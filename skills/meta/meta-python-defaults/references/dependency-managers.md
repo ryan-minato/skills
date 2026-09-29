@@ -10,7 +10,10 @@ The shape of the target decides the mode before any tool preference does:
 
 - **One-off script.** No project file at all: declare dependencies in the
   script itself with PEP 723 inline metadata and run it with `uv run`.
-  The script stays a single portable file.
+  The script stays a single portable file. A management script — a check,
+  hook, or CI script — follows
+  [management-scripts.md](management-scripts.md), which says when `uv run`
+  applies and when the interpreter does.
 - **Pinned-requirements workflow.** The pip-tools model: a human-edited
   input file compiled into a fully pinned output (`uv pip compile`), for
   projects that want lockfile discipline without adopting full project

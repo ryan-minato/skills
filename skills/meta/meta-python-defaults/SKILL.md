@@ -58,6 +58,9 @@ explicit user preference always wins.
      when commands or local gates need a stable entrypoint.
    - Read [references/doc-generators.md](references/doc-generators.md) only
      when the project actually publishes generated documentation.
+   - Read [references/management-scripts.md](references/management-scripts.md)
+     when the project has, or the harness build adds, scripts that never
+     ship in the product — checks, hooks, CI or administration scripts.
 6. Verify volatile commands, versions, configuration syntax, and current
    capabilities against official first-party documentation at execution
    time. Do not create a documentation-URL registry or copy one into the
