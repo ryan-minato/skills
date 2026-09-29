@@ -36,28 +36,32 @@ The builder SHALL keep a management script self-contained where its ecosystem ha
 - **WHEN** the builder finishes delivering management scripts
 - **THEN** the target's harness knowledge names their language and the command that runs them
 
-### Requirement: Behavior: Management code fails fast at its interfaces and hides no failure
-The builder SHALL write management code readable first and failing as early as possible: every interface with an external tool, command, API, or a file another step wrote SHALL be checked for what the code relies on and fail at once with a message naming the interface, the value received, and what to fix; a check's finding SHALL point at the file to fix and print no traceback; no default SHALL stand in for a failure — no fallback on a guaranteed key, swallowed exception, catch-all handler, or handler that only restates the exception — and data already checked at its interface SHALL NOT be checked again inside; values the data contract documents as possibly null SHALL be handled as domain logic; and structural safety, idempotence, and narrow retries on known-transient errors SHALL stay.
+### Requirement: Behavior: Management code follows the fail-fast philosophy and hides no failure
+The builder SHALL apply fail-fast as a design philosophy that guides judgment, not as a fixed procedure: management code is readable first; a failure that matters is never hidden — no default, fallback on a guaranteed key, swallowed exception, catch-all handler, or handler that only restates the exception turns it into a pass or a wrong answer — and nothing is built on a result the code knows is bad; where the code relies on an external tool, command, API, or a file another step wrote, it checks what it relies on and fails with a message naming the interface, the value received, and what to fix; a check's finding points at the file to fix and prints no traceback; when the failure surfaces — at the failing call, or after collecting findings at the end of the script or step — is chosen for readability and for the person who fixes it; values the data contract documents as possibly null are handled as domain logic; and structural safety, idempotence, and narrow retries on known-transient errors stay.
 
 #### Scenario: Validator finding
 - **WHEN** the builder writes a check that validates a committed file and the file violates it
 - **THEN** the check prints a message naming the file and the fix and exits non-zero without a traceback
 
+#### Scenario: Findings collected before failing
+- **WHEN** the user asks for a check that reports every violating file in one run
+- **THEN** the check collects the findings, reports each with its file, and fails once at the end, and the builder does not restructure it to stop at the first finding
+
 #### Scenario: External command output
 - **WHEN** a management script consumes an external command's JSON output
-- **THEN** it checks the command's exit status and the parsed shape where it calls the command, fails naming the command when either is wrong, and reads the fields directly afterwards without `.get(...) or {}` fallbacks
+- **THEN** a wrong exit status or an unexpected shape ends the script failed with a message naming the command, and no default stands in for the data it did not get
 
 #### Scenario: Documented null
 - **WHEN** a script reads a pull request body, which the platform documents as null when the body is empty
 - **THEN** it treats null as empty text and adds no guard to fields the platform guarantees
 
-### Requirement: Behavior: Shell in management code fails on the failing command
-The builder SHALL write shell steps under `set -euo pipefail` unless a documented exception applies, handling an expected nonzero exit at that command instead of dropping the flags for the whole script; SHALL set `defaults.run.shell: bash` in the GitHub Actions workflows it generates; and SHALL run a command whose failure matters before the condition that tests its result, never inside the condition.
-
-#### Scenario: Generated workflow
-- **WHEN** the builder generates a GitHub Actions workflow with `run:` steps
-- **THEN** the workflow sets `defaults.run.shell: bash`
+### Requirement: Behavior: Shell in management code does not lose a failure
+The builder SHALL keep the shell it writes from losing a failure that matters — a command's failure is not read as a false condition, swallowed by `|| true`, or hidden behind a pipe — so that the step or job ends failed, whether at the failing command or when the step ends, and SHALL treat strict mode (`set -euo pipefail`) and a workflow-level `defaults.run.shell: bash` as tools it may use where they make that simplest, not as rules every step must follow.
 
 #### Scenario: Command inside a condition
 - **WHEN** a generated step decides from a command's output whether a check must run
-- **THEN** the command runs on its own before the test, so its failure fails the step, and a failed command is never read as "nothing to check"
+- **THEN** a failure of that command fails the step instead of being read as "nothing to check"
+
+#### Scenario: Status checked when the step ends
+- **WHEN** a generated step pipes the output of a command whose failure matters into another command
+- **THEN** the step ends failed when that command failed, either through `pipefail` or through a status the step checks before it ends, and neither form is treated as a defect
