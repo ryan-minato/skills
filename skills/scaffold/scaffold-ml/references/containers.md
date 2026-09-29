@@ -101,13 +101,27 @@ value. Plain `docker run` configures nothing — add `--shm-size` (or
 ## Task-runner recipes
 
 Append to the justfile; `<project name>` is the one slot. The sealed
-build refuses a dirty tree so the stamp is the code inside; the digest
-recipe prints what a run exports as `IMAGE_DIGEST`.
+build reads the tree status and the commit before it tests them, refuses
+a dirty tree so the stamp is the code inside, and stops when git cannot
+read the tree; the digest recipe prints what a run exports as
+`IMAGE_DIGEST`.
 
 ```just
 docker-build target="runtime":
-    @if [ "{{target}}" = sealed ] && [ -n "$(git status --porcelain)" ]; then echo "docker-build: commit first; a sealed image stamps the commit it copies" >&2; exit 1; fi
-    docker build --target {{target}} --build-arg GIT_COMMIT=$(git rev-parse HEAD) --iidfile .image-id -t <project name>:{{target}} .
+    #!/usr/bin/env bash
+    set -euo pipefail
+    commit=""
+    if [ "{{target}}" = sealed ]; then
+        # Read before testing, so a failed read stops the build instead of
+        # passing as a clean tree or an empty commit.
+        status=$(git status --porcelain)
+        commit=$(git rev-parse HEAD)
+        if [ -n "$status" ]; then
+            echo "docker-build: commit first; a sealed image stamps the commit it copies" >&2
+            exit 1
+        fi
+    fi
+    docker build --target {{target}} --build-arg GIT_COMMIT="$commit" --iidfile .image-id -t <project name>:{{target}} .
 
 docker-digest:
     @cat .image-id
