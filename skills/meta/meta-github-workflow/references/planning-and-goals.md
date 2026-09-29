@@ -70,9 +70,9 @@ Keep them. Add only what the harness needs:
 
 Every label carries a description and a 6-digit hex color without `#`.
 Labels are per-repository with no organization inheritance: commit the
-taxonomy as `labels.json` in the target and ship
-`scripts/sync_labels.py` beside it so sibling repos
-and drift both have a mechanical answer. The deposited taxonomy check keeps
+taxonomy as `labels.json` in the target and deliver the label sync from
+`assets/sync_labels.py` as the target's own `scripts/sync_labels.py`, so
+sibling repos and drift both have a mechanical answer. The deposited taxonomy check keeps
 `labels.json`, `release.yml`, the issue forms, and the labeler config
 agreeing.
 

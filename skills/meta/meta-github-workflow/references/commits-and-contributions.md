@@ -40,8 +40,9 @@ The full claim procedure lives in [issues-and-prs.md](issues-and-prs.md).
 
 ## Enforcement
 
-Ship `assets/check_commits.py` into the target's
-`scripts/` with its `CONFIG` block edited to the agreed convention, wired
+Deliver `assets/check_commits.py` as the target's
+`scripts/check_commits.py` with its `CONFIG` block, the one marked setting,
+edited to the agreed convention, wired
 as: a local hook or documented command, and the commit-check workflow
 running the same script — title mode under squash, range mode otherwise.
 The convention document, the `CONFIG` block, and CONTRIBUTING must state

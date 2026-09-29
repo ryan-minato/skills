@@ -22,9 +22,8 @@ release does not delete its tag. Draft releases are collaborator-only —
 the one draft surface on GitHub that is actually private.
 
 Versioning: record the version source, tag format, and bump rules in the
-committed versioning policy; ship
-`scripts/next_version.py` only when the project
-chose SemVer, and pair the tag-check workflow with any tag ruleset so
+committed versioning policy; deliver `assets/next_version.py` into the
+durable project skill's `scripts/` only when the project chose SemVer, and pair the tag-check workflow with any tag ruleset so
 format and protection agree.
 
 ## Environments and deployments
