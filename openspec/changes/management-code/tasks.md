@@ -33,8 +33,8 @@
 - [x] 3.13 Readback R1 — closes MH: Audit finds a bound script; MPD: No uv in CI.
 - [x] 3.14 Readback R2 — closes MGL: Durable project skill with CI diagnosis; SemVer not chosen; Commit check job; OSW: Command answered when the script fails; GitLab install; SKW: Command answered when the script fails; and the `meta-spec-workflow` sentence.
 - [x] 3.15 Identity and hygiene: the `byte-identical` and `identical copy` search read hit by hit; every workflow and CI asset parses as YAML; the placeholder grep; `just check-skill` for each touched skill.
-- [ ] 3.16 Record the skipped cases and their reasons for the pull request's Validation section.
+- [x] 3.16 Record the skipped cases and their reasons for the pull request's Validation section.
 
 ## 4. Finish
 
-- [ ] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, and, once the maintainer closes the deliberation on the finished implementation, archive this change and run `just spec-validate`.
+- [x] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, and, once the maintainer closes the deliberation on the finished implementation, archive this change and run `just spec-validate`.
