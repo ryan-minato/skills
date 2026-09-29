@@ -11,7 +11,8 @@ description: >-
   branching model belongs to meta-git-branching.
 license: Apache-2.0
 compatibility: >-
-  Bundled tools require Python 3.9+ (stdlib only). Live GitLab discovery
+  Bundled tools require Python 3.9+ (stdlib only); script assets delivered to
+  the target need Python 3.10+. Live GitLab discovery
   requires network access; remote inspection or writes require suitable GitLab
   tooling, authentication, permissions, and explicit user approval.
 ---
@@ -162,10 +163,17 @@ Use [`scripts/sync_labels.py`](scripts/sync_labels.py) only after the taxonomy
 is approved: run its default dry-run, review the exact plan, apply only with
 explicit authorization, then read labels back. Use
 [`scripts/rest_read.py`](scripts/rest_read.py) only for minimal read-only
-fallback access. Copy [`scripts/pipeline_log_digest.py`](scripts/pipeline_log_digest.py)
-into the durable project skill when agents will diagnose GitLab CI, and copy
-[`scripts/next_version.py`](scripts/next_version.py) only when the project has
-chosen SemVer.
+fallback access.
+
+This skill's `scripts/` serve the build alone; every script the target gets
+comes from a management asset. Into the durable project skill's `scripts/`,
+deliver [`assets/pipeline_log_digest.py`](assets/pipeline_log_digest.py) when
+agents will diagnose GitLab CI (the project skill runs it from there), and
+[`assets/next_version.py`](assets/next_version.py) only when the project has
+chosen SemVer. Script assets are working management code: change only their
+marked settings (such as the commit check's `CONFIG`), never bind a delivered
+script to this skill's files, and tell the user the target owns them and
+later fixes here do not reach them.
 
 Read [publish-review.md](references/publish-review.md) before the first remote
 or publishable write. For every such write, use this sequence:
@@ -188,7 +196,8 @@ cannot be reliably undone, so the gate has to outlive this builder.
 Verify local links, documented commands, templates, CI syntax against the
 target instance, selected remote settings by readback, and the reachability of
 every knowledge file from the entrypoint. Confirm that no durable target file
-contains this skill's disposable marker or depends on this skill's paths.
+contains this skill's disposable marker, depends on this skill's paths, or
+binds a delivered script to them.
 Confirm every extension slot listed in
 [durable-harness.md](references/durable-harness.md) exists by its heading,
 step, or section, so a paradigm builder can fill it later without guessing.
