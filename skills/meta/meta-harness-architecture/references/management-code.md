@@ -10,11 +10,12 @@ so write it for whoever reads it next.
 
 - Write each script for the job that calls it (a CI check, a hook, a
   project-skill helper) and put it in the project's own paths.
-- When a skill used in the build already ships a script that does the job,
-  do not bind the project to it. No rule, check, or instruction may require
-  the project's script to stay identical to a skill's bundled script, and no
-  step runs a script from a skill's install path. Write or deposit a script
-  for the role. Its content may match the skill's script where the role
+- When a skill already ships a script that does the job, do not bind the
+  project to it. A script inside a skill's directory, whether the skill was
+  installed or is the project's own, is written for the agent that runs the
+  skill: no CI step, hook, or recipe runs it from there, and no rule, check,
+  or instruction may require the project's script to stay identical to it.
+  Write or deposit a script for the role in the project's own paths. Its content may match the skill's script where the role
   needs the same code; matching content is not the defect, a binding is.
 - Say in the handoff that the project owns the script and that later fixes
   to the skill do not reach it.
