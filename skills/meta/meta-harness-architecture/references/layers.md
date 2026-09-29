@@ -67,8 +67,9 @@ language already guarantees:
   tests, tests for key components only, scenario tests, or a smoke test —
   rather than defaulting to maximal coverage.
 - Custom checks must fail with messages that explain what failed, why it
-  matters, and the likely fix. A check agents cannot self-correct against
-  just burns tokens.
+  matters, and the likely fix. A finding names the file to fix and prints
+  no traceback; a traceback is for an unexpected failure of the check
+  itself. A check agents cannot self-correct against just burns tokens.
 
 ## Workflow constraints
 

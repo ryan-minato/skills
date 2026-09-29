@@ -30,6 +30,8 @@ skill's root).
   skill-local references only for a substantial branch that many
   invocations skip, and give each reference a precise load condition.
 - Add assets only for structural skeletons or snippets the agent copies.
+- Scripts inside a project skill are management code: write them by
+  `references/management-code.md` (path relative to this skill's root).
 - Record project-specific failure modes as gotchas.
 
 Do not pour broad goals, architecture, or team workflow into a skill; those

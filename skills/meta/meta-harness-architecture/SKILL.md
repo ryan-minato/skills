@@ -56,6 +56,15 @@ precise when-to-read pointer; encode repeated, fragile, ordered, or branchy work
 a project skill; put deterministic repeated logic in a script. A split that does
 not reduce what loads for a task only adds navigation cost.
 
+Code that never ships in the product — checks, CI and administration scripts,
+hooks, workflow shell, and project-skill scripts — is the project's own
+management code. Write it for its role and readable first, and let no fallback
+postpone or hide an unexpected error: the failure surfaces with a message that
+names what to fix, while a failure the design expects may still be handled or
+deferred on purpose. Never bind it to a skill's runtime script: a rule, check,
+or instruction that keeps the two identical is a defect to remove, although
+matching content alone is not.
+
 AGENTS.md is the map for progressive loading, not an exhaustive manual. It states
 the project's purpose, always-applicable constraints, validation entrypoints, and
 the exact conditions for reading deeper material. Aim for about 100 lines. A light
@@ -175,8 +184,15 @@ self-announce, but every knowledge or reference file needs an explicit
 when-to-read pointer.
 
 For scripts, tests, linters, CI, hooks, task runners, and framework settings,
-implement the approved feedback and safety layers. Custom checks must explain
-what failed, why it matters, and the likely fix.
+implement the approved feedback and safety layers as management code the
+target owns: written for its role and never bound to a skill's bundled script,
+in a language the project's community scripts in, with dependencies and an
+invocation that work in every environment it runs in, and with no fallback
+hiding an unexpected failure. Custom checks must explain what failed, why it
+matters, and the likely fix. Tell the user that the project owns this code and
+that later fixes to a skill do not reach it. Before writing or depositing any
+script, hook, CI step, task-runner recipe, or project-skill script, read
+[references/management-code.md](references/management-code.md).
 
 ## Gotchas
 
