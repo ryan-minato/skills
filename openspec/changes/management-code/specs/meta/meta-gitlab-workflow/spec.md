@@ -11,9 +11,9 @@ The builder SHALL deliver every script it gives the target — the commit check,
 - **WHEN** the project did not choose SemVer
 - **THEN** no next-version helper is delivered
 
-### Requirement: Behavior: Delivered job scripts do not lose a failure
-The CI jobs the builder delivers SHALL end failed whenever a command whose failure matters failed — including one whose output is piped on, or one whose result a condition tests — whether at that command or when the job's script ends.
+### Requirement: Behavior: Delivered job scripts hide no unexpected failure
+The CI jobs the builder delivers SHALL hide no unexpected failure — a failed command whose output is piped on, or whose result a condition tests, is not read as success — and SHALL mark a failure the design tolerates or defers explicitly, such as `allow_failure` on an advisory job.
 
 #### Scenario: Commit check job
 - **WHEN** mechanical commit enforcement is selected and the builder writes the commit-check job
-- **THEN** a failing commit check fails the job, and a failure of a command whose output the job pipes on is not lost
+- **THEN** a failing commit check fails the job, and a failure of a command whose output the job pipes on is not read as success

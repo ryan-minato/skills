@@ -36,8 +36,8 @@ The builder SHALL keep a management script self-contained where its ecosystem ha
 - **WHEN** the builder finishes delivering management scripts
 - **THEN** the target's harness knowledge names their language and the command that runs them
 
-### Requirement: Behavior: Management code follows the fail-fast philosophy and hides no failure
-The builder SHALL apply fail-fast as a design philosophy that guides judgment, not as a fixed procedure: management code is readable first; a failure that matters is never hidden — no default, fallback on a guaranteed key, swallowed exception, catch-all handler, or handler that only restates the exception turns it into a pass or a wrong answer — and nothing is built on a result the code knows is bad; where the code relies on an external tool, command, API, or a file another step wrote, it checks what it relies on and fails with a message naming the interface, the value received, and what to fix; a check's finding points at the file to fix and prints no traceback; when the failure surfaces — at the failing call, or after collecting findings at the end of the script or step — is chosen for readability and for the person who fixes it; values the data contract documents as possibly null are handled as domain logic; and structural safety, idempotence, and narrow retries on known-transient errors stay.
+### Requirement: Behavior: Management code hides no unexpected failure behind a fallback
+The builder SHALL apply fail-fast as a design philosophy aimed at one thing — a fallback that postpones or hides an unexpected error — and not as a rule against handling or deferring a failure by design: management code is readable first; an unexpected failure is not turned into a pass or a wrong answer by a default, a fallback on a guaranteed key, a swallowed exception, a catch-all handler, or a handler that only restates the exception, and nothing is built on a result the code knows is bad; where the code relies on an external tool, command, API, or a file another step wrote, it checks what it relies on and fails with a message naming the interface, the value received, and what to fix; a check's finding points at the file to fix and prints no traceback; a failure the design expects — a finding to collect, an exit status that carries meaning, a result a later step or gate decides on — is handled or deferred as designed, and when a failure surfaces is chosen for readability and for the person who fixes it; values the data contract documents as possibly null are handled as domain logic; and structural safety, idempotence, and narrow retries on known-transient errors stay.
 
 #### Scenario: Validator finding
 - **WHEN** the builder writes a check that validates a committed file and the file violates it
@@ -49,19 +49,19 @@ The builder SHALL apply fail-fast as a design philosophy that guides judgment, n
 
 #### Scenario: External command output
 - **WHEN** a management script consumes an external command's JSON output
-- **THEN** a wrong exit status or an unexpected shape ends the script failed with a message naming the command, and no default stands in for the data it did not get
+- **THEN** an unexpected exit status or an unexpected shape ends the script failed with a message naming the command, and no default stands in for the data it did not get
 
 #### Scenario: Documented null
 - **WHEN** a script reads a pull request body, which the platform documents as null when the body is empty
 - **THEN** it treats null as empty text and adds no guard to fields the platform guarantees
 
-### Requirement: Behavior: Shell in management code does not lose a failure
-The builder SHALL keep the shell it writes from losing a failure that matters — a command's failure is not read as a false condition, swallowed by `|| true`, or hidden behind a pipe — so that the step or job ends failed, whether at the failing command or when the step ends.
+### Requirement: Behavior: Shell in management code hides no unexpected failure
+The builder SHALL keep the shell it writes from hiding an unexpected failure — a failed command read as a false condition, an `|| true` that swallows more than the exit it was written for, a pipe that drops a status nobody meant to drop — and SHALL write a deliberate deferral explicitly, so that a failure the design tolerates or hands on (an advisory check, a report step that runs after a failure, a gate that decides on collected results) is visibly marked where it is written and still reaches where the design sends it.
 
 #### Scenario: Command inside a condition
 - **WHEN** a generated step decides from a command's output whether a check must run
 - **THEN** a failure of that command fails the step instead of being read as "nothing to check"
 
-#### Scenario: Status checked when the step ends
-- **WHEN** a generated step pipes the output of a command whose failure matters into another command
-- **THEN** the step ends failed when that command failed, whether it stops at once or checks the status before it ends, and either form is accepted
+#### Scenario: Advisory check by design
+- **WHEN** the user wants a check that reports its findings on every run but does not block the merge
+- **THEN** the builder marks that deferral explicitly where it is written, keeps the report, and neither refuses the request nor makes the check blocking

@@ -15,10 +15,10 @@ See proposal.md for motivation. `openspec/changes/management-code/design.md` cov
   - The snapshot reader turns a 404 on a subtree into "empty".
 - **`scripts/sync_labels.py`** (239 lines) is `cmp`-identical to `meta-github-workflow`'s. `labels / sync` runs it with `--apply` on every push to `main` that touches it.
 - **`validate_harness.py` `check_copies`** enforces both identities: `sync_labels.py` with a `# DIVERGENCE:` escape, `spec_changes.py` without one, although the docstring promises one for both.
-- **Workflow steps that lose a failure:**
-  - `checks.yml` decides whether spec paths changed with `git diff … | grep -Eq` inside an `if`.
-  - `spec-command.yml` ends its reply block with `|| true`.
-  - `spec-labels.yml` loops over `< <(jq …)`.
+- **Workflow steps that hide an unexpected failure:**
+  - `checks.yml` decides whether spec paths changed with `git diff … | grep -Eq` inside an `if`, so a failed diff reads as "nothing to validate".
+  - `spec-command.yml` ends its reply block with `|| true`. Posting the script's output as the reply is a designed deferral, but the `|| true` also turns a crash into a green run.
+  - `spec-labels.yml` loops over `< <(jq …)`, so a `jq` failure reads as an empty plan.
 - **Script guidance.**
   - `.agents/knowledge/skill-quality.md` `## Scripts` governs skills' `scripts/`.
   - `.agents/skills/code-review/SKILL.md` calibrates scripts as developer tooling and says scripts copied into targets "follow the same calibration: their input is repository content, not adversarial traffic". That is false for a script running under `pull_request_target` or `issue_comment`.
@@ -68,14 +68,14 @@ See proposal.md for motivation. `openspec/changes/management-code/design.md` cov
   - Skills' `scripts/` keep their rules, which the brief places out of scope. The global target (py310) already matches the assets' 3.10 floor, so no per-file target entry is needed.
   - Directories, not globs, go into the recipe: `sh` has no brace expansion, and an unmatched glob would reach ruff as a literal path.
   - A justified exception carries `# noqa: BLE001` or `# noqa: S110` with its reason. The rules make a hidden failure visible in review; they do not forbid a reasoned one.
-- **Fix only the steps that lose a failure** (workflow steps bullet; user clarification that fail-fast is a design philosophy, not an iron rule).
-  - A step that fails when it ends is as correct as one that stops at the failing command.
-  - Reading every `run:` step found three that lose a failure, and only those are rewritten; each is fixed in the way that reads most plainly for that step.
+- **Fix only the steps that hide an unexpected failure** (workflow steps bullet; user clarification that fail-fast targets fallbacks that postpone unexpected errors, not deferral by design).
+  - Deferrals designed on purpose stay: the `/spec` reply posted before the run fails, the label plan printed before it is applied, the gate deciding on the needed jobs' results.
+  - Reading every `run:` step found three that hide an unexpected failure, and only those are rewritten; each is fixed in the way that reads most plainly for that step.
 
 ## Risks / Trade-offs
 
 - **[`labels / sync` applies the rewritten script to the live repository on merge]** → Before the pull request is marked ready, the old and the new script each run a dry run against `ryan-minato/skills`, and their plans must be byte-identical.
-- **[A step that loses a failure is missed]** → Every `run:` step of every workflow is read, and the reading is recorded in the Validation section.
+- **[A step that hides an unexpected failure is missed]** → Every `run:` step of every workflow is read, and the reading is recorded in the Validation section.
   - `spec-command.yml` keeps `grep … || true`, which handles grep's expected exit 1 on no match.
   - The jq pipelines in `labels-sync.yml` run after a successful plan file exists.
 - **[The privileged workflows cannot be exercised by this pull request]** → Local runs of their step bodies against fixture snapshots and plans, and a readback after the merge on the next pull request carrying a `/spec` command.
@@ -126,7 +126,7 @@ Per What Changes bullet. The scratch repositories and stubs live under the sessi
   - The `spec-command.yml` reply block runs with a stub script exiting 0, 2, 1, and with a Python traceback. A stub `gh` records the posted body each time, and the step's exit is 0, 0, 1, and 1.
   - The `spec-labels.yml` loop runs on a fixture plan with one add and one remove.
   - `just validate` passes: the job names parse and the case line is read.
-- **Management-code rules; `meta/CONTEXT.md`.** A readback: the section states R1–R6 as the fail-fast philosophy, with no hidden failure as the firm outcome, names where it applies, and records the stdlib and `python3` choice. The code-review text links it and keeps the privileged-job threat model. The CONTEXT bullet names the script-asset exception.
+- **Management-code rules; `meta/CONTEXT.md`.** A readback: the section states R1–R6 as the fail-fast philosophy aimed at fallbacks that postpone or hide unexpected errors, with deferral by design allowed, names where it applies, and records the stdlib and `python3` choice. The code-review text links it and keeps the privileged-job threat model. The CONTEXT bullet names the script-asset exception.
 - **Lint.**
   - `just lint` passes.
   - In a disposable worktree, adding `try: pass\nexcept Exception: pass` to a repository script fails `just lint` with BLE001 and S110. The same lines in a skill's `scripts/` file do not.

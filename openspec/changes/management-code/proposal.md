@@ -10,21 +10,21 @@ The principles, called R1–R6 below, apply to **management code**: code that ne
 - R2 language: the project's language when its community widely and maturely scripts in it, otherwise Python or Deno, Bash for simple operations in a controlled Linux environment.
 - R3 dependencies: self-contained where the ecosystem has no widespread convention; the standard library only when it solves the task cleanly, never a reimplementation of a mature library.
 - R4 invocation: `uv run` only where uv exists in every environment the script runs in.
-- R5 errors: readability first, and let unexpected failures crash. Where the code relies on an external tool, command, API, or a file another step wrote, it checks what it relies on and fails with a message naming it before anything is built on a bad result. Fallbacks that turn a failure into a wrong answer go; structural safety, idempotence, and narrow retries stay.
-- R6 shell: a command whose failure matters ends its step or job failed — it is not read as a false condition, swallowed by `|| true`, or hidden behind a pipe — whether at that command or when the step ends. The shell and its options are chosen as each step needs.
+- R5 errors: readability first, and let unexpected failures crash. Where the code relies on an external tool, command, API, or a file another step wrote, it checks what it relies on and fails with a message naming it before anything is built on a bad result. Fallbacks that postpone or hide an unexpected failure go; structural safety, idempotence, and narrow retries stay.
+- R6 shell: shell does not hide an unexpected failure — a failed command is not read as a false condition, swallowed by an `|| true` meant for another exit, or dropped by a pipe — and a deliberate deferral is written explicitly. The shell and its options are chosen as each step needs.
 
-R5 and R6 express fail-fast as a design philosophy that guides judgment, not as a fixed procedure. Its one firm outcome is that a failure that matters is never hidden. When it surfaces — at the failing call, or after collecting findings at the end of a script or step — is chosen for readability and for the person who fixes it.
+R5 and R6 express fail-fast as a design philosophy that guides judgment, not as a fixed procedure. It is aimed at fallbacks that postpone or hide unexpected errors. Handling or deferring a failure by design is outside it: collecting findings before failing, an advisory check, a report step that runs after a failure, a gate that decides on collected results. Such a deferral is written explicitly, and the failure reaches where the design sends it.
 
 Per skill:
 
-- `meta-harness`: the `## Harness Methodology` section gains one principle: management code belongs to the project, is readable, follows the fail-fast philosophy so no failure is hidden, and is never bound to a skill's runtime script. Applying it, the agent writes a project-owned script for the role instead of binding the project to a skill's script, and reports such a binding, not matching content, as a finding in an audit.
+- `meta-harness`: the `## Harness Methodology` section gains one principle: management code belongs to the project, is readable, follows the fail-fast philosophy so no fallback hides an unexpected error, and is never bound to a skill's runtime script. Applying it, the agent writes a project-owned script for the role instead of binding the project to a skill's script, and reports such a binding, not matching content, as a finding in an audit.
 - `meta-harness-architecture`: the same methodology line (the section is a validated byte-identical mirror). The builder writes or deposits management code by R1–R6 and records the chosen language and invocation in the target's harness knowledge. A new reference carries the details: language judgment with examples, dependencies, invocation, the interface checks and the fallbacks to remove, documented nulls, and how shell keeps a failure from being lost.
 - `meta-python-defaults`: the Python realization. PEP 723 inline metadata, `uv run` only where uv exists everywhere the script runs, the standard-library path otherwise, and an error-handling idiom of interface checks that exit with a message, where a blind, silent, or restating handler needs a stated reason. Locking a CI script's dependencies (`uv lock --script` or an `exclude-newer` cutoff) is presented as a recommendation. Its default follows the job's actual risk, and the user decides.
 - `meta-github-workflow`:
   - every script it gives the target comes from a management asset written for the target's role, not from the scripts the builder runs; nothing keeps the two identical, and an asset may still match the builder's script. It ships new `sync_labels.py` and `run_log_digest.py` assets. `next_version.py` and `project_fields.py`, which the builder never runs, move from `scripts/` to `assets/`.
   - `check_commits.py` and `check_taxonomy.py` are rewritten by R5. The taxonomy check declares PyYAML inline and runs through uv, with the builder recommending uv where the target lacks it and presenting locking as the user's decision.
-  - every `run:` step of the delivered workflows is read for a failure it could lose, and only such a step is rewritten.
-- `meta-gitlab-workflow`: the same for its deliveries: a new `pipeline_log_digest.py` asset, `next_version.py` moved to `assets/`, the commit check rewritten, and job scripts that do not lose a failing command's status.
+  - every `run:` step of the delivered workflows is read for an unexpected failure it hides, and only such a step is rewritten; deliberate deferrals stay.
+- `meta-gitlab-workflow`: the same for its deliveries: a new `pipeline_log_digest.py` asset, `next_version.py` moved to `assets/`, the commit check rewritten, and job scripts that hide no unexpected failure.
 - `openspec-workflow`:
   - the automation deposits a management asset, `assets/spec_changes.py`, at the path the delivered workflows already call, the project's `scripts/spec_changes.py`, in place of a byte-identical copy of the bundled script. It holds only what the workflows call: `snapshot`, `check`, `show`, `status`, `labels`.
   - an unknown change name in a comment command is answered with the related changes, every name rendered as code.
@@ -47,7 +47,7 @@ Per skill:
 ## Installed behavior
 
 - `meta-harness`, `meta-harness-architecture`, `meta-python-defaults`: an agent gains rules it did not have for the management code it writes → `feat`.
-- `meta-github-workflow`, `meta-gitlab-workflow`, `openspec-workflow`, `spec-kit-workflow`: an agent no longer hands the target a runtime script it must keep identical, and no longer delivers a step that passes after a command it depends on failed → `fix`.
+- `meta-github-workflow`, `meta-gitlab-workflow`, `openspec-workflow`, `spec-kit-workflow`: an agent no longer hands the target a runtime script it must keep identical, and no longer delivers a step that hides an unexpected failure behind a fallback → `fix`.
 - `scaffold-ml`: the delivered sealed-build recipe no longer builds when git cannot read the tree → `fix`.
 
 ## Impact

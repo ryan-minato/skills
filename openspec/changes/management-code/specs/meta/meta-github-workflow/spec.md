@@ -16,11 +16,11 @@ The builder SHALL deliver every script it gives the target — the commit check,
 - **THEN** no next-version or project-field helper is delivered
 
 ### Requirement: Behavior: Delivered workflows and the taxonomy check follow the management-code rules
-The workflows the builder delivers SHALL let no step pass after a command it depends on failed — the aggregator gate fails whenever a needed job failed or was cancelled — whether the step fails at that command or when it ends; the taxonomy check SHALL declare its YAML dependency in PEP 723 inline metadata and run through `uv run`, the builder recommending uv for the target's harness where a developer environment lacks it and presenting dependency locking as the user's decision, defaulted by the job's risk.
+The workflows the builder delivers SHALL hide no unexpected failure behind a fallback and SHALL mark every deliberate deferral where it is written, the aggregator gate being the designed point that decides on the needed jobs' results and fails whenever one failed or was cancelled; the taxonomy check SHALL declare its YAML dependency in PEP 723 inline metadata and run through `uv run`, the builder recommending uv for the target's harness where a developer environment lacks it and presenting dependency locking as the user's decision, defaulted by the job's risk.
 
 #### Scenario: Workflows delivered
 - **WHEN** the builder delivers the checks, commit-check, taxonomy, and tag-check workflows
-- **THEN** no delivered step passes after a command it depends on failed, and the gate step, run as its workflow runs it with a needs result containing a failed job, exits non-zero
+- **THEN** no delivered step reads an unexpected failure as success, every deliberate deferral is marked where it is written, and the gate step, run as its workflow runs it with a needs result containing a failed job, exits non-zero
 
 #### Scenario: Taxonomy check without local uv
 - **WHEN** the target's developers do not have uv installed
