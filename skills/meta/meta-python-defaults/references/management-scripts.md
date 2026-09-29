@@ -106,12 +106,21 @@ Ask, then write the option the user chose, or none.
 
 Write the conventions into the harness where the project keeps its
 implementation constraints, in full, so the next agent applies them without
-this builder:
+this builder. Adapt this block; keep every line:
 
-- how each management script is invoked, and why (`uv run` or the
-  interpreter);
-- the error-handling idiom: interface checks that exit with a message naming
-  the interface and the value received, and blind, silent, and restating
-  handlers allowed only with a stated reason;
-- for each CI job that runs a management script, whether locking is
-  recommended or optional for that job, and the user's decision.
+```markdown
+## Management scripts
+
+- Invocation: `<script>` runs with `<uv run | python3>` because <uv is or
+  is not in every environment it runs in; it has or has no third-party
+  dependency>.
+- Errors: each subprocess, HTTP, and file interface is checked where its
+  data enters, and a mismatch exits with a message naming the interface and
+  the value received. A bare or blind `except`, a `try`/`except`/`pass`, or
+  a handler that only restates the exception needs a stated reason in a
+  comment.
+- Locking, per CI job that runs a management script: `<job>` —
+  <recommended | optional> (<privileged trigger, writable token, or
+  secrets | read-only, no secrets>), or nothing to lock (no third-party
+  dependency); decision: <pending | `uv lock --script` | `exclude-newer`>.
+```
