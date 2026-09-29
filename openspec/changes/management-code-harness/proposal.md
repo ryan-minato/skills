@@ -19,14 +19,14 @@ The `management-code` change makes the harness-producing skills deliver manageme
   - The `gh` interface stays checked: presence, exit status, parseable JSON, and a list shape.
   - `labels.json` type errors name the file and exit 1, instead of `str()` quietly accepting a wrong type.
   - The dry-run default, `--apply`, and `--prune` stay, and the plan it computes for this repository is unchanged.
-- **Workflow steps.** Every `run:` step is read for a failure it could lose. Three steps lose one and are rewritten:
+- **Workflow steps.** Every `run:` step is read for an unexpected failure it hides behind a fallback. Three steps hide one and are rewritten:
   - the spec job decides the event first, then runs `git diff` outside the condition, so a failed diff fails the job instead of reading as "nothing to validate";
-  - `/spec` replies are posted even when the script fails, and the run fails except on a bad argument;
-  - the label loops read `jq` output produced before the loop, not through a process substitution whose failure is lost.
+  - the `/spec` reply keeps its designed deferral — it is posted even when the script fails — but the blanket `|| true` that also swallowed crashes goes, so the run fails afterwards except on a bad argument;
+  - the label loops read `jq` output produced before the loop, not through a process substitution that reads a `jq` failure as an empty plan.
 
-  Every other step, the gate included, loses no failure and stays as it is.
+  Every other step, including deliberate deferrals such as the gate that decides on collected results, hides no unexpected failure and stays as it is.
 - **Management-code rules.**
-  - `.agents/knowledge/skill-quality.md` keeps its Scripts section for skills' `scripts/`, and gains a `## Management code` section, the rules' one source in this repository. It holds R1–R6 as the fail-fast design philosophy — the firm outcome that no failure is hidden, and when to fail as a judgment — and where the rules apply: scripts a skill deposits (`assets/`), this repository's `scripts/`, workflow shell, and project-skill scripts. It also records this repository's choice: stdlib-only scripts run with `python3` and no PEP 723 header, because CI installs no uv, until the first third-party dependency.
+  - `.agents/knowledge/skill-quality.md` keeps its Scripts section for skills' `scripts/`, and gains a `## Management code` section, the rules' one source in this repository. It holds R1–R6 as the fail-fast design philosophy — aimed at fallbacks that postpone or hide unexpected errors, with handling or deferring a failure by design left legitimate and written explicitly — and where the rules apply: scripts a skill deposits (`assets/`), this repository's `scripts/`, workflow shell, and project-skill scripts. It also records this repository's choice: stdlib-only scripts run with `python3` and no PEP 723 header, because CI installs no uv, until the first third-party dependency.
   - `.agents/skills/code-review/SKILL.md` links that section in place of "Scripts copied into target projects for CI follow the same calibration". It keeps the privileged-job threat model for request-authored content, states that exit 2 is guaranteed only for bad arguments and an unexpected crash exits 1, and drops the `sync_labels.py` copy from what `just check` enforces.
 - **`skills/meta/CONTEXT.md`.** "Assets are raw starting shapes. Rework every line" gains its exception: script assets are working management code whose marked settings alone are configured, and the target owns the delivered copy.
 - **Lint.**
@@ -44,7 +44,7 @@ Repository change.
 No installed skill changes. Agents working in this repository:
 - run and review this repository's management scripts as its own code, no longer bound to a skill's bundled script;
 - get a named failure when an interface of those scripts misbehaves, where before they got an empty answer;
-- see a red spec job or `/spec` run when a command fails, where before they saw a pass;
+- see a red spec job or `/spec` run when a command fails unexpectedly, where before they saw a pass;
 - review management code, and scripts skills deposit, against one written rule set, with lint catching blind and silent handlers.
 
 ## Impact
