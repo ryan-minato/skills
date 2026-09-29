@@ -23,13 +23,13 @@
 - [x] 3.3 Delivered workflow steps: the `workflow-checks.yml` gate on a failed needs result exits 1; each `workflow-spec-command.yml` reply step with a stub script exiting 2, 1, and raising posts the reply and exits 0, 1, 1; each GitLab job script under the runner's options with a failing stub fails with its output logged, and the precondition names a hidden `jq` — closes MGH: Workflows delivered (gate part); OSW and SKW: Command answered when the script fails; MGL: Commit check job (job part).
 - [x] 3.4 Meta asset harness: `sync_labels.py`, `run_log_digest.py`, `next_version.py`, `project_fields.py`, both `check_commits.py`, `check_taxonomy.py`, and `pipeline_log_digest.py` each run help, a representative run, a repeated run, and `--bogus`; each external interface fed a malformed response fails naming the command or endpoint; the `sync_labels.py` dry run, the `run_log_digest.py` read-only run on a real failed run of this repository, and `check_taxonomy.py` through `uv run` with a malformed `release.yml` — closes the script side of MGH and MGL.
 - [x] 3.5 `scaffold-ml` recipe run with a stub `docker`: outside a repository, clean, and dirty — closes SML: Tree state unreadable; Sealed image built.
-- [ ] 3.6 Outcome O1 — closes MH: Skill script offered as the project's check.
-- [ ] 3.7 Outcome O2 — closes MHA: Go project; Command inside a condition; Advisory check by design; Validator finding; Invocation recorded.
-- [ ] 3.8 Outcome O3 — closes MHA: C++ project; YAML parsing without uv; Validator finding; Findings collected before failing.
-- [ ] 3.9 Outcome O4 — closes MHA: Bundled script available; Node project dependency; External command output; Documented null.
-- [ ] 3.10 Outcome O5 — closes MPD: Dependency with uv everywhere; Error-handling convention recorded; Privileged job; Read-only check.
-- [ ] 3.11 Outcome O6 — closes MGH: Label taxonomy committed; Durable project skill with CI diagnosis; SemVer not chosen; Workflows delivered; Taxonomy check without local uv.
-- [ ] 3.12 Outcomes O7 and O8 — closes OSW and SKW: GitHub install; Privileged job reads the head.
+- [x] 3.6 Outcome O1 — closes MH: Skill script offered as the project's check.
+- [x] 3.7 Outcome O2 — closes MHA: Go project; Command inside a condition; Advisory check by design; Validator finding; Invocation recorded.
+- [x] 3.8 Outcome O3 — closes MHA: C++ project; YAML parsing without uv; Validator finding; Findings collected before failing.
+- [x] 3.9 Outcome O4 — closes MHA: Bundled script available; Node project dependency; External command output; Documented null.
+- [x] 3.10 Outcome O5 — closes MPD: Dependency with uv everywhere; Error-handling convention recorded; Privileged job; Read-only check.
+- [x] 3.11 Outcome O6 — closes MGH: Label taxonomy committed; Durable project skill with CI diagnosis; SemVer not chosen; Workflows delivered; Taxonomy check without local uv.
+- [x] 3.12 Outcomes O7 and O8 — closes OSW and SKW: GitHub install; Privileged job reads the head.
 - [x] 3.13 Readback R1 — closes MH: Audit finds a bound script; MPD: No uv in CI.
 - [x] 3.14 Readback R2 — closes MGL: Durable project skill with CI diagnosis; SemVer not chosen; Commit check job; OSW: Command answered when the script fails; GitLab install; SKW: Command answered when the script fails; and the `meta-spec-workflow` sentence.
 - [x] 3.15 Identity and hygiene: the `byte-identical` and `identical copy` search read hit by hit; every workflow and CI asset parses as YAML; the placeholder grep; `just check-skill` for each touched skill.
