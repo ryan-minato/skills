@@ -2,8 +2,9 @@
 # pull request comments: `/spec show [<change>] [proposal|design|tasks|specs|all]`,
 # `/spec status [<change>]`, `/spec help`.
 #
-# Replace {{PINNED_SHA}} with the checkout action's pinned commit;
-# `scripts/spec_changes.py` is the project's copy of this skill's script.
+# Replace {{PINNED_SHA}} with the checkout action's pinned commit.
+# `scripts/spec_changes.py` is the project's own management script; nothing
+# keeps it identical to a skill's script.
 name: spec-command
 
 on:
@@ -78,6 +79,7 @@ jobs:
           [ $# -gt 0 ] && shift
           note=""
           [ "$STATE" = "OPEN" ] || note=" (pull request is $STATE)"
+          rc=0
           {
             # Backticks are dropped so the echoed command stays inside its code span.
             printf '`/spec %s` — head `%s`%s\n\n' "$(echo "$cmd $*" | tr -d '`' | sed 's/ *$//')" "${HEAD:0:7}" "$note"
@@ -98,8 +100,15 @@ jobs:
                 printf 'Commands: `/spec show [<change>] [proposal|design|tasks|specs|all]`, `/spec status [<change>]`, `/spec help`.\n'
                 ;;
             esac
-          } > "$RUNNER_TEMP/reply.md" 2>&1 || true
+          } > "$RUNNER_TEMP/reply.md" 2>&1 || rc=$?
+          # The reply is posted whatever the script exited with: its output,
+          # a traceback included, is the answer. The failure is deferred to
+          # the end of the step, never dropped.
           # `--body-file` keeps the reply out of the argument list, and a comment
           # posted with the platform token starts no workflow run, so the job
           # cannot answer itself.
           gh pr comment "$N" --repo "$REPO" --body-file "$RUNNER_TEMP/reply.md"
+          # Exit 2 is a bad argument, such as a change name the request does not
+          # touch: the reply answers it and the run stays green. Any other
+          # failure fails the run.
+          [ "$rc" -eq 0 ] || [ "$rc" -eq 2 ] || exit "$rc"

@@ -10,7 +10,7 @@ placeholders).
 
 | Piece | From | To | Notes |
 |---|---|---|---|
-| Script | `scripts/spec_changes.py` | the project's `scripts/spec_changes.py` | byte-identical copy; the workflows call it by that path |
+| Script | `assets/spec_changes.py` | the project's `scripts/spec_changes.py` | the project's own management script, written for the workflows (`snapshot`, `check`, `show`, `status`, `labels`; no `archive`), which call it by that path; nothing keeps it identical to this skill's bundled `scripts/spec_changes.py`, and later fixes to the skill do not reach it — say so in the handoff |
 | Check | `assets/github/job-spec-check.yml` | a job in the project's existing checks workflow | add `spec-check` to the aggregator gate's `needs:`; set `on.pull_request.types` to `[opened, synchronize, reopened, ready_for_review, converted_to_draft]` so the verdict follows the draft state; no new required check — the gate is already required |
 | Comment commands | `assets/github/workflow-spec-command.yml` | `.github/workflows/spec-command.yml` | job `spec / command` |
 | Status labels | `assets/github/workflow-spec-labels.yml` | `.github/workflows/spec-labels.yml` | job `spec / labels` |
@@ -59,8 +59,8 @@ verified against GitHub's documentation on 2026-09-17:
 One rule carries this, and it is structural rather than a promise: **no
 object authored by the request ever reaches a privileged runner.** A
 privileged job (`pull_request_target`, `issue_comment`) checks out the
-base and reads the head through `spec_changes.py snapshot`, which pulls
-the file list and the documents from the REST API. The head's bytes are
+base and reads the head through the deposited script's `snapshot`, which
+pulls the file list and the documents from the REST API. The head's bytes are
 parsed and never executed, so a later edit cannot turn a `git checkout`
 typo into a takeover: the head is not in the runner's git store to check
 out.
@@ -86,6 +86,12 @@ out.
 - Request-authored names, paths, and task text reach a bot comment only
   inside code spans, and the echoed command loses its backticks, so a
   comment cannot carry a link or a mention under the bot's name.
+- No step hides an unexpected failure behind a fallback. The comment
+  command posts the script's output as the reply even when the script
+  fails — a deliberate deferral — and then fails the run for every exit
+  but 2, a bad argument such as a change name the request does not touch.
+  The label loops read `jq` output written to files first, so a `jq`
+  failure fails the job instead of reading as an empty plan.
 - Invocation gates: the label job runs on the request's own events and
   applies only what the taxonomy allows; the commands admit only a
   collaborator association; the bot's own comments start nothing.
@@ -120,8 +126,10 @@ records awaiting their implementation requests.
 - No workflow pushes and none reaches the head:
   `grep -n 'git push\|git .*fetch\|checkout'` over the files finds only
   the base checkouts.
-- `python3 scripts/spec_changes.py --help` exits 0; `check --draft` on a
-  branch with an unarchived change exits 0 with a warning, `check` exits 1.
+- `python3 scripts/spec_changes.py --help` exits 0 and names five
+  subcommands; `check --draft` on a branch with an unarchived change exits 0
+  with a warning, `check` exits 1; `show --change nope` exits 2 and lists
+  the related changes.
 - `snapshot --repo <o/r> --pr <n>` on a real pull request exits 0, and
   `status --snapshot` on its output matches `status --base ... --head ...`
   run against a local clone.
