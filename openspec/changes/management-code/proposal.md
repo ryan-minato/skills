@@ -11,7 +11,7 @@ The principles, called R1–R6 below, apply to **management code**: code that ne
 - R3 dependencies: self-contained where the ecosystem has no widespread convention; the standard library only when it solves the task cleanly, never a reimplementation of a mature library.
 - R4 invocation: `uv run` only where uv exists in every environment the script runs in.
 - R5 errors: readability first, and let unexpected failures crash. Where the code relies on an external tool, command, API, or a file another step wrote, it checks what it relies on and fails with a message naming it before anything is built on a bad result. Fallbacks that turn a failure into a wrong answer go; structural safety, idempotence, and narrow retries stay.
-- R6 shell: a command whose failure matters ends its step or job failed — it is not read as a false condition, swallowed by `|| true`, or hidden behind a pipe — whether at that command or when the step ends. `set -euo pipefail` and a workflow-level `defaults.run.shell: bash` are tools for this, not rules every step must follow.
+- R6 shell: a command whose failure matters ends its step or job failed — it is not read as a false condition, swallowed by `|| true`, or hidden behind a pipe — whether at that command or when the step ends. The shell and its options are chosen as each step needs.
 
 R5 and R6 express fail-fast as a design philosophy that guides judgment, not as a fixed procedure. Its one firm outcome is that a failure that matters is never hidden. When it surfaces — at the failing call, or after collecting findings at the end of a script or step — is chosen for readability and for the person who fixes it.
 
@@ -23,7 +23,7 @@ Per skill:
 - `meta-github-workflow`:
   - every script it gives the target comes from a management asset written for the target's role, not from the scripts the builder runs; nothing keeps the two identical, and an asset may still match the builder's script. It ships new `sync_labels.py` and `run_log_digest.py` assets. `next_version.py` and `project_fields.py`, which the builder never runs, move from `scripts/` to `assets/`.
   - `check_commits.py` and `check_taxonomy.py` are rewritten by R5. The taxonomy check declares PyYAML inline and runs through uv, with the builder recommending uv where the target lacks it and presenting locking as the user's decision.
-  - every `run:` step of the delivered workflows is read for a failure it could lose, and only such a step is rewritten; no shell default is imposed.
+  - every `run:` step of the delivered workflows is read for a failure it could lose, and only such a step is rewritten.
 - `meta-gitlab-workflow`: the same for its deliveries: a new `pipeline_log_digest.py` asset, `next_version.py` moved to `assets/`, the commit check rewritten, and job scripts that do not lose a failing command's status.
 - `openspec-workflow`:
   - the automation deposits a management asset, `assets/spec_changes.py`, at the path the delivered workflows already call, the project's `scripts/spec_changes.py`, in place of a byte-identical copy of the bundled script. It holds only what the workflows call: `snapshot`, `check`, `show`, `status`, `labels`.

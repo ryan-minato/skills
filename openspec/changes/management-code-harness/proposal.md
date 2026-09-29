@@ -19,14 +19,14 @@ The `management-code` change makes the harness-producing skills deliver manageme
   - The `gh` interface stays checked: presence, exit status, parseable JSON, and a list shape.
   - `labels.json` type errors name the file and exit 1, instead of `str()` quietly accepting a wrong type.
   - The dry-run default, `--apply`, and `--prune` stay, and the plan it computes for this repository is unchanged.
-- **Workflow shell.** Every `run:` step is read for a failure it could lose. Three steps lose one and are rewritten; no shell default is imposed:
+- **Workflow steps.** Every `run:` step is read for a failure it could lose. Three steps lose one and are rewritten:
   - the spec job decides the event first, then runs `git diff` outside the condition, so a failed diff fails the job instead of reading as "nothing to validate";
   - `/spec` replies are posted even when the script fails, and the run fails except on a bad argument;
   - the label loops read `jq` output produced before the loop, not through a process substitution whose failure is lost.
 
-  The gate's `printf | grep -Eq` is correct under the Actions default `bash -e` and stays.
+  Every other step, the gate included, loses no failure and stays as it is.
 - **Management-code rules.**
-  - `.agents/knowledge/skill-quality.md` keeps its Scripts section for skills' `scripts/`, and gains a `## Management code` section, the rules' one source in this repository. It holds R1–R6 as the fail-fast design philosophy — the firm outcome that no failure is hidden, when to fail as a judgment, strict mode as a tool rather than a rule — and where the rules apply: scripts a skill deposits (`assets/`), this repository's `scripts/`, workflow shell, and project-skill scripts. It also records this repository's choice: stdlib-only scripts run with `python3` and no PEP 723 header, because CI installs no uv, until the first third-party dependency.
+  - `.agents/knowledge/skill-quality.md` keeps its Scripts section for skills' `scripts/`, and gains a `## Management code` section, the rules' one source in this repository. It holds R1–R6 as the fail-fast design philosophy — the firm outcome that no failure is hidden, and when to fail as a judgment — and where the rules apply: scripts a skill deposits (`assets/`), this repository's `scripts/`, workflow shell, and project-skill scripts. It also records this repository's choice: stdlib-only scripts run with `python3` and no PEP 723 header, because CI installs no uv, until the first third-party dependency.
   - `.agents/skills/code-review/SKILL.md` links that section in place of "Scripts copied into target projects for CI follow the same calibration". It keeps the privileged-job threat model for request-authored content, states that exit 2 is guaranteed only for bad arguments and an unexpected crash exits 1, and drops the `sync_labels.py` copy from what `just check` enforces.
 - **`skills/meta/CONTEXT.md`.** "Assets are raw starting shapes. Rework every line" gains its exception: script assets are working management code whose marked settings alone are configured, and the target owns the delivered copy.
 - **Lint.**
