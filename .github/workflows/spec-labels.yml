@@ -3,8 +3,8 @@
 # and `spec/not-started` | `spec/in-progress` | `spec/done`. A pull request
 # with no related change carries none of them.
 #
-# `scripts/spec_changes.py` is this repository's copy of the openspec-workflow
-# skill's script.
+# `scripts/spec_changes.py` is this repository's own management script, not a
+# copy that must match the openspec-workflow skill's script.
 name: spec-labels
 
 on:

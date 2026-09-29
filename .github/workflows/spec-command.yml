@@ -2,8 +2,8 @@
 # `/spec show [<change>] [proposal|design|tasks|specs|all]`,
 # `/spec status [<change>]`, `/spec help`.
 #
-# `scripts/spec_changes.py` is this repository's copy of the
-# openspec-workflow skill's script.
+# `scripts/spec_changes.py` is this repository's own management script,
+# not a copy that must match the openspec-workflow skill's script.
 name: spec-command
 
 on:

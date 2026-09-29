@@ -15,8 +15,9 @@ variable of the `justfile` (verified 2026-09-17 against `openspec --help`
 and the tool's documentation). Before running or documenting any OpenSpec
 command, run `openspec --help`; commands and skill names have changed
 between releases and are not recorded here. Framework skill:
-`openspec-workflow` (`skills/sdd/openspec-workflow`), which owns the
-request automation below and its script.
+`openspec-workflow` (`skills/sdd/openspec-workflow`), which supplies the
+request automation below; this repository owns its installed copy,
+`scripts/spec_changes.py` included.
 
 ## Artifacts
 
@@ -165,10 +166,10 @@ and ask again.
 
 ## Request automation
 
-`openspec-workflow`'s automation, mirrored into `.github/workflows/` and
-`scripts/spec_changes.py`: a pull request's *related changes* are the
-change directories its diff touches (an archived directory counts under
-its change name). `checks / spec` runs the strict validator and fails a
+`openspec-workflow`'s automation, installed into `.github/workflows/`
+and run by this repository's own `scripts/spec_changes.py`: a pull
+request's *related changes* are the change directories its diff touches
+(an archived directory counts under its change name). `checks / spec` runs the strict validator and fails a
 ready pull request holding an unarchived related change (a warning while
 it is a draft); on a push to `main` any change outside `archive/` fails.
 `/spec show [<slug>] [proposal|design|tasks|specs|all]` and
