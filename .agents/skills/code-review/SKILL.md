@@ -130,10 +130,22 @@ issues. What does matter:
   or `--confirm`.
 - Secrets are never printed or logged.
 - The repository script contract holds: non-interactive, `--help`, data to
-  stdout and diagnostics to stderr, exit codes 0/1/2, idempotent.
+  stdout and diagnostics to stderr, exit codes 0/1/2, idempotent. Exit 2
+  is guaranteed only for bad arguments; an unexpected crash exits 1.
 
-Scripts copied into target projects for CI follow the same calibration:
-their input is repository content, not adversarial traffic.
+Management code — this repository's `scripts/` and workflow shell, the
+project skills' scripts, and the script assets skills deposit into their
+targets — is reviewed against `## Management code` in
+`.agents/knowledge/skill-quality.md`. A fallback that hides an unexpected
+failure is a finding: a default in place of data, a swallowed exception, a
+catch-all handler, a blanket `|| true`, a command whose failure a
+condition reads as false. A checked interface and a deferral written
+explicitly by design are not. Management code that runs in a privileged
+job (`pull_request_target`, `issue_comment`, `workflow_run`) handles
+content the request's author wrote — file paths, change names, document
+text, comment words — so there it is untrusted input: parsed and never
+executed or fetched, and rendered into a comment or a label only through
+escaping or a literal allow-list.
 
 ## Do not report what machines catch
 

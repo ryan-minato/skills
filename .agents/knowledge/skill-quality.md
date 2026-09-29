@@ -207,6 +207,65 @@ Rules for anything in a skill's `scripts/`:
 - Pin versions in one-off commands (`npx tool@1.2.3`) and state runtime
   prerequisites (or use the `compatibility` field) instead of assuming them.
 
+A script a skill deposits into a target from `assets/` is management code:
+`## Management code` below governs how it is written, and the interface
+rules above (`--help`, streams, exit codes, idempotence) apply to it too.
+
+## Management code
+
+Management code is code that never ships in the product: quality checks,
+environment preparation, CI and administration scripts, git hooks, inline
+workflow shell, and scripts inside a project skill. Here that is
+`scripts/`, the `run:` steps of `.github/workflows/`, the scripts of the
+project skills under `.agents/skills/`, and the script assets skills
+deposit into their targets. A skill's own `scripts/` follow `## Scripts`
+alone. Management code:
+
+- **Is written for its role and owned where it runs (R1).** It need not
+  be identical to a skill's bundled script, and no rule, check, or
+  instruction keeps the two identical; their content may still match
+  where the role needs the same code. A skill ships an asset written for
+  the management role, and the target owns its copy.
+- **Is written in a language its community scripts in (R2):** the
+  project's language when its community widely and maturely scripts in
+  it, otherwise Python or Deno, and Bash only for simple operations in a
+  controlled Linux environment.
+- **Keeps its dependencies self-contained (R3)** where the ecosystem has
+  no convention for them (PEP 723 inline metadata for Python), uses the
+  standard library only when it solves the task cleanly, and never
+  reimplements a mature library.
+- **Runs through `uv run` only where uv exists in every environment it
+  runs in (R4)**, and through the interpreter otherwise.
+- **Hides no unexpected failure behind a fallback (R5).** Readability
+  comes first, and an unexpected failure is left to crash. Where the code
+  relies on an external tool, command, API, or a file another step
+  wrote, it checks what it relies on (exit status, parseable output,
+  shape, documented flags) and fails with a message naming the interface
+  and the value received, before anything is built on it. A default
+  standing in for a failure, a swallowed exception, a catch-all handler,
+  and a handler that only restates the exception go. A value the data
+  contract documents as possibly null is domain logic; structural safety,
+  idempotence, and narrow retries on known-transient errors stay.
+- **Writes shell that hides no unexpected failure (R6):** no failed
+  command read as a false condition, no `|| true` wider than the exit it
+  was written for, no pipe that drops a status nobody meant to drop. The
+  shell and its options are chosen as each step needs.
+
+Fail-fast here is a design philosophy aimed at one thing: the fallback
+that postpones or hides an unexpected error. Handling or deferring a
+failure by design is outside it — a check that collects every finding
+and fails once, an advisory job, a report step that runs after a
+failure, a gate that decides on collected results, a reply posted before
+the run fails. Such a deferral is written explicitly where it happens,
+and the failure still reaches where the design sends it.
+
+This repository's `scripts/` use the standard library only, run with
+`python3`, and carry no PEP 723 header, because CI installs no uv; the
+choice is revisited with the first third-party dependency. Script assets
+are Python 3.10 or later, standard library first; one that needs a
+third-party package declares it in PEP 723 and says how the target runs
+it.
+
 ## Checklist before committing
 
 1. Scope: the skill covers one coherent work unit and adds something the

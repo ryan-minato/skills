@@ -51,6 +51,9 @@ Rules for disposable builders that create durable agent harnesses.
   static external inventories. Resolve volatile facts from first-party sources
   when the selected procedure needs them.
 - Assets are raw starting shapes. Rework every line and remove every placeholder.
+  Script assets are the exception: they are working management code, tested
+  in the skill, whose marked settings alone are configured on delivery, and
+  the target owns the delivered copy.
 
 ## Dependencies
 
