@@ -101,3 +101,17 @@ Default the recommendation by the job's actual risk:
 | Read-only token, no secrets, unprivileged trigger | Say locking is optional for this job |
 
 Ask, then write the option the user chose, or none.
+
+## What to record
+
+Write the conventions into the harness where the project keeps its
+implementation constraints, in full, so the next agent applies them without
+this builder:
+
+- how each management script is invoked, and why (`uv run` or the
+  interpreter);
+- the error-handling idiom: interface checks that exit with a message naming
+  the interface and the value received, and blind, silent, and restating
+  handlers allowed only with a stated reason;
+- for each CI job that runs a management script, whether locking is
+  recommended or optional for that job, and the user's decision.
