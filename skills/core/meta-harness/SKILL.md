@@ -58,6 +58,15 @@ precise when-to-read pointer; encode repeated, fragile, ordered, or branchy work
 a project skill; put deterministic repeated logic in a script. A split that does
 not reduce what loads for a task only adds navigation cost.
 
+Code that never ships in the product — checks, CI and administration scripts,
+hooks, workflow shell, and project-skill scripts — is the project's own
+management code. Write it for its role and readable first, and let no fallback
+postpone or hide an unexpected error: the failure surfaces with a message that
+names what to fix, while a failure the design expects may still be handled or
+deferred on purpose. Never bind it to a skill's runtime script: a rule, check,
+or instruction that keeps the two identical is a defect to remove, although
+matching content alone is not.
+
 AGENTS.md is the map for progressive loading, not an exhaustive manual. It states
 the project's purpose, always-applicable constraints, validation entrypoints, and
 the exact conditions for reading deeper material. Aim for about 100 lines. A light

@@ -35,6 +35,10 @@ rewrite — change what the findings justify.
 - Speculative components serving no current need, and constraints thicker
   than the work justifies.
 - Workflow automation the team never actually delegated.
+- A project script bound to a skill's bundled script by a sync rule, a
+  check, or an instruction to keep it identical. The binding is the
+  finding, not matching content; the fix removes the binding so the script
+  becomes the project's own.
 
 ## Decision rules
 
