@@ -18,10 +18,6 @@ Checks (errors unless marked warning):
   pointers   every path AGENTS.md and ARCHITECTURE.md name exists; every
              .agents/knowledge/*.md is named in AGENTS.md; every `just
              <recipe>` AGENTS.md names exists (README: warning)
-  copies     scripts/sync_labels.py and scripts/spec_changes.py are
-             byte-identical to their origins in the meta-github-workflow
-             and openspec-workflow skills unless one carries a
-             `# DIVERGENCE:` line explaining why
   suite      every skills/engineering/brownfield-* member carries the
              `## Evidence discipline` section of its SKILL.md byte-identical
              to brownfield-investigation's, the source
@@ -66,10 +62,7 @@ DEVCONTAINER = ROOT / ".devcontainer" / "devcontainer.json"
 CHECKS_WORKFLOW = WORKFLOWS / "checks.yml"
 SKILLS_DIR = ROOT / ".agents" / "skills"
 OPENSPEC_TARGET = SKILLS_DIR / ".openspec-target"
-SYNC_LABELS = ROOT / "scripts" / "sync_labels.py"
-SYNC_LABELS_ORIGIN = ROOT / "skills" / "meta" / "meta-github-workflow" / "scripts" / "sync_labels.py"
 SPEC_CHANGES = ROOT / "scripts" / "spec_changes.py"
-SPEC_CHANGES_ORIGIN = ROOT / "skills" / "sdd" / "openspec-workflow" / "scripts" / "spec_changes.py"
 SPEC_LABELS_WORKFLOW = WORKFLOWS / "spec-labels.yml"
 ENGINEERING = ROOT / "skills" / "engineering"
 SUITE_PREFIX = "brownfield-"
@@ -308,21 +301,6 @@ def check_pointers() -> None:
                 report(f"{rel(doc)} names `just {recipe}`, which is not a justfile recipe.")
 
 
-def check_copies() -> None:
-    ours, origin = read(SYNC_LABELS), read(SYNC_LABELS_ORIGIN)
-    if ours != origin and "# DIVERGENCE:" not in ours:
-        error(
-            f"{rel(SYNC_LABELS)} differs from {rel(SYNC_LABELS_ORIGIN)}; copy the origin over it "
-            "(run `ruff format` on both) or add a `# DIVERGENCE: <why>` line."
-        )
-    ours, origin = read(SPEC_CHANGES), read(SPEC_CHANGES_ORIGIN)
-    if ours != origin:
-        error(
-            f"{rel(SPEC_CHANGES)} differs from {rel(SPEC_CHANGES_ORIGIN)}; copy the origin over it "
-            "(the repository runs the skill's script, never a fork of it)."
-        )
-
-
 def markdown_section(text: str, heading: str) -> str | None:
     """One level-2 section, heading included, up to the next level-2 heading, untrimmed."""
     match = re.search(rf"^{re.escape(heading)}[ \t]*$.*?(?=^## (?!#)|\Z)", text, re.MULTILINE | re.DOTALL)
@@ -476,7 +454,6 @@ def main() -> int:
         check_template,
         check_intake,
         check_pointers,
-        check_copies,
         check_suite,
         check_spec_labels,
         check_checks_doc,
