@@ -69,9 +69,11 @@ install from it, or a `run:` of its files.
 - Commands admit only a collaborator association; the bot's own comments start
   no workflow run.
 - No step hides an unexpected failure behind a fallback. The comment
-  command posts the script's output as the reply even when the script
-  fails — a deliberate deferral — and then fails the run for every exit
-  but 2, a bad argument such as a feature name the request does not touch.
+  command posts the output of `show` or `status` as the reply even when
+  that run fails — a deliberate deferral — and then fails the run for
+  every exit but 2, a bad argument such as a feature name the request does
+  not touch. A `snapshot` that fails fails the run before any reply, in
+  the step that reads the head.
   The label loops read `jq` output written to files first, so a `jq`
   failure fails the job instead of reading as an empty plan.
 
