@@ -63,8 +63,14 @@ the `assets/` directory). Recipes only, adopt on explicit request:
 | Triage lifecycle (`status/needs-triage` on/off, one priority) | triage workflow — issue events only, comment-not-remove |
 
 The taxonomy check declares PyYAML in its PEP 723 header and its workflow
-runs it with `uv run`, installing uv from PyPI at the current release
-(`{{UV_VERSION}}` in the asset). When the target's developers do not have
+runs it with `uv run`, installing uv with `astral-sh/setup-uv` (commit
+SHA verified 2026-09-29 for v10.2.0) at the uv release set in
+`{{UV_VERSION}}`. That action is third-party, so the first-party rule in
+[actions-and-checks.md](actions-and-checks.md) applies: ask the user
+explicitly, keep the full commit-SHA pin, and record its review date and
+update owner. If the user declines it, install uv from PyPI after
+`actions/setup-python` (`python3 -m pip install "uv==<release>"`) instead.
+When the target's developers do not have
 uv, recommend adding it to the target's harness (the dev container, the
 setup instructions) rather than bundling a YAML parser. Locking the
 check's dependency is the user's decision: its job is read-only with no

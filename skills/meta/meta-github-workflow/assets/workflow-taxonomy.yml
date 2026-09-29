@@ -37,13 +37,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      # A third-party action, adopted by explicit decision and pinned by full
+      # commit SHA; its review date and update owner are recorded with the
+      # platform settings. The checker declares PyYAML in its PEP 723 header,
+      # and `uv run` installs what the header declares.
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: "3.x"
-      # The checker declares PyYAML in its PEP 723 header, and `uv run`
-      # installs what the header declares. uv comes from PyPI at a pinned
-      # release, so no third-party action joins the workflow.
-      - name: Install uv
-        run: python3 -m pip install "uv=={{UV_VERSION}}"
+          version: "{{UV_VERSION}}"
       - name: Check the taxonomy
         run: uv run scripts/check_taxonomy.py
