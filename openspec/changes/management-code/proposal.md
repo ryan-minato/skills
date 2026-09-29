@@ -6,7 +6,7 @@ Skills that build or deposit a project's harness hand the target copies of their
 
 The principles, called R1–R6 below, apply to **management code**: code that never ships in the product (quality checks, environment preparation, CI and administration scripts, git hooks, inline workflow shell, scripts inside a project skill).
 
-- R1 decouple: a skill's bundled script and a management script are never bound to be identical; a skill ships a separate asset written for the management role, and the target owns its copy.
+- R1 decouple: a skill's bundled script and a management script need not be identical, and no rule, check, or instruction keeps them identical. A skill ships an asset written for the management role — its content may still match the bundled script where the role happens to need the same code — and the target owns its copy.
 - R2 language: the project's language when its community widely and maturely scripts in it, otherwise Python or Deno, Bash for simple operations in a controlled Linux environment.
 - R3 dependencies: self-contained where the ecosystem has no widespread convention; the standard library only when it solves the task cleanly, never a reimplementation of a mature library.
 - R4 invocation: `uv run` only where uv exists in every environment the script runs in.
@@ -15,11 +15,11 @@ The principles, called R1–R6 below, apply to **management code**: code that ne
 
 Per skill:
 
-- `meta-harness`: the `## Harness Methodology` section gains one principle: management code belongs to the project, is readable, fails fast, and is never a copy of a skill's runtime script. Applying it, the agent writes a project-owned script instead of copying a skill's, and reports such a copy as a finding in an audit.
+- `meta-harness`: the `## Harness Methodology` section gains one principle: management code belongs to the project, is readable, fails fast, and is never bound to a skill's runtime script. Applying it, the agent writes a project-owned script for the role instead of binding the project to a skill's script, and reports such a binding, not matching content, as a finding in an audit.
 - `meta-harness-architecture`: the same methodology line (the section is a validated byte-identical mirror). The builder writes or deposits management code by R1–R6 and records the chosen language and invocation in the target's harness knowledge. A new reference carries the details: language judgment with examples, dependencies, invocation, the interface checks and the fallbacks to remove, documented nulls, and the shell rules.
 - `meta-python-defaults`: the Python realization. PEP 723 inline metadata, `uv run` only where uv exists everywhere the script runs, the standard-library path otherwise, and an error-handling idiom of interface checks that exit with a message and no blind, silent, or restating handlers. Locking a CI script's dependencies (`uv lock --script` or an `exclude-newer` cutoff) is presented as a recommendation. Its default follows the job's actual risk, and the user decides.
 - `meta-github-workflow`:
-  - every script it gives the target comes from a management asset, never a copy of a script the builder runs. It ships new `sync_labels.py` and `run_log_digest.py` assets. `next_version.py` and `project_fields.py`, which the builder never runs, move from `scripts/` to `assets/`.
+  - every script it gives the target comes from a management asset written for the target's role, not from the scripts the builder runs; nothing keeps the two identical, and an asset may still match the builder's script. It ships new `sync_labels.py` and `run_log_digest.py` assets. `next_version.py` and `project_fields.py`, which the builder never runs, move from `scripts/` to `assets/`.
   - `check_commits.py` and `check_taxonomy.py` are rewritten by R5. The taxonomy check declares PyYAML inline and runs through uv, with the builder recommending uv where the target lacks it and presenting locking as the user's decision.
   - delivered workflows set `defaults.run.shell: bash`, and the aggregator gate no longer passes when its output pipe breaks.
 - `meta-gitlab-workflow`: the same for its deliveries: a new `pipeline_log_digest.py` asset, `next_version.py` moved to `assets/`, the commit check rewritten, and job scripts that fail on the failing command.
