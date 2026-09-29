@@ -24,7 +24,7 @@ openspec/                        Specifications: specs/ (source of truth), chang
   skills -> ../.agents/skills    Copilot-facing path to the same skills
 scripts/                         Repository tooling
 justfile                         Canonical check recipes and tool version pins
-ruff.toml                        Lint and format configuration (repo and skill scripts)
+ruff.toml                        Lint and format configuration (repo scripts, skill scripts, script assets)
 .pre-commit-config.yaml          Hooks: commit safety, secrets, ruff, validators
 .gitmessage                      Commit message template
 ```
@@ -212,10 +212,12 @@ may ready a pull request under the H1 policy; the maintainer merges.
 ## Quality Gates
 
 - `just check` = `validate` (`scripts/validate_skills.py` +
-  `scripts/validate_harness.py`) + `lint` (ruff over `scripts/` and every
-  `skills/*/*/scripts/`) + `spec-validate` + `pre-commit run --all-files`
-  (whitespace, secrets, ruff, both validators; the `commit-safety` hook
-  runs only on `git commit`).
+  `scripts/validate_harness.py`) + `lint` (ruff over `scripts/`, every
+  `skills/*/*/scripts/`, and the script assets under `skills/meta/*/assets/`
+  and `skills/sdd/*/assets/`; blind and silent exception handlers fail it
+  outside the skills' own `scripts/`) + `spec-validate` + `pre-commit run
+  --all-files` (whitespace, secrets, ruff, both validators; the
+  `commit-safety` hook runs only on `git commit`).
 - pre-commit hooks are installed by `just setup` (run automatically by the
   devcontainer's `postCreateCommand`), which also installs the pinned
   OpenSpec CLI and sets the `.gitmessage` commit template.

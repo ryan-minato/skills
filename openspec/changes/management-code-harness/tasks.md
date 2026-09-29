@@ -6,7 +6,7 @@
 - [x] 1.4 `.github/workflows/checks.yml` (`changed` step), `spec-command.yml` (reply status), `spec-labels.yml` (both loops, the literal case line kept); every other `run:` step read and left as it is. Verify with `just validate` and the workflow-step proofs of the plan. Proves: Workflow steps.
 - [x] 1.5 `.agents/knowledge/skill-quality.md` `## Management code` and its pointer from `## Scripts`; `.agents/skills/code-review/SKILL.md` `## Scripts: the threat model`; `skills/meta/CONTEXT.md` assets bullet. Verify with `just validate` and the readback of the plan. Proves: Management-code rules; `skills/meta/CONTEXT.md`.
 - [x] 1.6 `openspec/config.yaml` archive command with `--base origin/main --head HEAD`. Verify by running it in the scratch repository. Proves: Archive command.
-- [ ] 1.7 After the skill change's assets exist and are formatted: `ruff.toml` (`BLE001`, `S110`, the `skills/*/*/scripts/**/*.py` exemption, header), the `justfile` `lint` recipe and the `.pre-commit-config.yaml` ruff `files` covering `skills/meta/*/assets` and `skills/sdd/*/assets`, the `AGENTS.md` Validation row, and the `ARCHITECTURE.md` lint bullet. Verify with `just lint`, `just validate` (no ruff warning), and the lint proof of the plan. Proves: Lint.
+- [x] 1.7 After the skill change's assets exist and are formatted: `ruff.toml` (`BLE001`, `S110`, the `skills/*/*/scripts/**/*.py` exemption, header), the `justfile` `lint` recipe and the `.pre-commit-config.yaml` ruff `files` covering `skills/meta/*/assets` and `skills/sdd/*/assets`, the `AGENTS.md` Validation row, and the `ARCHITECTURE.md` lint bullet. Verify with `just lint`, `just validate` (no ruff warning), and the lint proof of the plan. Proves: Lint.
 
 ## 2. External impact
 
@@ -21,7 +21,7 @@
 - [x] 3.5 `sync_labels.py`: help, `--bogus`, `--prune` without `--apply`, the byte-identical dry-run plans of the old and the new script against `ryan-minato/skills`, the stub-`gh` failures (non-JSON, object, missing `gh`), the three bad `labels.json` files, and a repeated dry run. Proves: `sync_labels.py` rewritten.
 - [x] 3.6 Workflow step bodies run locally: the `changed` step on an unknown base, a push, and an `openspec/` diff; the gate on a failure and on successes; the `/spec` reply block with a stub script exiting 0, 2, 1, and raising, the posted body recorded and the exits 0, 0, 1, 1; the label loop on a fixture plan; every `run:` step's reading recorded for the Validation section. Proves: Workflow steps.
 - [ ] 3.7 Readback of `skill-quality.md` `## Management code`, the code-review section, and the `meta/CONTEXT.md` bullet. Proves: Management-code rules; `skills/meta/CONTEXT.md`.
-- [ ] 3.8 Lint: `try`/`except Exception: pass` added to a repository script fails `just lint` with BLE001 and S110 in a disposable worktree, and the same lines in a skill's `scripts/` file do not. Proves: Lint.
+- [x] 3.8 Lint: `try`/`except Exception: pass` added to a repository script fails `just lint` with BLE001 and S110 in a disposable worktree, and the same lines in a skill's `scripts/` file do not. Proves: Lint.
 - [x] 3.9 The archive command from `openspec/config.yaml` archives a complete change in the scratch repository. Proves: Archive command.
 
 ## 4. Finish

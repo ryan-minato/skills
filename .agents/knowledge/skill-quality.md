@@ -261,7 +261,10 @@ and the failure still reaches where the design sends it.
 
 This repository's `scripts/` use the standard library only, run with
 `python3`, and carry no PEP 723 header, because CI installs no uv; the
-choice is revisited with the first third-party dependency. Script assets
+choice is revisited with the first third-party dependency. `just lint`
+fails a blind `except` (BLE001) and a `try`/`except`/`pass` (S110) in
+them and in the script assets; a justified exception carries
+`# noqa: BLE001` or `# noqa: S110` with its reason. Script assets
 are Python 3.10 or later, standard library first; one that needs a
 third-party package declares it in PEP 723 and says how the target runs
 it.
