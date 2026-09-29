@@ -34,8 +34,8 @@ gen-marketplace:
 
 # Lint and check formatting of repository and skill scripts
 lint:
-    ruff check scripts skills/*/*/scripts
-    ruff format --check scripts skills/*/*/scripts
+    ruff check scripts skills/*/*/scripts skills/meta/*/assets skills/sdd/*/assets
+    ruff format --check scripts skills/*/*/scripts skills/meta/*/assets skills/sdd/*/assets
 
 # Validate every OpenSpec spec and change (strict)
 spec-validate:

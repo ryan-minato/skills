@@ -1,6 +1,10 @@
-# Ruff configuration for repository scripts and skill-bundled scripts.
+# Ruff configuration for repository scripts, skill-bundled scripts, and the
+# script assets the meta and sdd skills deposit into targets.
 # The explicit `select` keeps local and pre-commit runs on one rule set; the
-# line length matches .editorconfig.
+# line length matches .editorconfig. BLE001 and S110 hold management code to
+# the rule that no handler hides a failure (.agents/knowledge/skill-quality.md,
+# Management code); a justified exception carries `# noqa: <rule>` and its
+# reason. Skills' own scripts/ follow the Scripts rules instead.
 line-length = 120
 target-version = "py310"
 
@@ -13,4 +17,7 @@ target-version = "py310"
 "skills/meta/meta-gitlab-workflow/scripts/*.py" = "py39"
 
 [lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "BLE001", "S110"]
+
+[lint.per-file-ignores]
+"skills/*/*/scripts/**/*.py" = ["BLE001", "S110"]

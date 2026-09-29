@@ -44,9 +44,9 @@ repos:
     rev: v0.16.4
     hooks:
       - id: ruff-check
-        files: ^(scripts|skills/[^/]+/[^/]+/scripts)/.*\.py$
+        files: ^(scripts|skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
       - id: ruff-format
-        files: ^(scripts|skills/[^/]+/[^/]+/scripts)/.*\.py$
+        files: ^(scripts|skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
 
   - repo: local
     hooks:
