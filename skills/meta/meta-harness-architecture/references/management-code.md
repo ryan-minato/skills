@@ -48,11 +48,14 @@ in its language, not by whether the language has a build step:
   declares its packages in PEP 723 inline metadata. The conventions of a
   Python project's own scripts belong to the `meta-python-defaults`
   builder.
-- Use the standard library only when it solves the task cleanly. When the
-  task needs a mature library (YAML, schema validation, HTTP with
-  retries), a standard-library version would need its own tests before
-  anyone could trust it. Recommend adding uv to the harness and declaring
-  the library in PEP 723 instead of hand-writing a parser.
+- Use the standard library only when it solves the task cleanly. Parsing
+  a format such as YAML or TOML, validating a schema, or HTTP with retries
+  needs its mature library, even when today's files look like a small
+  subset: a hand-written parser would need its own tests before anyone
+  could trust it, and the next file breaks it. In Python, declare the
+  library in PEP 723 and recommend adding uv to the harness where it is
+  missing; in Deno, import the standard library's module (`jsr:@std/yaml`
+  for YAML).
 - Invoke a script with `uv run` only when uv exists in every environment
   the script runs in: developer machines, the dev container, and each CI
   job that calls it. Otherwise call the interpreter, or add uv to the
