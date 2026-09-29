@@ -51,7 +51,7 @@ spec-sync:
 spec-check BASE="origin/main" HEAD="HEAD" *ARGS:
     python3 scripts/spec_changes.py check --base {{BASE}} --head {{HEAD}} --shape combined {{ARGS}}
 
-# Related-change tooling for a pull request: related, status, show, check, archive, labels (see --help)
+# Related-change tooling for a pull request: snapshot, status, show, check, archive, labels (see --help)
 spec-changes *ARGS:
     python3 scripts/spec_changes.py {{ARGS}}
 

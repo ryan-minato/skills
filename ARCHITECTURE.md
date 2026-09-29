@@ -190,9 +190,9 @@ OpenSpec CLI version is pinned in the `justfile`; `just spec-validate`
 runs its strict validator, `just spec-check` adds the unarchived-change
 rule, and `just spec-sync` regenerates the `openspec-*` skills. The
 request automation — the check, the slash-spec comment commands, the
-spec status labels, all of them read-only — is the `openspec-workflow`
-skill's,
-mirrored into `.github/workflows/` and `scripts/spec_changes.py`.
+spec status labels, all of them read-only — was installed from the
+`openspec-workflow` skill's assets into `.github/workflows/`, and runs
+`scripts/spec_changes.py`, this repository's own management script.
 
 ## GitHub Workflow
 
