@@ -10,17 +10,17 @@
 
 ## 2. External impact
 
-- [ ] 2.1 Confirm no other file under `scripts/`, `.github/`, or `.agents/knowledge/` changes beyond the placement table: `git diff --stat origin/main...HEAD -- scripts .github .agents`. Verify with `just validate`.
+- [x] 2.1 Confirm no other file under `scripts/`, `.github/`, or `.agents/knowledge/` changes beyond the placement table: `git diff --stat origin/main...HEAD -- scripts .github .agents`. Verify with `just validate`.
 
 ## 3. Tests
 
 - [x] 3.1 Copies check: a comment line appended to `scripts/sync_labels.py` in a disposable worktree passes `just validate` after 1.1 and failed naming the file before it; the `DIVERGENCE|check_copies|ORIGIN` grep of `validate_harness.py` is empty. Proves: Copies check removed.
-- [ ] 3.2 Readback of the two register rows against the files they name. Proves: Synchronization register.
+- [x] 3.2 Readback of the two register rows against the files they name. Proves: Synchronization register.
 - [x] 3.3 `spec_changes.py` scratch-repository runs: help, `check` (plain, `--draft`, `--shape split`), `archive` refusing an open task, archiving, and repeating with no change, `show --change nope` exiting 2 with names as code, `--bogus` exiting 2, `labels --taxonomy`, and `check` with `openspec` hidden from `PATH`. Proves: `spec_changes.py` rewritten.
 - [x] 3.4 `spec_changes.py` stub-API runs through `--api-url`: snapshot parity with the git source for `status`, `show`, and `labels`; cap, truncated tree, and non-UTF-8 document refused naming the path; list-for-object and 404 on a listed tree failing naming the endpoint; a foreign or incomplete snapshot file refused naming the file; then a read-only `snapshot` of this pull request whose `status` matches the git source. Proves: `spec_changes.py` rewritten.
 - [x] 3.5 `sync_labels.py`: help, `--bogus`, `--prune` without `--apply`, the byte-identical dry-run plans of the old and the new script against `ryan-minato/skills`, the stub-`gh` failures (non-JSON, object, missing `gh`), the three bad `labels.json` files, and a repeated dry run. Proves: `sync_labels.py` rewritten.
 - [x] 3.6 Workflow step bodies run locally: the `changed` step on an unknown base, a push, and an `openspec/` diff; the gate on a failure and on successes; the `/spec` reply block with a stub script exiting 0, 2, 1, and raising, the posted body recorded and the exits 0, 0, 1, 1; the label loop on a fixture plan; every `run:` step's reading recorded for the Validation section. Proves: Workflow steps.
-- [ ] 3.7 Readback of `skill-quality.md` `## Management code`, the code-review section, and the `meta/CONTEXT.md` bullet. Proves: Management-code rules; `skills/meta/CONTEXT.md`.
+- [x] 3.7 Readback of `skill-quality.md` `## Management code`, the code-review section, and the `meta/CONTEXT.md` bullet. Proves: Management-code rules; `skills/meta/CONTEXT.md`.
 - [x] 3.8 Lint: `try`/`except Exception: pass` added to a repository script fails `just lint` with BLE001 and S110 in a disposable worktree, and the same lines in a skill's `scripts/` file do not. Proves: Lint.
 - [x] 3.9 The archive command from `openspec/config.yaml` archives a complete change in the scratch repository. Proves: Archive command.
 
