@@ -78,5 +78,7 @@ Report the object/MR links, final state, time recorded, checks, unresolved work,
 and any manual or approval-gated action. Update this skill in the same MR when
 its commands, templates, labels, paths, settings, or lifecycle policy change.
 
-<!-- Add project-specific routed references and scripts only for selected
-planning, pipeline, release, wiki, guardrail, deployment, or MLOps branches. -->
+<!-- Add project-specific routed references, and scripts delivered from the
+builder's assets into this skill's scripts/ (the pipeline-log digest, run from
+there), only for selected planning, pipeline, release, wiki, guardrail,
+deployment, or MLOps branches. -->

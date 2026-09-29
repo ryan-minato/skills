@@ -44,6 +44,19 @@ rewrite a CI checkout and report success without proving the committed format.
 Keep fork MR jobs tokenless by default. Secrets and protected runners must not
 be exposed to untrusted code.
 
+## Job scripts
+
+A job script hides no unexpected failure. GitLab Runner's generated bash
+script sets `errexit`, and `pipefail` where the shell supports it (read from
+the runner's bash shell writer on 2026-09-29), so most failing commands
+already fail the job; what still hides one is a command tested inside a
+condition (`if cmd | grep -q x` reads a failed `cmd` as "no match") and an
+`|| true` wider than the exit it was written for. Run such a command outside
+the condition and test its saved output, and tolerate only the exit you
+mean. A failure the design tolerates is marked where it is written:
+`allow_failure: true` on an advisory job, with a comment saying why, and its
+report kept in the log or an artifact.
+
 ## Integration and validation
 
 Preserve working job names because merge gates and dashboards may key on them.

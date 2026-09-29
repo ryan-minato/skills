@@ -22,10 +22,13 @@ domains; rework `assets/commit-conventions.md` into that document. If
 changelog configuration; commits without the expected trailer can disappear
 from generated notes silently.
 
-Rework `assets/check_commits.py` only when mechanical enforcement is
-selected. Copy it into the target, edit its CONFIG, and verify message, file,
-and MR-range modes. CI needs complete MR history and must validate only the
-intended range. In squash workflows, validate the MR
+Deliver `assets/check_commits.py` as the target's `scripts/check_commits.py`
+only when mechanical enforcement is selected: edit its `CONFIG`, the one
+marked setting, and verify message, file, and MR-range modes. CI needs
+complete MR history and must validate only the intended range. The
+commit-check job runs the script so that a failing check fails the job: no
+`|| true` around it, no pipe that drops its status, and no `allow_failure`
+unless the team chose an advisory check, marked as one. In squash workflows, validate the MR
 title because individual commits may not reach the default branch.
 
 ## Branch and merge contract

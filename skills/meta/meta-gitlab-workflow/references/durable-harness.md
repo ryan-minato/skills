@@ -42,8 +42,9 @@ convention discovery, exact-payload safety gate, assignment state machine, and
 early draft-MR flow inline. Put optional planning, release, wiki, guardrail,
 pipeline, and MLOps branches in skill-local references only when selected.
 
-Copy deterministic scripts only when their branch is selected and record
-their runtime. Remove every unused script/reference. The generated skill and
+Deliver scripts from this builder's `assets/` only when their branch is
+selected, and record their runtime. The target owns them: no rule, check, or
+instruction keeps them identical to this builder's files. Remove every unused script/reference. The generated skill and
 all assets must omit the disposable marker.
 
 ## Remote settings as durable knowledge

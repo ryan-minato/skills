@@ -27,8 +27,8 @@ Rules:
   identifier (alphabetically — matching the common alpha < beta < rc)
   and then by counter; a final release always outranks its prereleases.
 
-Exit codes: 0 = tag printed; 1 = no parseable version tag found (pass
---latest explicitly); 2 = bad arguments or git unavailable.
+Exit codes: 0 = tag printed; 1 = no version tag in the repository (pass
+--latest) or git failed; 2 = bad arguments.
 """
 
 from __future__ import annotations
@@ -45,72 +45,58 @@ SEMVER_RE = re.compile(
 )
 
 
-def parse(tag: str):
+def parse(tag: str) -> dict | None:
     match = SEMVER_RE.match(tag.strip())
     if not match:
         return None
     return {
-        "prefix": match.group("prefix"),
-        "release": (
-            int(match.group("major")),
-            int(match.group("minor")),
-            int(match.group("patch")),
-        ),
-        "ident": match.group("ident"),
-        "counter": int(match.group("counter")) if match.group("counter") else None,
+        "tag": tag.strip(),
+        "prefix": match["prefix"],
+        "release": (int(match["major"]), int(match["minor"]), int(match["patch"])),
+        "ident": match["ident"],
+        "counter": int(match["counter"]) if match["counter"] else None,
     }
 
 
-def latest_from_git() -> str | None:
+def version_tag(value: str) -> dict:
+    """argparse type for --latest: a tag this script can parse."""
+    parsed = parse(value)
+    if parsed is None:
+        raise argparse.ArgumentTypeError(f"{value!r} is not PREFIX + X.Y.Z[-IDENT.N]")
+    return parsed
+
+
+def latest_from_git() -> dict | None:
+    """The highest version tag of the current repository, or None when it has none."""
     try:
-        proc = subprocess.run(["git", "tag", "--list"], capture_output=True, text=True, check=False)
+        result = subprocess.run(["git", "tag", "--list"], capture_output=True, text=True)
     except FileNotFoundError:
-        print("git is not installed or not on PATH", file=sys.stderr)
-        sys.exit(2)
-    if proc.returncode != 0:
-        sys.stderr.write(proc.stderr)
-        sys.exit(2)
-    best_tag, best_key = None, None
-    for tag in proc.stdout.splitlines():
-        parsed = parse(tag)
-        if parsed is None:
-            continue
-        # A final release outranks its own prereleases; among prereleases,
-        # compare the identifier alphabetically, then the counter.
-        key = (
-            parsed["release"],
-            parsed["counter"] is None,
-            parsed["ident"] or "",
-            parsed["counter"] or 0,
-        )
-        if best_key is None or key > best_key:
-            best_tag, best_key = tag.strip(), key
-    return best_tag
+        sys.exit("next_version: error: `git` is not installed; pass --latest instead.")
+    if result.returncode != 0:
+        sys.exit(f"next_version: error: `git tag --list` exited {result.returncode}: {result.stderr.strip()}")
+    tags = [parsed for parsed in map(parse, result.stdout.splitlines()) if parsed]
+    # A final release outranks its own prereleases; among prereleases,
+    # compare the identifier alphabetically, then the counter.
+    return max(
+        tags,
+        key=lambda t: (t["release"], t["counter"] is None, t["ident"] or "", t["counter"] or 0),
+        default=None,
+    )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog="next_version.py",
-        description="Print the next semver tag (see module docstring)",
-        epilog="Example: python3 scripts/next_version.py --latest v1.2.3 --bump patch",
+        prog="next_version.py", description="Print the next semver tag (see the module docstring)."
     )
     parser.add_argument("--bump", required=True, choices=["major", "minor", "patch"])
-    parser.add_argument("--latest", help="current latest tag; else read git tags")
+    parser.add_argument("--latest", type=version_tag, help="current latest tag; else read the git tags")
     parser.add_argument("--prefix", help="tag prefix for the output, e.g. v")
     parser.add_argument("--pre", help="prerelease identifier, e.g. rc")
     args = parser.parse_args()
 
-    latest = args.latest or latest_from_git()
-    if latest is None:
-        print(
-            "no parseable version tag found; pass --latest vX.Y.Z",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-    current = parse(latest)
+    current = args.latest or latest_from_git()
     if current is None:
-        print(f"cannot parse {latest!r} as PREFIXX.Y.Z[-ident.N]", file=sys.stderr)
-        sys.exit(1 if args.latest is None else 2)
+        sys.exit("next_version: error: the repository has no version tag; pass --latest vX.Y.Z.")
 
     major, minor, patch = current["release"]
     if args.bump == "major":
@@ -125,7 +111,7 @@ def main() -> None:
         nxt = current["release"]
 
     counter = 1
-    if args.pre and current["ident"] == args.pre and current["counter"] is not None:
+    if args.pre and current["ident"] == args.pre:
         # Continue the running prerelease series toward its base version.
         nxt = current["release"]
         counter = current["counter"] + 1
@@ -134,7 +120,6 @@ def main() -> None:
     version = f"{prefix}{nxt[0]}.{nxt[1]}.{nxt[2]}"
     if args.pre:
         version = f"{version}-{args.pre}.{counter}"
-
     print(version)
 
 
