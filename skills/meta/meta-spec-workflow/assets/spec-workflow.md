@@ -182,7 +182,8 @@ again.
 ## Request automation
 
 <Delete when no framework skill is installed.> The framework skill
-`<framework skill name>` owns the request automation and its script:
+`<framework skill name>` supplies the request automation and its
+management script; the project owns the deposited copy.
 `<command syntax>` shows a related record's documents and
 `<command syntax>` its task progress <on GitHub as comment commands | on
 GitLab as manual jobs>; the `<labels job name>` <workflow | job> keeps the

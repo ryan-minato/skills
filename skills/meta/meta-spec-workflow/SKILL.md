@@ -347,7 +347,8 @@ nothing, never touch the security or sensitivity-review checklist item):
 3. The request automation and the validator: hand both to the framework
    skill (the handoff of step 3), which installs the check into the
    command and workflow the base already runs, the comment commands, the
-   status labels, and its script, and records
+   status labels, and the management script it deposits, which the
+   project owns, and records
    the maintainer actions those need; edit no workflow or pipeline file
    yourself. Without a framework skill, record the by-hand executor, the
    request checklist as the gate, and the automation as remaining work.
