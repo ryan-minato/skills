@@ -4,11 +4,11 @@ Governs what an agent that loaded the `meta-harness-architecture` builder observ
 ## ADDED Requirements
 
 ### Requirement: Behavior: Management code is written for its role and owned by the target
-When the build needs a script, hook, or CI step, the builder SHALL write or deposit management code written for that role and owned by the target, never a copy of a skill's bundled runtime script bound to stay identical to it, and SHALL tell the user that the project owns the code and that later fixes to the skill do not reach it.
+When the build needs a script, hook, or CI step, the builder SHALL write or deposit management code written for that role and owned by the target, never bound to a skill's bundled runtime script — no rule, check, or instruction keeps the two identical, although their content may match where the role needs the same code — and SHALL tell the user that the project owns the code and that later fixes to the skill do not reach it.
 
 #### Scenario: Bundled script available
 - **WHEN** a skill used in the build ships a runtime script that does what the target's CI needs
-- **THEN** the target receives a script written for the CI role, no delivered file is byte-identical to a skill's bundled script, and the handoff says the project owns it
+- **THEN** the target receives a script written for the CI role, nothing in the target requires it to stay identical to the skill's script, and the handoff says the project owns it
 
 ### Requirement: Behavior: Management code is written in a language the project's community scripts in
 The builder SHALL write management code in the project's language when that language's community widely and maturely uses it for scripting, judged by the maturity of that practice and not by whether the language has a build step, and checked against current official documentation for a borderline ecosystem; otherwise in Python or Deno; and in Bash only for simple operations that certainly run in a controlled Linux environment.

@@ -1,11 +1,11 @@
 ## ADDED Requirements
 
 ### Requirement: Behavior: Scripts delivered to the target come from management assets the target owns
-The builder SHALL deliver every script it gives the target — the commit check, the taxonomy check, the label sync committed beside `labels.json`, and the run-log digest, next-version, and project-field helpers of the durable project skill — from its management assets, never as a copy of a script the builder runs itself; SHALL change only an asset's marked settings; and SHALL tell the user that the target owns the delivered scripts.
+The builder SHALL deliver every script it gives the target — the commit check, the taxonomy check, the label sync committed beside `labels.json`, and the run-log digest, next-version, and project-field helpers of the durable project skill — from its management assets rather than from the scripts the builder runs itself, with no rule, check, or instruction binding a delivered script to one of those (an asset may still match one where the role needs the same code); SHALL change only an asset's marked settings; and SHALL tell the user that the target owns the delivered scripts.
 
 #### Scenario: Label taxonomy committed
 - **WHEN** the approved taxonomy is committed to the target as `labels.json`
-- **THEN** the label sync script delivered beside it comes from the builder's management asset, and no delivered file is byte-identical to a file in the builder's `scripts/`
+- **THEN** the label sync script delivered beside it comes from the builder's management asset, and nothing delivered to the target requires it to stay identical to a file in the builder's `scripts/`
 
 #### Scenario: Durable project skill with CI diagnosis
 - **WHEN** the builder delivers the durable project skill with the Actions-diagnosis branch selected

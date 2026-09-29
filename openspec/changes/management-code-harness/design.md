@@ -50,7 +50,7 @@ See proposal.md for motivation. `openspec/changes/management-code/design.md` cov
 
 ## Decisions
 
-- **Remove the check; do not loosen it with a divergence marker** (copies bullet). A marker keeps the pair bound and only moves the burden onto a comment. The pair should not exist at all.
+- **Remove the check; do not loosen it with a divergence marker** (copies bullet). A marker keeps the pair bound and only moves the burden onto a comment. The pair should not be enforced at all; after the rewrite the files differ, but a future match would not be a defect either.
 - **Keep every subcommand a caller uses, and drop `related`** (spec_changes bullet).
   - `grep` finds no caller of `related` outside the script, the recipe comment, and the epilog.
   - `archive` stays, with its local-write default and `--dry-run`, for the reasons in Non-goals.
