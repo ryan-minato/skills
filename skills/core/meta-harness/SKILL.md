@@ -63,11 +63,12 @@ hooks, workflow shell, and project-skill scripts — is the project's own
 management code. Write it for its role and readable first, and let no fallback
 postpone or hide an unexpected error: the failure surfaces with a message that
 names what to fix, while a failure the design expects may still be handled or
-deferred on purpose. Never bind it to a skill's runtime script: when a skill's
-script already does the job, give the project a script of its own in its own
-paths rather than running the skill's from where the skill is installed, and
-treat a rule, check, or instruction that keeps the two identical as a defect to
-remove, although matching content alone is not.
+deferred on purpose. Never bind it to a skill's runtime script: a script inside
+a skill's directory, installed or the project's own, is written for the agent
+that runs the skill, so give a check, hook, or CI step a script of its own in the
+project's paths instead of running the skill's, and treat a rule, check, or
+instruction that keeps the two identical as a defect to remove, although matching
+content alone is not.
 
 AGENTS.md is the map for progressive loading, not an exhaustive manual. It states
 the project's purpose, always-applicable constraints, validation entrypoints, and
