@@ -25,13 +25,16 @@ Choose by how widely and maturely the project's community writes scripts
 in its language, not by whether the language has a build step:
 
 - Use the project's language when its community widely and maturely
-  scripts in it. A Go project gets Go checks run with `go run`. A Node
-  project gets TypeScript or JavaScript run by its package manager.
+  scripts in it, however short the check. A Go project gets Go checks run
+  with `go run`. A Node project gets TypeScript or JavaScript run by its
+  package manager.
 - Otherwise use Python or Deno. A C or C++ project whose build has no
   scripting practice of its own gets Python or Deno checks, not C++
   programs and not long Bash scripts.
-- Use Bash only for simple operations that certainly run in a controlled
-  Linux environment, such as a short CI step or a dev container hook.
+- Bash is for a few lines of glue that certainly run only in a controlled
+  Linux environment, such as the body of one CI step or a dev container
+  hook. A check that developers also run, or that grows past a few lines,
+  is not a Bash case.
 - For a borderline ecosystem, check the language's current official
   documentation for its scripting practice (a run command, a script mode, a
   tools layout) before choosing.
