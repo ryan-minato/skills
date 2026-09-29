@@ -39,7 +39,7 @@ Per skill:
 - `meta/meta-harness-architecture` (new): management code written for its role, its language and dependencies, fail-fast error handling, and shell.
 - `meta/meta-python-defaults` (new): Python management-script conventions and the dependency-locking recommendation.
 - `meta/meta-github-workflow` (modified): scripts delivered from management assets; delivered workflows and the taxonomy check follow the management-code rules.
-- `meta/meta-gitlab-workflow` (modified): scripts delivered from management assets; job scripts fail on the failing command.
+- `meta/meta-gitlab-workflow` (modified): scripts delivered from management assets; job scripts hide no unexpected failure.
 - `sdd/openspec-workflow` (modified): the automation deposits a management script; the management script's contract.
 - `sdd/spec-kit-workflow` (modified): the same.
 - `scaffold/scaffold-ml` (modified): the container recipe's sealed build.
