@@ -189,7 +189,8 @@ when-to-read pointer.
 For scripts, tests, linters, CI, hooks, task runners, and framework settings,
 implement the approved feedback and safety layers as management code the
 target owns: written for its role and never bound to a skill's bundled script,
-in a language the project's community scripts in, with dependencies and an
+in a language the project's community scripts in (a skill's tested script
+asset is delivered in the language it ships in), with dependencies and an
 invocation that work in every environment it runs in, and with no fallback
 hiding an unexpected failure. Custom checks must explain what failed, why it
 matters, and the likely fix. Tell the user that the project owns this code and
