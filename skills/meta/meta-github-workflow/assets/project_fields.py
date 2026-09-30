@@ -6,8 +6,8 @@ gh project item-edit takes GraphQL node IDs (--project-id, --field-id,
 surface directly. This script resolves them from the project number and
 human-readable names via gh's JSON output.
 
-Usage:
-    python3 scripts/project_fields.py --owner OWNER --number N \\
+Usage, from the repository root:
+    python3 <project skill>/scripts/project_fields.py --owner OWNER --number N \\
         [--field "Status" [--option "In Progress"]] [--item-url URL]
 
 Output: one JSON object on stdout —

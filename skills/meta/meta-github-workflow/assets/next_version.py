@@ -5,10 +5,10 @@ Reads the latest version from --latest, or from the git tags of the
 current directory's repository when --latest is omitted, then applies the
 requested bump and prints the next tag to stdout (nothing else).
 
-Usage:
-    python3 scripts/next_version.py --bump patch
-    python3 scripts/next_version.py --bump minor --pre rc
-    python3 scripts/next_version.py --bump major --latest v2.9.3 --prefix v
+Usage, from the repository root:
+    python3 <project skill>/scripts/next_version.py --bump patch
+    python3 <project skill>/scripts/next_version.py --bump minor --pre rc
+    python3 <project skill>/scripts/next_version.py --bump major --latest v2.9.3 --prefix v
 
 Rules:
 - Tags are matched as PREFIX + MAJOR.MINOR.PATCH with an optional
