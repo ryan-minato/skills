@@ -21,10 +21,14 @@ variables:
   image: "{{PYTHON_IMAGE}}"
   stage: spec
   before_script:
-    # The jobs run python3 and jq; an image without them fails here, by name,
-    # instead of midway through a job.
+    # Every job runs python3; the note and label jobs post through jq only
+    # when a posting token is set, and every job shares this image. A missing
+    # tool fails here, by name, instead of midway through a job; without a
+    # posting token, no job asks for jq.
     - |
-      for tool in python3 jq; do
+      tools="python3"
+      if [ -n "${SPEC_NOTE_TOKEN:-}${SPEC_LABELS_TOKEN:-}" ]; then tools="$tools jq"; fi
+      for tool in $tools; do
         command -v "$tool" > /dev/null || { echo "The spec jobs need $tool, which the image $CI_JOB_IMAGE lacks; choose an image that has it, or install it here." >&2; exit 1; }
       done
     - export SPEC_BASE="$CI_MERGE_REQUEST_DIFF_BASE_SHA" SPEC_HEAD="$CI_COMMIT_SHA"
