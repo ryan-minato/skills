@@ -45,7 +45,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-OPEN_TASK = re.compile(r"^\s*-\s*\[ \]\s*(.*)$", re.MULTILINE)
+OPEN_TASK = re.compile(r"^[ \t]*-[ \t]*\[ \][ \t]*(.*)$", re.MULTILINE)
 DONE_TASK = re.compile(r"^\s*-\s*\[[xX]\]\s", re.MULTILINE)
 SKIP_SPECS = re.compile(r"^\s*skip_specs\s*:\s*true\s*$", re.MULTILINE)
 ARCHIVE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}-")
@@ -73,6 +73,8 @@ SAFE_REPO = re.compile(r"^[A-Za-z0-9._-]{1,100}/[A-Za-z0-9._-]{1,100}$")
 # The documents inside a change directory the commands read; nothing else is fetched.
 CHANGE_DOCS = ("proposal.md", "design.md", "tasks.md", ".openspec.yaml")
 MAX_FILES = 3000
+# Room `show` keeps for its closing line that counts the documents cut for size.
+OMITTED_RESERVE = 80
 MAX_FILE_BYTES = 1_000_000
 MAX_TOTAL_BYTES = 8_000_000
 # The platform token's REST budget is shared by every workflow of the repository.
@@ -283,8 +285,13 @@ class Api:
         self.max_calls = max_calls
         self.calls = 0
 
-    def get(self, endpoint: str, kind: type) -> dict | list:
-        """One GET whose body must be JSON of ``kind``; anything else fails naming the endpoint."""
+    def get(self, endpoint: str, kind: type, keys: tuple[str, ...] = ()) -> dict | list:
+        """One GET whose body must be JSON of ``kind``; anything else fails naming the endpoint.
+
+        ``keys`` are the fields the caller reads, of the object or of every
+        item of the list; a missing one fails here, so callers read them
+        directly.
+        """
         body = self._read(endpoint)
         try:
             data = json.loads(body)
@@ -295,6 +302,14 @@ class Api:
                 f"GET {endpoint} returned {JSON_KINDS.get(type(data), type(data).__name__)} where the API "
                 f"documents {JSON_KINDS[kind]}; nothing is reported from a partial snapshot."
             )
+        what = "an entry" if isinstance(data, list) else "an object"
+        for item in data if isinstance(data, list) else [data]:
+            missing = [key for key in keys if not isinstance(item, dict) or key not in item]
+            if missing:
+                raise Failure(
+                    f"GET {endpoint} returned {what} without `{'`, `'.join(missing)}`: {str(item)[:200]}; "
+                    "nothing is reported from a partial snapshot."
+                )
         return data
 
     def _read(self, endpoint: str) -> bytes:
@@ -330,14 +345,36 @@ class Api:
                     raise Failure(f"cannot reach {self.api_url} for GET {endpoint}: {exc.reason}") from exc
             time.sleep(2**attempt)
 
-    def pull_heads(self, number: int) -> tuple[str, str]:
-        pull = self.get(f"repos/{self.repo}/pulls/{number}", dict)
-        return pull["base"]["sha"], pull["head"]["sha"]
+    def pull_heads(self, number: int) -> tuple[str, str, int]:
+        """The base and head SHAs and the count of changed files the request reports."""
+        endpoint = f"repos/{self.repo}/pulls/{number}"
+        pull = self.get(endpoint, dict, ("base", "head", "changed_files"))
+        for side in ("base", "head"):
+            if not isinstance(pull[side], dict) or not isinstance(pull[side].get("sha"), str):
+                raise Failure(
+                    f"GET {endpoint} returned a `{side}` without a `sha`: {str(pull[side])[:200]}; "
+                    "nothing is reported from a partial snapshot."
+                )
+        if not isinstance(pull["changed_files"], int):
+            raise Failure(
+                f"GET {endpoint} returned `changed_files` {pull['changed_files']!r}, not a count; "
+                "nothing is reported from a partial snapshot."
+            )
+        return pull["base"]["sha"], pull["head"]["sha"], pull["changed_files"]
 
-    def pull_files(self, number: int, max_files: int) -> list[str]:
+    def pull_files(self, number: int, max_files: int, changed_files: int) -> list[str]:
+        """The request's paths; a listing shorter than the request's ``changed_files`` fails.
+
+        The endpoint lists at most 3000 files however it is paged, and a
+        larger request comes back cut short without an error: only the count
+        the pull request reports shows the cut.
+        """
+        endpoint = f"repos/{self.repo}/pulls/{number}/files"
         paths: list[str] = []
+        listed = 0
         for page in itertools.count(1):
-            batch = self.get(f"repos/{self.repo}/pulls/{number}/files?per_page=100&page={page}", list)
+            batch = self.get(f"{endpoint}?per_page=100&page={page}", list, ("filename",))
+            listed += len(batch)
             for item in batch:
                 paths.append(item["filename"])
                 # `git diff --no-renames` reports a rename as its old path plus
@@ -354,12 +391,32 @@ class Api:
                 f"the request touches at least {len(paths)} files, over the --max-files cap "
                 f"({max_files}); split the request, or raise the cap deliberately."
             )
+        if listed < changed_files:
+            raise Failure(
+                f"GET {endpoint} listed {listed} of the request's {changed_files} changed files (the endpoint "
+                "lists at most 3000); nothing is reported from a partial snapshot. Split the request."
+            )
         return paths
 
     def tree(self, sha: str, path: str, recursive: bool = False) -> list[dict]:
         """The entries of one tree, named ``path`` in messages; a truncated listing fails."""
         endpoint = f"repos/{self.repo}/git/trees/{urllib.parse.quote(sha, safe='')}"
-        data = self.get(endpoint + ("?recursive=1" if recursive else ""), dict)
+        data = self.get(endpoint + ("?recursive=1" if recursive else ""), dict, ("truncated", "tree"))
+        bad = next(
+            (
+                e
+                for e in data["tree"]
+                if not isinstance(e, dict)
+                or not {"path", "type", "sha"} <= e.keys()
+                or (e["type"] == "blob" and "size" not in e)
+            ),
+            None,
+        )
+        if bad is not None:
+            raise Failure(
+                f"GET {endpoint} listed an entry of {path} without its path, type, sha, or a blob's size: "
+                f"{str(bad)[:200]}; nothing is reported from a partial snapshot."
+            )
         if data["truncated"]:
             raise Failure(
                 f"the tree of {path} came back truncated (GET {endpoint}); nothing is reported from a partial "
@@ -369,7 +426,7 @@ class Api:
 
     def blob_text(self, sha: str, path: str) -> str:
         endpoint = f"repos/{self.repo}/git/blobs/{urllib.parse.quote(sha, safe='')}"
-        data = self.get(endpoint, dict)
+        data = self.get(endpoint, dict, ("encoding", "content"))
         if data["encoding"] != "base64":
             raise Failure(f"GET {endpoint} for {path} returned encoding {data['encoding']!r}, not base64.")
         try:
@@ -426,8 +483,8 @@ def build_snapshot(api: Api, number: int, changes_dir: str, caps: dict) -> dict:
     instead of being reported on: a label or a status derived from half the
     request is worse than no answer.
     """
-    base_sha, head_sha = api.pull_heads(number)
-    changed = api.pull_files(number, caps["max_files"])
+    base_sha, head_sha, changed_files = api.pull_heads(number)
+    changed = api.pull_files(number, caps["max_files"], changed_files)
     base = change_dirs(api, base_sha, changes_dir)
     head = change_dirs(api, head_sha, changes_dir)
 
@@ -608,10 +665,17 @@ def doc_paths(source: Source, path: str, doc: str) -> list[str]:
 
 
 def show_markdown(source: Source, changes: list[dict], doc: str, url_prefix: str, max_chars: int) -> str:
+    """The documents as Markdown, at most ``max_chars`` long.
+
+    The document that crosses the budget is cut and linked; every document
+    after it is counted in one closing line instead of listed, so the output
+    stays within ``max_chars`` however many documents follow.
+    """
     docs = DOCS if doc == "all" else (doc,)
     out: list[str] = []
     used = 0
     overflow = False
+    omitted = 0
 
     def emit(block: str) -> None:
         nonlocal used
@@ -620,34 +684,41 @@ def show_markdown(source: Source, changes: list[dict], doc: str, url_prefix: str
 
     for change in changes:
         if change["path"] is None:
-            emit(f"### {code_span(change['name'])} — removed at the head; nothing to show.\n\n")
+            if not overflow:
+                emit(f"### {code_span(change['name'])} — removed at the head; nothing to show.\n\n")
             continue
         for d in docs:
             paths = doc_paths(source, change["path"], d)
             if not paths:
-                emit(f"**{code_span(change['path'] + '/specs/')}** — _no delta spec yet_\n\n")
+                if not overflow:
+                    emit(f"**{code_span(change['path'] + '/specs/')}** — _no delta spec yet_\n\n")
                 continue
             for p in paths:
-                view = f" ([view]({link_to(url_prefix, p)}))" if url_prefix else ""
-                header = f"**{code_span(p)}**{view}\n\n"
-                if overflow:
-                    emit(f"**{code_span(p)}** — omitted for size{view}\n\n")
-                    continue
                 text = source.head_text(p)
                 if text is None:
-                    emit(f"**{code_span(p)}** — _no {p.rsplit('/', 1)[-1]} yet_\n\n")
+                    if not overflow:
+                        emit(f"**{code_span(p)}** — _no {p.rsplit('/', 1)[-1]} yet_\n\n")
                     continue
+                if overflow:
+                    omitted += 1
+                    continue
+                view = f" ([view]({link_to(url_prefix, p)}))" if url_prefix else ""
+                header = f"**{code_span(p)}**{view}\n\n"
                 fence = fence_for(text)
                 block = f"{header}{fence}markdown\n{text.rstrip()}\n{fence}\n\n"
-                budget = max_chars - used
+                budget = max_chars - used - OMITTED_RESERVE
                 if len(block) > budget:
                     overflow = True
-                    keep = text[: max(0, budget - len(header) - len(fence) * 2 - 80)]
-                    keep = keep[: keep.rfind("\n")] if "\n" in keep else keep
+                    opening = f"{header}{fence}markdown\n"
                     tail = f": {link_to(url_prefix, p)}" if url_prefix else ""
-                    emit(f"{header}{fence}markdown\n{keep}\n{fence}\n… truncated — full file{tail}\n\n")
+                    closing = f"\n{fence}\n… truncated — full file{tail}\n\n"
+                    keep = text[: max(0, budget - len(opening) - len(closing))]
+                    keep = keep[: keep.rfind("\n")] if "\n" in keep else keep
+                    emit(f"{opening}{keep}{closing}")
                     continue
                 emit(block)
+    if omitted:
+        emit(f"_{omitted} more document{'' if omitted == 1 else 's'} omitted for size._\n")
     return "".join(out) or "No related OpenSpec change: the diff touches nothing under the changes directory.\n"
 
 
