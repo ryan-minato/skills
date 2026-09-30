@@ -264,7 +264,9 @@ This repository's `scripts/` use the standard library only, run with
 choice is revisited with the first third-party dependency. `just lint`
 fails a blind `except` (BLE001) and a `try`/`except`/`pass` (S110) in
 them and in the script assets; a justified exception carries
-`# noqa: BLE001` or `# noqa: S110` with its reason. Script assets
+`# noqa: BLE001` or `# noqa: S110` with its reason. Neither rule sees
+`contextlib.suppress(Exception)`, so SIM105, which suggests that rewrite,
+is off there, and review catches a blind `suppress`. Script assets
 are Python 3.10 or later, standard library first; one that needs a
 third-party package declares it in PEP 723 and says how the target runs
 it.
