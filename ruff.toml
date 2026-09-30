@@ -4,7 +4,9 @@
 # line length matches .editorconfig. BLE001 and S110 hold management code to
 # the rule that no handler hides a failure (.agents/knowledge/skill-quality.md,
 # Management code); a justified exception carries `# noqa: <rule>` and its
-# reason. Skills' own scripts/ follow the Scripts rules instead.
+# reason. SIM105 is off there because it rewrites a flagged handler into
+# `contextlib.suppress`, which neither rule sees. Skills' own scripts/
+# follow the Scripts rules instead.
 line-length = 120
 target-version = "py310"
 
@@ -21,3 +23,4 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF", "BLE001", "S110"]
 
 [lint.per-file-ignores]
 "skills/*/*/scripts/**/*.py" = ["BLE001", "S110"]
+"!skills/*/*/scripts/**/*.py" = ["SIM105"]

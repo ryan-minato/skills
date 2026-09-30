@@ -214,10 +214,12 @@ may ready a pull request under the H1 policy; the maintainer merges.
 - `just check` = `validate` (`scripts/validate_skills.py` +
   `scripts/validate_harness.py`) + `lint` (ruff over `scripts/`, every
   `skills/*/*/scripts/`, and the script assets under `skills/meta/*/assets/`
-  and `skills/sdd/*/assets/`; blind and silent exception handlers fail it
-  outside the skills' own `scripts/`) + `spec-validate` + `pre-commit run
-  --all-files` (whitespace, secrets, ruff, both validators; the
-  `commit-safety` hook runs only on `git commit`).
+  and `skills/sdd/*/assets/`; in all but the skills' own `scripts/`, a
+  blind `except` and a `try`/`except`/`pass` fail it, and SIM105 is off so
+  ruff never suggests `contextlib.suppress`, which neither rule sees) +
+  `spec-validate` + `pre-commit run --all-files` (whitespace, secrets,
+  ruff, both validators; the `commit-safety` hook runs only on
+  `git commit`).
 - pre-commit hooks are installed by `just setup` (run automatically by the
   devcontainer's `postCreateCommand`), which also installs the pinned
   OpenSpec CLI and sets the `.gitmessage` commit template.
