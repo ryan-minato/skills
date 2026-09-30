@@ -12,7 +12,7 @@ GitLab project. The assets under `assets/gitlab/` are raw shapes: every
 | Jobs | `assets/gitlab/ci-spec-jobs.yml` | included from `.gitlab-ci.yml` (or pasted), stage `spec` | `spec:check`, `spec:show`, `spec:status`, `spec:labels` |
 | Labels | `assets/gitlab/labels-spec.json` | the project's label file, synced with its label tool | GitLab colors carry `#` |
 
-Placeholders: `{{PYTHON_IMAGE}}` and `{{REQUEST_SHAPE}}` (`combined` or `split`, from the contract). No archive job: Spec-Kit has no archive
+Placeholders: `{{PYTHON_IMAGE}}` (an image with `python3`, and `jq` when a posting token is set) and `{{REQUEST_SHAPE}}` (`combined` or `split`, from the contract). No archive job: Spec-Kit has no archive
 operation; `spec:check` enforces the ticked task list once the merge
 request is no longer a draft.
 
@@ -47,8 +47,9 @@ with the parent's variables and tokens. Enforcement is the project setting
 
 - The fragment parses; `grep -n '{{' .gitlab-ci.yml <fragment>` returns
   nothing.
-- The image carries `python3` and `jq`: the fragment's `before_script`
-  names either one when it is missing, and a failing script fails its job
+- The image carries `python3`, and `jq` too when `SPEC_NOTE_TOKEN` or
+  `SPEC_LABELS_TOKEN` is set: the fragment's `before_script` names the
+  missing one, and a failing script fails its job
   with its output in the log (GitLab Runner runs job scripts with `errexit`,
   and `pipefail` where the shell supports it).
 - A test merge request: `spec:check` runs on each push and fails on a
