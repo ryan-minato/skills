@@ -101,8 +101,13 @@ def main() -> None:
             "json",
             key="items",
         )
-        # A draft issue's content has no URL.
-        item = next((i for i in listing["items"] if i["content"].get("url") == args.item_url), None)
+        # gh prints `content` as null for an item type it does not map (such
+        # as an item redacted from a repository the token cannot read), and a
+        # draft issue's content has no URL; neither can match.
+        item = next(
+            (i for i in listing["items"] if i["content"] is not None and i["content"].get("url") == args.item_url),
+            None,
+        )
         if item is None:
             sys.exit(f"project_fields: item with url {args.item_url} not found in the first {args.limit} items")
         result["item_id"] = item["id"]
