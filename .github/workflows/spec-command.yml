@@ -51,10 +51,11 @@ jobs:
         run: |
           set -euo pipefail
           gh pr view "$N" --repo "$REPO" --json headRefOid,state > "$RUNNER_TEMP/pr.json"
-          {
-            echo "head=$(jq -r .headRefOid "$RUNNER_TEMP/pr.json")"
-            echo "state=$(jq -r .state "$RUNNER_TEMP/pr.json")"
-          } >> "$GITHUB_OUTPUT"
+          # Assigned before use: a failed `jq` inside an `echo` argument would
+          # not stop the step, and an empty head would reach the reply.
+          head=$(jq -r .headRefOid "$RUNNER_TEMP/pr.json")
+          state=$(jq -r .state "$RUNNER_TEMP/pr.json")
+          printf 'head=%s\nstate=%s\n' "$head" "$state" >> "$GITHUB_OUTPUT"
           # The head is read through the REST API and parsed: never fetched
           # into the runner's git store, checked out, installed, or executed.
           # That is what makes this job safe on a pull request from a fork.
