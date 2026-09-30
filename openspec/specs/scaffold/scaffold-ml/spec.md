@@ -121,7 +121,7 @@ The scaffolded entry point SHALL write a run manifest at start (status running) 
 - **THEN** it writes its own manifest under `outputs/<run_id>/eval/<eval_id>/` with the training run as its parent, the evaluation set and model artifact as inputs, and the metrics in the finalized record
 
 ### Requirement: Behavior: The container recipe yields a recorded image identity
-When the user opts into containers, the builder SHALL provide a multi-stage recipe — an environment stage installed from the committed lock on a bare CUDA or ROCm base image, a runtime target, and a sealed target that adds the source — SHALL record the pushed image's digest (or the local image id when never pushed) as the run's environment identity by injecting it into the run, SHALL keep the Dockerfile and any tag out of the identity, SHALL install the environment outside the path the source is mounted on and filter the build context so data, outputs, secrets, caches, and the repository metadata never enter an image, SHALL give the dev container the task runner it invokes and take its GPU flags from the GPU container decision, SHALL still record the host facts a container cannot pin, SHALL mount `data/`, `outputs/`, and the model-hub cache as volumes with the container-path mapping recorded and raise the container's shared memory for data-loader workers, and, when a preinstalled-stack image is chosen instead, SHALL make the image's framework authoritative by removing it from the project's dependencies and recording that rule; containers SHALL stay opt-in.
+When the user opts into containers, the builder SHALL provide a multi-stage recipe — an environment stage installed from the committed lock on a bare CUDA or ROCm base image, a runtime target, and a sealed target that adds the source — SHALL record the pushed image's digest (or the local image id when never pushed) as the run's environment identity by injecting it into the run, SHALL keep the Dockerfile and any tag out of the identity, SHALL have the sealed build run the git reads it depends on — the working-tree status and the commit it stamps — before testing their result, so that a failed read stops the build, SHALL install the environment outside the path the source is mounted on and filter the build context so data, outputs, secrets, caches, and the repository metadata never enter an image, SHALL give the dev container the task runner it invokes and take its GPU flags from the GPU container decision, SHALL still record the host facts a container cannot pin, SHALL mount `data/`, `outputs/`, and the model-hub cache as volumes with the container-path mapping recorded and raise the container's shared memory for data-loader workers, and, when a preinstalled-stack image is chosen instead, SHALL make the image's framework authoritative by removing it from the project's dependencies and recording that rule; containers SHALL stay opt-in.
 
 #### Scenario: Container requested
 - **WHEN** the user asks for a training image
@@ -134,6 +134,10 @@ When the user opts into containers, the builder SHALL provide a multi-stage reci
 #### Scenario: Sealed image built
 - **WHEN** the sealed target is built from a working tree
 - **THEN** the build refuses a dirty tree, the build context excludes data, outputs, secrets, caches, and the repository metadata, and the image carries the commit as a revision label and as the stamped value the manifest reads
+
+#### Scenario: Tree state unreadable
+- **WHEN** the sealed target is built where git cannot read the working tree, for example outside a repository
+- **THEN** the recipe stops with git's error and builds no image, instead of treating the unread tree as clean
 
 #### Scenario: Run inside a sealed image
 - **WHEN** the training entry point runs inside a sealed image with no repository present
