@@ -15,8 +15,9 @@ so write it for whoever reads it next.
   installed or is the project's own, is written for the agent that runs the
   skill: no CI step, hook, or recipe runs it from there, and no rule, check,
   or instruction may require the project's script to stay identical to it.
-  Write or deposit a script for the role in the project's own paths. Its content may match the skill's script where the role
-  needs the same code; matching content is not the defect, a binding is.
+  Write or deposit a script for the role in the project's own paths. Its
+  content may match the skill's script where the role needs the same code;
+  matching content is not the defect, a binding is.
 - Say in the handoff that the project owns the script and that later fixes
   to the skill do not reach it.
 
@@ -39,6 +40,12 @@ in its language, not by whether the language has a build step:
 - For a borderline ecosystem, check the language's current official
   documentation for its scripting practice (a run command, a script mode, a
   tools layout) before choosing.
+
+This choice governs code you write. A script asset that a skill deposits
+is tested code: deliver it in the language it ships in, change only its
+marked settings, and do not port it during the build, since an untested
+port can drop a property the asset was tested for. Tell the user the
+project may port its copy later, as its own change.
 
 ## Dependencies and invocation
 
