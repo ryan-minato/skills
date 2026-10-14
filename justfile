@@ -34,6 +34,7 @@ install-opentofu:
         echo "OpenTofu $version already installed at $bin"
         exit 0
     fi
+    [ "$(uname -s)" = Linux ] || { echo "install-opentofu: this recipe downloads the Linux release; on $(uname -s) install OpenTofu $version yourself" >&2; exit 1; }
     case "$(uname -m)" in
         x86_64) arch=amd64 ;;
         aarch64|arm64) arch=arm64 ;;
