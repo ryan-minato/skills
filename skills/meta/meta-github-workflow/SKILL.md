@@ -1,17 +1,18 @@
 ---
 name: meta-github-workflow
 description: >-
-  Disposable builder skill (delete after the harness is built): designs and builds
-  a complete, durable lifecycle harness for repositories hosted on GitHub.com
-  or GitHub Enterprise. Use only when initializing a GitHub-hosted repository,
+  Disposable builder skill (delete after the harness is built): designs and
+  builds a complete, durable lifecycle harness for repositories hosted on
+  GitHub.com or GitHub Enterprise, including the repository that holds an
+  organization's GitHub settings as Terraform or OpenTofu code. Use only when
+  initializing a GitHub-hosted repository or such a configuration repository,
   establishing or replacing its repository-wide lifecycle scaffolding, or
-  systematically auditing and repairing several connected GitHub harness
-  layers — including an organization's configuration repository that keeps
-  its GitHub settings as Terraform or OpenTofu code. The deliverable is a durable project operating system, not an
-  isolated operational answer, a single template, or a branching strategy; a
-  one-off issue, pull request, release, or failing-run question does not
-  invoke it, nor does Terraform for cloud infrastructure, nor the GitHub Flow
-  branching model, which belongs to meta-git-branching.
+  systematically auditing and repairing several connected GitHub harness layers.
+  The deliverable is a durable project operating system, not an operational
+  answer or a single template: it does not load for one label, issue, pull
+  request, release, or failing run, for Terraform that manages cloud
+  infrastructure, or for the GitHub Flow branching model, which belongs to
+  meta-git-branching.
 license: Apache-2.0
 compatibility: >-
   Bundled tools require Python 3.9+ and the standard library. Script assets

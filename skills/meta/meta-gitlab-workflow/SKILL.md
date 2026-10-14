@@ -1,16 +1,17 @@
 ---
 name: meta-gitlab-workflow
 description: >-
-  Disposable builder skill (delete after the harness is built): designs and builds
-  a complete, durable lifecycle harness for projects hosted on gitlab.com or a
-  self-managed GitLab instance. Use only when initializing a GitLab-hosted
-  project, establishing or replacing its platform-wide lifecycle scaffolding,
-  or systematically auditing and repairing several connected GitLab harness
-  layers — including a group's configuration repository that keeps its
-  GitLab settings as Terraform or OpenTofu code. The deliverable is a durable
-  project operating system, not an isolated operational answer or
-  version-control strategy; infrastructure code that deploys services is
-  not in scope, and choosing a branching model belongs to meta-git-branching.
+  Disposable builder skill (delete after the harness is built): designs and
+  builds a complete, durable lifecycle harness for projects hosted on gitlab.com
+  or a self-managed GitLab instance, including the project that holds a group's
+  GitLab settings as Terraform or OpenTofu code. Use only when initializing a
+  GitLab-hosted project or such a configuration repository, establishing or
+  replacing its platform-wide lifecycle scaffolding, or systematically auditing
+  and repairing several connected GitLab harness layers. The deliverable is a
+  durable project operating system, not an operational answer: it does not load
+  for one label, work item, merge request, or pipeline, for Terraform or
+  OpenTofu that deploys infrastructure (GitLab-managed state included), or for
+  choosing a branching model, which belongs to meta-git-branching.
 license: Apache-2.0
 compatibility: >-
   Bundled tools require Python 3.9+ (stdlib only); script assets delivered to
