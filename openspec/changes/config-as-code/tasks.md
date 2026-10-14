@@ -77,7 +77,7 @@
 - [x] 3.19 Outcome O16 — closes GH: Recipes for a justfile project; Provider fallback considered; Login lacks the organization scope.
 - [x] 3.20 Outcome O17 — closes GL: Recipes for a Makefile project; Make expansion would print the token.
 - [x] 3.21 Readback cases — closes GL: Personal namespace; GL: Tool absent; GH and GL MODIFIED: Durable project skill with CI diagnosis; SemVer not chosen.
-- [ ] 3.22 Record the skipped cases (live plan and apply; live workflow and pipeline runs) and their reasons for the Validation section.
+- [x] 3.22 Record the skipped cases (live plan and apply; live workflow and pipeline runs) and their reasons for the Validation section.
 
 ## 4. Finish
 
