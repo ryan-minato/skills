@@ -1,0 +1,23 @@
+# Fragment for .gitlab-ci.yml — applies the committed label file to the
+# project after it changes on the default branch. CI_JOB_TOKEN cannot call the
+# labels API, so the job uses a project access token with the least role that
+# manages labels (Planner from GitLab 17.7, Reporter before), stored as the
+# masked, protected CI/CD variable LABEL_SYNC_TOKEN of this project only. On
+# GitLab.com Free, where project access tokens are unavailable, deliver no
+# job: a maintainer runs the same command by hand. It never deletes a label unless the project
+# chose pruning, which adds --prune below and is recorded in
+# platform-settings.md. Deleting a label strips it from every work item and
+# merge request that carries it.
+
+labels-sync:
+  stage: check
+  image: "python:3.12-slim@{{DIGEST}}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - .gitlab/labels.json
+        - scripts/sync_labels.py
+  variables:
+    GITLAB_TOKEN: $LABEL_SYNC_TOKEN
+  script:
+    - python3 scripts/sync_labels.py --file .gitlab/labels.json --apply

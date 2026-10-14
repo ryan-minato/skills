@@ -76,6 +76,18 @@ sibling repos and drift both have a mechanical answer. The deposited taxonomy ch
 `labels.json`, `release.yml`, the issue forms, and the labeler config
 agreeing.
 
+Labels never go into tf, even when the repository's other settings do:
+label writes need only `issues: write`, while a tf apply needs an
+administrator. How the file reaches GitHub is a harness option. The default
+is CI: deliver `assets/workflow-labels-sync.yml`,
+which applies `labels.json` on default-branch pushes with the default token
+and `issues: write` as its only write permission. The alternative is
+manual: a maintainer runs `scripts/sync_labels.py --apply`. Pruning labels
+absent from the file is a separate option, off by default. Deleting a label
+strips it from every issue and pull request that carries it, so when the
+user turns pruning on, say that and add `--prune` to the workflow. Record
+both choices in `platform-settings.md`.
+
 ## Triage lifecycle
 
 `status/needs-triage` is applied on arrival (by the form's `labels:` key or

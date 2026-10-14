@@ -1,0 +1,27 @@
+# Fragment for .gitlab-ci.yml — credential-free checks of .gitlab/policy.tf:
+# format and validation against the committed provider lock. The job reads
+# no variable holding a credential, because a maintainer plans and applies
+# locally through the task-runner recipes, and review is the check on what
+# the file declares.
+# Merge the job into the project's pipeline and its stages.
+
+policy-check:
+  stage: check
+  # An image carrying `tofu` (or `terraform`, with the commands below
+  # renamed), pinned by digest; record its review date with the platform
+  # settings.
+  image: "{{TF_IMAGE}}@{{DIGEST}}"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab/policy.tf
+        - .gitlab/.terraform.lock.hcl
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - .gitlab/policy.tf
+        - .gitlab/.terraform.lock.hcl
+  script:
+    - cd .gitlab
+    - tofu fmt -check -diff policy.tf
+    - tofu init -backend=false -input=false -lockfile=readonly
+    - tofu validate

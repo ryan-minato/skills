@@ -58,6 +58,14 @@ After facts are gathered, the first user-owned frontier normally includes:
 4. Supervised versus unattended agent operation and its approval boundary.
 5. Confidentiality boundary and where sensitive reports are allowed.
 6. Whether the available runner capacity may be used for project CI.
+7. Harness options, each proposed with its default and recorded in
+   `platform-settings.md`: platform settings as tf (default yes when
+   `tofu` or `terraform` is installed; see
+   [config-as-code.md](config-as-code.md)); label sync (default CI with a
+   project access token, manual on GitLab.com Free); label pruning (default
+   off); and, when the workspace is a group's configuration repository, its
+   sync mode (default CI plans and applies; see
+   [config-repo.md](config-repo.md)).
 
 Only ask an item when project evidence cannot answer it.
 

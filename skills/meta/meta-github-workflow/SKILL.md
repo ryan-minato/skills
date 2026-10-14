@@ -6,11 +6,12 @@ description: >-
   or GitHub Enterprise. Use only when initializing a GitHub-hosted repository,
   establishing or replacing its repository-wide lifecycle scaffolding, or
   systematically auditing and repairing several connected GitHub harness
-  layers. The deliverable is a durable project operating system, not an
+  layers — including an organization's configuration repository that keeps
+  its GitHub settings as Terraform or OpenTofu code. The deliverable is a durable project operating system, not an
   isolated operational answer, a single template, or a branching strategy; a
   one-off issue, pull request, release, or failing-run question does not
-  invoke it, and neither does the GitHub Flow branching model, which belongs
-  to meta-git-branching.
+  invoke it, nor does Terraform for cloud infrastructure, nor the GitHub Flow
+  branching model, which belongs to meta-git-branching.
 license: Apache-2.0
 compatibility: >-
   Bundled tools require Python 3.9+ and the standard library. Script assets
@@ -136,6 +137,9 @@ owner, the live issue types and issue fields belong to the same
 deliverable: they decide where the type and priority axes live, and the
 two features are version-gated separately on GHES.
 
+Probe `command -v tofu terraform`; record whether the workspace holds
+organization settings as code.
+
 Snapshot the security configuration as it stands before proposing
 anything: both protection layers, the `security_and_analysis` switches,
 the code-scanning setup, Dependabot alerts, allowed merge methods, and
@@ -196,6 +200,8 @@ load only the references whose conditions now apply:
 | Issue-form syntax, PR templates, GitHub-rendered prose, or wiki | [github-markdown-and-templates.md](references/github-markdown-and-templates.md) |
 | Releases, changelogs, environments, deployments, Pages, or package/container registries | [releases-deploy-registry.md](references/releases-deploy-registry.md) |
 | The project trains, evaluates, promotes, or stores machine-learning models | [ml-experiments.md](references/ml-experiments.md) |
+| `tofu` or `terraform` is installed | [config-as-code.md](references/config-as-code.md) |
+| The workspace holds organization settings as code | [config-repo.md](references/config-repo.md) |
 | Discussions routing, CONTRIBUTING, SECURITY, SUPPORT, CODE_OF_CONDUCT, GOVERNANCE, FUNDING, or the account `.github` repository | [community-and-health-files.md](references/community-and-health-files.md) |
 
 Default to one project skill named `github-project-workflow` plus project
@@ -219,7 +225,10 @@ the `${{ github.… }}` expressions delivered workflows legitimately keep.
 Use [`scripts/sync_labels.py`](scripts/sync_labels.py) only after the
 taxonomy is approved: dry-run, review the exact plan, apply only with
 explicit authorization, then read labels back. Labels must exist before the
-first labeler, form, or release-notes run.
+first labeler, form, or release-notes run; afterwards the chosen label
+sync mode keeps them. Deliver tf only as
+[config-as-code.md](references/config-as-code.md) directs, and run no
+apply without the user's explicit approval of the shown plan.
 [`scripts/sync_org_taxonomy.py`](scripts/sync_org_taxonomy.py) follows the
 same sequence for organization issue types and fields, but its approval is
 a separate and larger one: organization settings reach every repository in
@@ -230,7 +239,9 @@ fallback access.
 This skill's `scripts/` serve the build alone; every script the target gets
 comes from a management asset. Deliver
 [`assets/sync_labels.py`](assets/sync_labels.py) as the target's
-`scripts/sync_labels.py`. Into the project skill's `scripts/`, deliver
+`scripts/sync_labels.py`, and with tf,
+[`assets/tf_plan_guard.py`](assets/tf_plan_guard.py) as its
+`scripts/tf_plan_guard.py`. Into the project skill's `scripts/`, deliver
 [`assets/run_log_digest.py`](assets/run_log_digest.py) by default (the
 project skill runs it from there),
 [`assets/next_version.py`](assets/next_version.py) only when the project

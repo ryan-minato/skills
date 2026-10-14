@@ -59,6 +59,29 @@ file and keep its human/agent meanings in reachable guidance. Run
 creates/updates/deletes, and do not prune existing labels without separate
 explicit approval.
 
+Commit the file as `.gitlab/labels.json`. Project labels never go into tf;
+group labels do, in the group's configuration repository
+([config-repo.md](config-repo.md)). Deliver `assets/sync_labels.py` as the
+target's `scripts/sync_labels.py`: it calls the REST API with the token in
+`GITLAB_TOKEN` and edits only the project's own labels. How the file
+reaches GitLab is a harness option:
+
+- **CI (the default).** Deliver `assets/gitlab-ci-labels-sync.yml`.
+  `CI_JOB_TOKEN` cannot call the labels API, so the job uses a project
+  access token with the least role that manages labels: Planner from GitLab
+  17.7, Reporter before. It is stored as a masked, protected variable of
+  that project. On GitLab.com, project access tokens need Premium or
+  Ultimate (checked 2026-10-14).
+- **Manual.** The only mode on GitLab.com Free. A maintainer runs
+  `GITLAB_TOKEN=... python3 scripts/sync_labels.py --file .gitlab/labels.json --api-url https://HOST/api/v4 --project PATH --apply`,
+  reading the token from their glab login as in
+  [config-as-code.md](config-as-code.md); record the command in knowledge.
+
+Pruning labels absent from the file is a separate option, off by default.
+Deleting a label strips it from every work item and merge request that
+carries it, so say that when the user turns pruning on, and add `--prune`.
+Record both choices in `platform-settings.md`.
+
 ## Milestones and hierarchy
 
 Use milestones for a coherent future state or long-range goal; a goal

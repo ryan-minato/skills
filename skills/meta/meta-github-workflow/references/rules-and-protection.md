@@ -89,6 +89,11 @@ Rule changes are remote writes under the SKILL.md sequence: read current
 state, draft the exact delta, confirm plan and permission preconditions,
 state the rollback, apply with approval, read back. Report tier-gated or
 permission-blocked fields plainly instead of retrying broader scopes.
+When the rules are declared as tf, the plan is the drafted delta and the
+readback: an organization ruleset belongs to the organization's
+configuration repository, and a repository ruleset belongs to
+`.github/policy.tf` only for what the organization leaves unset
+([config-as-code.md](config-as-code.md), `## Ownership`).
 
 Done when: every baseline rule is either platform-enforced and read back,
 or recorded as advisory/convention with its owner and upgrade trigger; no

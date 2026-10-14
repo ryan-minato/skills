@@ -65,6 +65,10 @@ table in `.agents/knowledge/gitlab-workflow.md`:
 - local validation command ↔ CI job;
 - CI job name ↔ merge gate;
 - directory/module ↔ CODEOWNERS and area label;
+- `.gitlab/policy.tf` declarations ↔ the `platform-settings.md` rows whose
+  "Described by" names it (when tf was chosen);
+- `.gitlab/labels.json` path ↔ the `labels-sync` job's `changes:` (when CI
+  label sync was chosen);
 - work-item template quick action ↔ label/type taxonomy;
 - every filled extension slot ↔ the paradigm contract it was filled from
   (the filling builder registers the row);

@@ -37,7 +37,10 @@ private reports). Never route security reports through the issue tracker.
 Three scanners are part of the default baseline, proposed on every build
 rather than offered as options: **secret scanning**, **push protection**
 (which rejects a push whose commits carry a recognized secret), and
-**code scanning** through CodeQL default setup.
+**code scanning** through CodeQL default setup. Where an organization's
+configuration repository sets them, its organization-level configuration is
+their owner; a repository's `policy.tf` then leaves them alone
+([config-as-code.md](config-as-code.md), `## Ownership`).
 
 They are free on **public** repositories. On private or internal ones they
 need separately purchased SKUs — GitHub Secret Protection for the first

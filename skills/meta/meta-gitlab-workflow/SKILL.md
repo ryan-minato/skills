@@ -6,9 +6,11 @@ description: >-
   self-managed GitLab instance. Use only when initializing a GitLab-hosted
   project, establishing or replacing its platform-wide lifecycle scaffolding,
   or systematically auditing and repairing several connected GitLab harness
-  layers. The deliverable is a durable project operating system, not an
-  isolated operational answer or version-control strategy; choosing a
-  branching model belongs to meta-git-branching.
+  layers — including a group's configuration repository that keeps its
+  GitLab settings as Terraform or OpenTofu code. The deliverable is a durable
+  project operating system, not an isolated operational answer or
+  version-control strategy; infrastructure code that deploys services is
+  not in scope, and choosing a branching model belongs to meta-git-branching.
 license: Apache-2.0
 compatibility: >-
   Bundled tools require Python 3.9+ (stdlib only); script assets delivered to
@@ -99,6 +101,9 @@ paradigm-neutral base and its extension slots
 ([durable-harness.md](references/durable-harness.md)); it neither
 implements a paradigm nor reshapes the base for one.
 
+Probe `command -v tofu terraform`; record whether the workspace holds group
+settings as code.
+
 Audit every existing harness artifact for its discovery path, load condition,
 source of truth, and update trigger. Classify it as keep, extend, reconnect,
 replace-with-approval, or remove-with-approval.
@@ -143,6 +148,8 @@ Load only the references whose conditions now apply:
 | Releases, changelogs, environments, deployments, review apps, or registries | [releases-deploy-registry.md](references/releases-deploy-registry.md) |
 | The project trains, evaluates, promotes, or stores machine-learning models | [mlops.md](references/mlops.md) |
 | CONTRIBUTING, SECURITY, SUPPORT, CODE_OF_CONDUCT, GOVERNANCE, or public ownership files | [community-files.md](references/community-files.md) |
+| `tofu` or `terraform` is installed | [config-as-code.md](references/config-as-code.md) |
+| The workspace holds group settings as code | [config-repo.md](references/config-repo.md) |
 
 Read [durable-harness.md](references/durable-harness.md) on every build. Default
 to one project skill named `gitlab-project-workflow` plus project knowledge
@@ -161,12 +168,19 @@ finished files. Keep public files human-first and agent files directive.
 
 Use [`scripts/sync_labels.py`](scripts/sync_labels.py) only after the taxonomy
 is approved: run its default dry-run, review the exact plan, apply only with
-explicit authorization, then read labels back. Use
+explicit authorization, then read labels back; afterwards the chosen label
+sync mode keeps them. Deliver tf only as
+[config-as-code.md](references/config-as-code.md) directs, and run no apply
+without the user's explicit approval of the shown plan. Use
 [`scripts/rest_read.py`](scripts/rest_read.py) only for minimal read-only
 fallback access.
 
 This skill's `scripts/` serve the build alone; every script the target gets
-comes from a management asset. Into the durable project skill's `scripts/`,
+comes from a management asset. Deliver
+[`assets/sync_labels.py`](assets/sync_labels.py) as the target's
+`scripts/sync_labels.py`, and with tf,
+[`assets/tf_plan_guard.py`](assets/tf_plan_guard.py) as its
+`scripts/tf_plan_guard.py`. Into the durable project skill's `scripts/`,
 deliver [`assets/pipeline_log_digest.py`](assets/pipeline_log_digest.py) when
 agents will diagnose GitLab CI (the project skill runs it from there), and
 [`assets/next_version.py`](assets/next_version.py) only when the project has
