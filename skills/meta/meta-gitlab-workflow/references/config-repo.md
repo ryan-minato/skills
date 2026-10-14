@@ -87,5 +87,8 @@ Start from `assets/gitlab-ci-config-repo.yml`:
    group inherits group variables, and their pipelines would then hold a
    credential that changes group rules.
 3. In `platform-settings.md`, record each token's name, scopes, role,
-   expiry, and rotation owner, never its value. GitLab can email owners
-   before a token expires; the owner rotates it and updates the variable.
+   expiry, and rotation owner, never its value. Before the token exists,
+   write the expiry as "at most 365 days after creation, set when created",
+   and the rotation owner as the group Owner who creates it unless the user
+   names someone else. GitLab can email owners before a token expires; the
+   owner rotates it and updates the variable.

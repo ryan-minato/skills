@@ -34,13 +34,21 @@ jobs:
           client-id: ${{ vars.{{APP_CLIENT_ID_VARIABLE}} }}
           private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
           owner: ${{ github.repository_owner }}
-      # A third-party action, adopted by explicit decision and pinned by full
-      # commit SHA. Use hashicorp/setup-terraform and `terraform` below when
-      # the organization runs Terraform.
-      - uses: opentofu/setup-opentofu@{{FULL_COMMIT_SHA}} # {{RELEASE_TAG}}
-        with:
-          tofu_version: "{{TOFU_VERSION}}"
-          tofu_wrapper: false
+      # OpenTofu from its official release, checked against the release's
+      # SHA256SUMS; no third-party action. A Terraform project downloads from
+      # releases.hashicorp.com the same way and runs `terraform` below.
+      - name: Install OpenTofu {{TOFU_VERSION}}
+        env:
+          TOFU_VERSION: "{{TOFU_VERSION}}"
+        run: |
+          base="https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}"
+          zip="tofu_${TOFU_VERSION}_linux_amd64.zip"
+          curl --proto '=https' --tlsv1.2 -fsSLO "$base/$zip"
+          curl --proto '=https' --tlsv1.2 -fsSL -o SHA256SUMS "$base/tofu_${TOFU_VERSION}_SHA256SUMS"
+          grep " ${zip}\$" SHA256SUMS | sha256sum -c -
+          unzip -q "$zip" tofu -d "$RUNNER_TEMP/tofu"
+          rm "$zip" SHA256SUMS
+          echo "$RUNNER_TEMP/tofu" >> "$GITHUB_PATH"
       - name: Plan and guard
         env:
           GITHUB_TOKEN: ${{ steps.app.outputs.token }}
@@ -66,10 +74,21 @@ jobs:
           client-id: ${{ vars.{{APP_CLIENT_ID_VARIABLE}} }}
           private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
           owner: ${{ github.repository_owner }}
-      - uses: opentofu/setup-opentofu@{{FULL_COMMIT_SHA}} # {{RELEASE_TAG}}
-        with:
-          tofu_version: "{{TOFU_VERSION}}"
-          tofu_wrapper: false
+      # OpenTofu from its official release, checked against the release's
+      # SHA256SUMS; no third-party action. A Terraform project downloads from
+      # releases.hashicorp.com the same way and runs `terraform` below.
+      - name: Install OpenTofu {{TOFU_VERSION}}
+        env:
+          TOFU_VERSION: "{{TOFU_VERSION}}"
+        run: |
+          base="https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}"
+          zip="tofu_${TOFU_VERSION}_linux_amd64.zip"
+          curl --proto '=https' --tlsv1.2 -fsSLO "$base/$zip"
+          curl --proto '=https' --tlsv1.2 -fsSL -o SHA256SUMS "$base/tofu_${TOFU_VERSION}_SHA256SUMS"
+          grep " ${zip}\$" SHA256SUMS | sha256sum -c -
+          unzip -q "$zip" tofu -d "$RUNNER_TEMP/tofu"
+          rm "$zip" SHA256SUMS
+          echo "$RUNNER_TEMP/tofu" >> "$GITHUB_PATH"
       - name: Plan, guard, and apply that plan
         env:
           GITHUB_TOKEN: ${{ steps.app.outputs.token }}

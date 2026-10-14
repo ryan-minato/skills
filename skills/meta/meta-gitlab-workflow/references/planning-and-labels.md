@@ -77,9 +77,11 @@ reaches GitLab is a harness option:
   reading the token from their glab login as in
   [config-as-code.md](config-as-code.md); record the command in knowledge.
 
-Pruning labels absent from the file is a separate option, off by default.
-Deleting a label strips it from every work item and merge request that
-carries it, so say that when the user turns pruning on, and add `--prune`.
+In CI mode the label file never ships without its job. Pruning labels
+absent from the file is a separate option, off by default. A user who asks
+to delete the labels the file does not list has chosen pruning: say once
+that deleting a label strips it from every work item and merge request
+that carries it, add `--prune`, and record the choice — do not ask again.
 Record both choices in `platform-settings.md`.
 
 ## Milestones and hierarchy

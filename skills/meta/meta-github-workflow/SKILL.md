@@ -227,8 +227,8 @@ Use [`scripts/sync_labels.py`](scripts/sync_labels.py) only after the
 taxonomy is approved: dry-run, review the exact plan, apply only with
 explicit authorization, then read labels back. Labels must exist before the
 first labeler, form, or release-notes run; afterwards the chosen label
-sync mode keeps them. Deliver tf only as
-[config-as-code.md](references/config-as-code.md) directs, and run no
+sync mode keeps them. Deliver tf only when `tofu` or `terraform` is
+installed, as [config-as-code.md](references/config-as-code.md) directs, and run no
 apply without the user's explicit approval of the shown plan.
 [`scripts/sync_org_taxonomy.py`](scripts/sync_org_taxonomy.py) follows the
 same sequence for organization issue types and fields, but its approval is

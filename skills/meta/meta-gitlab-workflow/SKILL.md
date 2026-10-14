@@ -170,8 +170,8 @@ finished files. Keep public files human-first and agent files directive.
 Use [`scripts/sync_labels.py`](scripts/sync_labels.py) only after the taxonomy
 is approved: run its default dry-run, review the exact plan, apply only with
 explicit authorization, then read labels back; afterwards the chosen label
-sync mode keeps them. Deliver tf only as
-[config-as-code.md](references/config-as-code.md) directs, and run no apply
+sync mode keeps them. Deliver tf only when `tofu` or `terraform` is
+installed, as [config-as-code.md](references/config-as-code.md) directs, and run no apply
 without the user's explicit approval of the shown plan. Use
 [`scripts/rest_read.py`](scripts/rest_read.py) only for minimal read-only
 fallback access.
