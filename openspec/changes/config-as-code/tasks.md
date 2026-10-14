@@ -70,7 +70,7 @@
 - [x] 3.12 Outcomes O8 and O9 — closes GH: Personal account or the .github repository.
 - [x] 3.13 Outcome O10 — closes GL: Tool installed; Unreadable change rejected; GitLab-managed state offered.
 - [x] 3.14 Outcome O11 — closes GL: Project pipeline for policy.tf; Group token offered to the project.
-- [ ] 3.15 Outcome O12 — closes GL: Group baseline exists.
+- [x] 3.15 Outcome O12 — closes GL: Group baseline exists.
 - [x] 3.16 Outcome O13 — closes GL: Default sync mode on a paid or self-managed instance; Group labels.
 - [x] 3.17 Outcome O14 — closes GL: GitLab.com Free; GitLab.com Free label sync.
 - [x] 3.18 Outcome O15 — closes GL: Default label sync on a self-managed instance; CI job token considered; Label file committed.
