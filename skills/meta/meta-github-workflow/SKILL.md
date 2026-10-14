@@ -202,7 +202,7 @@ load only the references whose conditions now apply:
 | Releases, changelogs, environments, deployments, Pages, or package/container registries | [releases-deploy-registry.md](references/releases-deploy-registry.md) |
 | The project trains, evaluates, promotes, or stores machine-learning models | [ml-experiments.md](references/ml-experiments.md) |
 | `tofu` or `terraform` is installed | [config-as-code.md](references/config-as-code.md) |
-| The workspace holds organization settings as code | [config-repo.md](references/config-repo.md) |
+| The workspace holds, or is to hold, organization settings as code | [config-repo.md](references/config-repo.md) |
 | Discussions routing, CONTRIBUTING, SECURITY, SUPPORT, CODE_OF_CONDUCT, GOVERNANCE, FUNDING, or the account `.github` repository | [community-and-health-files.md](references/community-and-health-files.md) |
 
 Default to one project skill named `github-project-workflow` plus project
