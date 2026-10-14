@@ -19,6 +19,7 @@ tier: {{ENFORCED_ADVISORY_OR_CONVENTION}}.
 | Actions availability & token policy | {{ENABLED_ALLOWED_ACTIONS_DEFAULT_PERMS}} | enforced | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/actions/permissions` | org policy change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | CODEOWNERS enforcement | {{REQUIRE_CODEOWNER_REVIEW_ON_OR_OFF}} | {{TIER}} | {{OWNER}} | ruleset settings | ownership change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Environments & reviewers | {{ENVIRONMENTS_AND_APPROVERS}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/environments` | deploy-authority change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
+| Configuration repository collaborators (configuration repository only) | organization owners only — a pull request runs its own code under the read-only plan token | enforced | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/collaborators` | membership change | none |
 | Secrets & variables (names only) | {{NAMES_AND_OWNERS}} | enforced | {{OWNER}} | `gh secret list` | rotation | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Secret scanning | {{ENABLED_OR_DOWNGRADED_WITH_SKU}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}} --jq .security_and_analysis` | plan or visibility change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Push protection | {{ENABLED_OR_DOWNGRADED_WITH_SKU}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}} --jq .security_and_analysis` | plan or visibility change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |

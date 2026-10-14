@@ -54,7 +54,13 @@ substitute: it carries a person's whole authority.
 Start from `assets/gitlab-ci-config-repo.yml`:
 
 - **Plan on merge request pipelines.** A fork's merge request pipeline runs
-  in the fork and gets none of this project's variables.
+  in the fork and gets none of this project's variables, as long as the
+  project setting "Run pipelines in the parent project for merge requests
+  from forks" stays off; never enable it here. A merge request from a
+  branch of this project runs its own CI under the plan token, so everyone
+  who can push a branch here can read what that token reads: keep the
+  project's members to the group's Owners, and say so in
+  `platform-settings.md`.
 - **Apply only on the protected default branch**, as a manual job. Only
   users allowed to merge to that branch can run a manual job. On Premium or
   Ultimate, a protected environment narrows the job to its allowed
@@ -81,7 +87,8 @@ Start from `assets/gitlab-ci-config-repo.yml`:
    names them:
    - the apply token as masked and protected;
    - the plan token as masked and not protected, so merge request pipelines
-     can read it.
+     can read it; it is read-only, and the members rule above bounds who
+     can run code under it.
 
    **Never store either one as a group variable.** Every project in the
    group inherits group variables, and their pipelines would then hold a
