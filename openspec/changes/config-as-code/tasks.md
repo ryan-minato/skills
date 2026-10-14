@@ -59,24 +59,24 @@
 - [x] 3.1 Plan-guard harness, run on both copies: help; a no-op and imported-update plan; `["delete","create"]`, `["create","delete"]`, and `["delete"]`; the plan after a declaration is removed; an undeclared-attribute update that is listed; a create without `importing` that is listed; malformed JSON; a repeated run; `--bogus` — closes GH and GL: Replace in the plan; Declaration removed (guard part).
 - [x] 3.2 GitLab `sync_labels.py` harness against a stub labels API: a dry run; `--apply` without pruning; `--prune` only when given; a repeated all-skip run; an object where a list is expected; help and `--bogus` — closes GL: Label file committed (script part).
 - [x] 3.3 Asset hygiene: every new workflow and CI asset parses as YAML; `grep -rn '{{[A-Z]'` finds placeholders only inside string literals in `.tf` assets and where the references list them; `just tf-validate` passes.
-- [ ] 3.4 Trigger cases T1–T8 — closes GH and GL Trigger: description.
-- [ ] 3.5 Outcome O1 — closes GH: Tool installed; Unreadable change rejected; Setting nobody needs; tf delivered.
-- [ ] 3.6 Outcome O2 — closes GH: Tool absent.
-- [ ] 3.7 Outcome O3 — closes GH: Project CI for policy.tf; Asked to apply from project CI.
+- [x] 3.4 Trigger cases T1–T8 — closes GH and GL Trigger: description.
+- [x] 3.5 Outcome O1 — closes GH: Tool installed; Unreadable change rejected; Setting nobody needs; tf delivered.
+- [x] 3.6 Outcome O2 — closes GH: Tool absent.
+- [x] 3.7 Outcome O3 — closes GH: Project CI for policy.tf; Asked to apply from project CI.
 - [ ] 3.8 Outcome O4 — closes GH: Organization baseline exists; Security switch settable only per repository.
-- [ ] 3.9 Outcome O5 — closes GH: Authoritative resource requested; Default label sync; Pruning chosen.
-- [ ] 3.10 Outcome O6 — closes GH: Default sync mode chosen; Credential storage requested at organization level.
-- [ ] 3.11 Outcome O7 — closes GH: Fully local sync mode chosen.
-- [ ] 3.12 Outcomes O8 and O9 — closes GH: Personal account or the .github repository.
-- [ ] 3.13 Outcome O10 — closes GL: Tool installed; Unreadable change rejected; GitLab-managed state offered.
-- [ ] 3.14 Outcome O11 — closes GL: Project pipeline for policy.tf; Group token offered to the project.
+- [x] 3.9 Outcome O5 — closes GH: Authoritative resource requested; Default label sync; Pruning chosen.
+- [x] 3.10 Outcome O6 — closes GH: Default sync mode chosen; Credential storage requested at organization level.
+- [x] 3.11 Outcome O7 — closes GH: Fully local sync mode chosen.
+- [x] 3.12 Outcomes O8 and O9 — closes GH: Personal account or the .github repository.
+- [x] 3.13 Outcome O10 — closes GL: Tool installed; Unreadable change rejected; GitLab-managed state offered.
+- [x] 3.14 Outcome O11 — closes GL: Project pipeline for policy.tf; Group token offered to the project.
 - [ ] 3.15 Outcome O12 — closes GL: Group baseline exists.
-- [ ] 3.16 Outcome O13 — closes GL: Default sync mode on a paid or self-managed instance; Group labels.
-- [ ] 3.17 Outcome O14 — closes GL: GitLab.com Free; GitLab.com Free label sync.
-- [ ] 3.18 Outcome O15 — closes GL: Default label sync on a self-managed instance; CI job token considered; Label file committed.
+- [x] 3.16 Outcome O13 — closes GL: Default sync mode on a paid or self-managed instance; Group labels.
+- [x] 3.17 Outcome O14 — closes GL: GitLab.com Free; GitLab.com Free label sync.
+- [x] 3.18 Outcome O15 — closes GL: Default label sync on a self-managed instance; CI job token considered; Label file committed.
 - [ ] 3.19 Outcome O16 — closes GH: Recipes for a justfile project; Provider fallback considered; Login lacks the organization scope.
 - [ ] 3.20 Outcome O17 — closes GL: Recipes for a Makefile project; Make expansion would print the token.
-- [ ] 3.21 Readback cases — closes GL: Personal namespace; GL: Tool absent; GH and GL MODIFIED: Durable project skill with CI diagnosis; SemVer not chosen.
+- [x] 3.21 Readback cases — closes GL: Personal namespace; GL: Tool absent; GH and GL MODIFIED: Durable project skill with CI diagnosis; SemVer not chosen.
 - [ ] 3.22 Record the skipped cases (live plan and apply; live workflow and pipeline runs) and their reasons for the Validation section.
 
 ## 4. Finish
