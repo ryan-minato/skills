@@ -63,7 +63,7 @@
 - [x] 3.5 Outcome O1 — closes GH: Tool installed; Unreadable change rejected; Setting nobody needs; tf delivered.
 - [x] 3.6 Outcome O2 — closes GH: Tool absent.
 - [x] 3.7 Outcome O3 — closes GH: Project CI for policy.tf; Asked to apply from project CI.
-- [ ] 3.8 Outcome O4 — closes GH: Organization baseline exists; Security switch settable only per repository.
+- [x] 3.8 Outcome O4 — closes GH: Organization baseline exists; Security switch settable only per repository.
 - [x] 3.9 Outcome O5 — closes GH: Authoritative resource requested; Default label sync; Pruning chosen.
 - [x] 3.10 Outcome O6 — closes GH: Default sync mode chosen; Credential storage requested at organization level.
 - [x] 3.11 Outcome O7 — closes GH: Fully local sync mode chosen.
@@ -74,8 +74,8 @@
 - [x] 3.16 Outcome O13 — closes GL: Default sync mode on a paid or self-managed instance; Group labels.
 - [x] 3.17 Outcome O14 — closes GL: GitLab.com Free; GitLab.com Free label sync.
 - [x] 3.18 Outcome O15 — closes GL: Default label sync on a self-managed instance; CI job token considered; Label file committed.
-- [ ] 3.19 Outcome O16 — closes GH: Recipes for a justfile project; Provider fallback considered; Login lacks the organization scope.
-- [ ] 3.20 Outcome O17 — closes GL: Recipes for a Makefile project; Make expansion would print the token.
+- [x] 3.19 Outcome O16 — closes GH: Recipes for a justfile project; Provider fallback considered; Login lacks the organization scope.
+- [x] 3.20 Outcome O17 — closes GL: Recipes for a Makefile project; Make expansion would print the token.
 - [x] 3.21 Readback cases — closes GL: Personal namespace; GL: Tool absent; GH and GL MODIFIED: Durable project skill with CI diagnosis; SemVer not chosen.
 - [ ] 3.22 Record the skipped cases (live plan and apply; live workflow and pipeline runs) and their reasons for the Validation section.
 
