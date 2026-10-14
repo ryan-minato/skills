@@ -50,7 +50,10 @@ each in `platform-settings.md` with: intended setting, enforcement tier
 UI path, last-verified evidence, and the update trigger. Secrets and
 variables are recorded by name, never by value. Where the tier is
 advisory-only, pre-compute the upgrade trigger ("if this becomes public or
-the plan upgrades, enable the ruleset with these exact job names").
+the plan upgrades, enable the ruleset with these exact job names"). When
+tf was chosen, the row's "Described by" names `.github/policy.tf` or the
+organization's configuration repository, and a plan through the local
+recipes is its verification ([config-as-code.md](config-as-code.md)).
 
 ## Synchronization ownership
 
@@ -80,6 +83,10 @@ committed config):
   its slot text, or the reverse, leaves the harness saying two things);
 - ruleset ↔ legacy branch protection (record both layers or drift is
   invisible);
+- `.github/policy.tf` declarations ↔ the `platform-settings.md` rows whose
+  "Described by" names it (when tf was chosen);
+- `labels.json` path ↔ the `labels / sync` workflow's paths filter (when
+  CI label sync was chosen);
 - release tag and changelog ↔ package or deployment automation;
 - public contribution and security statements ↔ the internal workflow.
 

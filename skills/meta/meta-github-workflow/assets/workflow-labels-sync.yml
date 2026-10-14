@@ -1,0 +1,36 @@
+# .github/workflows/labels-sync.yml — applies the committed label file to the
+# repository after it changes on the default branch, with the default token
+# and `issues: write` as its only write permission. It creates missing labels
+# and corrects drifted colors and descriptions; it never deletes a label
+# unless the project chose pruning, which adds --prune below and is recorded
+# in platform-settings.md. Deleting a label strips it from every issue and
+# pull request that carries it.
+name: labels-sync
+
+on:
+  push:
+    branches: ["{{DEFAULT_BRANCH}}"]
+    paths:
+      - ".github/labels.json"
+      - "scripts/sync_labels.py"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: labels / sync
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply the label file
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/sync_labels.py --file .github/labels.json --repo "${{ github.repository }}" --apply

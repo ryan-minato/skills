@@ -58,6 +58,13 @@ After facts are gathered, the first user-owned frontier normally includes:
    identity, and who approves environment deploys.
 8. Billed minutes — ask only when the repository is private.
 9. Runner substrate — ask only for GHES or when self-hosted runners exist.
+10. Harness options, each proposed with its default and recorded in
+    `platform-settings.md`: platform settings as tf (default yes when
+    `tofu` or `terraform` is installed; see
+    [config-as-code.md](config-as-code.md)); label sync (default CI with
+    `issues: write`, or manual); label pruning (default off); and, when the
+    workspace is an organization's configuration repository, its sync mode
+    (default CI plans and applies; see [config-repo.md](config-repo.md)).
 
 Resolve organization-versus-personal ownership before any taxonomy
 question: issue types and issue fields exist only in organizations, and

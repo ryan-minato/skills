@@ -1,0 +1,50 @@
+# .github/workflows/policy-check.yml — credential-free checks of
+# .github/policy.tf: format and validation against the committed provider
+# lock. No secret and no write permission: an administrator plans and applies
+# locally through the task-runner recipes, and review is the check on what the
+# file declares. Runs only when the tf files change; when this job is a
+# required check, the paths filter and the aggregator gate must agree, or a
+# skipped run reads as a vacuous pass.
+name: policy-check
+
+on:
+  pull_request:
+    paths:
+      - ".github/policy.tf"
+      - ".github/.terraform.lock.hcl"
+  push:
+    branches: ["{{DEFAULT_BRANCH}}"]
+    paths:
+      - ".github/policy.tf"
+      - ".github/.terraform.lock.hcl"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  policy:
+    name: policy / check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .github
+    steps:
+      - uses: actions/checkout@v4
+      # A third-party action, adopted by explicit decision and pinned by full
+      # commit SHA; its review date and update owner are recorded with the
+      # platform settings. Use hashicorp/setup-terraform (terraform_version)
+      # instead when the project runs Terraform, and `terraform` below.
+      - uses: opentofu/setup-opentofu@{{FULL_COMMIT_SHA}} # {{RELEASE_TAG}}
+        with:
+          tofu_version: "{{TOFU_VERSION}}"
+          tofu_wrapper: false
+      - name: Format
+        run: tofu fmt -check -diff policy.tf
+      - name: Validate against the committed lock
+        run: |
+          tofu init -backend=false -input=false -lockfile=readonly
+          tofu validate

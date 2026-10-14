@@ -1,0 +1,81 @@
+# .github/workflows/config.yml — the organization configuration repository's
+# sync, for the "CI plans and applies" mode (delete the apply job for the
+# "CI plans, an administrator applies" mode; deliver no workflow holding the
+# App key for the fully local mode). The credential is a GitHub App
+# installation token minted per run from a key stored on this repository or
+# its environment only — never an organization secret, which other
+# repositories' workflows could reach. Fork pull requests get no secrets
+# under `pull_request`, so their plan job fails at the token step by design.
+name: config
+
+on:
+  pull_request:
+  push:
+    branches: ["{{DEFAULT_BRANCH}}"]
+
+permissions:
+  contents: read
+
+# One run at a time, never cancelled: an apply must not race another apply.
+concurrency:
+  group: config-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    name: config / plan
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: app
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.{{APP_CLIENT_ID_VARIABLE}} }}
+          private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
+          owner: ${{ github.repository_owner }}
+      # A third-party action, adopted by explicit decision and pinned by full
+      # commit SHA. Use hashicorp/setup-terraform and `terraform` below when
+      # the organization runs Terraform.
+      - uses: opentofu/setup-opentofu@{{FULL_COMMIT_SHA}} # {{RELEASE_TAG}}
+        with:
+          tofu_version: "{{TOFU_VERSION}}"
+          tofu_wrapper: false
+      - name: Plan and guard
+        env:
+          GITHUB_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          tofu fmt -check -diff
+          tofu init -backend=false -input=false -lockfile=readonly
+          tofu plan -input=false -out=plan.out
+          tofu show -json plan.out > plan.json
+          python3 scripts/tf_plan_guard.py plan.json
+
+  apply:
+    name: config / apply
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    # Required reviewers on this environment are the human approval of every
+    # apply; the job waits for them before any step runs.
+    environment: "{{APPLY_ENVIRONMENT}}"
+    steps:
+      - uses: actions/checkout@v4
+      - id: app
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.{{APP_CLIENT_ID_VARIABLE}} }}
+          private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
+          owner: ${{ github.repository_owner }}
+      - uses: opentofu/setup-opentofu@{{FULL_COMMIT_SHA}} # {{RELEASE_TAG}}
+        with:
+          tofu_version: "{{TOFU_VERSION}}"
+          tofu_wrapper: false
+      - name: Plan, guard, and apply that plan
+        env:
+          GITHUB_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          tofu init -backend=false -input=false -lockfile=readonly
+          tofu plan -input=false -out=plan.out
+          tofu show -json plan.out > plan.json
+          python3 scripts/tf_plan_guard.py plan.json
+          tofu apply -input=false plan.out

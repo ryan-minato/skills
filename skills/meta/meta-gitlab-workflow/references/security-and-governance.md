@@ -39,7 +39,10 @@ schedule, auto-merge limits, and broken-update ownership.
 
 Use least-privilege project/group access tokens or job-token capabilities,
 protected and masked variables, environment scopes, and protected runners.
-Record who rotates each credential and how jobs avoid printing it. Do not put
+Record who rotates each credential and how jobs avoid printing it. A token
+that can change group rules lives only in the group's configuration
+repository, never in a group-level variable that every project inherits
+([config-as-code.md](config-as-code.md), `## Who applies`). Do not put
 secret values, private addresses, personal data, or internal incident detail in
 committed harness files, issues, MRs, comments, artifacts, caches, or logs.
 
@@ -48,7 +51,11 @@ committed harness files, issues, MRs, comments, artifacts, caches, or logs.
 For every remote setting, capture current state, exact proposed delta, tier and
 permission preconditions, rollback, and readback command. Review and approve the
 batch before applying. Store the intended setting—not a token—in reachable
-project knowledge, including its owner and drift-check trigger.
+project knowledge, including its owner and drift-check trigger. When the
+settings are declared as tf, the plan is the drafted delta and the
+readback, and each setting has one owner: the group's configuration
+repository or the project's `policy.tf` ([config-as-code.md](config-as-code.md),
+`## Ownership`).
 
 Unattended agents receive only explicitly delegated operations with isolation,
 validation, audit, stop, and rollback paths. Repository protection changes,

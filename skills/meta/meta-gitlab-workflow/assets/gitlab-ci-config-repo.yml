@@ -1,0 +1,69 @@
+# .gitlab-ci.yml for a group configuration repository, in the "CI plans and
+# applies" mode (drop the apply job for "CI plans, a maintainer applies";
+# deliver only format and validation for the fully local mode). No backend:
+# every run imports the group's current settings and the plan guard blocks
+# any delete or replace.
+#
+# Credentials, stored as CI/CD variables of THIS project only — never as group
+# variables, which every project in the group inherits:
+# - PLAN_TOKEN: a group access token with `read_api` and the
+#   least role that can read the declared settings; masked, not protected, so
+#   merge request pipelines can plan. Fork merge requests do not receive it.
+# - APPLY_TOKEN: a group access token with `api` and the role the
+#   declared settings need; masked and protected, so only the protected
+#   default branch sees it. Expires within 365 days; its rotation owner is
+#   recorded in platform-settings.md.
+
+stages:
+  - plan
+  - apply
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+.tf:
+  # An image carrying `tofu` (or `terraform`, with the commands renamed) and
+  # python3 for the plan guard, pinned by digest.
+  image: "{{TF_IMAGE}}@{{DIGEST}}"
+  variables:
+    GITLAB_BASE_URL: "${CI_API_V4_URL}/"
+  before_script:
+    - tofu init -backend=false -input=false -lockfile=readonly
+
+plan:
+  extends: .tf
+  stage: plan
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  variables:
+    GITLAB_TOKEN: $PLAN_TOKEN
+  script:
+    - tofu fmt -check -diff
+    - tofu plan -input=false -out=plan.out
+    - tofu show -json plan.out > plan.json
+    - python3 scripts/tf_plan_guard.py plan.json
+
+apply:
+  extends: .tf
+  stage: apply
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+  # The manual job is the human approval of every apply: only users allowed
+  # to merge to the default branch can run it, and on Premium or Ultimate a
+  # protected environment narrows that to its allowed deployers and approval
+  # rules. resource_group serializes applies.
+  environment:
+    name: "{{APPLY_ENVIRONMENT}}"
+  resource_group: config-apply
+  variables:
+    GITLAB_TOKEN: $APPLY_TOKEN
+  script:
+    - tofu plan -input=false -out=plan.out
+    - tofu show -json plan.out > plan.json
+    - python3 scripts/tf_plan_guard.py plan.json
+    - tofu apply -input=false plan.out
