@@ -8,7 +8,11 @@
 # variables, which every project in the group inherits:
 # - PLAN_TOKEN: a group access token with `read_api` and the
 #   least role that can read the declared settings; masked, not protected, so
-#   merge request pipelines can plan. Fork merge requests do not receive it.
+#   merge request pipelines can plan. Everyone who can push a branch to this
+#   project runs their own CI under it, so this project's members are the
+#   group's Owners and nobody else. Fork merge requests do not receive it
+#   while "Run pipelines in the parent project for merge requests from forks"
+#   stays off; never enable that setting here.
 # - APPLY_TOKEN: a group access token with `api` and the role the
 #   declared settings need; masked and protected, so only the protected
 #   default branch sees it. Expires within 365 days; its rotation owner is

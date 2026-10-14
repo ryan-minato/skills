@@ -17,9 +17,9 @@ terraform {
   }
 }
 
-# Credentials come from the environment only: GITHUB_APP_ID,
-# GITHUB_APP_INSTALLATION_ID, and GITHUB_APP_PEM_FILE in CI, or GITHUB_TOKEN
-# from `gh auth token` in the local recipes. Never write them here.
+# Credentials come from the environment only, as GITHUB_TOKEN: in CI the
+# workflow mints a GitHub App installation token per run; the local recipes
+# pass `gh auth token`. Never write them here.
 provider "github" {
   owner = "example-org" # {{ORG}}
 }

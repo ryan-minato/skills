@@ -10,6 +10,7 @@ Last verified: <timestamp and evidence>
 | Required pipeline jobs | <job names or none> | <platform/convention> | <owner> | <readback> | <trigger> | <.gitlab/policy.tf, the group's configuration repository, or none> |
 | Runners | <eligible runners or none> | <platform> | <owner> | <readback> | <trigger> | <.gitlab/policy.tf, the group's configuration repository, or none> |
 | Environments and deployment approvals | <value or none> | <platform/convention> | <owner> | <readback> | <trigger> | <.gitlab/policy.tf, the group's configuration repository, or none> |
+| Configuration project members (configuration project only) | group Owners only — a merge request runs its own CI under the read-only plan token; "Run pipelines in the parent project for merge requests from forks" off | platform | <owner> | `glab api projects/<id>/members/all` | membership change | none |
 | Scanners and security policies | <value or none> | <platform/convention> | <owner> | <readback> | <trigger> | <.gitlab/policy.tf, the group's configuration repository, or none> |
 
 "Described by" names the file that declares the row. A row a tf file

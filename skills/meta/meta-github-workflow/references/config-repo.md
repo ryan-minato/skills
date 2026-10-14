@@ -83,12 +83,21 @@ CI.
    reference.
 2. Install it on the organization, with repository access limited to the
    configuration repository.
-3. Generate a private key and store it as a secret of the configuration
-   repository or of its environment, and store the App's client ID as a
-   variable there. **Never store the key as an organization secret**: an
-   organization secret can be shared with other repositories, whose
-   workflows would then hold a credential that changes organization rules.
-4. Record the App, its permissions, the secret's name (never its value),
+3. Generate a private key and store it as a **repository** secret of the
+   configuration repository, and store the App's client ID as a repository
+   variable. An environment secret would not reach the plan job, which runs
+   on pull requests outside any environment. **Never store the key as an
+   organization secret**: an organization secret can be shared with other
+   repositories, whose workflows would then hold a credential that changes
+   organization rules.
+4. The plan job mints its token read-only through the action's
+   `permission-<name>: read` inputs, one per permission the declared
+   resources need, and the apply job mints the same at write. A pull
+   request runs its own workflow and tf under the plan token, so everyone
+   who can push to the configuration repository can read what that token
+   reads: keep its collaborators to the organization's owners, and say so
+   in `platform-settings.md`.
+5. Record the App, its permissions, the secret's name (never its value),
    and the key-rotation owner in `platform-settings.md`.
 
 A fine-grained personal access token is the fallback only when an App is
