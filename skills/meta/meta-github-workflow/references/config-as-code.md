@@ -106,6 +106,7 @@ once with `gh auth login`, and nothing new is stored.
 ```just
 # Plan .github/policy.tf with the gh login; the guard lists what would change
 policy-plan:
+    cd .github && tofu init -input=false
     t="$(gh auth token)" && cd .github && GITHUB_TOKEN="$t" tofu plan -input=false -out=plan.out
     cd .github && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
 
@@ -117,6 +118,7 @@ policy-apply:
 
 ```make
 policy-plan:
+	cd .github && tofu init -input=false
 	@t="$$(gh auth token)" && cd .github && GITHUB_TOKEN="$$t" tofu plan -input=false -out=plan.out
 	cd .github && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
 
@@ -133,6 +135,8 @@ policy-apply:
   `make` echo a recipe line before running it, and only shell substitution
   keeps the value out of that echo. Make's `$(shell gh auth token)` expands before the echo and
   prints the token. Never write the token to a file, `.env` included.
+- `tofu init` writes the provider lock file on the first run; commit it,
+  since CI initializes with `-lockfile=readonly`. Ignore `.terraform/`.
 - Ignore `plan.out` and `plan.json` in `.gitignore`: a saved plan can hold
   values the reviewer never meant to publish.
 - Repository settings need repository admin. The organization's
