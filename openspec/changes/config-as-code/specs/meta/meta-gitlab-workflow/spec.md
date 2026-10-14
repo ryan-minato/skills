@@ -61,11 +61,11 @@ The builder SHALL have `policy.tf` planned and applied by a project maintainer o
 - **THEN** the builder declines, saying that group variables are inherited by every project in the group, and offers the local apply or the configuration repository instead
 
 ### Requirement: Behavior: Local plan and apply reuse the glab login through the task runner
-Where a maintainer plans or applies locally, the builder SHALL add recipes to the target's existing task runner (such as a `justfile` or `Makefile`) that pass glab's stored OAuth or personal login for the instance to the tf command line as `GITLAB_TOKEN`, with `GITLAB_BASE_URL` set for a self-managed instance, read inside the recipe's shell at each run so a refreshed OAuth token is used; the apply recipe SHALL plan to a file, run the plan guard on it, and apply only that file; and no recipe SHALL write the token to a file or print it.
+Where a maintainer plans or applies locally, the builder SHALL add recipes to the target's existing task runner (such as a `justfile` or `Makefile`) that pass glab's stored OAuth or personal login for the instance to the tf command line as `GITLAB_TOKEN`, with `GITLAB_BASE_URL` set for a self-managed instance, read inside the recipe's shell at each run so a refreshed OAuth token is used; the plan recipe SHALL save the plan to a file and run the plan guard on it, removing a plan the guard rejects, and the apply recipe SHALL apply only that saved file; and no recipe SHALL write the token to a file or print it.
 
 #### Scenario: Recipes for a Makefile project
 - **WHEN** the target uses a `Makefile`, `policy.tf` is delivered, and the maintainer is logged in with `glab auth login` using OAuth
-- **THEN** the delivered targets read the token from glab within the recipe's shell command at each run, set `GITLAB_TOKEN` (and `GITLAB_BASE_URL` on a self-managed instance) for the tf command only, run plan with `-out`, the guard, and apply of that plan file in order, and no token value appears in the Makefile, its echoed command, or any file
+- **THEN** the delivered targets read the token from glab within the recipe's shell command at each run, set `GITLAB_TOKEN` (and `GITLAB_BASE_URL` on a self-managed instance) for the tf command only, the plan target runs plan with `-out` and the guard, the apply target applies only that plan file, and no token value appears in the Makefile, its echoed command, or any file
 
 #### Scenario: Make expansion would print the token
 - **WHEN** the agent drafts the token read as a Make-level `$(shell …)` expansion
