@@ -142,6 +142,7 @@ glab-token:
 
 # Plan .gitlab/policy.tf with the glab login; the guard lists what would change
 policy-plan:
+    cd .gitlab && tofu init -input=false
     t="$(just glab-token)" && cd .gitlab && GITLAB_TOKEN="$t" GITLAB_BASE_URL="https://{{gitlab_host}}/api/v4/" tofu plan -input=false -out=plan.out
     cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
 
@@ -163,6 +164,7 @@ GLAB_TOKEN_READ = t="$$(glab config get token --host $(GITLAB_HOST))"; \
 BASE_URL = https://$(GITLAB_HOST)/api/v4/
 
 policy-plan:
+	cd .gitlab && tofu init -input=false
 	@$(GLAB_TOKEN_READ); cd .gitlab && GITLAB_TOKEN="$$t" GITLAB_BASE_URL="$(BASE_URL)" tofu plan -input=false -out=plan.out
 	cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
 
@@ -175,6 +177,8 @@ policy-apply:
   echoing the recipe line, which prints the token.
 - Never write the token to a file, `.env` included, and never echo the
   status output, which contains it.
+- `tofu init` writes the provider lock file on the first run; commit it,
+  since CI initializes with `-lockfile=readonly`. Ignore `.terraform/`.
 - Ignore `plan.out` and `plan.json` in `.gitignore`.
 - On a self-managed instance, `GITLAB_BASE_URL` is required and ends with
   a slash.
