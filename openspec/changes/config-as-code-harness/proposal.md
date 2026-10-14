@@ -4,7 +4,7 @@ The `config-as-code` change adds `.tf` starting-shape assets to `meta-github-wor
 
 ## What Changes
 
-- **OpenTofu pin.** The `justfile` gains an `opentofu_version` variable as the single source of the pin. `just install-tools` installs that version as a standalone binary from the official OpenTofu release, with its checksum verified, so the dev container and CI get the same binary through the same recipe.
+- **OpenTofu pin.** The `justfile` gains an `opentofu_version` variable as the single source of the pin. `just install-tools` installs that version as a standalone binary from the official OpenTofu release into the repository's ignored `.tools/bin`, with its checksum verified. The dev container and CI get the same binary through the same recipe, and recipes call it by that path, so no `PATH` change is needed.
 - **New recipe `tf-validate`.** For every `skills/*/*/assets/**/*.tf` file, it runs `tofu fmt -check`. Then, in a scratch copy, it runs `tofu init -backend=false` followed by `tofu validate`. Nothing is written into the skill directories. A failure names the asset.
 - **`just check` runs `tf-validate`**, so `checks / quality` runs it with no workflow change beyond what `just install-tools` already does.
 - **`scripts/validate_harness.py`** rejects an OpenTofu version hard-coded in `checks.yml` or `devcontainer.json`, matching the existing OpenSpec rule, so the `justfile` pin stays the only copy.
@@ -24,8 +24,8 @@ Agents working in this repository can run `just tf-validate`, or `just check`, t
 
 ## Impact
 
-- `justfile`, `scripts/validate_harness.py`, `AGENTS.md`, `ARCHITECTURE.md`, `.agents/knowledge/github-checks.md`, `.agents/knowledge/harness-maintenance.md`.
-- `.github/workflows/checks.yml` changes only if the installed binary's directory has to be added to `PATH`.
+- `justfile`, `.gitignore` (`.tools/`), `scripts/validate_harness.py`, `AGENTS.md`, `ARCHITECTURE.md`, `.agents/knowledge/github-checks.md`, `.agents/knowledge/harness-maintenance.md`.
+- `.github/workflows/checks.yml` is not changed: the recipes call the binary by its path.
 - `.devcontainer/devcontainer.json` is not changed, because `just setup` already runs `install-tools`.
 
 ## Non-goals
