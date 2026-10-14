@@ -161,6 +161,14 @@ Each rubric item scores 1. Critical items are marked (C), and any critical failu
 - O5: "The design is approved and we're in step 4 of the harness build. Manage all our labels in Terraform too, and delete any label that isn't in the list."
 - O13: "Set this up as our group config repo with the default sync, including our group labels. Treat every other choice as approved with its default."
 
+**Continuation runs** (2026-10-14, confirmed by the maintainer in conversation). With those prompts, O4, the first half of O16, and O17 still loaded no builder in a fresh session, and all three ran out of attempts. In real use these requests come in a session where the builder is already loaded during step 4. Each of those three cases now runs as a continuation, with up to three attempts per case:
+1. The solver first gets the full step-4 prompt for its fixture. GitHub fixtures use O1's prompt. `gl-project-tf` uses "The design is approved. Build step 4 for project settings and deliver what we need. Local files only, no remote writes."
+2. An attempt is valid only when that first turn loads the target.
+3. The harness commits the result in the fixture.
+4. The case's own prompt is then sent to the same solver, without the step-4 lead-in.
+
+The grader scores the final state against the row's rubric, and judges "alone" and "nothing redeclared" on the second turn's diff. The O12 rerun also changed its fixture's knowledge from a Free license to Premium, because the group approval settings that knowledge records need Premium.
+
 **Readback cases.** A clean-context subagent reads the finished skill files. For each scenario not exercised above, it quotes the passage that produces the scenario's THEN and says whether that passage is present, precise, and unconditional. A missing passage is a critical failure.
 - GL: Personal namespace.
 - GL: Tool absent, whose passage mirrors the GitHub case O2 exercises.
