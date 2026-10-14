@@ -150,7 +150,7 @@ Load only the references whose conditions now apply:
 | The project trains, evaluates, promotes, or stores machine-learning models | [mlops.md](references/mlops.md) |
 | CONTRIBUTING, SECURITY, SUPPORT, CODE_OF_CONDUCT, GOVERNANCE, or public ownership files | [community-files.md](references/community-files.md) |
 | `tofu` or `terraform` is installed | [config-as-code.md](references/config-as-code.md) |
-| The workspace holds group settings as code | [config-repo.md](references/config-repo.md) |
+| The workspace holds, or is to hold, group settings as code | [config-repo.md](references/config-repo.md) |
 
 Read [durable-harness.md](references/durable-harness.md) on every build. Default
 to one project skill named `gitlab-project-workflow` plus project knowledge
