@@ -47,8 +47,12 @@ def read_plan(source: str) -> dict:
         plan = json.loads(text)
     except json.JSONDecodeError as exc:
         fail(f"{label} is not JSON ({exc.msg} at line {exc.lineno}); pass the output of `show -json` on a saved plan")
-    if not isinstance(plan, dict) or not isinstance(plan.get("resource_changes", []), list):
-        fail(f"{label} is not a plan JSON: expected an object with a resource_changes list")
+    if (
+        not isinstance(plan, dict)
+        or "format_version" not in plan
+        or not isinstance(plan.get("resource_changes", []), list)
+    ):
+        fail(f"{label} is not a plan JSON: expected an object with format_version and a resource_changes list")
     for rc in plan.get("resource_changes", []):
         change = rc.get("change") if isinstance(rc, dict) else None
         if (

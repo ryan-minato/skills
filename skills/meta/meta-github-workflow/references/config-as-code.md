@@ -113,6 +113,7 @@ policy-plan:
 # Apply exactly the plan the user reviewed from policy-plan
 policy-apply:
     test -f .github/plan.out || { echo "policy-apply: run just policy-plan and review it first" >&2; exit 1; }
+    cd .github && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
     t="$(gh auth token)" && cd .github && GITHUB_TOKEN="$t" tofu apply -input=false plan.out
     cd .github && rm -f plan.out terraform.tfstate terraform.tfstate.backup
 ```
@@ -125,6 +126,7 @@ policy-plan:
 
 policy-apply:
 	test -f .github/plan.out || { echo "policy-apply: run make policy-plan and review it first" >&2; exit 1; }
+	cd .github && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
 	@t="$$(gh auth token)" && cd .github && GITHUB_TOKEN="$$t" tofu apply -input=false plan.out
 	cd .github && rm -f plan.out terraform.tfstate terraform.tfstate.backup
 ```
@@ -140,8 +142,8 @@ policy-apply:
 - `tofu init` writes the provider lock file on the first run; commit it,
   since CI initializes with `-lockfile=readonly`. Ignore `.terraform/`.
 - `policy-plan` first removes any earlier plan, and it removes a plan the
-  guard rejects, so `policy-apply` only ever finds a plan that passed the
-  guard.
+  guard rejects. `policy-apply` runs the guard again on the exact file it
+  applies, so a plan written outside the recipe gets the same check.
 - Even with no backend, `tofu apply` writes a local `terraform.tfstate`
   (and a `.backup`), and the next plan reads it. A declaration removed
   after that would plan a destroy (checked with OpenTofu 1.13.0 on
