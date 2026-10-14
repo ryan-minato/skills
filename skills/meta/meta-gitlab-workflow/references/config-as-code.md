@@ -14,7 +14,8 @@ installed, offer `.gitlab/policy.tf` and record the choice. One file serves
 both tools; the commands below say `tofu`, and a Terraform project runs
 `terraform` instead.
 
-`platform-settings.md` stays either way. Its "Described by" column names
+`platform-settings.md` stays either way: rework `assets/platform-settings.md`
+into the target's knowledge on every build, tf or not. Its "Described by" column names
 the rows a tf file declares, and the rows no provider covers keep their
 readback as the only check. Resolve resources, their arguments, and their
 import ID formats from the `gitlabhq/gitlab` provider's registry
@@ -28,7 +29,9 @@ requirement the user stated depends on: typically the description, the
 visibility, issues and merge requests, the merge method the branch contract
 settled, the pipeline and discussion merge checks, the default branch's
 protection, and the approval rules the group leaves unset. Every
-declaration carries a comment saying what it sets and why.
+declaration carries a comment saying what it sets and why. Never declare a setting only to keep its current
+value: that turns the file into an inventory nobody can justify line by
+line. Leave it out and name it in the reset note instead.
 
 Anything left out may take any value, and an apply resets it to the
 provider's value. That is the accepted contract: declare every setting the
@@ -73,15 +76,20 @@ with no state, nothing is destroyed. Two things could still delete:
 Deliver `assets/tf_plan_guard.py` as `scripts/tf_plan_guard.py`. It reads
 `tofu show -json` of a saved plan and exits 1 on any delete or replace. It
 also lists every create that imports nothing and every update to an
-undeclared attribute, so the reviewer sees each reset. The target owns the
-delivered copy.
+undeclared attribute, so the reviewer sees each reset. Tell the user the
+target owns the delivered copy.
 
 ## Who applies
 
 A maintainer or owner plans and applies `policy.tf` locally with their own
-login. The project's pipeline gets `assets/gitlab-ci-policy-check.yml`
+login. A group access token lives only in the group's configuration
+repository; never offer one in any project's variables, the project's own
+included. The project's pipeline gets `assets/gitlab-ci-policy-check.yml`
 alone: format and validation against the committed lock, reading no
-variable that holds a token. Never put a group access token where a
+variable that holds a token. Always deliver it with `policy.tf`. When the
+image's digest cannot be resolved where you work, pin the image by tag and
+record the digest pin as an open item in `platform-settings.md` — never
+drop the job. Never put a group access token where a
 project's pipeline can read it, and never in a group-level CI/CD variable:
 every project in the group inherits those. When the user asks for that,
 decline and offer the local recipes or the group's configuration
@@ -118,33 +126,49 @@ again.
 ```just
 gitlab_host := "gitlab.example.com"
 
-# Plan .gitlab/policy.tf with the glab login; the guard lists what would change
-policy-plan:
+# Print glab's token for the host; the recipes below capture it, nothing shows it
+[private]
+glab-token:
     #!/usr/bin/env bash
     set -euo pipefail
-    glab_token="$(glab config get token --host {{gitlab_host}})"
-    if [ -z "$glab_token" ]; then
+    t="$(glab config get token --host {{gitlab_host}})"
+    if [ -z "$t" ]; then
         auth_out="$(glab auth status --hostname {{gitlab_host}} --show-token 2>&1)" \
-            || { echo "policy-plan: glab is not logged in to {{gitlab_host}}; run glab auth login" >&2; exit 1; }
-        glab_token="$(printf '%s\n' "$auth_out" | sed -n '/Token found in/{s/.*Token found in [^:]*: //p;q;}')"
+            || { echo "glab is not logged in to {{gitlab_host}}; run glab auth login" >&2; exit 1; }
+        t="$(printf '%s\n' "$auth_out" | sed -n '/Token found in/{s/.*Token found in [^:]*: //p;q;}')"
     fi
-    [ -n "$glab_token" ] || { echo "policy-plan: glab holds no token for {{gitlab_host}}" >&2; exit 1; }
-    cd .gitlab
-    GITLAB_TOKEN="$glab_token" GITLAB_BASE_URL="https://{{gitlab_host}}/api/v4/" tofu plan -input=false -out=plan.out
-    tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
+    [ -n "$t" ] || { echo "glab holds no token for {{gitlab_host}}" >&2; exit 1; }
+    printf '%s' "$t"
+
+# Plan .gitlab/policy.tf with the glab login; the guard lists what would change
+policy-plan:
+    t="$(just glab-token)" && cd .gitlab && GITLAB_TOKEN="$t" GITLAB_BASE_URL="https://{{gitlab_host}}/api/v4/" tofu plan -input=false -out=plan.out
+    cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
+
+# Apply exactly the plan the user reviewed from policy-plan
+policy-apply:
+    test -f .gitlab/plan.out || { echo "policy-apply: run just policy-plan and review it first" >&2; exit 1; }
+    t="$(just glab-token)" && cd .gitlab && GITLAB_TOKEN="$t" GITLAB_BASE_URL="https://{{gitlab_host}}/api/v4/" tofu apply -input=false plan.out
 ```
 
-`policy-apply` repeats the token read and runs
-`tofu apply -input=false plan.out` after `policy-plan`. A `just`
-shebang recipe is not echoed. In a `Makefile`, put the same lines in one
-recipe line joined with `; \`, and write each shell `$` as `$$`:
+`just` echoes `t="$(just glab-token)"` literally, and the shebang helper is
+not echoed at all. In a `Makefile`, join the token lines with `; \` into the
+same recipe line as the tf command, and write each shell `$` as `$$`:
 
 ```make
+GITLAB_HOST := gitlab.example.com
+GLAB_TOKEN_READ = t="$$(glab config get token --host $(GITLAB_HOST))"; \
+	[ -n "$$t" ] || t="$$(glab auth status --hostname $(GITLAB_HOST) --show-token 2>&1 | sed -n '/Token found in/{s/.*Token found in [^:]*: //p;q;}')"; \
+	[ -n "$$t" ] || { echo "glab holds no token for $(GITLAB_HOST); run glab auth login" >&2; exit 1; }
+BASE_URL = https://$(GITLAB_HOST)/api/v4/
+
 policy-plan:
-	@glab_token="$$(glab config get token --host $(GITLAB_HOST))"; \
-	[ -n "$$glab_token" ] || { echo "policy-plan: no glab token for $(GITLAB_HOST)" >&2; exit 1; }; \
-	cd .gitlab && GITLAB_TOKEN="$$glab_token" GITLAB_BASE_URL="https://$(GITLAB_HOST)/api/v4/" tofu plan -input=false -out=plan.out
+	@$(GLAB_TOKEN_READ); cd .gitlab && GITLAB_TOKEN="$$t" GITLAB_BASE_URL="$(BASE_URL)" tofu plan -input=false -out=plan.out
 	cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
+
+policy-apply:
+	@test -f .gitlab/plan.out || { echo "policy-apply: run make policy-plan and review it first" >&2; exit 1; }
+	@$(GLAB_TOKEN_READ); cd .gitlab && GITLAB_TOKEN="$$t" GITLAB_BASE_URL="$(BASE_URL)" tofu apply -input=false plan.out
 ```
 
 - Never read the token with Make's `$(shell …)`. Make expands it before
@@ -157,10 +181,14 @@ policy-plan:
 
 ## Review is the check
 
-Record in the target's knowledge that review is the check on
-`policy.tf`. A change whose declarations do not say what they set and why
-is rejected, and the plan, with the guard's listings, is read with it. No
-static check beyond format and validation stands in for that review.
+Write this rule into the target's knowledge file itself — a comment in
+the tf file is not enough:
+
+> Review is the check on `policy.tf`. A change whose declarations do not
+> say what they set and why is rejected; the plan, with the guard's
+> listings, is read with it.
+
+No static check beyond format and validation stands in for that review.
 
 ## Ownership
 

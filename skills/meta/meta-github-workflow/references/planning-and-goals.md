@@ -82,10 +82,12 @@ administrator. How the file reaches GitHub is a harness option. The default
 is CI: deliver `assets/workflow-labels-sync.yml`,
 which applies `labels.json` on default-branch pushes with the default token
 and `issues: write` as its only write permission. The alternative is
-manual: a maintainer runs `scripts/sync_labels.py --apply`. Pruning labels
-absent from the file is a separate option, off by default. Deleting a label
-strips it from every issue and pull request that carries it, so when the
-user turns pruning on, say that and add `--prune` to the workflow. Record
+manual: a maintainer runs `scripts/sync_labels.py --apply`. In CI mode the
+label file never ships without its workflow. Pruning labels absent from the
+file is a separate option, off by default. A user who asks to delete the
+labels the file does not list has chosen pruning: say once that deleting a
+label strips it from every issue and pull request that carries it, add
+`--prune` to the workflow, and record the choice — do not ask again. Record
 both choices in `platform-settings.md`.
 
 ## Triage lifecycle

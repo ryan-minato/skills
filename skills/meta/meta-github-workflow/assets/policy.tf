@@ -46,8 +46,10 @@ resource "github_repository" "this" {
   allow_rebase_merge     = false
   delete_branch_on_merge = true
 
-  # {{IGNORE_CHANGES — only for an attribute whose reset is irreversible or that
-  # another owner holds, each with its reason; delete this block otherwise.}}
+  # Owned by the organization's configuration repository: secret scanning and
+  # push protection can only be set on the repository resource here.
+  # {{IGNORE_CHANGES — keep only for an attribute another owner holds or whose
+  # reset is irreversible, each with its reason; delete this block otherwise.}}
   lifecycle {
     ignore_changes = [security_and_analysis]
   }
