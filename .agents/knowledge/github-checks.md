@@ -6,7 +6,7 @@ command that exists and passes locally; CI never chooses its own linters.
 
 | Check | Workflow | Command | Runs on | Tier | Healthy run |
 |---|---|---|---|---|---|
-| `checks / quality` | `checks.yml` | `just install-tools && just check` (Python 3.12, Node 24, pinned pre-commit, rust-just, ruff) | every pull request; push to `main` | feeds the gate | `just check` exits 0: validators, lint, spec validation, pre-commit hooks (commit-safety skipped by design). |
+| `checks / quality` | `checks.yml` | `just install-tools && just check` (Python 3.12, Node 24, pinned pre-commit, rust-just, ruff; OpenSpec and OpenTofu through `install-tools`) | every pull request; push to `main` | feeds the gate | `just check` exits 0: validators, lint, spec validation, pre-commit hooks (commit-safety skipped by design). |
 | `checks / spec` | `checks.yml` | `just spec-check <base> <head> [--draft]` on a pull request, `just spec-changes check --all` on a push; then `just spec-sync` + `git diff --exit-code -- .agents/skills` | pull requests (opened, synchronized, reopened, ready, converted to draft) that touch `openspec/`, `.agents/skills/openspec-*`, `.agents/skills/.openspec-target`, `scripts/spec_changes.py`, or `justfile`; every push to `main` | feeds the gate | Strict validation exits 0; a related change still unarchived is a warning on a draft and a failure on a ready pull request — the recipe pins `--shape combined`, so no pull request merges with an unarchived change here, not even one that implemented nothing; on `main` no change sits outside `openspec/changes/archive/`; the regenerated OpenSpec skills are identical to the committed ones. On an untouched pull request the job logs "nothing to validate" and passes. |
 | `checks / gate` | `checks.yml` | aggregates the two jobs above (`if: always()`) | every pull request; push to `main` | **required** | Green only when neither dependency failed or was cancelled; a skipped `checks / spec` is fine. |
 | `pr / policy` | `pr-policy.yml` | `python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"` (template and script from the base commit) | pull request opened, edited, synchronized, reopened, ready, converted to draft | **required** | Body carries every template heading, the `Closes`/`N/A` line, and the security checkbox line, and every commit subject (the title, for a fork) follows Conventional Commits; ready pull requests also have Changes and Validation filled (no reserved line, not empty), `Phase: implementation`, every checklist box ticked, and a `Spec:` line (a link to the change directory; a bare URL or path is still accepted). |
@@ -54,7 +54,8 @@ name live on `main` before the ruleset requires it.
 the dev container and pre-commit use: `ruff==0.16.4` (pre-commit rev
 `v0.16.4`), `rust-just` and `pre-commit` pinned in the workflows, and
 `@fission-ai/openspec` at the `openspec_version` of the `justfile`
-(`just install-tools`). `scripts/validate_harness.py` checks that the ruff
+(`just install-tools`), as is OpenTofu at its `opentofu_version`, installed
+into the ignored `.tools/bin` for `just tf-validate`. `scripts/validate_harness.py` checks that the ruff
 pins agree in all three places. Bump them together; see
 `.agents/knowledge/harness-maintenance.md`.
 

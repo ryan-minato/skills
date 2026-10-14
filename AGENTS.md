@@ -103,6 +103,7 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
 | One skill while drafting | `just check-skill <dir>...` |
 | Specs and changes (strict) | `just spec-validate` |
 | Python style (repo scripts, skill scripts, script assets) | `just lint` |
+| Format and validate the tf skill assets (pinned OpenTofu) | `just tf-validate` |
 | Regenerate `marketplace.json` | `just gen-marketplace` |
 | Regenerate the OpenSpec skills | `just spec-sync` |
 | Staged-change safety gate (also the first pre-commit hook) | `just commit-gate` |

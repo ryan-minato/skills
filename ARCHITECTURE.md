@@ -217,7 +217,10 @@ may ready a pull request under the H1 policy; the maintainer merges.
   and `skills/sdd/*/assets/`; in all but the skills' own `scripts/`, a
   blind `except` and a `try`/`except`/`pass` fail it, and SIM105 is off so
   ruff never suggests `contextlib.suppress`, which neither rule sees) +
-  `spec-validate` + `pre-commit run --all-files` (whitespace, secrets,
+  `spec-validate` + `tf-validate` (`tofu fmt -check`, then `init
+  -backend=false` and `validate` on a temp copy of every `.tf` skill asset,
+  with the OpenTofu pinned as `opentofu_version` and installed into the
+  ignored `.tools/bin` by `just install-tools`) + `pre-commit run --all-files` (whitespace, secrets,
   ruff, both validators; the `commit-safety` hook runs only on
   `git commit`).
 - pre-commit hooks are installed by `just setup` (run automatically by the

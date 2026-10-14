@@ -19,7 +19,7 @@ See proposal.md for motivation, and `config-as-code` for the assets this change 
 
 | What Changes bullet | Carrier | Proof |
 |---|---|---|
-| OpenTofu pin | `justfile` `opentofu_version` and an `install-tools` step: the official standalone install method for that version, with the checksum verified | `just install-tools` then `tofu version` prints the pin; a repeated `install-tools` leaves the same binary |
+| OpenTofu pin | `justfile` `opentofu_version` and an `install-opentofu` step of `install-tools`: the release zip for the host architecture and the release's SHA256SUMS, as the official standalone install documentation lays them out, unpacked into the ignored `.tools/bin` (`.gitignore`) | `just install-tools` then `tofu version` prints the pin; a repeated `install-tools` leaves the same binary |
 | `tf-validate` recipe | `justfile` recipe looping over `skills/*/*/assets/**/*.tf`: `tofu fmt -check`, then `init -backend=false` and `validate` in a temp copy | passes on the `config-as-code` assets; a deliberately broken scratch copy (an unknown attribute, a misformatted line) fails, naming the asset; `git status --porcelain` stays empty after a run |
 | `just check` runs it | `justfile` `check` dependencies | `just check` output shows the recipe; the `checks / quality` run on the draft pull request shows it |
 | Version guard | `scripts/validate_harness.py`, beside the OpenSpec rule | a scratch edit hard-coding a tofu version in `checks.yml` makes `just validate` fail, naming the file; reverted |

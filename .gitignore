@@ -9,3 +9,6 @@ skills-lock.json
 __pycache__/
 *.py[cod]
 .ruff_cache/
+
+### Repository tools (just install-tools) ###
+.tools/
