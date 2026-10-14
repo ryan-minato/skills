@@ -24,6 +24,8 @@ concurrency:
 jobs:
   sync:
     name: labels / sync
+    # A manual run from any other branch would apply an unreviewed label file.
+    if: github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     permissions:
       contents: read
