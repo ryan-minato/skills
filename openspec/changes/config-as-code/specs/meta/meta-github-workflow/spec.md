@@ -95,7 +95,7 @@ When the workspace is an organization's configuration repository, the builder SH
 
 #### Scenario: Default sync mode chosen
 - **WHEN** the user accepts the default sync mode for a private configuration repository
-- **THEN** the delivered workflow plans on pull requests with no secret available to fork pull requests and applies only from the default branch through an environment with required reviewers; the credential is a GitHub App installation token minted per run from a private key stored as a secret of that repository or its environment; and the provider version is pinned with its lock file committed
+- **THEN** the delivered workflow plans on pull requests with no secret available to fork pull requests and applies only from the default branch through an environment with required reviewers; the credential is a GitHub App installation token minted per run from a private key stored as a secret of that repository, read-only for the plan job and at write only for the apply job, and the builder records that everyone who can push to the configuration repository can use the plan token; and the provider version is pinned with its lock file committed
 
 #### Scenario: Fully local sync mode chosen
 - **WHEN** the user chooses the fully local sync mode
@@ -103,7 +103,7 @@ When the workspace is an organization's configuration repository, the builder SH
 
 #### Scenario: Credential storage requested at organization level
 - **WHEN** the user proposes storing the App private key as an organization secret available to all repositories
-- **THEN** the builder declines and stores it on the configuration repository or its environment only, saying that an organization secret can reach other repositories' workflows
+- **THEN** the builder declines and stores it on the configuration repository only, saying that an organization secret can reach other repositories' workflows
 
 #### Scenario: Personal account or the .github repository
 - **WHEN** the owner is a personal account, or the user proposes the `.github` repository as the configuration repository

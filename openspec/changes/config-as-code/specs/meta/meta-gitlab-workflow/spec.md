@@ -83,7 +83,7 @@ When the workspace is a group's configuration repository, the builder SHALL load
 
 #### Scenario: Default sync mode on a paid or self-managed instance
 - **WHEN** the group is on GitLab.com Premium or Ultimate or on a self-managed instance, and the user accepts the default sync mode
-- **THEN** the delivered pipeline plans on merge requests and applies only from the default branch through a protected environment with a manual job; the credential is a group access token stored as a masked, protected CI/CD variable of the configuration project only; the token's expiry within 365 days and its rotation owner are recorded in `platform-settings.md`; and the provider version is pinned with its lock file committed
+- **THEN** the delivered pipeline plans on merge requests and applies only from the default branch through a protected environment with a manual job; the apply credential is a group access token with `api` stored as a masked, protected CI/CD variable of the configuration project only, and the merge request plan uses a separate read-only group access token stored masked and unprotected there, with the builder recording that everyone who can push a branch to the configuration project can use the plan token; the token's expiry within 365 days and its rotation owner are recorded in `platform-settings.md`; and the provider version is pinned with its lock file committed
 
 #### Scenario: GitLab.com Free
 - **WHEN** the group is on GitLab.com Free
