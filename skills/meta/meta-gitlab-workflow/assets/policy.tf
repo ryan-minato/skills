@@ -63,6 +63,7 @@ resource "gitlab_branch_protection" "default" {
 }
 
 # {{WHY — e.g. "One approval from the backend team; the group sets no approval rule."}}
+# Approval rules need Premium or Ultimate; on Free, delete this block.
 # First creation: an approval rule has no ID before it exists, so it starts
 # without an import block and the plan guard lists the create. After the apply,
 # read its ID with `glab api projects/<id>/approval_rules` and add:

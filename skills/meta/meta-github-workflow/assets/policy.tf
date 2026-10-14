@@ -40,7 +40,9 @@ resource "github_repository" "this" {
   # Intake forms and the triage workflow run on issues.
   has_issues = true
 
-  # {{WHY — the merge method the branch contract settled; keep only the methods it allows.}}
+  # {{WHY — the merge method the branch contract settled.}} Declare all three;
+  # set the methods the contract excludes to false, so an apply cannot reset
+  # them to the provider's default of true.
   allow_squash_merge     = true
   allow_merge_commit     = false
   allow_rebase_merge     = false
