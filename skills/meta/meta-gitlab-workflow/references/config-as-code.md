@@ -142,14 +142,15 @@ glab-token:
 
 # Plan .gitlab/policy.tf with the glab login; the guard lists what would change
 policy-plan:
-    cd .gitlab && tofu init -input=false
+    cd .gitlab && rm -f plan.out terraform.tfstate terraform.tfstate.backup && tofu init -input=false
     t="$(just glab-token)" && cd .gitlab && GITLAB_TOKEN="$t" GITLAB_BASE_URL="https://{{gitlab_host}}/api/v4/" tofu plan -input=false -out=plan.out
-    cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
+    cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
 
 # Apply exactly the plan the user reviewed from policy-plan
 policy-apply:
     test -f .gitlab/plan.out || { echo "policy-apply: run just policy-plan and review it first" >&2; exit 1; }
     t="$(just glab-token)" && cd .gitlab && GITLAB_TOKEN="$t" GITLAB_BASE_URL="https://{{gitlab_host}}/api/v4/" tofu apply -input=false plan.out
+    cd .gitlab && rm -f plan.out terraform.tfstate terraform.tfstate.backup
 ```
 
 `just` echoes `t="$(just glab-token)"` literally, and the shebang helper is
@@ -164,13 +165,14 @@ GLAB_TOKEN_READ = t="$$(glab config get token --host $(GITLAB_HOST))"; \
 BASE_URL = https://$(GITLAB_HOST)/api/v4/
 
 policy-plan:
-	cd .gitlab && tofu init -input=false
+	cd .gitlab && rm -f plan.out terraform.tfstate terraform.tfstate.backup && tofu init -input=false
 	@$(GLAB_TOKEN_READ); cd .gitlab && GITLAB_TOKEN="$$t" GITLAB_BASE_URL="$(BASE_URL)" tofu plan -input=false -out=plan.out
-	cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
+	cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
 
 policy-apply:
 	@test -f .gitlab/plan.out || { echo "policy-apply: run make policy-plan and review it first" >&2; exit 1; }
 	@$(GLAB_TOKEN_READ); cd .gitlab && GITLAB_TOKEN="$$t" GITLAB_BASE_URL="$(BASE_URL)" tofu apply -input=false plan.out
+	cd .gitlab && rm -f plan.out terraform.tfstate terraform.tfstate.backup
 ```
 
 - Never read the token with Make's `$(shell …)`. Make expands it before
@@ -179,6 +181,15 @@ policy-apply:
   status output, which contains it.
 - `tofu init` writes the provider lock file on the first run; commit it,
   since CI initializes with `-lockfile=readonly`. Ignore `.terraform/`.
+- `policy-plan` first removes any earlier plan, and it removes a plan the
+  guard rejects, so `policy-apply` only ever finds a plan that passed the
+  guard.
+- Even with no backend, `tofu apply` writes a local `terraform.tfstate`
+  (and a `.backup`), and the next plan reads it. A declaration removed
+  after that would plan a destroy (checked with OpenTofu 1.13.0 on
+  2026-10-14). The recipes remove that file after each apply and before
+  each plan, so every run starts from an empty state; ignore it in
+  `.gitignore` too.
 - Ignore `plan.out` and `plan.json` in `.gitignore`.
 - On a self-managed instance, `GITLAB_BASE_URL` is required and ends with
   a slash.
