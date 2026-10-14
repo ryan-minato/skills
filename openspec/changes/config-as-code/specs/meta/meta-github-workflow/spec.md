@@ -65,11 +65,11 @@ The builder SHALL have `policy.tf` planned and applied by a repository administr
 - **THEN** the builder declines to put an organization-level credential in the project's CI, and offers the local apply or the configuration repository instead
 
 ### Requirement: Behavior: Local plan and apply reuse the GitHub CLI login through the task runner
-Where an administrator plans or applies locally, the builder SHALL add recipes to the target's existing task runner (such as a `justfile` or `Makefile`) that pass the GitHub CLI's stored login to the tf command line as `GITHUB_TOKEN` read from `gh auth token` inside the recipe's shell, rather than relying on the provider's own CLI fallback; the apply recipe SHALL plan to a file, run the plan guard on it, and apply only that file; and no recipe SHALL write the token to a file or print it.
+Where an administrator plans or applies locally, the builder SHALL add recipes to the target's existing task runner (such as a `justfile` or `Makefile`) that pass the GitHub CLI's stored login to the tf command line as `GITHUB_TOKEN` read from `gh auth token` inside the recipe's shell, rather than relying on the provider's own CLI fallback; the plan recipe SHALL save the plan to a file and run the plan guard on it, removing a plan the guard rejects, and the apply recipe SHALL apply only that saved file; and no recipe SHALL write the token to a file or print it.
 
 #### Scenario: Recipes for a justfile project
 - **WHEN** the target uses a `justfile`, `policy.tf` is delivered, and the administrator is logged in with `gh auth login`
-- **THEN** the delivered recipes set `GITHUB_TOKEN` from `gh auth token` within the recipe's shell command, the apply recipe runs plan with `-out`, the guard on that plan's JSON, and apply of that plan file in order, and no token value appears in the recipe text, its echoed command, or any file
+- **THEN** the delivered recipes set `GITHUB_TOKEN` from `gh auth token` within the recipe's shell command, the plan recipe runs plan with `-out` and the guard on that plan's JSON, the apply recipe applies only that plan file, and no token value appears in the recipe text, its echoed command, or any file
 
 #### Scenario: Provider fallback considered
 - **WHEN** the agent considers leaving the provider without a token so it falls back to `gh auth token` by itself
