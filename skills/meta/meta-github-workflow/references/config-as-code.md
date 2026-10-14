@@ -106,25 +106,27 @@ once with `gh auth login`, and nothing new is stored.
 ```just
 # Plan .github/policy.tf with the gh login; the guard lists what would change
 policy-plan:
-    cd .github && tofu init -input=false
+    cd .github && rm -f plan.out terraform.tfstate terraform.tfstate.backup && tofu init -input=false
     t="$(gh auth token)" && cd .github && GITHUB_TOKEN="$t" tofu plan -input=false -out=plan.out
-    cd .github && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
+    cd .github && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
 
 # Apply exactly the plan the user reviewed from policy-plan
 policy-apply:
     test -f .github/plan.out || { echo "policy-apply: run just policy-plan and review it first" >&2; exit 1; }
     t="$(gh auth token)" && cd .github && GITHUB_TOKEN="$t" tofu apply -input=false plan.out
+    cd .github && rm -f plan.out terraform.tfstate terraform.tfstate.backup
 ```
 
 ```make
 policy-plan:
-	cd .github && tofu init -input=false
+	cd .github && rm -f plan.out terraform.tfstate terraform.tfstate.backup && tofu init -input=false
 	@t="$$(gh auth token)" && cd .github && GITHUB_TOKEN="$$t" tofu plan -input=false -out=plan.out
-	cd .github && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py -
+	cd .github && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
 
 policy-apply:
 	test -f .github/plan.out || { echo "policy-apply: run make policy-plan and review it first" >&2; exit 1; }
 	@t="$$(gh auth token)" && cd .github && GITHUB_TOKEN="$$t" tofu apply -input=false plan.out
+	cd .github && rm -f plan.out terraform.tfstate terraform.tfstate.backup
 ```
 
 - Pass the token explicitly. The provider documents a `gh auth token`
@@ -137,6 +139,15 @@ policy-apply:
   prints the token. Never write the token to a file, `.env` included.
 - `tofu init` writes the provider lock file on the first run; commit it,
   since CI initializes with `-lockfile=readonly`. Ignore `.terraform/`.
+- `policy-plan` first removes any earlier plan, and it removes a plan the
+  guard rejects, so `policy-apply` only ever finds a plan that passed the
+  guard.
+- Even with no backend, `tofu apply` writes a local `terraform.tfstate`
+  (and a `.backup`), and the next plan reads it. A declaration removed
+  after that would plan a destroy (checked with OpenTofu 1.13.0 on
+  2026-10-14). The recipes remove that file after each apply and before
+  each plan, so every run starts from an empty state; ignore it in
+  `.gitignore` too.
 - Ignore `plan.out` and `plan.json` in `.gitignore`: a saved plan can hold
   values the reviewer never meant to publish.
 - Repository settings need repository admin. The organization's
