@@ -64,8 +64,8 @@ After facts are gathered, the first user-owned frontier normally includes:
    [config-as-code.md](config-as-code.md)); label sync (default CI with a
    project access token, manual on GitLab.com Free); label pruning (default
    off); and, when the workspace is a group's configuration repository, its
-   sync mode (default CI plans and applies; see
-   [config-repo.md](config-repo.md)).
+   sync mode (default CI plans and applies) and its state backend (default
+   the project's GitLab-managed state; see [config-repo.md](config-repo.md)).
 
 Only ask an item when project evidence cannot answer it.
 

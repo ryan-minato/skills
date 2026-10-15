@@ -25,6 +25,7 @@ provider covers keeps its readback as the only check.
 | Label sync | <CI or manual> | CI with a project access token; manual on GitLab.com Free | <date> |
 | Label pruning | <off or on> | off — deleting a label strips it from every work item and merge request | <date> |
 | Configuration repository sync (configuration repository only) | <CI plans and applies, CI plans and a maintainer applies, or local> | CI plans and applies; local on GitLab.com Free | <date> |
+| State backend (configuration repository only) | <GitLab-managed state, a named third-party backend, or stateless> | this project's GitLab-managed state — with state, removing a declaration deletes through an approved plan | <date> |
 
 Never record token or variable values. Record names, scopes, roles, expiry, owners, rotation,
 and verification only.

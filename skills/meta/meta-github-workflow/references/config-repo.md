@@ -2,10 +2,10 @@
 
 Read when the workspace is, or is to become, the repository that holds an
 organization's settings as code. Every rule of
-[config-as-code.md](config-as-code.md) applies here too: minimal
-declarations with reasons, no state, removal is not deletion, the plan
-guard, and review as the check. This file adds what is specific to the
-organization's repository.
+[config-as-code.md](config-as-code.md) applies here too — minimal
+declarations with reasons, the plan guard, and review as the check —
+except that this repository keeps state by default (`## State` below).
+This file adds what is specific to the organization's repository.
 
 ## Eligibility
 
@@ -25,8 +25,12 @@ organization's repository.
 
 Only organization-level mechanisms: organization rulesets, code security
 configurations, Actions policies, and organization settings — the security
-baseline and the team workflow. It never declares a single repository,
-since each repository's `.github/policy.tf` owns that, and it never declares
+baseline, the team workflow, and every rule the organization can set
+uniformly. When several repositories need the same rule, declare one
+organization ruleset targeting them, not one repository ruleset each:
+every managed resource counts against a state backend that caps or bills
+them. It never declares a single repository's own attributes, since each
+repository's `.github/policy.tf` owns those, and it never declares
 labels, which stay in each repository's label file. Issue types and issue
 fields follow [org-configuration.md](org-configuration.md); a provider
 resource replaces its script only when the registry documents one.
@@ -34,6 +38,53 @@ resource replaces its script only when the registry documents one.
 State the blast radius before every approval: an apply here reaches every
 repository in the organization. That approval is separate from any
 repository-level one.
+
+## State
+
+The state backend is a harness option. Propose the default for the
+installed tool, let the user decide, and record the choice in
+`platform-settings.md` under harness options:
+
+| Tool | Default | Alternatives |
+|---|---|---|
+| Terraform | HCP Terraform, workspace in local execution mode | stateless tf; a third-party backend |
+| OpenTofu | a backend the user names: a third-party service that supports OpenTofu, or object storage the organization controls | stateless tf |
+
+- **HCP Terraform.** Declare a `cloud` block naming the HCP Terraform
+  organization and the workspace, and set the workspace's execution mode
+  to Local. HCP Terraform then stores and locks state only, and plans and
+  applies still run in Actions or on an administrator's machine, under the
+  App token and the environment approval below. The Free plan allows 500
+  managed resources; data sources and `terraform_data` do not count
+  (HashiCorp's documentation, checked 2026-10-15). State that limit, and
+  say why the organization prefers one organization-level resource.
+- **OpenTofu.** Do not default to HCP Terraform: OpenTofu's documentation
+  promises no compatibility with it, and reports disagree (checked
+  2026-10-15). Ask the user to name a backend, or to choose stateless tf.
+  When the user still wants HCP Terraform, say so and have them test it on
+  a workspace that manages nothing first.
+- **With state, removing a declaration deletes the object.** Say so to the
+  user. Run the guard with `--allow-delete`: it lists every delete and
+  replace for the approver and passes. Only the saved plan the approver saw
+  is applied. To stop managing an object but keep it, replace its
+  declaration with a `removed` block:
+
+  ```hcl
+  removed {
+    from = github_organization_ruleset.example
+    lifecycle {
+      destroy = false
+    }
+  }
+  ```
+
+  `removed` blocks need Terraform 1.7; check the OpenTofu version that
+  supports `lifecycle` in them before relying on it there.
+- **Keep the `import` blocks.** They adopt existing objects into a new or
+  lost state and do nothing once an object is in state.
+- **Stateless tf**, the alternative: no backend, and every rule of
+  `config-as-code.md` applies, including the guard's default mode and
+  `--allow-create` for a first creation.
 
 ## Sync mode
 
@@ -43,12 +94,15 @@ options:
 
 | Mode | CI does | An administrator does | Credential in CI |
 |---|---|---|---|
-| CI plans and applies (default) | plan on pull requests; apply on the default branch after the environment's reviewers approve | reviews and approves | App installation token |
-| CI plans, the administrator applies | plan on pull requests | applies locally through the recipes in [config-as-code.md](config-as-code.md) | App installation token |
+| CI plans and applies (default) | plan on pull requests; on the default branch, save a plan and apply it after the environment's reviewers approve | reviews the saved plan and approves | App installation token, plus the state backend's token |
+| CI plans, the administrator applies | plan on pull requests | applies locally through the recipes in [config-as-code.md](config-as-code.md) | App installation token, plus the state backend's token |
 | Fully local | nothing that needs a credential (format and validation only) | plans and applies locally | none |
 
 For the local steps, the administrator's `gh` login needs `admin:org`
-(`gh auth refresh -s admin:org`).
+(`gh auth refresh -s admin:org`). With state, pass `--allow-delete` as the
+recipes' guard argument; with HCP Terraform, the administrator runs
+`terraform login` once, which keeps their own token in Terraform's
+credentials file.
 
 ## The CI gate
 
@@ -56,12 +110,16 @@ Start from
 `assets/workflow-config-repo.yml`:
 
 - Plan on `pull_request`, never `pull_request_target`, so a fork's pull
-  request gets no secret.
-- Apply only from a push to the default branch, in a job bound to an
-  environment whose required reviewers are organization owners and whose
-  deployment branches are limited to the default branch.
-- Plan, run the guard, and apply that saved plan in one job. Serialize runs
-  with a concurrency group that never cancels.
+  request gets no secret. With state, the pull request plan reads state
+  without taking its lock (`-lock=false`).
+- On a push to the default branch, one job plans, runs the guard, writes
+  its output to the job summary, and uploads the saved plan with a short
+  retention. The apply job is bound to an environment whose required
+  reviewers are organization owners and whose deployment branches are
+  limited to the default branch; it downloads that plan and applies it,
+  so the reviewers approve the plan they read. A plan made stale by
+  another apply is refused; run the workflow again.
+- Serialize runs with a concurrency group that never cancels.
 - Pin the provider and commit its lock file, and initialize with
   `-lockfile=readonly`.
 - Protect the default branch so it takes changes only through pull
@@ -99,6 +157,13 @@ CI.
    in `platform-settings.md`.
 5. Record the App, its permissions, the secret's name (never its value),
    and the key-rotation owner in `platform-settings.md`.
+6. With HCP Terraform, store an API token as a **repository** secret named
+   `TF_TOKEN_app_terraform_io`, which Terraform reads for that host. Prefer
+   a team token whose team can reach only this workspace. Before creating
+   it, check in HCP Terraform's API-token documentation which token types
+   can plan and write state on the organization's plan, because the Free
+   plan has no teams. Record its type, expiry, and rotation owner, never
+   its value. A third-party backend's credential follows the same rule.
 
 A fine-grained personal access token is the fallback only when an App is
 impossible. It belongs to a person and lives long, so record its owner and

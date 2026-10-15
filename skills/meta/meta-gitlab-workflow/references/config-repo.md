@@ -2,9 +2,10 @@
 
 Read when the workspace is, or is to become, the project that holds a
 group's settings as code. Every rule of [config-as-code.md](config-as-code.md)
-applies here too: minimal declarations with reasons, no state (GitLab-managed
-state included), removal is not deletion, the plan guard, and review as the
-check. This file adds what is specific to the group's repository.
+applies here too — minimal declarations with reasons, the plan guard, and
+review as the check — except that this project keeps state by default
+(`## State` below). This file adds what is specific to the group's
+repository.
 
 ## Eligibility
 
@@ -24,12 +25,61 @@ It declares only group-level settings: the security baseline and the team
 workflow, such as group merge request approval settings, push rules,
 two-factor requirements, and **group labels**. Group labels are group
 configuration and are declared here. Project labels stay in each project's
-label file. It never declares a single project, because each project's
-`.gitlab/policy.tf` owns that.
+label file. When several projects need the same rule, declare it once at
+group level rather than once per project. It never declares a single
+project's own attributes, because each project's `.gitlab/policy.tf` owns
+those.
 
 State the blast radius before every approval: an apply here reaches every
 project in the group and its subgroups. That approval is separate from any
 project-level one.
+
+## State
+
+The state backend is a harness option. Propose the default, let the user
+decide, and record the choice in `platform-settings.md` under harness
+options. The default is this project's GitLab-managed Terraform state,
+which every tier provides and which works with Terraform and OpenTofu
+alike (GitLab documentation, checked 2026-10-15). The alternatives are
+stateless tf and a third-party backend.
+
+- **GitLab-managed state.** Declare an empty `backend "http" {}` block and
+  give its settings through the environment, so nothing in the file names
+  a credential. In CI, `assets/gitlab-ci-config-repo.yml` sets the state
+  address under `${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/`,
+  the lock and unlock addresses, the user `gitlab-ci-token`, and the job
+  token as the password. The job token carries the role of the user who
+  started the job: reading state needs Developer, and locking and writing
+  it need Maintainer.
+- **Locally**, a maintainer sets the same `TF_HTTP_*` variables in the
+  recipe's shell, with their GitLab username and the token glab holds,
+  read as in [config-as-code.md](config-as-code.md). GitLab documents a
+  personal access token with the `api` scope for this; whether an OAuth
+  token from `glab auth login --web` works here was not checked. If it is
+  refused, log glab in with a personal access token instead, and never
+  write the token to a file.
+- **With state, removing a declaration deletes the object.** Say so to the
+  user. Run the guard with `--allow-delete`: it lists every delete and
+  replace for the approver and passes. Only the saved plan the approver saw
+  is applied. To stop managing an object but keep it, replace its
+  declaration with a `removed` block:
+
+  ```hcl
+  removed {
+    from = gitlab_group_label.example
+    lifecycle {
+      destroy = false
+    }
+  }
+  ```
+
+  `removed` blocks need Terraform 1.7; check the OpenTofu version that
+  supports `lifecycle` in them before relying on it there.
+- **Keep the `import` blocks.** They adopt existing objects into a new or
+  lost state and do nothing once an object is in state.
+- **Stateless tf**, the alternative: no backend, and every rule of
+  `config-as-code.md` applies, including the guard's default mode and
+  `--allow-create` for a first creation.
 
 ## Sync mode
 
@@ -39,7 +89,7 @@ options:
 
 | Mode | CI does | A maintainer does | Token in CI |
 |---|---|---|---|
-| CI plans and applies (default) | plan on merge requests; apply on the default branch as a manual job | reviews the plan and runs the apply job | group access tokens |
+| CI plans and applies (default) | plan on merge requests; on the default branch, save a plan, and apply it from a manual job | reviews the saved plan and runs the apply job | group access tokens; the job token for state |
 | CI plans, the maintainer applies | plan on merge requests | applies locally through the recipes in [config-as-code.md](config-as-code.md) | a read-only group access token |
 | Fully local | format and validation only | plans and applies locally | none |
 
@@ -47,7 +97,9 @@ options:
 Ultimate on GitLab.com, and any tier on Self-Managed or Dedicated; checked
 2026-10-14). There, only the fully local mode exists. Say so plainly, and
 never propose a personal access token, or a bot user's personal token, as a
-substitute: it carries a person's whole authority.
+CI substitute: it carries a person's whole authority. The state can still
+be this project's GitLab-managed state, reached with each maintainer's own
+glab login.
 
 ## The CI gate
 
@@ -60,14 +112,19 @@ Start from `assets/gitlab-ci-config-repo.yml`:
   branch of this project runs its own CI under the plan token, so everyone
   who can push a branch here can read what that token reads: keep the
   project's members to the group's Owners, and say so in
-  `platform-settings.md`.
-- **Apply only on the protected default branch**, as a manual job. Only
+  `platform-settings.md`. With state, the merge request plan reads state
+  without taking its lock (`-lock=false`).
+- **Save the plan on the default branch.** A plan job runs the guard and
+  keeps the saved plan as a short-lived artifact.
+- **Apply only on the protected default branch**, as a manual job that
+  applies that saved plan, so whoever runs it approves the plan they
+  read. Only
   users allowed to merge to that branch can run a manual job. On Premium or
   Ultimate, a protected environment narrows the job to its allowed
   deployers and approval rules. Protected environments need Premium or
   Ultimate; checked 2026-10-14.
-- **Plan, guard, and apply the same plan in one job.** `resource_group`
-  serializes applies.
+- **`resource_group` serializes applies.** A plan made stale by another
+  apply is refused; run the pipeline again.
 - **Pin the provider and commit its lock file**, and initialize with
   `-lockfile=readonly`. Set `GITLAB_BASE_URL` from `CI_API_V4_URL` with a
   trailing slash.

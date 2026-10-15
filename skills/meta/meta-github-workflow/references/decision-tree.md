@@ -64,7 +64,9 @@ After facts are gathered, the first user-owned frontier normally includes:
     [config-as-code.md](config-as-code.md)); label sync (default CI with
     `issues: write`, or manual); label pruning (default off); and, when the
     workspace is an organization's configuration repository, its sync mode
-    (default CI plans and applies; see [config-repo.md](config-repo.md)).
+    (default CI plans and applies) and its state backend (default HCP
+    Terraform with Terraform, a backend the user names with OpenTofu; see
+    [config-repo.md](config-repo.md)).
 
 Resolve organization-versus-personal ownership before any taxonomy
 question: issue types and issue fields exist only in organizations, and

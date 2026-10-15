@@ -1,8 +1,13 @@
 # .gitlab-ci.yml for a group configuration repository, in the "CI plans and
-# applies" mode (drop the apply job for "CI plans, a maintainer applies";
-# deliver only format and validation for the fully local mode). No backend:
-# every run imports the group's current settings and the plan guard blocks
-# any delete or replace.
+# applies" mode (drop the save-plan and apply jobs for "CI plans, a
+# maintainer applies"; deliver only format and validation for the fully
+# local mode). State lives in this project's GitLab-managed state, reached
+# with the job token. Reading needs the Developer role of the user who
+# started the job; locking and writing need Maintainer. The guard runs with
+# --allow-delete and lists every delete for whoever runs the manual apply,
+# which applies only the plan the save-plan job saved. For stateless tf,
+# drop the TF_HTTP_* variables and --allow-delete, and initialize with
+# -backend=false.
 #
 # Credentials, stored as CI/CD variables of THIS project only — never as group
 # variables, which every project in the group inherits:
@@ -35,8 +40,17 @@ workflow:
   image: "{{TF_IMAGE}}@{{DIGEST}}"
   variables:
     GITLAB_BASE_URL: "${CI_API_V4_URL}/"
+    TF_STATE_NAME: "group-settings" # {{STATE_NAME}}
+    TF_HTTP_ADDRESS: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${TF_STATE_NAME}"
+    TF_HTTP_LOCK_ADDRESS: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${TF_STATE_NAME}/lock"
+    TF_HTTP_UNLOCK_ADDRESS: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${TF_STATE_NAME}/lock"
+    TF_HTTP_LOCK_METHOD: "POST"
+    TF_HTTP_UNLOCK_METHOD: "DELETE"
+    TF_HTTP_USERNAME: "gitlab-ci-token"
+    TF_HTTP_PASSWORD: "${CI_JOB_TOKEN}"
+    TF_HTTP_RETRY_WAIT_MIN: "5"
   before_script:
-    - tofu init -backend=false -input=false -lockfile=readonly
+    - tofu init -input=false -lockfile=readonly
 
 plan:
   extends: .tf
@@ -47,27 +61,47 @@ plan:
     GITLAB_TOKEN: $PLAN_TOKEN
   script:
     - tofu fmt -check -diff
+    # Reads state without taking its lock, so a merge request never blocks
+    # an apply.
+    - tofu plan -input=false -lock=false -out=plan.out
+    - tofu show -json plan.out > plan.json
+    - python3 scripts/tf_plan_guard.py plan.json --allow-delete
+
+save-plan:
+  extends: .tf
+  stage: plan
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    GITLAB_TOKEN: $PLAN_TOKEN
+  script:
     - tofu plan -input=false -out=plan.out
     - tofu show -json plan.out > plan.json
-    - python3 scripts/tf_plan_guard.py plan.json
+    # Its listing in this job's log is what the person running apply reads.
+    - python3 scripts/tf_plan_guard.py plan.json --allow-delete
+  artifacts:
+    paths:
+      - plan.out
+    expire_in: 1 day
 
 apply:
   extends: .tf
   stage: apply
+  needs: ["save-plan"]
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
   # The manual job is the human approval of every apply: only users allowed
   # to merge to the default branch can run it, and on Premium or Ultimate a
   # protected environment narrows that to its allowed deployers and approval
-  # rules. resource_group serializes applies.
+  # rules. It applies only the saved plan; a plan made stale by another apply
+  # is refused. resource_group serializes applies.
   environment:
     name: "{{APPLY_ENVIRONMENT}}"
   resource_group: config-apply
   variables:
     GITLAB_TOKEN: $APPLY_TOKEN
   script:
-    - tofu plan -input=false -out=plan.out
     - tofu show -json plan.out > plan.json
-    - python3 scripts/tf_plan_guard.py plan.json
+    - python3 scripts/tf_plan_guard.py plan.json --allow-delete
     - tofu apply -input=false plan.out
