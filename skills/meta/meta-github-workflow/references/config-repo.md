@@ -19,7 +19,10 @@ This file adds what is specific to the organization's repository.
   organization's security posture.
 - It holds `assets/config-repo.tf` reworked
   into its root, the committed lock file, `scripts/tf_plan_guard.py`, the
-  workflow its sync mode needs, and knowledge reachable from `AGENTS.md`.
+  workflow its sync mode needs, and knowledge reachable from `AGENTS.md`,
+  including `platform-settings.md` with the sync mode, the state backend,
+  and every credential row — in every sync mode, the fully local one
+  included.
 
 ## What it declares
 
@@ -61,10 +64,15 @@ installed tool, let the user decide, and record the choice in
 - **OpenTofu.** Do not default to HCP Terraform: OpenTofu's documentation
   promises no compatibility with it, and reports disagree (checked
   2026-10-15). Ask the user to name a backend, or to choose stateless tf.
-  When the user still wants HCP Terraform, say so and have them test it on
-  a workspace that manages nothing first.
+  Until they name one — including when they said to take every default —
+  build stateless tf, which needs no credential and deletes nothing, and
+  record the backend in `platform-settings.md` as an open question. When
+  the user still wants HCP Terraform, say so and have them test it on a
+  workspace that manages nothing first.
 - **With state, removing a declaration deletes the object.** Say so to the
-  user. Run the guard with `--allow-delete`: it lists every delete and
+  user when you set up state, and again in the same turn whenever the user
+  asks to stop managing something: deleting its declaration alone would
+  delete it. Run the guard with `--allow-delete`: it lists every delete and
   replace for the approver and passes. Only the saved plan the approver saw
   is applied. To stop managing an object but keep it, replace its
   declaration with a `removed` block:
@@ -80,8 +88,9 @@ installed tool, let the user decide, and record the choice in
 
   `removed` blocks need Terraform 1.7. OpenTofu 1.13.0 plans this block as
   `forget` and the guard passes it (checked 2026-10-15).
-- **Keep the `import` blocks.** They adopt existing objects into a new or
-  lost state and do nothing once an object is in state.
+- **Keep the `import` blocks.** Give every object that may already exist on
+  the platform one: it adopts the object into a new or lost state and does
+  nothing once the object is in state.
 - **Stateless tf**, the alternative: no backend, and every rule of
   `config-as-code.md` applies, including the guard's default mode and
   `--allow-create` for a first creation.
@@ -158,12 +167,22 @@ CI.
 5. Record the App, its permissions, the secret's name (never its value),
    and the key-rotation owner in `platform-settings.md`.
 6. With HCP Terraform, store an API token as a **repository** secret named
-   `TF_TOKEN_app_terraform_io`, which Terraform reads for that host. Prefer
-   a team token whose team can reach only this workspace. Before creating
-   it, check in HCP Terraform's API-token documentation which token types
-   can plan and write state on the organization's plan, because the Free
-   plan has no teams. Record its type, expiry, and rotation owner, never
-   its value. A third-party backend's credential follows the same rule.
+   `TF_TOKEN_app_terraform_io`, which Terraform reads for that host. Keep
+   the HCP Terraform organization to this workspace, so the token reaches
+   nothing else. On a plan with teams, use a team token whose team can
+   reach only this workspace. On the Free plan, which has no teams, use the
+   user token of a dedicated HCP Terraform account. HashiCorp's token
+   documentation says organization tokens cannot start runs, and whether
+   they can write state was not confirmed (read 2026-10-15), so do not use
+   one. Confirm the choice in that documentation before creating the
+   token. Record in `platform-settings.md`,
+   never the value:
+   - its type, as above;
+   - its expiry: set when created, at most one year;
+   - its rotation owner: the organization owner who creates it, unless the
+     user names someone else.
+
+   A third-party backend's credential follows the same rule.
 
 A fine-grained personal access token is the fallback only when an App is
 impossible. It belongs to a person and lives long, so record its owner and
