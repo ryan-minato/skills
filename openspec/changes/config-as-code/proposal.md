@@ -34,13 +34,13 @@ The rules below apply to both builders. Where GitLab differs, the difference is 
 - **New capability: the workspace is a configuration repository.** A new reference in each builder covers:
   - what the configuration repository is: a separate private repository, never GitHub's `.github` repository, and only for an organization or a group;
   - the sync mode, a harness option:
-    - CI plans and applies (the default);
+    - CI plans and applies (the default where the platform can require a second person to approve the apply; on GitHub, environment required reviewers on a private repository need Enterprise);
     - CI plans and an administrator applies locally;
     - everything runs locally;
   - when CI applies, the gate: plan on pull or merge requests with no secret reaching a fork; apply only from the default branch, through a protected environment with required reviewers;
   - the state backend, a harness option with the defaults above;
   - the credentials when CI is chosen, scoped to the configuration repository alone:
-    - GitHub: an organization-installed GitHub App whose installation token is minted per run;
+    - GitHub: organization-installed GitHub Apps whose installation tokens are minted per run: one holding only read permissions for the plan jobs, and one with write permissions whose key only the approved apply job can read;
     - GitLab: a group access token, which on GitLab.com needs Premium or Ultimate and expires within 365 days, so its rotation owner is recorded;
   - GitLab.com Free: the fully local mode is the only one available, and the reference says so.
 - **Labels stay out of tf and sync with the least privilege.**

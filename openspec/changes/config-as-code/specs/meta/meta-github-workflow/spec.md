@@ -106,18 +106,26 @@ The builder SHALL assign every managed setting to exactly one of the organizatio
 - **THEN** `policy.tf` lists that attribute under `ignore_changes` with a comment naming the configuration repository as its owner
 
 ### Requirement: Behavior: An organization configuration repository is built with a chosen sync mode
-When the workspace is an organization's configuration repository, the builder SHALL load its configuration-repository reference, SHALL present the sync mode as a harness option defaulting to CI plan and apply, and SHALL scope any CI credential to that repository alone. It SHALL present the state backend as a harness option:
+When the workspace is an organization's configuration repository, the builder SHALL load its configuration-repository reference, SHALL present the sync mode as a harness option, and SHALL scope any CI credential to that repository alone. The default sync mode is CI plan and apply only where the private configuration repository can require reviewers on an environment; elsewhere it is CI plans with an administrator applying locally, and no workflow then holds a credential that can write organization settings. A CI credential that a pull request's workflow can reach SHALL grant only reads, because whoever can push a branch can read every secret that workflow is given; the write credential SHALL be reachable only by the apply job after a reviewer other than the run's initiator approves it, and the default branch SHALL take changes only through pull requests with at least one approving review. It SHALL present the state backend as a harness option:
 - when the tool is Terraform, the default is HCP Terraform with the workspace in local execution mode, so it stores only state and runs happen in Actions or on an administrator's machine;
 - when the tool is OpenTofu, the default is a backend the user names, either a third-party service that supports OpenTofu or object storage the organization controls, because OpenTofu does not promise compatibility with HCP Terraform;
 - in both cases, the alternatives are stateless tf and a third-party backend.
 
 #### Scenario: Default sync mode chosen
-- **WHEN** the user accepts the default sync mode for a private configuration repository
-- **THEN** the delivered workflow plans on pull requests with no secret available to fork pull requests; on the default branch it saves a plan, and the apply job behind an environment with required reviewers applies only that saved plan; the credential is a GitHub App installation token minted per run from a private key stored as a secret of that repository, read-only for the plan job and at write only for the apply job, and the builder records that everyone who can push to the configuration repository can use the plan token; and the provider version is pinned with its lock file committed
+- **WHEN** the user accepts the default sync mode for a private configuration repository whose plan provides environment required reviewers on private repositories
+- **THEN** the delivered workflow plans on pull requests with no secret available to fork pull requests; on the default branch it saves a plan, and the apply job behind an environment whose required reviewers are organization owners, with self-review prevented, applies only that saved plan; the plan jobs mint their token from a plan App that holds only read permissions, whose private key is a repository secret, and the builder records that everyone who can push to the configuration repository can read what that App reads; the apply job mints its token from a separate App with write permissions, whose private key is a secret of the apply environment only; the default branch takes changes only through pull requests with at least one approving review; and the provider version is pinned with its lock file committed
+
+#### Scenario: No environment required reviewers on the plan
+- **WHEN** the private configuration repository's plan does not provide environment required reviewers on private repositories and the user accepts the default sync mode
+- **THEN** the default is CI plans with an administrator applying locally, the builder says why, and no workflow holds a credential that can write organization settings
+
+#### Scenario: One organization owner
+- **WHEN** the organization has a single owner
+- **THEN** the builder says that no second person can review a change or approve an apply, proposes CI plans with the owner applying locally, and records the accepted risk in `platform-settings.md`
 
 #### Scenario: Default state backend with Terraform
 - **WHEN** `terraform` is installed and the user accepts the default state backend
-- **THEN** the configuration declares a `cloud` block naming the HCP Terraform organization and workspace, the workspace runs in local execution mode, the HCP Terraform API token is a secret of the configuration repository only with its type, expiry, and rotation owner recorded in `platform-settings.md`, and the builder states the Free plan's managed-resource limit with the date it was checked
+- **THEN** the configuration declares a `cloud` block naming the HCP Terraform organization and workspace, the workspace runs in local execution mode, the HCP Terraform API token is a secret of the configuration repository only with its type, expiry, and rotation owner recorded in `platform-settings.md`; where the HCP Terraform plan has teams, the plan jobs use a token that can only read state and the apply job a write token kept as a secret of the apply environment, and otherwise the builder records that the token the plan jobs hold can write state; and the builder states the Free plan's managed-resource limit with the date it was checked
 
 #### Scenario: OpenTofu installed
 - **WHEN** only `tofu` is installed
