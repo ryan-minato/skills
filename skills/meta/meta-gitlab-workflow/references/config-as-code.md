@@ -2,8 +2,9 @@
 
 Read when Terraform or OpenTofu is installed, when the user wants the
 project's settings described as code, or before writing
-`.gitlab/policy.tf` or any other tf file for the target. The
-configuration-repository case adds [config-repo.md](config-repo.md).
+`.gitlab/policy.tf` or any other tf file for the target. `policy.tf` is
+always stateless; the configuration-repository case, which keeps state by
+default, adds [config-repo.md](config-repo.md).
 
 ## When tf is delivered
 
@@ -25,11 +26,19 @@ here would go stale.
 ## What policy.tf declares
 
 Start from `assets/policy.tf` and keep only what the harness or a
-requirement the user stated depends on: typically the description, the
-visibility, issues and merge requests, the merge method the branch contract
-settled, the pipeline and discussion merge checks, the default branch's
-protection, and the approval rules the group leaves unset. Every
-declaration carries a comment saying what it sets and why. Never declare a setting only to keep its current
+requirement the user stated depends on. `policy.tf` holds two kinds of
+setting and nothing else:
+
+- **Enumerable, idempotent project attributes**, read back on every plan:
+  the name, description, visibility, archive state, merge method,
+  source-branch removal, the pipeline and discussion merge checks, whether
+  issues, merge requests, and the wiki are on, and the default branch's
+  protection.
+- **A rule the group does not set uniformly**, such as one project's extra
+  approval rule. When several projects need the same rule, it belongs in
+  the group's configuration repository as one group-level setting instead.
+
+Every declaration carries a comment saying what it sets and why. Never declare a setting only to keep its current
 value: that turns the file into an inventory nobody can justify line by
 line. Leave it out and name it in the reset note instead.
 
@@ -48,19 +57,24 @@ Pin the provider with a version constraint and commit the lock file
 
 ## No state
 
-- Declare no `backend` block — not even GitLab-managed Terraform state,
-  though it is free and built in. Every run starts from an empty state and
+- Declare no `backend` block in `policy.tf` — not even GitLab-managed
+  Terraform state, though it is free and built in. Every run starts from an empty state and
   learns the current values through `import` blocks: one per resource,
   using the import ID format in that resource's documentation. Import blocks
   need Terraform 1.5 or OpenTofu 1.6; leave `for_each` off them so both
   floors hold.
-- When the user asks for GitLab-managed state, keep the configuration
-  stateless and say why. Every run imports the current settings, so state
-  would add nothing but a second source of truth. Removing a declaration
-  only stops managing the object, while with state it would delete it.
+- When the user asks for GitLab-managed state for `policy.tf`, keep it
+  stateless and say why: its settings are enumerable and idempotent, so
+  every run imports them, and removing a declaration only stops managing
+  the object. GitLab-managed state is the default of the group's
+  configuration repository ([config-repo.md](config-repo.md)), where
+  removal deletes through an approved plan.
 - A resource that only has a platform-assigned ID, such as an approval
-  rule, is created once without an import block. The plan guard lists the
-  create, and the ID goes into an import block in the next change.
+  rule, has no import block before it exists. With no state, every later
+  run would create it again, so the plan guard fails on any create that
+  imports nothing. For the first creation, plan with `--allow-create`
+  passed to the guard, apply, read the new ID, and add its import block in
+  the next change before anyone plans again.
 
 ## Removal is not deletion
 
@@ -74,10 +88,12 @@ with no state, nothing is destroyed. Two things could still delete:
   recreated.
 
 Deliver `assets/tf_plan_guard.py` as `scripts/tf_plan_guard.py`. It reads
-`tofu show -json` of a saved plan and exits 1 on any delete or replace. It
-also lists every create that imports nothing and every update to an
-undeclared attribute, so the reviewer sees each reset. Tell the user the
-target owns the delivered copy.
+`tofu show -json` of a saved plan and exits 1 on any delete, replace, or
+create that imports nothing, unless `--allow-create` is given for a first
+creation. It also lists every update to an undeclared attribute, so the
+reviewer sees each reset. Its `--allow-delete` mode is for a configuration
+repository with state only. Tell the user the target owns the delivered
+copy.
 
 ## Who applies
 
@@ -126,11 +142,18 @@ again.
 ```just
 gitlab_host := "gitlab.example.com"
 
-# Print glab's token for the host; the recipes below capture it, nothing shows it
+# Plan .gitlab/policy.tf with the glab login; pass --allow-create only for a first creation
+policy-plan *guard_args: (_policy "plan" guard_args)
+
+# Apply exactly the plan the user reviewed from policy-plan, with the same guard arguments
+policy-apply *guard_args: (_policy "apply" guard_args)
+
+# Read glab's token for the host and run one tf step with it; nothing here prints the token
 [private]
-glab-token:
+_policy step *guard_args:
     #!/usr/bin/env bash
     set -euo pipefail
+    cd .gitlab
     t="$(glab config get token --host {{gitlab_host}})"
     if [ -z "$t" ]; then
         auth_out="$(glab auth status --hostname {{gitlab_host}} --show-token 2>&1)" \
@@ -138,25 +161,25 @@ glab-token:
         t="$(printf '%s\n' "$auth_out" | sed -n '/Token found in/{s/.*Token found in [^:]*: //p;q;}')"
     fi
     [ -n "$t" ] || { echo "glab holds no token for {{gitlab_host}}" >&2; exit 1; }
-    printf '%s' "$t"
-
-# Plan .gitlab/policy.tf with the glab login; the guard lists what would change
-policy-plan:
-    cd .gitlab && rm -f plan.out terraform.tfstate terraform.tfstate.backup && tofu init -input=false
-    t="$(just glab-token)" && cd .gitlab && GITLAB_TOKEN="$t" GITLAB_BASE_URL="https://{{gitlab_host}}/api/v4/" tofu plan -input=false -out=plan.out
-    cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
-
-# Apply exactly the plan the user reviewed from policy-plan
-policy-apply:
-    test -f .gitlab/plan.out || { echo "policy-apply: run just policy-plan and review it first" >&2; exit 1; }
-    cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
-    t="$(just glab-token)" && cd .gitlab && GITLAB_TOKEN="$t" GITLAB_BASE_URL="https://{{gitlab_host}}/api/v4/" tofu apply -input=false plan.out
-    cd .gitlab && rm -f plan.out terraform.tfstate terraform.tfstate.backup
+    base_url="https://{{gitlab_host}}/api/v4/"
+    guard() { tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - {{guard_args}} || { rm -f plan.out; exit 1; }; }
+    if [ "{{step}}" = plan ]; then
+        rm -f plan.out terraform.tfstate terraform.tfstate.backup
+        tofu init -input=false
+        GITLAB_TOKEN="$t" GITLAB_BASE_URL="$base_url" tofu plan -input=false -out=plan.out
+        guard
+    else
+        [ -f plan.out ] || { echo "policy-apply: run just policy-plan and review it first" >&2; exit 1; }
+        guard
+        GITLAB_TOKEN="$t" GITLAB_BASE_URL="$base_url" tofu apply -input=false plan.out
+        rm -f plan.out terraform.tfstate terraform.tfstate.backup
+    fi
 ```
 
-`just` echoes `t="$(just glab-token)"` literally, and the shebang helper is
-not echoed at all. In a `Makefile`, join the token lines with `; \` into the
-same recipe line as the tf command, and write each shell `$` as `$$`:
+A shebang recipe is not echoed, and the token never leaves `_policy`: no
+recipe prints it, so running any of them by hand shows nothing secret. In
+a `Makefile`, join the token lines with `; \` into the same recipe line as
+the tf command, and write each shell `$` as `$$`:
 
 ```make
 GITLAB_HOST := gitlab.example.com
@@ -165,14 +188,15 @@ GLAB_TOKEN_READ = t="$$(glab config get token --host $(GITLAB_HOST))"; \
 	[ -n "$$t" ] || { echo "glab holds no token for $(GITLAB_HOST); run glab auth login" >&2; exit 1; }
 BASE_URL = https://$(GITLAB_HOST)/api/v4/
 
+# make policy-plan GUARD_ARGS=--allow-create, only for a first creation
 policy-plan:
 	cd .gitlab && rm -f plan.out terraform.tfstate terraform.tfstate.backup && tofu init -input=false
 	@$(GLAB_TOKEN_READ); cd .gitlab && GITLAB_TOKEN="$$t" GITLAB_BASE_URL="$(BASE_URL)" tofu plan -input=false -out=plan.out
-	cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
+	cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - $(GUARD_ARGS) || { rm -f plan.out; exit 1; }
 
 policy-apply:
 	@test -f .gitlab/plan.out || { echo "policy-apply: run make policy-plan and review it first" >&2; exit 1; }
-	cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - || { rm -f plan.out; exit 1; }
+	cd .gitlab && tofu show -json plan.out | python3 ../scripts/tf_plan_guard.py - $(GUARD_ARGS) || { rm -f plan.out; exit 1; }
 	@$(GLAB_TOKEN_READ); cd .gitlab && GITLAB_TOKEN="$$t" GITLAB_BASE_URL="$(BASE_URL)" tofu apply -input=false plan.out
 	cd .gitlab && rm -f plan.out terraform.tfstate terraform.tfstate.backup
 ```
@@ -211,14 +235,15 @@ No static check beyond format and validation stands in for that review.
 
 Every setting has exactly one owner:
 
-- **The group's configuration repository** owns the security baseline and
-  the team workflow, through group-level settings such as merge request
-  approval settings, push rules, and group labels. It never declares a
-  single project.
-- **`policy.tf`** owns the project's description, its visibility, and the
-  approval and merge policy the group does not set. It declares only what
-  it adds, such as one extra approval rule, and nothing the group already
-  sets.
+- **The group's configuration repository** owns the security baseline,
+  the team workflow, and every rule the group can set uniformly, through
+  group-level settings such as merge request approval settings, push
+  rules, and group labels. Recommend that it carry most managed resources,
+  and prefer one group-level setting over one resource per project. It
+  never declares a single project's own attributes.
+- **`policy.tf`** owns the project's enumerable attributes and any rule the
+  group does not set uniformly. It declares only what it adds, such as one
+  extra approval rule, and nothing the group already sets.
 
 Where a group-owned setting can only be set on the project resource, list
 that attribute under `ignore_changes` with a comment naming the
