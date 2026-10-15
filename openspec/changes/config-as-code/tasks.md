@@ -89,4 +89,4 @@
 
 ## 4. Finish
 
-- [ ] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, and leave the record unarchived until the maintainer closes the implementation deliberation.
+- [x] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, and leave the record unarchived until the maintainer closes the implementation deliberation.
