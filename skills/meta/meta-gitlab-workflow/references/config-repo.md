@@ -17,7 +17,9 @@ repository.
   - the committed lock file;
   - `scripts/tf_plan_guard.py`;
   - the pipeline its sync mode needs;
-  - knowledge reachable from `AGENTS.md`.
+  - knowledge reachable from `AGENTS.md`, including `platform-settings.md`
+    with the sync mode, the state backend, and every credential row, in
+    every sync mode.
 
 ## What it declares
 
@@ -59,7 +61,9 @@ stateless tf and a third-party backend.
   refused, log glab in with a personal access token instead, and never
   write the token to a file.
 - **With state, removing a declaration deletes the object.** Say so to the
-  user. Run the guard with `--allow-delete`: it lists every delete and
+  user when you set up state, and again in the same turn whenever the user
+  asks to stop managing something: deleting its declaration alone would
+  delete it. Run the guard with `--allow-delete`: it lists every delete and
   replace for the approver and passes. Only the saved plan the approver saw
   is applied. To stop managing an object but keep it, replace its
   declaration with a `removed` block:
@@ -75,8 +79,9 @@ stateless tf and a third-party backend.
 
   `removed` blocks need Terraform 1.7. OpenTofu 1.13.0 plans this block as
   `forget` and the guard passes it (checked 2026-10-15).
-- **Keep the `import` blocks.** They adopt existing objects into a new or
-  lost state and do nothing once an object is in state.
+- **Keep the `import` blocks.** Give every object that may already exist on
+  the platform one: it adopts the object into a new or lost state and does
+  nothing once the object is in state.
 - **Stateless tf**, the alternative: no backend, and every rule of
   `config-as-code.md` applies, including the guard's default mode and
   `--allow-create` for a first creation.

@@ -169,6 +169,7 @@ policy-apply:
   2026-10-14). The recipes remove that file after each apply and before
   each plan, so every run starts from an empty state; ignore it in
   `.gitignore` too.
+- Ignore `__pycache__/`, which running the guard writes beside it.
 - Ignore `plan.out` and `plan.json` in `.gitignore`: a saved plan can hold
   values the reviewer never meant to publish.
 - Repository settings need repository admin. The organization's
