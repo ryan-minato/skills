@@ -38,10 +38,10 @@ kinds of setting and nothing else:
   same rule, it belongs in the organization's configuration repository as
   one organization-level rule instead.
 
- Every declaration carries a comment saying
-what it sets and why. Never declare a setting only to keep its current
-value: that turns the file into an inventory nobody can justify line by
-line. Leave it out and name it in the reset note instead.
+Every declaration carries a comment saying what it sets and why. Never
+declare a setting only to keep its current value: that turns the file into
+an inventory nobody can justify line by line. Leave it out and name it in
+the reset note instead.
 
 Anything left out may take any value, and an apply resets it to the
 provider's value. A read-only plan that imported this library's own
