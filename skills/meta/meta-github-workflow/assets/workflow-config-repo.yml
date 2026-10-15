@@ -171,9 +171,10 @@ jobs:
       - name: Apply the saved plan
         env:
           GITHUB_TOKEN: ${{ steps.app.outputs.token }}
-          # HCP Terraform state, written with this secret of the apply
-          # environment where teams allow a separate plan token; drop for
-          # stateless tf or another backend.
+          # HCP Terraform state: a secret of the apply environment where teams
+          # give the plan jobs their own read-only one; on the Free plan, the
+          # same repository secret as the plan jobs. Drop for stateless tf or
+          # another backend.
           TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_APPLY_TOKEN_SECRET}} }}
         run: |
           tofu init -input=false -lockfile=readonly
