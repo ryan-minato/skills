@@ -1,7 +1,11 @@
 # .github/workflows/config.yml — the organization configuration repository's
-# sync, for the "CI plans and applies" mode (delete the apply job for the
-# "CI plans, an administrator applies" mode; deliver no workflow holding the
-# App key for the fully local mode). The credential is a GitHub App
+# sync, for the "CI plans and applies" mode (delete the save-plan and apply
+# jobs for the "CI plans, an administrator applies" mode; deliver no workflow
+# holding the App key for the fully local mode). With state, the guard runs
+# with --allow-delete and lists every delete for the approver; for stateless
+# tf, drop that flag and the HCP Terraform token, and the guard blocks
+# deletes. On the default branch the plan is saved and the apply job, behind
+# the environment's required reviewers, applies only that file. The credential is a GitHub App
 # installation token minted per run from a key stored as a secret of this
 # repository only — never an organization secret, which other repositories'
 # workflows could reach. Fork pull requests get no secrets under
@@ -18,6 +22,12 @@ on:
 
 permissions:
   contents: read
+
+# An explicit bash shell runs with pipefail, so a guard failure piped into
+# `tee` still fails the step.
+defaults:
+  run:
+    shell: bash
 
 # One run at a time, never cancelled: an apply must not race another apply.
 concurrency:
@@ -42,8 +52,10 @@ jobs:
           # resources need; an organization ruleset needs this one.
           permission-organization-administration: read
       # OpenTofu from its official release, checked against the release's
-      # SHA256SUMS; no third-party action. A Terraform project downloads from
-      # releases.hashicorp.com the same way and runs `terraform` below.
+      # SHA256SUMS; no third-party action. With HCP Terraform, the Terraform
+      # default, download terraform_<v>_linux_amd64.zip and
+      # terraform_<v>_SHA256SUMS from releases.hashicorp.com/terraform/<v>/
+      # the same way, and run `terraform` below.
       - name: Install OpenTofu {{TOFU_VERSION}}
         env:
           TOFU_VERSION: "{{TOFU_VERSION}}"
@@ -56,25 +68,78 @@ jobs:
           unzip -q "$zip" tofu -d "$RUNNER_TEMP/tofu"
           rm "$zip" SHA256SUMS
           echo "$RUNNER_TEMP/tofu" >> "$GITHUB_PATH"
-      - name: Plan and guard
+      - name: Plan and guard, without taking the state lock
         env:
           GITHUB_TOKEN: ${{ steps.app.outputs.token }}
+          # HCP Terraform state; drop for stateless tf or another backend.
+          TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_TOKEN_SECRET}} }}
         run: |
           tofu fmt -check -diff
-          tofu init -backend=false -input=false -lockfile=readonly
+          tofu init -input=false -lockfile=readonly
+          tofu plan -input=false -lock=false -out=plan.out
+          tofu show -json plan.out | python3 scripts/tf_plan_guard.py - --allow-delete
+
+  save-plan:
+    name: config / save plan
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: app
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.{{APP_CLIENT_ID_VARIABLE}} }}
+          private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
+          owner: ${{ github.repository_owner }}
+          # Read-only: a pull request runs its own code under this token. One
+          # `permission-<name>: read` line per permission the declared
+          # resources need; an organization ruleset needs this one.
+          permission-organization-administration: read
+      # OpenTofu from its official release, checked against the release's
+      # SHA256SUMS; no third-party action. With HCP Terraform, the Terraform
+      # default, download terraform_<v>_linux_amd64.zip and
+      # terraform_<v>_SHA256SUMS from releases.hashicorp.com/terraform/<v>/
+      # the same way, and run `terraform` below.
+      - name: Install OpenTofu {{TOFU_VERSION}}
+        env:
+          TOFU_VERSION: "{{TOFU_VERSION}}"
+        run: |
+          base="https://github.com/opentofu/opentofu/releases/download/v${TOFU_VERSION}"
+          zip="tofu_${TOFU_VERSION}_linux_amd64.zip"
+          curl --proto '=https' --tlsv1.2 -fsSLO "$base/$zip"
+          curl --proto '=https' --tlsv1.2 -fsSL -o SHA256SUMS "$base/tofu_${TOFU_VERSION}_SHA256SUMS"
+          grep " ${zip}\$" SHA256SUMS | sha256sum -c -
+          unzip -q "$zip" tofu -d "$RUNNER_TEMP/tofu"
+          rm "$zip" SHA256SUMS
+          echo "$RUNNER_TEMP/tofu" >> "$GITHUB_PATH"
+      - name: Plan and guard; the guard's lists go to the job summary
+        env:
+          GITHUB_TOKEN: ${{ steps.app.outputs.token }}
+          # HCP Terraform state; drop for stateless tf or another backend.
+          TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_TOKEN_SECRET}} }}
+        run: |
+          tofu init -input=false -lockfile=readonly
           tofu plan -input=false -out=plan.out
-          tofu show -json plan.out > plan.json
-          python3 scripts/tf_plan_guard.py plan.json
+          tofu show -json plan.out | python3 scripts/tf_plan_guard.py - --allow-delete | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plan
+          path: plan.out
+          retention-days: 1
 
   apply:
     name: config / apply
-    if: github.event_name == 'push'
+    needs: save-plan
     runs-on: ubuntu-latest
-    # Required reviewers on this environment are the human approval of every
-    # apply; the job waits for them before any step runs.
+    # Required reviewers on this environment approve the saved plan whose
+    # guard lists they read in the save-plan job's summary; the job waits for
+    # them before any step runs.
     environment: "{{APPLY_ENVIRONMENT}}"
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: plan
       - id: app
         uses: actions/create-github-app-token@v3
         with:
@@ -84,8 +149,10 @@ jobs:
           # The same permissions as the plan job, at write.
           permission-organization-administration: write
       # OpenTofu from its official release, checked against the release's
-      # SHA256SUMS; no third-party action. A Terraform project downloads from
-      # releases.hashicorp.com the same way and runs `terraform` below.
+      # SHA256SUMS; no third-party action. With HCP Terraform, the Terraform
+      # default, download terraform_<v>_linux_amd64.zip and
+      # terraform_<v>_SHA256SUMS from releases.hashicorp.com/terraform/<v>/
+      # the same way, and run `terraform` below.
       - name: Install OpenTofu {{TOFU_VERSION}}
         env:
           TOFU_VERSION: "{{TOFU_VERSION}}"
@@ -98,12 +165,12 @@ jobs:
           unzip -q "$zip" tofu -d "$RUNNER_TEMP/tofu"
           rm "$zip" SHA256SUMS
           echo "$RUNNER_TEMP/tofu" >> "$GITHUB_PATH"
-      - name: Plan, guard, and apply that plan
+      - name: Apply the saved plan
         env:
           GITHUB_TOKEN: ${{ steps.app.outputs.token }}
+          # HCP Terraform state; drop for stateless tf or another backend.
+          TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_TOKEN_SECRET}} }}
         run: |
-          tofu init -backend=false -input=false -lockfile=readonly
-          tofu plan -input=false -out=plan.out
-          tofu show -json plan.out > plan.json
-          python3 scripts/tf_plan_guard.py plan.json
+          tofu init -input=false -lockfile=readonly
+          tofu show -json plan.out | python3 scripts/tf_plan_guard.py - --allow-delete
           tofu apply -input=false plan.out

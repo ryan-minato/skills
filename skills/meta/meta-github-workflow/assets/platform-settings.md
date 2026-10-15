@@ -20,6 +20,7 @@ tier: {{ENFORCED_ADVISORY_OR_CONVENTION}}.
 | CODEOWNERS enforcement | {{REQUIRE_CODEOWNER_REVIEW_ON_OR_OFF}} | {{TIER}} | {{OWNER}} | ruleset settings | ownership change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Environments & reviewers | {{ENVIRONMENTS_AND_APPROVERS}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/environments` | deploy-authority change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Configuration repository collaborators (configuration repository only) | organization owners only — a pull request runs its own code under the read-only plan token | enforced | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/collaborators` | membership change | none |
+| State backend credential (configuration repository only) | {{TOKEN_TYPE_SCOPE_EXPIRY_ROTATION_OWNER — e.g. HCP Terraform team token as TF_TOKEN_app_terraform_io; never the value}} | enforced | {{OWNER}} | `gh secret list` and the backend's token settings | rotation or expiry | none |
 | Secrets & variables (names only) | {{NAMES_AND_OWNERS}} | enforced | {{OWNER}} | `gh secret list` | rotation | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Secret scanning | {{ENABLED_OR_DOWNGRADED_WITH_SKU}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}} --jq .security_and_analysis` | plan or visibility change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Push protection | {{ENABLED_OR_DOWNGRADED_WITH_SKU}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}} --jq .security_and_analysis` | plan or visibility change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
@@ -42,6 +43,7 @@ describes is verified by a plan, not only by its readback.
 | Label sync | {{CI_OR_MANUAL}} | CI (`labels / sync`, `issues: write`) | {{DATE}} |
 | Label pruning | {{OFF_OR_ON}} | off — deleting a label strips it from every issue and pull request | {{DATE}} |
 | Configuration repository sync (configuration repository only) | {{CI_PLAN_AND_APPLY_OR_CI_PLAN_LOCAL_APPLY_OR_LOCAL}} | CI plans and applies | {{DATE}} |
+| State backend (configuration repository only) | {{HCP_TERRAFORM_NAMED_BACKEND_OR_STATELESS}} | HCP Terraform, local execution, with Terraform; a backend the user names with OpenTofu — with state, removing a declaration deletes through an approved plan | {{DATE}} |
 
 Advisory-tier upgrade trigger: {{UPGRADE_TRIGGER — e.g. "if visibility
 becomes public or the plan upgrades, enable the ruleset requiring
