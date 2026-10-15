@@ -93,6 +93,6 @@
 
 ## 6. Security revision (2026-10-15)
 
-- [ ] 6.1 GitHub `config-repo.md`: the sync-mode default depends on environment required reviewers on a private repository; two Apps, the plan App read-only with its key a repository secret, the apply App's key a secret of the apply environment; the apply environment prevents self-review and the default branch needs one approving review; a single owner gets the local apply and a recorded risk; the HCP token split where teams exist. Update `workflow-config-repo.yml`, `platform-settings.md`, and `decision-tree.md` to match. Verify `just check-skill` and the YAML parse — closes GH: Default sync mode chosen (security revision); No environment required reviewers on the plan; One organization owner.
-- [ ] 6.2 Outcomes S1, S2, and S3.
-- [ ] 6.3 Run `just check` and update the pull request's Validation section.
+- [x] 6.1 GitHub `config-repo.md`: the sync-mode default depends on environment required reviewers on a private repository; two Apps, the plan App read-only with its key a repository secret, the apply App's key a secret of the apply environment; the apply environment prevents self-review and the default branch needs one approving review; a single owner gets the local apply and a recorded risk; the HCP token split where teams exist. Update `workflow-config-repo.yml`, `platform-settings.md`, and `decision-tree.md` to match. Verify `just check-skill` and the YAML parse — closes GH: Default sync mode chosen (security revision); No environment required reviewers on the plan; One organization owner.
+- [x] 6.2 Outcomes S1, S2, and S3.
+- [x] 6.3 Run `just check` and update the pull request's Validation section.
