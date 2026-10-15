@@ -19,8 +19,8 @@ The description SHALL load the builder for building, replacing, or systematicall
 - **WHEN** the user says "Create a `blocked` label in this project."
 - **THEN** the skill does not load
 
-### Requirement: Behavior: Needed platform settings are declared as minimal stateless tf when the tool is installed
-When Terraform or OpenTofu is installed, the builder SHALL offer `.gitlab/policy.tf`, which declares only the project settings that the harness or a requirement the user stated depends on, gives each declaration its reason, declares no backend (GitLab-managed state included), and has an `import` block for every resource; it SHALL keep `platform-settings.md`, recording there which rows the tf file describes, what no provider covers, and each harness option chosen; and it SHALL record in the target's knowledge that review is the check on `policy.tf`: a change whose declarations do not make their effect and reason readable is rejected.
+### Requirement: Behavior: A project's own settings are declared as minimal stateless tf when the tool is installed
+When Terraform or OpenTofu is installed, the builder SHALL offer `.gitlab/policy.tf`, which declares only the project settings that the harness or a requirement the user stated depends on, gives each declaration its reason, declares no backend (GitLab-managed state included), and has an `import` block for every resource. It SHALL limit `policy.tf` to enumerable, idempotent project attributes, such as the name, description, visibility, archive state, merge method, source-branch removal, the merge checks, and whether issues and the wiki are enabled, plus any rule the harness needs that the group does not set uniformly; it SHALL keep `platform-settings.md`, recording there which rows the tf file describes, what no provider covers, and each harness option chosen; and it SHALL record in the target's knowledge that review is the check on `policy.tf`: a change whose declarations do not make their effect and reason readable is rejected.
 
 #### Scenario: Tool installed
 - **WHEN** `tofu` or `terraform` is on the path, the design is approved, and the harness needs merge requests and a protected default branch
@@ -35,11 +35,11 @@ When Terraform or OpenTofu is installed, the builder SHALL offer `.gitlab/policy
 - **THEN** no tf file is delivered, and the remote settings are recorded in `platform-settings.md` as before
 
 #### Scenario: GitLab-managed state offered
-- **WHEN** the user asks to keep the tf state in the project's GitLab-managed Terraform state
-- **THEN** the builder keeps the configuration stateless, explaining that every run imports the current settings and that removing a declaration only stops managing it
+- **WHEN** the user asks to keep the state of the project's `policy.tf` in the project's GitLab-managed Terraform state
+- **THEN** the builder keeps `policy.tf` stateless, explaining that its settings are enumerable and idempotent, so every run imports them, and that GitLab-managed state is the default of the group's configuration repository
 
-### Requirement: Behavior: Removing a declaration stops managing the object and never deletes it
-The builder SHALL deliver tf that never deletes or replaces a platform object: it SHALL use no resource that deletes or rewrites objects outside its own list, and SHALL deliver a plan guard that fails on any delete or replace action and lists every change to an attribute the configuration does not declare.
+### Requirement: Behavior: Without state, removing a declaration stops managing the object and never deletes it
+For stateless tf, which is `policy.tf` and any configuration repository that chose no state backend, the builder SHALL deliver tf that never deletes or replaces a platform object. It SHALL use no resource that deletes or rewrites objects outside its own list. It SHALL run the plan guard in its default mode, which fails on any delete or replace action and lists every change to an attribute the configuration does not declare.
 
 #### Scenario: Declaration removed
 - **WHEN** a branch-protection declaration and its `import` block are removed from `policy.tf` and the plan guard reads the resulting plan
@@ -48,6 +48,17 @@ The builder SHALL deliver tf that never deletes or replaces a platform object: i
 #### Scenario: Replace in the plan
 - **WHEN** the plan guard reads a plan whose resource changes include `["create", "delete"]`
 - **THEN** the guard exits non-zero and names the resource
+
+### Requirement: Behavior: With state, a delete is applied only from a saved plan a human approved
+In a configuration repository with a state backend, removing a declaration deletes the object. The builder SHALL say so. It SHALL run the plan guard in its delete-listing mode, which lists every delete and replace for approval and passes. It SHALL apply only the saved plan that a human approved after seeing that list. To stop managing an object without deleting it, it SHALL replace the declaration with a `removed` block whose lifecycle sets `destroy = false`.
+
+#### Scenario: Declaration removed with state
+- **WHEN** a group label's declaration is removed from a configuration repository that keeps state
+- **THEN** the default-branch pipeline's plan job saves a plan that shows the delete, the guard lists it among the deletes to approve and passes, and the manual apply job applies only that saved plan
+
+#### Scenario: Stop managing without deleting
+- **WHEN** the user wants the configuration repository to stop managing a group setting but keep it on the platform
+- **THEN** the builder replaces its declaration with a `removed` block with `destroy = false`, and the plan shows no delete
 
 ### Requirement: Behavior: Project CI never holds a credential that can change group rules
 The builder SHALL have `policy.tf` planned and applied by a project maintainer or owner with their own credentials, and SHALL give the project's pipeline only credential-free checks of the tf files: format and validation.
@@ -72,22 +83,22 @@ Where a maintainer plans or applies locally, the builder SHALL add recipes to th
 - **THEN** it rewrites it as a shell substitution inside the recipe line, because Make echoes a recipe line after expanding its variables
 
 ### Requirement: Behavior: Each platform setting has exactly one owner
-The builder SHALL assign every managed setting to exactly one of the group's configuration repository or the project's `policy.tf`, keeping the security baseline and team workflow in group-level mechanisms and leaving `policy.tf` the project's description, visibility, and the approval and merge policy the group does not set.
+The builder SHALL assign every managed setting to exactly one of the group's configuration repository or the project's `policy.tf`. It SHALL keep the security baseline, the team workflow, and every rule the group can set uniformly in group-level mechanisms, and SHALL recommend that the configuration repository carry most managed resources, preferring one group-level resource over one resource per project. It SHALL leave `policy.tf` the project's enumerable, idempotent attributes and any rule the group does not set uniformly.
 
 #### Scenario: Group baseline exists
 - **WHEN** the group's configuration repository sets the group's merge request approval settings and the project needs one extra approval rule
 - **THEN** `policy.tf` declares that rule alone, and declares nothing the group already sets
 
 ### Requirement: Behavior: A group configuration repository is built with a chosen sync mode
-When the workspace is a group's configuration repository, the builder SHALL load its configuration-repository reference, SHALL present the sync mode as a harness option defaulting to CI plan and apply where the instance allows it, and SHALL scope any CI credential to that project alone.
+When the workspace is a group's configuration repository, the builder SHALL load its configuration-repository reference, SHALL present the sync mode as a harness option defaulting to CI plan and apply where the instance allows it, and SHALL scope any CI credential to that project alone. It SHALL present the state backend as a harness option. The default is the configuration project's GitLab-managed Terraform state, which every tier provides and which works with both Terraform and OpenTofu. The alternatives are stateless tf and a third-party backend.
 
 #### Scenario: Default sync mode on a paid or self-managed instance
 - **WHEN** the group is on GitLab.com Premium or Ultimate or on a self-managed instance, and the user accepts the default sync mode
-- **THEN** the delivered pipeline plans on merge requests and applies only from the default branch through a protected environment with a manual job; the apply credential is a group access token with `api` stored as a masked, protected CI/CD variable of the configuration project only, and the merge request plan uses a separate read-only group access token stored masked and unprotected there, with the builder recording that everyone who can push a branch to the configuration project can use the plan token; the token's expiry within 365 days and its rotation owner are recorded in `platform-settings.md`; and the provider version is pinned with its lock file committed
+- **THEN** the configuration keeps its state in the configuration project's GitLab-managed Terraform state, and pipeline jobs authenticate to that state with the job token; the delivered pipeline plans on merge requests without taking the state lock, saves a plan on the default branch, and applies only that saved plan from a manual job in a protected environment; the apply credential is a group access token with `api` stored as a masked, protected CI/CD variable of the configuration project only, and the merge request plan uses a separate read-only group access token stored masked and unprotected there, with the builder recording that everyone who can push a branch to the configuration project can use the plan token; the token's expiry within 365 days and its rotation owner are recorded in `platform-settings.md`; and the provider version is pinned with its lock file committed
 
 #### Scenario: GitLab.com Free
 - **WHEN** the group is on GitLab.com Free
-- **THEN** the builder says group access tokens are unavailable there, offers only the fully local sync mode, and proposes no personal access token as a substitute
+- **THEN** the builder says group access tokens are unavailable there, offers only the fully local sync mode, and proposes no personal access token as a CI substitute; the state can still be the configuration project's GitLab-managed state, reached with each maintainer's own glab login
 
 #### Scenario: Group labels
 - **WHEN** the group's labels are in scope
@@ -124,6 +135,10 @@ The builder SHALL deliver every script it gives the target — the commit check,
 #### Scenario: SemVer not chosen
 - **WHEN** the project did not choose SemVer
 - **THEN** no next-version helper is delivered
+
+#### Scenario: Guard for a configuration repository with state
+- **WHEN** the configuration repository keeps state
+- **THEN** its pipeline runs the same delivered plan guard in its delete-listing mode, not a separate script
 
 #### Scenario: Label file committed
 - **WHEN** the approved label taxonomy is committed to the target
