@@ -61,9 +61,9 @@ installed tool, let the user decide, and record the choice in
   managed resources; data sources and `terraform_data` do not count
   (HashiCorp's documentation, checked 2026-10-15). State that limit, and
   say why the organization prefers one organization-level resource.
-- **OpenTofu.** Do not default to HCP Terraform: OpenTofu's documentation
-  promises no compatibility with it, and reports disagree (checked
-  2026-10-15). Ask the user to name a backend, or to choose stateless tf.
+- **OpenTofu.** Do not default to HCP Terraform, and tell the user why in
+  those words: OpenTofu's documentation promises no compatibility with it,
+  and reports disagree (checked 2026-10-15). Ask the user to name a backend, or to choose stateless tf.
   Until they name one — including when they said to take every default —
   build stateless tf, which needs no credential and deletes nothing, and
   record the backend in `platform-settings.md` as an open question. When
@@ -86,7 +86,8 @@ installed tool, let the user decide, and record the choice in
   }
   ```
 
-  `removed` blocks need Terraform 1.7. OpenTofu 1.13.0 plans this block as
+  `removed` blocks need Terraform 1.7: raise `required_version` to
+  `>= 1.7.0` when you add one. OpenTofu 1.13.0 plans this block as
   `forget` and the guard passes it (checked 2026-10-15).
 - **Keep the `import` blocks.** Give every object that may already exist on
   the platform one: it adopts the object into a new or lost state and does
