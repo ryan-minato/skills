@@ -1,22 +1,32 @@
 #!/usr/bin/env python3
-"""Plan guard for the project's stateless platform-settings tf.
+"""Plan guard for the project's platform-settings tf.
 
 Delivered as scripts/tf_plan_guard.py. It reads the JSON form of a saved
 plan (`tofu show -json plan.out` or `terraform show -json plan.out`) and
-enforces the rule that removing a declaration only stops managing an
-object: any delete or replace action fails the guard. It also lists, for
-the reviewer, every create that imports nothing (a first creation whose
-ID must be written into an import block afterwards) and every update to
-an attribute the configuration does not declare (a reset to the
-provider's default). Python 3.10+, standard library only.
+lists, for the reviewer, every update to an attribute the configuration
+does not declare (a reset to the provider's default).
+
+Without state (the default), removing a declaration only stops managing
+an object, so any delete or replace fails the guard. A create that
+imports nothing also fails: every run starts from an empty state, so a
+created object must get an import block before the next run, or the
+next run would create it again. Pass --allow-create only for the first
+creation of an object that does not exist yet.
+
+With --allow-delete, for a configuration that keeps state, deletes and
+replaces are listed under their own heading for the approver and pass,
+and creates are ordinary, because the state records them.
+
+Python 3.10+, standard library only.
 
 Usage:
     tofu plan -out plan.out && tofu show -json plan.out > plan.json
     python3 scripts/tf_plan_guard.py plan.json
-    tofu show -json plan.out | python3 scripts/tf_plan_guard.py -
+    tofu show -json plan.out | python3 scripts/tf_plan_guard.py - --allow-create
+    tofu show -json plan.out | python3 scripts/tf_plan_guard.py - --allow-delete
 
-Exit codes: 0 = no delete or replace (listings are informational);
-1 = a delete or replace is planned, or the input is not a readable plan
+Exit codes: 0 = nothing blocked (listings are informational);
+1 = a blocked change is planned, or the input is not a readable plan
 JSON; 2 = bad arguments.
 """
 
@@ -87,43 +97,63 @@ def changed_attributes(change: dict) -> set[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Fail on any delete or replace in a tf plan JSON; list un-imported creates and undeclared updates."
+        description="Check a tf plan JSON: without state, block deletes, replaces, and un-imported creates."
     )
     parser.add_argument("plan", help="path to the `show -json` output of a saved plan, or - for standard input")
+    parser.add_argument(
+        "--allow-create",
+        action="store_true",
+        help="without state: allow creates that import nothing, for the first creation of an object",
+    )
+    parser.add_argument(
+        "--allow-delete",
+        action="store_true",
+        help="with state: list deletes and replaces for approval instead of failing; creates are ordinary",
+    )
     args = parser.parse_args()
 
     plan = read_plan(args.plan)
     declared = declared_attributes(plan.get("configuration", {}).get("root_module", {}))
 
-    blocked, creates, resets = [], [], []
+    deletes, creates, resets = [], [], []
     for rc in plan.get("resource_changes", []):
         address = rc["address"]
         change = rc["change"]
         actions = change["actions"]
         if "delete" in actions:
             kind = "replace" if "create" in actions else "delete"
-            blocked.append(f"{address}: {kind} planned ({', '.join(actions)})")
+            deletes.append(f"{address}: {kind} planned ({', '.join(actions)})")
         elif actions == ["create"] and not change.get("importing"):
-            creates.append(f"{address}: created, not imported; write its ID into an import block after the apply")
+            creates.append(f"{address}: created, not imported")
         elif "update" in actions:
             config_address = INDEX_RE.sub("", address)
             undeclared = sorted(changed_attributes(change) - declared.get(config_address, set()))
             if undeclared:
                 resets.append(f"{address}: undeclared attributes change: {', '.join(undeclared)}")
 
-    for title, lines in (
-        ("Creates without import", creates),
+    blocked_creates = creates and not (args.allow_create or args.allow_delete)
+    blocked_deletes = deletes and not args.allow_delete
+    sections = (
         ("Undeclared attributes that change (reset to the provider's value)", resets),
-        ("Blocked: delete or replace", blocked),
-    ):
+        ("Blocked: create without import" if blocked_creates else "Creates", creates),
+        ("Blocked: delete or replace" if blocked_deletes else "Deletes and replaces to approve", deletes),
+    )
+    for title, lines in sections:
         if lines:
             print(f"{title}:")
             for line in lines:
                 print(f"  {line}")
-    if blocked:
-        print("Removing a declaration stops managing the object; nothing may be deleted or replaced.")
+    if blocked_creates:
+        print(
+            "Without state, every created object needs an import block before the next run, or that run creates it "
+            "again. If these objects do not exist yet, rerun with --allow-create and add their import blocks after "
+            "the apply."
+        )
+    if blocked_deletes:
+        print("Without state, removing a declaration stops managing the object; nothing may be deleted or replaced.")
+    if blocked_creates or blocked_deletes:
         sys.exit(1)
-    print("tf_plan_guard: no delete or replace planned.")
+    print("tf_plan_guard: nothing blocked.")
 
 
 if __name__ == "__main__":

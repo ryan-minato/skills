@@ -6,8 +6,9 @@
 # not. An attribute left out may be reset to the provider's value by an apply,
 # so declare everything the harness depends on. Plan and apply only through
 # the task-runner recipes the knowledge file names; the plan guard runs there.
-# Group-owned rules (the security baseline, team workflow) belong to the
-# group's configuration repository, never to this file.
+# This file holds enumerable project attributes and only the rules the group
+# does not set uniformly; group-owned rules (the security baseline, team
+# workflow) belong to its configuration repository.
 
 terraform {
   required_version = ">= 1.6.0"
@@ -64,9 +65,11 @@ resource "gitlab_branch_protection" "default" {
 
 # {{WHY — e.g. "One approval from the backend team; the group sets no approval rule."}}
 # Approval rules need Premium or Ultimate; on Free, delete this block.
-# First creation: an approval rule has no ID before it exists, so it starts
-# without an import block and the plan guard lists the create. After the apply,
-# read its ID with `glab api projects/<id>/approval_rules` and add:
+# Only for a rule the group does not set uniformly. First creation: an
+# approval rule has no ID before it exists, and with no state the next run
+# would create it again, so the guard blocks the create unless the plan and
+# apply pass --allow-create. After that apply, read its ID with
+# `glab api projects/<id>/approval_rules` and add, before anyone plans again:
 #   import {
 #     to = gitlab_project_approval_rule.extra
 #     id = "<project id>:<rule id>"
