@@ -77,7 +77,8 @@ stateless tf and a third-party backend.
   }
   ```
 
-  `removed` blocks need Terraform 1.7. OpenTofu 1.13.0 plans this block as
+  `removed` blocks need Terraform 1.7: raise `required_version` to
+  `>= 1.7.0` when you add one. OpenTofu 1.13.0 plans this block as
   `forget` and the guard passes it (checked 2026-10-15).
 - **Keep the `import` blocks.** Give every object that may already exist on
   the platform one: it adopts the object into a new or lost state and does
