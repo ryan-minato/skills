@@ -91,9 +91,9 @@ jobs:
           client-id: ${{ vars.{{APP_CLIENT_ID_VARIABLE}} }}
           private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
           owner: ${{ github.repository_owner }}
-          # Read-only: a pull request runs its own code under this token. One
-          # `permission-<name>: read` line per permission the declared
-          # resources need; an organization ruleset needs this one.
+          # Read-only: this job only plans; the apply job mints the write
+          # token. One `permission-<name>: read` line per permission the
+          # declared resources need; an organization ruleset needs this one.
           permission-organization-administration: read
       # OpenTofu from its official release, checked against the release's
       # SHA256SUMS; no third-party action. With HCP Terraform, the Terraform
