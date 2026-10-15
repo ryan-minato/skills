@@ -57,7 +57,7 @@ installed tool, let the user decide, and record the choice in
   organization and the workspace, and set the workspace's execution mode
   to Local. HCP Terraform then stores and locks state only, and plans and
   applies still run in Actions or on an administrator's machine, under the
-  App token and the environment approval below. The Free plan allows 500
+  App tokens and the approvals below. The Free plan allows 500
   managed resources; data sources and `terraform_data` do not count
   (HashiCorp's documentation, checked 2026-10-15). State that limit, and
   say why the organization prefers one organization-level resource.
@@ -104,9 +104,27 @@ options:
 
 | Mode | CI does | An administrator does | Credential in CI |
 |---|---|---|---|
-| CI plans and applies (default) | plan on pull requests; on the default branch, save a plan and apply it after the environment's reviewers approve | reviews the saved plan and approves | App installation token, plus the state backend's token |
-| CI plans, the administrator applies | plan on pull requests | applies locally through the recipes in [config-as-code.md](config-as-code.md) | App installation token, plus the state backend's token |
+| CI plans and applies | plan on pull requests; on the default branch, save a plan and apply it after the environment's reviewers approve | reviews the saved plan and approves | the plan App's key (repository secret); the apply App's key (apply environment secret); the state backend's tokens split the same way |
+| CI plans, the administrator applies | plan on pull requests | applies locally through the recipes in [config-as-code.md](config-as-code.md) | the plan App's key; the state backend's plan token |
 | Fully local | nothing that needs a credential (format and validation only) | plans and applies locally | none |
+
+The default depends on whether a second person can be required to approve
+the apply:
+
+- **CI plans and applies** is the default only when the private
+  configuration repository can have environment required reviewers. GitHub
+  offers them on private repositories with GitHub Enterprise only; on Free,
+  Pro, and Team they exist for public repositories only (GitHub
+  documentation, checked 2026-10-15). Read the plan from the probe.
+- **CI plans, the administrator applies** is the default everywhere else.
+  Say why: without required reviewers, a merge would apply with write
+  credentials and nobody approving. Never deliver the apply job without
+  them.
+- **One organization owner.** Say that no second person can review a
+  change or approve an apply, propose CI plans with the owner applying
+  locally, and record the accepted risk with its date in
+  `platform-settings.md`. Prevented self-review would block every apply
+  of a single owner, so do not offer the CI apply as a way around it.
 
 For the local steps, the administrator's `gh` login needs `admin:org`
 (`gh auth refresh -s admin:org`). With state, pass `--allow-delete` as the
@@ -133,65 +151,80 @@ Start from
 - On a push to the default branch, one job plans, runs the guard, writes
   its output to the job summary, and uploads the saved plan with a short
   retention. The apply job is bound to an environment whose required
-  reviewers are organization owners and whose deployment branches are
-  limited to the default branch; it downloads that plan and applies it,
-  so the reviewers approve the plan they read. A plan made stale by
-  another apply is refused; run the workflow again.
+  reviewers are organization owners, with **prevent self-review** on, and
+  whose deployment branches are limited to the default branch; it
+  downloads that plan and applies it, so a second person approves the plan
+  they read. A plan made stale by another apply is refused; run the
+  workflow again.
 - Serialize runs with a concurrency group that never cancels.
 - Pin the provider and commit its lock file, and initialize with
   `-lockfile=readonly`.
 - Protect the default branch so it takes changes only through pull
-  requests.
+  requests with at least one approving review. GitHub never counts the
+  author's own approval, so a change and its apply each need a second
+  person.
 - Agents draft tf changes and pull requests. They never approve the
   environment, and they never run an apply without the user's explicit
   approval.
 
 ## Credentials for CI
 
-Use a GitHub App owned by the organization. Its installation token is
-minted per run and expires after one hour, so no long-lived token sits in
-CI.
+Use GitHub Apps owned by the organization. An installation token is minted
+per run and expires after one hour, so no long-lived token sits in CI. The
+private key is the credential to protect: a pull request runs its own
+workflow, so everyone who can push a branch to the configuration
+repository can read every secret the pull request's job is given, and mint
+any token that key allows. Narrowing the minted token to read does not
+narrow the key, so the plan and the apply use separate Apps.
 
-1. Create the App under the organization's developer settings, with no
-   webhook. Grant only the permissions the declared resources need: an
-   organization ruleset needs organization **Administration: write**.
-   Look up any other resource's endpoint in GitHub's App-permission
-   reference.
+1. Create the **plan App** under the organization's developer settings,
+   with no webhook and only the read level of each permission the
+   declared resources need: an organization ruleset needs organization
+   **Administration: read**. Look up any other resource's endpoint in
+   GitHub's App-permission reference.
 2. Install it on the organization, with repository access limited to the
-   configuration repository.
-3. Generate a private key and store it as a **repository** secret of the
-   configuration repository, and store the App's client ID as a repository
-   variable. An environment secret would not reach the plan job, which runs
-   on pull requests outside any environment. **Never store the key as an
-   organization secret**: an organization secret can be shared with other
-   repositories, whose workflows would then hold a credential that changes
-   organization rules.
-4. The plan job mints its token read-only through the action's
-   `permission-<name>: read` inputs, one per permission the declared
-   resources need, and the apply job mints the same at write. A pull
-   request runs its own workflow and tf under the plan token, so everyone
-   who can push to the configuration repository can read what that token
-   reads: keep its collaborators to the organization's owners, and say so
-   in `platform-settings.md`.
-5. Record the App, its permissions, the secret's name (never its value),
-   and the key-rotation owner in `platform-settings.md`.
-6. With HCP Terraform, store an API token as a **repository** secret named
-   `TF_TOKEN_app_terraform_io`, which Terraform reads for that host. Keep
-   the HCP Terraform organization to this workspace, so the token reaches
-   nothing else. On a plan with teams, use a team token whose team can
-   reach only this workspace. On the Free plan, which has no teams, use the
-   user token of a dedicated HCP Terraform account. HashiCorp's token
-   documentation says organization tokens cannot start runs, and whether
-   they can write state was not confirmed (read 2026-10-15), so do not use
-   one. Confirm the choice in that documentation before creating the
-   token. Record in `platform-settings.md`,
-   never the value:
-   - its type, as above;
-   - its expiry: set when created, at most one year;
-   - its rotation owner: the organization owner who creates it, unless the
-     user names someone else.
+   configuration repository. Generate a private key and store it as a
+   **repository** secret of the configuration repository, and the App's
+   client ID as a repository variable; an environment secret would not
+   reach the plan job, which runs on pull requests outside any
+   environment. Everyone who can push to the configuration repository can
+   read what this App reads: keep its collaborators to the organization's
+   owners, and say so in `platform-settings.md`.
+3. Only in the "CI plans and applies" mode, create the **apply App** the
+   same way with the write level of the same permissions (organization
+   **Administration: write** for a ruleset). Store its private key as a
+   secret of the **apply environment**, and its client ID as a variable of
+   that environment. A job reads an environment secret only after a
+   required reviewer approves it (GitHub documentation, checked
+   2026-10-15), so no pull request and no unapproved run reaches the write
+   key.
+4. **Never store either key as an organization secret**: an organization
+   secret can be shared with other repositories, whose workflows would then
+   hold a credential that reads or changes organization rules.
+5. Record each App, its permissions, each secret's name and scope (never
+   its value), and the key-rotation owner in `platform-settings.md`.
+6. With HCP Terraform, Terraform reads the API token for that host from
+   `TF_TOKEN_app_terraform_io`. Keep the HCP Terraform organization to this
+   workspace, so the token reaches nothing else.
+   - On a plan with teams, use two team tokens: one whose team can only
+     read this workspace's state, stored as a **repository** secret for the
+     plan jobs, which plan with `-lock=false`; and one whose team can write
+     state, stored as a secret of the apply environment. Whether a
+     read-only state token suffices for such a plan was not checked;
+     confirm it on a workspace that manages nothing.
+   - On the Free plan, which has no teams, use the user token of a
+     dedicated HCP Terraform account as a repository secret, and record that
+     the plan jobs hold a token that can write state.
+   - HashiCorp's token documentation says organization tokens cannot start
+     runs, and whether they can write state was not confirmed (read
+     2026-10-15), so do not use one. Confirm the choice in that
+     documentation before creating the token.
 
-   A third-party backend's credential follows the same rule.
+   Record in `platform-settings.md`, never the value, each token's type, as
+   above; its expiry, set when created and at most one year; and its
+   rotation owner, the organization owner who creates it unless the user
+   names someone else. A third-party backend's credential follows the same
+   rule.
 
 A fine-grained personal access token is the fallback only when an App is
 impossible. It belongs to a person and lives long, so record its owner and
