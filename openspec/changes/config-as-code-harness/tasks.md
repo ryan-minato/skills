@@ -15,4 +15,4 @@
 
 ## 4. Finish
 
-- [ ] 4.1 `just check` passes locally and `checks / quality` passes on the pull request; the results are recorded in the Validation section.
+- [x] 4.1 `just check` passes locally and `checks / quality` passes on the pull request; the results are recorded in the Validation section.
