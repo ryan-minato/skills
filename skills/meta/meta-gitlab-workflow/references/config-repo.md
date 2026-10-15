@@ -107,6 +107,24 @@ CI substitute: it carries a person's whole authority. The state can still
 be this project's GitLab-managed state, reached with each maintainer's own
 glab login.
 
+The recipes in [config-as-code.md](config-as-code.md) are written for
+`.gitlab/policy.tf`; adapt them before delivering them here:
+
+- Run every step in the repository root, where this project's tf lives,
+  instead of `.gitlab`, and call the guard as `scripts/tf_plan_guard.py`.
+- With state, pass `--allow-delete` as the guard argument, and drop the
+  `rm -f terraform.tfstate terraform.tfstate.backup` parts: GitLab holds
+  the state, and only stateless tf needs a fresh empty one. Keep removing
+  `plan.out` as the recipes do.
+- With GitLab-managed state, `tofu init` already needs the state address
+  and credentials. In the `_policy` recipe, export the `TF_HTTP_*`
+  variables of `assets/gitlab-ci-config-repo.yml` right after the token is
+  read and before `tofu init`, with `https://HOST/api/v4` in place of
+  `${CI_API_V4_URL}`, the project's ID in place of `${CI_PROJECT_ID}`, the
+  maintainer's GitLab username as `TF_HTTP_USERNAME`, and the token as
+  `TF_HTTP_PASSWORD`. In a `Makefile`, put `tofu init` on the same recipe
+  line as the token read.
+
 ## The CI gate
 
 Start from `assets/gitlab-ci-config-repo.yml`:

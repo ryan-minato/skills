@@ -114,6 +114,14 @@ recipes' guard argument; with HCP Terraform, the administrator runs
 `terraform login` once, which keeps their own token in Terraform's
 credentials file.
 
+Those recipes are written for `.github/policy.tf`; adapt them before
+delivering them here. Run every step in the repository root, where this
+repository's tf lives, instead of `.github`, and call the guard as
+`scripts/tf_plan_guard.py`. With state, drop the
+`rm -f terraform.tfstate terraform.tfstate.backup` parts: the backend holds
+the state, and only stateless tf needs a fresh empty one. Keep removing
+`plan.out` as the recipes do.
+
 ## The CI gate
 
 Start from
