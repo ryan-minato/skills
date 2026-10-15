@@ -19,8 +19,9 @@ tier: {{ENFORCED_ADVISORY_OR_CONVENTION}}.
 | Actions availability & token policy | {{ENABLED_ALLOWED_ACTIONS_DEFAULT_PERMS}} | enforced | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/actions/permissions` | org policy change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | CODEOWNERS enforcement | {{REQUIRE_CODEOWNER_REVIEW_ON_OR_OFF}} | {{TIER}} | {{OWNER}} | ruleset settings | ownership change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Environments & reviewers | {{ENVIRONMENTS_AND_APPROVERS}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/environments` | deploy-authority change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
-| Configuration repository collaborators (configuration repository only) | organization owners only — a pull request runs its own code under the read-only plan token | enforced | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/collaborators` | membership change | none |
-| State backend credential (configuration repository only) | {{TOKEN_TYPE_SCOPE_EXPIRY_ROTATION_OWNER — e.g. HCP Terraform team token as TF_TOKEN_app_terraform_io; never the value}} | enforced | {{OWNER}} | `gh secret list` and the backend's token settings | rotation or expiry | none |
+| Configuration repository collaborators (configuration repository only) | organization owners only — a pull request's workflow can read the plan App's key and everything that App reads | enforced | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/collaborators` | membership change | none |
+| Configuration repository review gates (configuration repository only) | {{DEFAULT_BRANCH_ONE_APPROVING_REVIEW_AND_APPLY_ENVIRONMENT_PREVENT_SELF_REVIEW — or, with one owner, "no second person; accepted risk, DATE"}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}}/rulesets` and `gh api repos/{{OWNER_REPO}}/environments` | membership or plan change | none |
+| State backend credential (configuration repository only) | {{TOKEN_TYPE_SCOPE_EXPIRY_ROTATION_OWNER — one row per token, for the plan jobs (read-only, or recorded as able to write state) and for the apply environment; never the value}} | enforced | {{OWNER}} | `gh secret list` and the backend's token settings | rotation or expiry | none |
 | Secrets & variables (names only) | {{NAMES_AND_OWNERS}} | enforced | {{OWNER}} | `gh secret list` | rotation | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Secret scanning | {{ENABLED_OR_DOWNGRADED_WITH_SKU}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}} --jq .security_and_analysis` | plan or visibility change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
 | Push protection | {{ENABLED_OR_DOWNGRADED_WITH_SKU}} | {{TIER}} | {{OWNER}} | `gh api repos/{{OWNER_REPO}} --jq .security_and_analysis` | plan or visibility change | {{POLICY_TF_CONFIG_REPO_OR_NONE}} |
@@ -42,7 +43,7 @@ describes is verified by a plan, not only by its readback.
 | Platform settings as tf | {{YES_IF_TOFU_OR_TERRAFORM_INSTALLED_OR_NO}} | yes when the tool is installed | {{DATE}} |
 | Label sync | {{CI_OR_MANUAL}} | CI (`labels / sync`, `issues: write`) | {{DATE}} |
 | Label pruning | {{OFF_OR_ON}} | off — deleting a label strips it from every issue and pull request | {{DATE}} |
-| Configuration repository sync (configuration repository only) | {{CI_PLAN_AND_APPLY_OR_CI_PLAN_LOCAL_APPLY_OR_LOCAL}} | CI plans and applies | {{DATE}} |
+| Configuration repository sync (configuration repository only) | {{CI_PLAN_AND_APPLY_OR_CI_PLAN_LOCAL_APPLY_OR_LOCAL}} | CI plans and applies where the private repository can have environment required reviewers (Enterprise); otherwise CI plans, an administrator applies | {{DATE}} |
 | State backend (configuration repository only) | {{HCP_TERRAFORM_NAMED_BACKEND_OR_STATELESS}} | HCP Terraform, local execution, with Terraform; a backend the user names with OpenTofu — with state, removing a declaration deletes through an approved plan | {{DATE}} |
 
 Advisory-tier upgrade trigger: {{UPGRADE_TRIGGER — e.g. "if visibility

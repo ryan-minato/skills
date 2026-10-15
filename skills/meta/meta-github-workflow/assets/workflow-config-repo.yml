@@ -1,18 +1,22 @@
 # .github/workflows/config.yml — the organization configuration repository's
-# sync, for the "CI plans and applies" mode (delete the save-plan and apply
-# jobs for the "CI plans, an administrator applies" mode; deliver no workflow
-# holding the App key for the fully local mode). With state, the guard runs
+# sync, for the "CI plans and applies" mode, which needs environment required
+# reviewers on this private repository (delete the save-plan and apply jobs
+# for the "CI plans, an administrator applies" mode; deliver no workflow
+# holding an App key for the fully local mode). With state, the guard runs
 # with --allow-delete and lists every delete for the approver; for stateless
-# tf, drop that flag and the HCP Terraform token, and the guard blocks
+# tf, drop that flag and the HCP Terraform tokens, and the guard blocks
 # deletes. On the default branch the plan is saved and the apply job, behind
-# the environment's required reviewers, applies only that file. The credential is a GitHub App
-# installation token minted per run from a key stored as a secret of this
-# repository only — never an organization secret, which other repositories'
-# workflows could reach. Fork pull requests get no secrets under
-# `pull_request`, so their plan job fails at the token step by design. The
-# plan job's token is minted read-only: everyone who can push to this
-# repository can run code under it, so the repository's collaborators are
-# the organization's owners and nobody else.
+# the environment's required reviewers, applies only that file.
+#
+# Two GitHub Apps, minted per run. A pull request runs its own workflow, so
+# whoever can push a branch here can read every secret the plan job gets:
+# the plan App holds only read permissions and its key is a repository
+# secret; the apply App holds the write permissions and its key is a secret
+# of the apply environment, which no job reads before a reviewer approves.
+# Never an organization secret, which other repositories' workflows could
+# reach. Fork pull requests get no secrets under `pull_request`, so their
+# plan job fails at the token step by design. The repository's
+# collaborators are the organization's owners and nobody else.
 name: config
 
 on:
@@ -44,13 +48,10 @@ jobs:
       - id: app
         uses: actions/create-github-app-token@v3
         with:
-          client-id: ${{ vars.{{APP_CLIENT_ID_VARIABLE}} }}
-          private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
+          # The plan App: read permissions only, key a repository secret.
+          client-id: ${{ vars.{{PLAN_APP_CLIENT_ID_VARIABLE}} }}
+          private-key: ${{ secrets.{{PLAN_APP_PRIVATE_KEY_SECRET}} }}
           owner: ${{ github.repository_owner }}
-          # Read-only: a pull request runs its own code under this token. One
-          # `permission-<name>: read` line per permission the declared
-          # resources need; an organization ruleset needs this one.
-          permission-organization-administration: read
       # OpenTofu from its official release, checked against the release's
       # SHA256SUMS; no third-party action. With HCP Terraform, the Terraform
       # default, download terraform_<v>_linux_amd64.zip and
@@ -71,8 +72,9 @@ jobs:
       - name: Plan and guard, without taking the state lock
         env:
           GITHUB_TOKEN: ${{ steps.app.outputs.token }}
-          # HCP Terraform state; drop for stateless tf or another backend.
-          TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_TOKEN_SECRET}} }}
+          # HCP Terraform state, read-only where teams allow it; drop for
+          # stateless tf or another backend.
+          TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_PLAN_TOKEN_SECRET}} }}
         run: |
           tofu fmt -check -diff
           tofu init -input=false -lockfile=readonly
@@ -88,13 +90,10 @@ jobs:
       - id: app
         uses: actions/create-github-app-token@v3
         with:
-          client-id: ${{ vars.{{APP_CLIENT_ID_VARIABLE}} }}
-          private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
+          # The plan App: read permissions only, key a repository secret.
+          client-id: ${{ vars.{{PLAN_APP_CLIENT_ID_VARIABLE}} }}
+          private-key: ${{ secrets.{{PLAN_APP_PRIVATE_KEY_SECRET}} }}
           owner: ${{ github.repository_owner }}
-          # Read-only: this job only plans; the apply job mints the write
-          # token. One `permission-<name>: read` line per permission the
-          # declared resources need; an organization ruleset needs this one.
-          permission-organization-administration: read
       # OpenTofu from its official release, checked against the release's
       # SHA256SUMS; no third-party action. With HCP Terraform, the Terraform
       # default, download terraform_<v>_linux_amd64.zip and
@@ -112,14 +111,17 @@ jobs:
           unzip -q "$zip" tofu -d "$RUNNER_TEMP/tofu"
           rm "$zip" SHA256SUMS
           echo "$RUNNER_TEMP/tofu" >> "$GITHUB_PATH"
+      # Without the lock, as the plan token may only read state; the apply
+      # refuses this plan if another apply changed the state since.
       - name: Plan and guard; the guard's lists go to the job summary
         env:
           GITHUB_TOKEN: ${{ steps.app.outputs.token }}
-          # HCP Terraform state; drop for stateless tf or another backend.
-          TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_TOKEN_SECRET}} }}
+          # HCP Terraform state, read-only where teams allow it; drop for
+          # stateless tf or another backend.
+          TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_PLAN_TOKEN_SECRET}} }}
         run: |
           tofu init -input=false -lockfile=readonly
-          tofu plan -input=false -out=plan.out
+          tofu plan -input=false -lock=false -out=plan.out
           tofu show -json plan.out | python3 scripts/tf_plan_guard.py - --allow-delete | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
@@ -131,9 +133,10 @@ jobs:
     name: config / apply
     needs: save-plan
     runs-on: ubuntu-latest
-    # Required reviewers on this environment approve the saved plan whose
-    # guard lists they read in the save-plan job's summary; the job waits for
-    # them before any step runs.
+    # Required reviewers on this environment, with self-review prevented,
+    # approve the saved plan whose guard lists they read in the save-plan
+    # job's summary; the job waits for them before any step runs or any
+    # environment secret is read.
     environment: "{{APPLY_ENVIRONMENT}}"
     steps:
       - uses: actions/checkout@v4
@@ -143,11 +146,11 @@ jobs:
       - id: app
         uses: actions/create-github-app-token@v3
         with:
-          client-id: ${{ vars.{{APP_CLIENT_ID_VARIABLE}} }}
-          private-key: ${{ secrets.{{APP_PRIVATE_KEY_SECRET}} }}
+          # The apply App: write permissions; its key and client ID are a
+          # secret and a variable of the apply environment only.
+          client-id: ${{ vars.{{APPLY_APP_CLIENT_ID_VARIABLE}} }}
+          private-key: ${{ secrets.{{APPLY_APP_PRIVATE_KEY_SECRET}} }}
           owner: ${{ github.repository_owner }}
-          # The same permissions as the plan job, at write.
-          permission-organization-administration: write
       # OpenTofu from its official release, checked against the release's
       # SHA256SUMS; no third-party action. With HCP Terraform, the Terraform
       # default, download terraform_<v>_linux_amd64.zip and
@@ -168,8 +171,10 @@ jobs:
       - name: Apply the saved plan
         env:
           GITHUB_TOKEN: ${{ steps.app.outputs.token }}
-          # HCP Terraform state; drop for stateless tf or another backend.
-          TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_TOKEN_SECRET}} }}
+          # HCP Terraform state, written with this secret of the apply
+          # environment where teams allow a separate plan token; drop for
+          # stateless tf or another backend.
+          TF_TOKEN_app_terraform_io: ${{ secrets.{{HCP_APPLY_TOKEN_SECRET}} }}
         run: |
           tofu init -input=false -lockfile=readonly
           tofu show -json plan.out | python3 scripts/tf_plan_guard.py - --allow-delete
