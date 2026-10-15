@@ -19,8 +19,8 @@ The description SHALL load the builder for building, replacing, or systematicall
 - **WHEN** the user says "Add a `needs-triage` label to this repository."
 - **THEN** the skill does not load
 
-### Requirement: Behavior: Needed platform settings are declared as minimal stateless tf when the tool is installed
-When Terraform or OpenTofu is installed, the builder SHALL offer `.github/policy.tf`, which declares only the repository settings that the harness or a requirement the user stated depends on, gives each declaration its reason, declares no backend, and has an `import` block for every resource; it SHALL keep `platform-settings.md`, recording there which rows the tf file describes, what no provider covers, and each harness option chosen; and it SHALL record in the target's knowledge that review is the check on `policy.tf`: a change whose declarations do not make their effect and reason readable is rejected.
+### Requirement: Behavior: A repository's own settings are declared as minimal stateless tf when the tool is installed
+When Terraform or OpenTofu is installed, the builder SHALL offer `.github/policy.tf`, which declares only the repository settings that the harness or a requirement the user stated depends on, gives each declaration its reason, declares no backend, and has an `import` block for every resource. It SHALL limit `policy.tf` to enumerable, idempotent repository attributes, such as the name, description, visibility, template flag, archive state, merge methods, branch deletion on merge, and whether issues, discussions, and the wiki are enabled, plus any rule the harness needs that the organization does not set uniformly; it SHALL keep `platform-settings.md`, recording there which rows the tf file describes, what no provider covers, and each harness option chosen; and it SHALL record in the target's knowledge that review is the check on `policy.tf`: a change whose declarations do not make their effect and reason readable is rejected.
 
 #### Scenario: Tool installed
 - **WHEN** `tofu` or `terraform` is on the path, the design is approved, and the harness needs pull requests and Issues enabled on the repository
@@ -38,8 +38,8 @@ When Terraform or OpenTofu is installed, the builder SHALL offer `.github/policy
 - **WHEN** the repository has the wiki enabled and neither the harness nor the user depends on it
 - **THEN** `policy.tf` does not declare the wiki setting, and the builder says that undeclared settings may be reset to the provider's default by an apply
 
-### Requirement: Behavior: Removing a declaration stops managing the object and never deletes it
-The builder SHALL deliver tf that never deletes or replaces a platform object: it SHALL use no resource that deletes or rewrites objects outside its own list, and SHALL deliver a plan guard that fails on any delete or replace action and lists every change to an attribute the configuration does not declare.
+### Requirement: Behavior: Without state, removing a declaration stops managing the object and never deletes it
+For stateless tf, which is `policy.tf` and any configuration repository that chose no state backend, the builder SHALL deliver tf that never deletes or replaces a platform object. It SHALL use no resource that deletes or rewrites objects outside its own list. It SHALL run the plan guard in its default mode, which fails on any delete or replace action and lists every change to an attribute the configuration does not declare.
 
 #### Scenario: Declaration removed
 - **WHEN** a ruleset declaration and its `import` block are removed from `policy.tf` and the plan guard reads the resulting plan
@@ -52,6 +52,17 @@ The builder SHALL deliver tf that never deletes or replaces a platform object: i
 #### Scenario: Authoritative resource requested
 - **WHEN** the user asks the builder to manage every repository label through tf
 - **THEN** the builder keeps labels out of tf, points to the label file and its sync, and writes no resource that would delete labels missing from a list
+
+### Requirement: Behavior: With state, a delete is applied only from a saved plan a human approved
+In a configuration repository with a state backend, removing a declaration deletes the object. The builder SHALL say so. It SHALL run the plan guard in its delete-listing mode, which lists every delete and replace for approval and passes. It SHALL apply only the saved plan that a human approved after seeing that list. To stop managing an object without deleting it, it SHALL replace the declaration with a `removed` block whose lifecycle sets `destroy = false`.
+
+#### Scenario: Declaration removed with state
+- **WHEN** an organization ruleset's declaration is removed from a configuration repository that keeps state
+- **THEN** the plan shows the delete, the guard lists it among the deletes to approve and passes, and the apply runs only that saved plan after the environment's required reviewers approve it
+
+#### Scenario: Stop managing without deleting
+- **WHEN** the user wants the configuration repository to stop managing an organization ruleset but keep it on the platform
+- **THEN** the builder replaces its declaration with a `removed` block with `destroy = false`, and the plan shows no delete
 
 ### Requirement: Behavior: Project CI never holds a credential that can change organization rules
 The builder SHALL have `policy.tf` planned and applied by a repository administrator with their own credentials and SHALL give the project's CI only credential-free checks of the tf files: format and validation.
@@ -80,22 +91,37 @@ Where an administrator plans or applies locally, the builder SHALL add recipes t
 - **THEN** the builder names `gh auth refresh -s admin:org` as the step before the first plan and writes nothing that stores a token
 
 ### Requirement: Behavior: Each platform setting has exactly one owner
-The builder SHALL assign every managed setting to exactly one of the organization's configuration repository or the repository's `policy.tf`, keeping the security baseline and team workflow in organization-level mechanisms and leaving `policy.tf` the repository's description, visibility, and the approval and merge policy the organization does not set.
+The builder SHALL assign every managed setting to exactly one of the organization's configuration repository or the repository's `policy.tf`. It SHALL keep the security baseline, the team workflow, and every rule the organization can set uniformly in organization-level mechanisms, and SHALL recommend that the configuration repository carry most managed resources. It SHALL prefer one organization-level resource over one resource per repository, because a state backend that bills or caps managed resources counts each one. It SHALL leave `policy.tf` the repository's enumerable, idempotent attributes and any rule the organization does not set uniformly.
 
 #### Scenario: Organization baseline exists
 - **WHEN** the organization's configuration repository enforces an organization ruleset and the repository needs one extra required review
 - **THEN** `policy.tf` declares a repository ruleset for that review alone, and declares nothing the organization ruleset already sets
+
+#### Scenario: Same rule needed by several repositories
+- **WHEN** several repositories each need the same extra required review and the configuration repository keeps its state in HCP Terraform
+- **THEN** the builder recommends one organization ruleset targeting those repositories in the configuration repository, not one repository ruleset per repository, saying that each managed resource counts against the HCP Terraform organization's resource limit
 
 #### Scenario: Security switch settable only per repository
 - **WHEN** a security setting the organization owns can only be set on the repository resource
 - **THEN** `policy.tf` lists that attribute under `ignore_changes` with a comment naming the configuration repository as its owner
 
 ### Requirement: Behavior: An organization configuration repository is built with a chosen sync mode
-When the workspace is an organization's configuration repository, the builder SHALL load its configuration-repository reference, SHALL present the sync mode as a harness option defaulting to CI plan and apply, and SHALL scope any CI credential to that repository alone.
+When the workspace is an organization's configuration repository, the builder SHALL load its configuration-repository reference, SHALL present the sync mode as a harness option defaulting to CI plan and apply, and SHALL scope any CI credential to that repository alone. It SHALL present the state backend as a harness option:
+- when the tool is Terraform, the default is HCP Terraform with the workspace in local execution mode, so it stores only state and runs happen in Actions or on an administrator's machine;
+- when the tool is OpenTofu, the default is a backend the user names, either a third-party service that supports OpenTofu or object storage the organization controls, because OpenTofu does not promise compatibility with HCP Terraform;
+- in both cases, the alternatives are stateless tf and a third-party backend.
 
 #### Scenario: Default sync mode chosen
 - **WHEN** the user accepts the default sync mode for a private configuration repository
-- **THEN** the delivered workflow plans on pull requests with no secret available to fork pull requests and applies only from the default branch through an environment with required reviewers; the credential is a GitHub App installation token minted per run from a private key stored as a secret of that repository, read-only for the plan job and at write only for the apply job, and the builder records that everyone who can push to the configuration repository can use the plan token; and the provider version is pinned with its lock file committed
+- **THEN** the delivered workflow plans on pull requests with no secret available to fork pull requests; on the default branch it saves a plan, and the apply job behind an environment with required reviewers applies only that saved plan; the credential is a GitHub App installation token minted per run from a private key stored as a secret of that repository, read-only for the plan job and at write only for the apply job, and the builder records that everyone who can push to the configuration repository can use the plan token; and the provider version is pinned with its lock file committed
+
+#### Scenario: Default state backend with Terraform
+- **WHEN** `terraform` is installed and the user accepts the default state backend
+- **THEN** the configuration declares a `cloud` block naming the HCP Terraform organization and workspace, the workspace runs in local execution mode, the HCP Terraform API token is a secret of the configuration repository only with its type, expiry, and rotation owner recorded in `platform-settings.md`, and the builder states the Free plan's managed-resource limit with the date it was checked
+
+#### Scenario: OpenTofu installed
+- **WHEN** only `tofu` is installed
+- **THEN** the builder does not default to HCP Terraform, says that OpenTofu does not promise compatibility with it, asks the user to name a third-party or self-controlled backend or to choose stateless tf, and records the choice in `platform-settings.md`
 
 #### Scenario: Fully local sync mode chosen
 - **WHEN** the user chooses the fully local sync mode
@@ -140,3 +166,7 @@ The builder SHALL deliver every script it gives the target — the commit check,
 #### Scenario: tf delivered
 - **WHEN** the builder delivers `policy.tf`
 - **THEN** the plan guard comes from the builder's management asset, and the user is told the target owns it
+
+#### Scenario: Guard for a configuration repository with state
+- **WHEN** the configuration repository keeps state
+- **THEN** its workflow runs the same delivered plan guard in its delete-listing mode, not a separate script

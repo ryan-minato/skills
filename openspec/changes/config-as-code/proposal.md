@@ -13,13 +13,12 @@ The rules below apply to both builders. Where GitLab differs, the difference is 
     - what no provider covers;
     - which rows a tf file describes;
     - the harness options chosen.
-- **No state, and removal is not deletion.**
-  - Delivered tf declares no backend.
-  - Every managed resource has an `import` block, and every run starts from an empty state.
-  - Removing a declaration stops managing the object; the object stays on the platform.
-  - A delivered plan guard fails on any delete or replace action and lists every change to an undeclared attribute.
+- **State where CI applies organization-wide rules; none for a repository's own attributes.**
+  - `policy.tf` stays stateless and holds only enumerable, idempotent repository attributes: name, description, visibility, template, archive state, merge methods, branch deletion, and whether issues, discussions, and the wiki are on. Rules the organization does not set uniformly also stay there. Every managed resource has an `import` block, every run starts from an empty state, and removing a declaration only stops managing the object.
+  - The configuration repository keeps state by default. On GitHub with Terraform, the default is HCP Terraform in local execution mode, storing state only. With OpenTofu, which does not promise compatibility with HCP Terraform, the default is a backend the user names. On GitLab, the default is the configuration project's GitLab-managed state, available on every tier. Stateless tf and third-party backends are the alternatives.
+  - With state, removing a declaration deletes the object. The plan guard lists every delete and replace for approval, and only a saved plan a human approved is applied. A `removed` block with `destroy = false` stops managing an object without deleting it.
+  - Without state, the plan guard fails on any delete or replace. In both modes it lists every change to an undeclared attribute.
   - The builder never uses a resource that rewrites or deletes objects outside its own list.
-  - GitLab's built-in state is not used either.
 - **`policy.tf` is applied by an administrator, never by project CI.**
   - An administrator plans and applies `policy.tf` locally with their own credentials.
   - The project's CI runs `fmt` and `validate` without any credential. No static check of the tf files replaces review: a reviewer rejects a change whose declarations do not say what they do and why.
@@ -28,9 +27,9 @@ The rules below apply to both builders. Where GitLab differs, the difference is 
   - GitHub: the recipe passes `gh auth token` as `GITHUB_TOKEN`. The provider's own `gh` fallback exists only in its legacy client, so the recipe does not rely on it.
   - GitLab: the recipe passes glab's stored OAuth or personal login as `GITLAB_TOKEN`, read at each run.
   - The apply recipe plans to a file, runs the guard, and applies only that file. No token is written to a file or printed.
-- **One owner per setting.**
-  - The organization's or group's configuration repository owns the security baseline and team workflow, and expresses them only through organization- or group-level mechanisms.
-  - `policy.tf` owns the repository's description, visibility, and any approval or merge policy the organization leaves unset.
+- **One owner per setting, with the organization carrying most of it.**
+  - The organization's or group's configuration repository owns the security baseline, the team workflow, and every rule that can be set uniformly. It prefers one organization- or group-level resource over one per repository, because HCP Terraform counts each managed resource against the organization's plan (500 on the Free plan, checked 2026-10-15).
+  - `policy.tf` owns the repository's enumerable attributes and any rule the organization does not set uniformly.
   - Where a security setting can only be set per repository, `policy.tf` excludes that attribute with `ignore_changes` and states its owner.
 - **New capability: the workspace is a configuration repository.** A new reference in each builder covers:
   - what the configuration repository is: a separate private repository, never GitHub's `.github` repository, and only for an organization or a group;
@@ -39,6 +38,7 @@ The rules below apply to both builders. Where GitLab differs, the difference is 
     - CI plans and an administrator applies locally;
     - everything runs locally;
   - when CI applies, the gate: plan on pull or merge requests with no secret reaching a fork; apply only from the default branch, through a protected environment with required reviewers;
+  - the state backend, a harness option with the defaults above;
   - the credentials when CI is chosen, scoped to the configuration repository alone:
     - GitHub: an organization-installed GitHub App whose installation token is minted per run;
     - GitLab: a group access token, which on GitLab.com needs Premium or Ultimate and expires within 365 days, so its rotation owner is recorded;
@@ -52,19 +52,19 @@ The rules below apply to both builders. Where GitLab differs, the difference is 
   - GitLab group labels belong to the configuration repository's tf.
 - **New management assets.**
   - Starting-shape tf for `policy.tf` and for the configuration repository.
-  - A plan-guard script.
+  - A plan-guard script, with a delete-listing mode for configuration repositories that keep state.
   - A label-sync workflow (GitHub) or job (GitLab).
   - A GitLab label-sync script, delivered to the target for the first time.
 - **Descriptions.** Each builder's description states that it also handles an organization's or group's configuration repository, so the harness entry routes that case to it.
 
 ## Skills touched
 
-- `meta/meta-github-workflow` (modified): adds the description trigger, configuration as code, the stateless plan guard, setting ownership, the configuration-repository capability, label sync options, and the newly delivered scripts.
+- `meta/meta-github-workflow` (modified): adds the description trigger, configuration as code, the plan guard, setting ownership, the configuration-repository capability, label sync options, and the newly delivered scripts.
 - `meta/meta-gitlab-workflow` (modified): the same, plus the GitLab-specific credential tiers and the newly delivered label sync.
 
 ## Installed behavior
 
-- An agent building a GitHub or GitLab harness can now describe the needed platform settings as stateless tf, and can build an organization's or group's configuration repository. It now offers label sync in CI, and offers both sync modes, label pruning, and the configuration-repository sync mode as harness options with stated defaults. → `feat`.
+- An agent building a GitHub or GitLab harness can now describe a repository's own settings as stateless tf, and can build an organization's or group's configuration repository that keeps its state in HCP Terraform, GitLab, or a backend the user names. It now offers label sync in CI, and offers both sync modes, label pruning, and the configuration-repository sync mode as harness options with stated defaults. → `feat`.
 - Where the tool is absent, the agent does exactly what it did before.
 
 ## Impact
@@ -78,7 +78,7 @@ The rules below apply to both builders. Where GitLab differs, the difference is 
 ## Non-goals
 
 - Managing secrets, variables, or tokens with tf.
-- Any tf state backend, including state committed to git or encrypted state.
+- State committed to git, and state for a repository's own `policy.tf`.
 - A configuration-repository mode for personal accounts or personal namespaces.
 - Changing the label taxonomy rules, the issue-type and issue-field handling in `org-configuration.md`, or the security baseline itself.
 - Listing provider resources as a static inventory. Resource names are resolved from the provider registry when used.
@@ -86,4 +86,4 @@ The rules below apply to both builders. Where GitLab differs, the difference is 
 
 ## Tracked work
 
-No issue. The goal was settled with the maintainer in conversation on 2026-10-14.
+No issue. The goal was settled with the maintainer in conversation on 2026-10-14. The state model was revised with the maintainer on 2026-10-15: the configuration repository keeps state by default, and deletion with state needs an approved plan.
