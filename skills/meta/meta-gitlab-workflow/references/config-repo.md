@@ -73,8 +73,8 @@ stateless tf and a third-party backend.
   }
   ```
 
-  `removed` blocks need Terraform 1.7; check the OpenTofu version that
-  supports `lifecycle` in them before relying on it there.
+  `removed` blocks need Terraform 1.7. OpenTofu 1.13.0 plans this block as
+  `forget` and the guard passes it (checked 2026-10-15).
 - **Keep the `import` blocks.** They adopt existing objects into a new or
   lost state and do nothing once an object is in state.
 - **Stateless tf**, the alternative: no backend, and every rule of
