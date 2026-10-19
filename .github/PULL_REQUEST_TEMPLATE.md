@@ -24,7 +24,7 @@ Phase: specification
 <!-- The approval package, one link each: the draft opens once proposal, delta specs, and design (when the schema requires one) are written; tasks.md follows the closing. -->
 | Record | What it holds |
 |---|---|
-| [proposal.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/proposal.md) | Why, what changes, skills touched, installed behavior, impact, non-goals |
+| [proposal.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/proposal.md) | Why, what changes, skills touched, installed behavior, impact, non-goals, deliverable and pre-authorized actions |
 | [specs/<catalog>/<skill-name>/spec.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/specs/<catalog>/<skill-name>/spec.md) | Delta spec: requirements and scenarios (omit for a repository change) |
 | [design.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/design.md) | The approach's bounds — placement, decisions, risks — and the verification plan (omit only when the schema does not require one) |
 | tasks.md | Written after the package deliberation is closed |
