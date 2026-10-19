@@ -55,7 +55,14 @@ rewrite — change what the findings justify.
   needed — keep that part and push the rest behind a conditional pointer.
   Prefer merging over splitting.
 - Thin: valid but overweight — replace machinery with a pointer, a note, or
-  a single command.
+  a single command. The signal is a constraint that no longer catches
+  anything: a lint rule for a bug fixed long ago, a skill for a migration
+  that finished, a routing row for a removed module. Over-thickness never
+  fails a check; it only makes agents slower and more conservative, so it
+  is found by asking, not by waiting.
+- Harden: the project graduated from exploration to maintained work while
+  its harness did not — run the one-time hardening pass (`layers.md`,
+  Hardening and thinning) instead of patching layer by layer.
 - Remove: clearly obsolete, duplicated, or unsupported. Ask before removing
   anything that looks maintained.
 - Leave unchanged: accurate, reachable, proportionate.

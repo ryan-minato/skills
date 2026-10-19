@@ -25,10 +25,27 @@ reconsideration.
    bound fan-out and per-agent context, set a token budget with a hard
    cap, and avoid deeply nested delegation.
 3. **Split roles along harness seams.** Separate reading/research,
-   building, and verification. One writer at a time; parallel file
-   mutation only with isolated worktrees.
-4. **Keep orchestration deterministic.** Prefer scripted or
+   building, and verification. Read-only roles (review, analysis, scanning)
+   share one workspace; parallel file mutation only with isolated
+   worktrees or containers.
+4. **Namespace every shared resource.** Before running writers in
+   parallel, list what they would collide on — local ports, test database
+   instances or schemas, fixed-path lock files, build caches, external
+   rate limits — and allocate dynamically or per instance.
+5. **Keep remote state to one coordinator.** Worktrees do not isolate the
+   platform: two agents commenting on one issue are unreadable, two
+   editing one request's labels overwrite each other, two pushing one
+   branch lose commits. Each agent owns its own remote branch; every write
+   to a platform object (issue, comment, label, status) goes through one
+   coordinator, human or designated agent, and each such write is
+   pre-authorized under the authorization boundary — never decided by a
+   parallel agent on its own.
+6. **Plan the merge.** Isolation must be undone: name who merges the
+   results and who settles conflicts, and split the parallel work along
+   file boundaries at planning time, since the split decides how much the
+   parallelism pays.
+7. **Keep orchestration deterministic.** Prefer scripted or
    workflow-defined sequencing over free-form model-driven delegation, and
    document a single-agent fallback path that still works.
-5. **Record the decision.** The topology, its rationale, the fallback, and
+8. **Record the decision.** The topology, its rationale, the fallback, and
    the reconsideration trigger all go into the harness plan.

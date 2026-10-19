@@ -14,10 +14,13 @@ from it must match it.
 
 - Stack:
 - Layout:
-- Lifecycle (one-off / short / long-lived):
-- Team (solo / multi-person; review process):
-- Operation (attended / unattended):
 - Error cost (what a wrong change breaks):
+- Maintenance horizon (one-off / short / long-lived):
+- Environment isolation (host / sandboxed host / container or VM; what it exposes):
+- Agent autonomy (attended / unattended; external inputs agents read; where a human reviews results before they leave):
+- Team size (solo / multi-person; review process):
+- Pre-authorized irreversible actions (branch pushed, outward writes allowed):
+- Hard read-only control-plane files:
 - Model class (frontier / weak or local):
 - Existing checks and conventions:
 
@@ -34,20 +37,22 @@ from it must match it.
 
 ### 1. Thickness Per Layer
 
-> Rate each layer omitted / light / medium / thick, with a reason. For
-> omitted layers, record the trigger that would justify building later.
+> Name the preset the plan starts from (exploratory / engineering), then
+> rate each of the six layers omitted / light / medium / thick with the
+> variable that sets it; mark every deviation from the preset. For omitted
+> layers, record the trigger that would justify building later. Six rows,
+> never one level for the project.
 
-| Layer | Rating | Reason / build-later trigger |
-|---|---|---|
-| Environment |  |  |
-| Information tools |  |  |
-| Workflow tools |  |  |
-| Capability tools |  |  |
-| Target constraints |  |  |
-| Implementation constraints |  |  |
-| Quality constraints |  |  |
-| Workflow constraints |  |  |
-| Repository safety |  |  |
+Preset:
+
+| Layer | Rating | Variable and reason / build-later trigger | Deviates from preset |
+|---|---|---|---|
+| Environment and sandbox |  |  |  |
+| Knowledge and routing |  |  |  |
+| Hard gates |  |  |  |
+| Authorization boundary |  |  |  |
+| Specification and completion criteria |  |  |  |
+| Entropy management |  |  |  |
 
 ### 2. Evolution Mode
 

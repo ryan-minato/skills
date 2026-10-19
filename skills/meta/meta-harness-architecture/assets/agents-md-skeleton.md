@@ -17,10 +17,20 @@ too detailed. -->
 [path]/    <- [purpose]
 ```
 
-## Core Conventions
+## Always
 
-- [Convention that applies to most tasks.]
-- [Convention that applies to most tasks.]
+<!-- The rules whose breach costs the same whatever the task: safety,
+publishing, commits, language, the validation entry command, what to do
+when blocked. They come first because attention decays with position. -->
+
+- [Rule that applies to every task.]
+- [Rule that applies to every task.]
+- **Blocked work**: finish everything that does not depend on the decision;
+  record each pending decision with where it is stuck, the options, the
+  recommended option and why, and the completed work each option affects.
+- **Mismatches**: a document, script, or command found to disagree with the
+  repository is corrected in the same change, queued as a pending decision,
+  or filed as [tracked item and label] — never left in the conversation.
 
 ## When To Read What
 
@@ -36,16 +46,32 @@ usage documented elsewhere in this file. -->
 
 - [How to enter and verify the environment.]
 - [Isolation, approval, or sensitive-data boundary agents must respect.]
+- [Non-interactive settings in force: pagers off, prompts disabled.]
 
 ## Validation
 
 | Check | Command |
 |---|---|
-| [What this validates] | `[command]` |
+| [What this validates, full] | `[command]` |
+| [Scoped, seconds-scale check for one file or module] | `[command]` |
+
+## Authorization
+
+<!-- Delete if a knowledge file the table above points to owns this. -->
+
+- Proceed without asking: [reversible internal actions].
+- Pre-authorized only by the change's record: [push to the named branch,
+  other outward writes].
+- Never: [the deny list's intent — force push, hard reset, deletion of
+  the main branch]; the list is fool-proofing, [the sandbox] is the
+  boundary, and this policy is not relaxed by an agent.
 
 ## Workflow
 
 - [Team-decided rule for commits, reviews, merges, or task state.]
+- [Checkpoint rule: commits, not stashes; a task's drafts squashed into its
+  commit before the task is ticked; drafts never pushed; secret scan on
+  every commit.]
 
 ## Keep In Sync
 
