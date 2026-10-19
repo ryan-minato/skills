@@ -68,7 +68,10 @@ published package (error cost), the age and author count of the history
 (maintenance horizon, team size), a container or sandbox definition and
 the credentials it exposes (environment isolation), unattended workflows
 or scheduled agent runs (agent autonomy) — so these are confirmed as
-facts, not asked as questions.
+facts, not asked as questions: a committed container with a scoped token
+settles isolation, and the round presents it as "isolation: container,
+read-only token — confirm" rather than asking what the environment
+provides.
 
 For each existing harness artifact, record how a future agent finds it,
 when it loads, its source of truth, and what keeps it current; classify
@@ -110,7 +113,11 @@ recording every per-layer deviation with the variable that causes it; for
 an omitted layer, the trigger that would build it later; then the
 evolution mode, agent topology, sync family, model class, and entropy
 controls. Record one value and one reason per decision, and refuse to
-assign one maturity level to the whole project even when asked to.
+assign one maturity level to the whole project even when asked to. When
+the user names a preset or asks to skip the table, keep the six rows,
+take the named preset as the starting column, and record each layer the
+facts push away from it — the table is never dropped and the preset is
+never refused, only deviated from with reasons.
 
 Then assign every layer to whatever can build it best. List every skill
 available in this session — the installed builders and the durable skills

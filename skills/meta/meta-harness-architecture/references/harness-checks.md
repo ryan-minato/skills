@@ -29,7 +29,10 @@ long-lived project:
   it does not grow back into an encyclopedia.
 
 Add the second tier when the project has skills or specifications; the
-first alone serves a small long-lived repository.
+first alone serves a small long-lived repository. Keep the tiers apart in
+the plan: a project without skills or specifications gets the
+reference-integrity checks only, with the structural tier — the entrypoint
+budget included — named as deferred and its trigger stated.
 
 ## Rules for the checks
 

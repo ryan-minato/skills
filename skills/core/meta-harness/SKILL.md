@@ -143,7 +143,9 @@ sandbox absorbing a wrong call. The policy forbids the agent from relaxing it.
 Disable pagers, confirmation prompts, and watch modes by environment or flags,
 so no agent process hangs on standard input. Provide a seconds-scale scoped
 verification command beside the full check. A checkpoint is a commit, never a
-stash or a framework-only rewind: a task's draft commits are squashed into one
+stash (unnamed, addressed by stack position, conflict-prone on restore,
+invisible in the log) or a framework-only rewind (session-bound, invisible to
+humans): a task's draft commits are squashed into one
 atomic commit when the task ends, non-interactively; draft commits never leave
 the machine and every push names one ref; the secret scan runs on every commit
 and the pre-commit hook stays fast enough that nobody bypasses it; "no draft
@@ -198,8 +200,10 @@ pending decision when it needs one, or filed as a tracked item with a fixed
 label when it is out of scope — and never only in the conversation. A
 long-lived harness gets deterministic checks of its own, in two tiers: reference
 integrity (paths exist, documented commands exist in the task runner, mirrored
-files match) and structural compliance (skill layout, strict specification
-validation, entrypoint length budget), each failing with the file and the fix.
+files match) for every long-lived project, and structural compliance (skill
+layout, strict specification validation, entrypoint length budget) only once
+the project has skills or specifications to check, each failing with the file
+and the fix.
 
 Use simplification as the primary control for short-lived, actively supervised
 projects. Long-lived or agent-driven projects need real-time consistency controls;
