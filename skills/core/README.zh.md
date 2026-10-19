@@ -18,7 +18,7 @@ npx skills add ryan-minato/skills --skill <skill-name> -g
 | [git-commit](git-commit/) | 以有序门禁执行完整的 git 提交工作流：按明确优先级发现项目约定、检查变更原子性、扫描暂存 diff 中的机密与 PII、核对提交者身份、运行 hooks 与本地检查，并在提交前用内置脚本校验提交信息。 |
 | [great-skill-writing](great-skill-writing/) | 编写并改进行为可预测的 Agent Skill：触发准确的 description、渐进式披露、subagent 辅助的行为评估、隔离的脚本测试，以及内置校验脚本。 |
 | [human-writing](human-writing/) | 以英文、中文或日文起草、修改和审读面向人类读者的文本：先明确类型/作者/读者/预期效果，按长度预算列大纲，保留作者立场，规避可识别的 AI 写作模式，核实引用，并克制地修改。 |
-| [meta-harness](meta-harness/) | 将核心方法论应用于所有 harness 相关行动：先调研，以 AGENTS.md 作为渐进加载地图，按项目校准各层厚度，闭合前馈与反馈循环，并管理长期 harness 熵增。 |
+| [meta-harness](meta-harness/) | 将核心方法论应用于所有 harness 相关行动：先调研，以 AGENTS.md 作为渐进加载地图，用五个变量为六层分别定档，把硬边界放在真正执行它的地方、按威胁模型决定隔离，围绕可逆性设计授权边界，保持运行时非交互且以提交为检查点，并用 harness 自身的检查管理长期熵增。 |
 | [plan-clarification](plan-clarification/) | 追问一个计划、想法或决定，直到 agent 与用户达成同一理解：将其建模为决策树，每轮把当前可问的问题连同推荐答案通过宿主自带的提问工具抛出，所有事实自己去查，且不在工作区留下任何文件。 |
 | [programming-guidelines](programming-guidelines/) | 应用通用编程工作标准：编码前先思考，优先选择简单方案，保持改动精确，并用清晰的成功标准验证结果。 |
 | [ryan-minato-skills-installing](ryan-minato-skills-installing/) | 将 ryan-minato/skills 库中的 skill 安装到项目或全局：优先通过现代包运行器（pnpm/bun/yarn）或 npx 使用 vercel-labs skills CLI，在没有 Node 环境时回退到内置的纯标准库克隆复制脚本，并可发现列出可用的 skill。 |
