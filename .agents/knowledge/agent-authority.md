@@ -95,10 +95,11 @@ What an agent *can* do is set by the dev container and the `gh` login
 the user forwards; what it *may* do without a fresh decision is set here
 and by the conversation. The permission file `.claude/settings.json`
 allows the read-only and recipe commands every task runs and denies the
-known-dangerous ones (force and batch pushes, hard resets, branch
-deletion, merge, approve, deletes and settings writes on the platform);
-it is fool-proofing against a careless agent, the container is the
-boundary, and it carries no `ask` entry.
+common forms of the known-dangerous ones (force and batch pushes, hard
+resets, deletion of `main`, merge, approve, deletes and settings writes
+on the platform); a reordered flag gets past a prefix rule, which is why
+it is fool-proofing against a careless agent and the container is the
+boundary. It carries no `ask` entry.
 
 - Reversible internal actions — editing files, branching, local commits,
   running recipes — proceed without asking.

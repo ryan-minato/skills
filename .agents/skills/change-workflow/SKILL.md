@@ -127,13 +127,12 @@ commit non-interactively — `git reset --soft <task start commit>`, then
 one commit under the rules above (interactive rebase is unavailable).
 Draft commits never leave the machine: push only after the task commit,
 and push one named ref (`git push origin <branch>`; `--all`, `--mirror`,
-`--tags`, and force pushes are denied by `.claude/settings.json`, which is
-fool-proofing against a careless agent: the dev container and the
-forwarded `gh` login are the boundary, `agent-authority.md` says what is
-pre-authorized). The
-per-commit hooks are the secret scan, so they run on every draft and stay
-fast; "no draft commits on the branch" is part of every task's done
-criterion.
+`--tags`, and force pushes are denied by `.claude/settings.json`;
+`agent-authority.md` says why that list is fool-proofing and what is
+pre-authorized). The per-commit hooks — secret scans, validators, ruff —
+run on every draft, so every draft commit must pass them and the commit
+rules; keep them fast. A task is done only when no draft commit remains on
+the branch.
 
 Never bypass hooks, force a failing commit, or add tool-attribution
 trailers. Use a GitHub noreply author email unless the user explicitly
