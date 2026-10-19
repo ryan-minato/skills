@@ -41,10 +41,12 @@ project and changes nothing anywhere.
   with nothing wiring it into a hook, a check, a recipe, or a pointer, is
   recorded as unverified. Harnesses rot; a study that repeats rot misleads
   whoever builds on it.
-- **Nothing changes.** Neither the studied repositories nor the repository
-  the conversation runs in is edited, and no studied file is copied into
-  another project. The one write allowed is the report file the user
-  names, and never inside a studied repository.
+- **Nothing changes.** During the study, neither the studied repositories
+  nor the repository the conversation runs in is edited, and no studied
+  file is copied into another project. The one write the study makes is
+  the report file the user names, never inside a studied repository. What
+  the installing skill writes in step 5, after the user asks for the
+  findings to be applied, belongs to the application step, not the study.
 - **A subject, not a model.** However the user introduces the repository,
   examine it: every pattern is assessed on its own merits, and a defect
   in an admired repository is reported as a defect.
