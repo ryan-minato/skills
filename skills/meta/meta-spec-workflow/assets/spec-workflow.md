@@ -238,7 +238,8 @@ and the token variables>; <nothing else | "pipelines must succeed">.
   implementation, one link per file of the approval package with the task
   list marked as after-approval, `Approval:` in the mode above, and the
   pre-authorized actions line of the proposal-like artifact — the branch
-  pushed and nothing else outward unless named), related work with the closing reference (<a split-shape
+  pushed and nothing else outward unless named; the loop's own steps on
+  this <pull request | merge request> need no line), related work with the closing reference (<a split-shape
   specification <pull request | merge request> references the <issue |
   work item> with <`Refs #N` | a bare `#N`> and never closes it; the last
   implementation request does | delete under the combined shape>), and

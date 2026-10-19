@@ -72,8 +72,9 @@ project's files.
 The pre-authorized-actions line is part of the outcome artifact: the
 branch the change pushes and the outward writes it allows, within what the
 authority policy permits. An action the record does not name is queued
-when the implementation reaches it; the pushes and requests the contract
-itself prescribes (the draft's branch, the draft) need no line.
+when the implementation reaches it; the actions the contract itself
+prescribes for the loop (pushing the branch, opening the draft, replying
+to threads, marking ready, the freeze) need no line.
 
 ## A specification-ruled surface
 
