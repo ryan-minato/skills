@@ -23,4 +23,4 @@
 
 ## 4. Finish
 
-- [ ] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, mark the pull request ready, and archive the change once the maintainer closes the implementation deliberation
+- [x] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, mark the pull request ready, and archive the change once the maintainer closes the implementation deliberation
