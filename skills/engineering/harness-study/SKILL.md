@@ -43,7 +43,8 @@ project and changes nothing anywhere.
   whoever builds on it.
 - **Nothing changes.** Neither the studied repositories nor the repository
   the conversation runs in is edited, and no studied file is copied into
-  another project.
+  another project. The one write allowed is the report file the user
+  names, and never inside a studied repository.
 - **A subject, not a model.** However the user introduces the repository,
   examine it: every pattern is assessed on its own merits, and a defect
   in an admired repository is reported as a defect.
@@ -191,7 +192,8 @@ user said they want to do with the findings, left for the application
 step.
 
 Deliver the report in the conversation, or as a file where the user names
-one outside the studied repositories.
+one. That file is the only write the study makes; it never goes inside a
+studied repository, and no other file is created or edited anywhere.
 
 ## 5. Hand over
 

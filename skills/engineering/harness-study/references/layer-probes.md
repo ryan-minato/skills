@@ -28,8 +28,11 @@ entrypoint points to, project skills under `.claude/skills/`,
 
 Live when: the entrypoint's pointers resolve to files that exist; the
 commands it names exist as recipes or scripts; a knowledge file is
-reachable from a pointer; a project skill's description matches work the
-history shows happening.
+reachable from a pointer; a project skill sits under a root the recorded
+framework loads. A skill description that matches work the history shows
+proves relevance, not execution: record the skill as reachable, and its
+use as unverified unless an entrypoint pointer, a session log, or a
+direct invocation shows it ran.
 
 Record: entrypoint length and split (always-on rules versus routing
 table), every rule stated more than once with both locations, how deeper
