@@ -20,7 +20,42 @@
       "Bash(openspec list:*)",
       "Bash(openspec show:*)",
       "Bash(openspec validate:*)",
-      "Bash(openspec status:*)"
+      "Bash(openspec status:*)",
+      "Bash(just spec-check:*)",
+      "Bash(just spec-changes:*)",
+      "Bash(just commit-gate)",
+      "Bash(just gen-marketplace)",
+      "Bash(openspec new change:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh api repos/ryan-minato/skills/issues/*/comments)",
+      "Bash(gh api repos/ryan-minato/skills/pulls/*/reviews)"
+    ],
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push --force-with-lease:*)",
+      "Bash(git push --mirror:*)",
+      "Bash(git push --all:*)",
+      "Bash(git push --tags:*)",
+      "Bash(git push origin --delete:*)",
+      "Bash(git push origin :*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean:*)",
+      "Bash(git branch -D:*)",
+      "Bash(git checkout -- .)",
+      "Bash(git restore .)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr review --approve:*)",
+      "Bash(gh pr edit * --add-label spec/*)",
+      "Bash(gh api -X DELETE:*)",
+      "Bash(gh api --method DELETE:*)",
+      "Bash(gh api -X PUT:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(gh repo edit:*)",
+      "Bash(rm -rf /:*)",
+      "Bash(rm -rf ~:*)",
+      "Bash(rm -rf /workspaces/skills:*)",
+      "Bash(sudo:*)"
     ]
   }
 }

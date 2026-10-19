@@ -121,6 +121,20 @@ independently valid logical change:
    skill, and have the maintainer discuss and close the revision before
    continuing.
 
+Checkpoints inside a task are commits, never stashes: commit drafts as
+you go, and before ticking the task squash them into its one atomic
+commit non-interactively — `git reset --soft <task start commit>`, then
+one commit under the rules above (interactive rebase is unavailable).
+Draft commits never leave the machine: push only after the task commit,
+and push one named ref (`git push origin <branch>`; `--all`, `--mirror`,
+`--tags`, and force pushes are denied by `.claude/settings.json`, which is
+fool-proofing against a careless agent: the dev container and the
+forwarded `gh` login are the boundary, `agent-authority.md` says what is
+pre-authorized). The
+per-commit hooks are the secret scan, so they run on every draft and stay
+fast; "no draft commits on the branch" is part of every task's done
+criterion.
+
 Never bypass hooks, force a failing commit, or add tool-attribution
 trailers. Use a GitHub noreply author email unless the user explicitly
 approves a private one.
@@ -242,7 +256,9 @@ closes the issue through the closing keyword.
   discovered work separately.
 - When ending with work unfinished, leave a self-contained handoff in the
   PR or conversation: branch, change, completed work, remaining work,
-  current checks.
+  current checks, and the pending decisions in the shape `AGENTS.md`
+  requires. A handoff *file* lives only in the scratch directory, never in
+  the tree: it carries environment values and logs more easily than source.
 - Fork pull requests are squash-merged and their title is what the
   `pr / policy` check validates; in-repo branches are validated commit by
   commit.
