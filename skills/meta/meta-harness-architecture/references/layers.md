@@ -14,7 +14,7 @@ project's type:
 |---|---|---|
 | Error cost | hard gates, environment and sandbox | the more a wrong change breaks, the thicker the machine checks and the isolation |
 | Maintenance horizon | entropy management, knowledge and routing | the longer the code lives, the more copies drift; a short-lived project never reaches the point where cleanup pays |
-| Environment isolation | hard gates, authorization boundary (inverse) | the stronger the sandbox, the looser the gates and the wider the allow list can be, because a wrong call is absorbed |
+| Environment isolation | authorization boundary (inverse) | the stronger the sandbox, the wider the allow list can be, because a wrong call is absorbed by the environment; the gates that keep defects out of the trunk do not loosen, since a sandbox absorbs no bad merge |
 | Agent autonomy | authorization boundary, specification and completion criteria, hard gates | the longer agents run unattended, the more they need pre-authorization, checkable done criteria, and machine feedback |
 | Team size | hard gates, knowledge and routing | the more people, the less a convention holds; oral agreements become files and checks |
 
@@ -43,13 +43,20 @@ thinner than the engineering column and keeps the gates.
 
 ## Environment and sandbox
 
+Light: the host with scoped tokens and nothing mounted. Thick: a container
+or VM with a network allow list, security rules hard read-only, and a
+recorded session-log decision.
+
 Decide isolation first; it sets how much autonomy the other layers can
 grant. Fully isolated (container or VM holding everything the agent
 touches): minimal approval, secrets outside reach, a broken environment
 rebuilt rather than repaired. Sandboxed host (reads beyond the workspace,
 writes only inside it): agents escalate on their own judgment. Unisolated
-host: per-command approval, because agents can damage the host or reach
-confidential data. Prefer a reproducible isolated environment when the
+host: the host offers no boundary, so the allow list is narrow, the deny
+list is fool-proofing only, outward actions stay pre-authorized or queued
+as `authorization.md` describes, and isolation is recommended to the
+owner; step-by-step approval is only the pairing-mode exception that file
+names, never the standing mode. Prefer a reproducible isolated environment when the
 stack allows one. Capability tools — driving the running software, reading
 logs and metrics, querying telemetry — belong here; add the ones current
 work needs, since each unused tool is description noise in every session.
@@ -57,6 +64,10 @@ Whether an agent role needs the strict tier, and the sandbox audit, are in
 `security-boundary.md` (path relative to this skill's `references/`).
 
 ## Knowledge and routing
+
+Light: one root entrypoint under about 100 lines pointing at documents the
+project already has. Thick: the entrypoint plus a layered knowledge base,
+an architecture document, project skills, and directory-level entries.
 
 The entrypoint, its routing table, knowledge files, architecture
 documents, project skills, and information tools: everything that expands
@@ -72,6 +83,9 @@ design decisions, record them as fixed. The practice is in `entrypoint.md`,
 
 ## Hard gates
 
+Light: a formatter and a secret scan. Thick: type check, lint, tests, and
+architecture-boundary checks in both pre-commit and CI.
+
 Formatters, linters, type checks, tests, secret scans, and custom checks,
 in hooks and CI. They narrow output variance without shrinking exploration,
 but every future change pays to satisfy them: lean on the language's static
@@ -85,6 +99,10 @@ tests. Output noise is in `management-code.md`.
 
 ## Authorization boundary
 
+Light: a few allows and denies, the rest left to the framework's default.
+Thick: a written policy, a pre-authorized-actions list, and a fixed
+pending-decisions shape.
+
 What an agent may do inside what it can do: allow and deny lists,
 pre-authorized irreversible actions, the pending-decisions rule, and the
 workflow tools (ticket system, review flow, messaging) the team has
@@ -94,6 +112,10 @@ otherwise document the human handoff. The practice is in
 `authorization.md`.
 
 ## Specification and completion criteria
+
+Light: plan mode in the conversation with non-goals agreed orally. Thick: a
+specification framework with a judgeable scenario per requirement and
+strict validation in CI.
 
 Target constraints give agents a durable understanding of what the project
 is for. Every project needs at least a written goal; beyond that, match the
@@ -107,6 +129,9 @@ the agent itself can run, what is not done, what is delivered, and which
 irreversible actions are pre-authorized.
 
 ## Entropy management
+
+Light: a few sync reminders in the entrypoint. Thick: reference-integrity
+and structural checks in CI, periodic cleanup, and a drift label.
 
 Sync rules, drift reporting, harness self-checks, and periodic cleanup. The
 mechanisms are in `maintenance.md`, `periodic-reclamation.md`, and

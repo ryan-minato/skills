@@ -69,9 +69,10 @@ published package (error cost), the age and author count of the history
 the credentials it exposes (environment isolation), unattended workflows
 or scheduled agent runs (agent autonomy) — so these are confirmed as
 facts, not asked as questions: a committed container with a scoped token
-settles isolation, and the round presents it as "isolation: container,
-read-only token — confirm" rather than asking what the environment
-provides.
+is presented as "isolation: container, read-only token — confirm" rather
+than asked about; the sandbox audit of the architecture manual still runs
+before any autonomy is granted, because a container can mount what it
+should not.
 
 For each existing harness artifact, record how a future agent finds it,
 when it loads, its source of truth, and what keeps it current; classify

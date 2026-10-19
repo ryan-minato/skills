@@ -68,7 +68,7 @@ Binding constraints: `skills/meta/CONTEXT.md` (the marker sentence; builders inv
 
 ## Risks / Trade-offs
 
-- [The methodology section grows and is mirrored into the architecture SKILL.md, pushing that body toward its budget] → the new subsections state principles in a few sentences each and route detail to references; the architecture SKILL.md stays under 300 lines; `just check-skill` reports the body length.
+- [The methodology section grows and is mirrored into the architecture SKILL.md, pushing that body toward its budget] → the new subsections state principles in a few sentences each and route detail to references; the architecture SKILL.md stays well under the 500-line budget (about 335 lines); `just check-skill` reports the body length.
 - [Six layers lose a practice that only a nine-row model named] → `layers.md` carries each folded topic under its new layer; the verification plan's calibration case checks that target constraints, capability tools, and repository safety are still addressed.
 - [The authorization reference contradicts the deposited management-authority policy] → it defines execution permissions only, names review admission and integration as the authority policy's and never restates them, and the no-self-escalation rule is referenced, not duplicated.
 - [Framework-specific carriers (path rules, hooks) are presented as portable] → `entrypoint.md` states they are framework-dependent and that must-hold rules never live there alone.

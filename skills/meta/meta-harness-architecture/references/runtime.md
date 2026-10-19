@@ -29,16 +29,19 @@ polishing a small change waits for the whole build and stops verifying.
   humans. A commit is addressable, named, and inspectable by everyone with
   `git log`.
 - A task-level commit is an atomic commit. Define "a verified sub-step" as
-  the completion of one task of the specification; each checkpoint is then
+  the completion of one task of the plan or specification (the smallest
+  verified step the plan names, where no task list exists); each
+  checkpoint is then
   one atomic commit under the project's message convention, with nothing to
   tidy afterwards.
 - Draft commits inside a task are squashed into that task's commit when the
-  task ends. The unit of squashing is the task, not the change request: a
-  request with three tasks lands as three commits. Do not postpone the
-  squash to the request's ready step — by then the context no longer knows
+  task ends. The unit of squashing is the task, not the whole plan: a
+  plan with three tasks lands as three commits. Do not postpone the
+  squash until the plan is finished — by then the context no longer knows
   what each draft was. Interactive rebase is unavailable to agents, so
-  name the non-interactive sequence: reset softly to the task's start
-  commit, then make one commit.
+  name the non-interactive sequence: record the task's start commit when
+  the task begins (a lightweight tag, a ref such as `refs/tasks/<name>`,
+  or the recipe's argument), reset softly to it, then make one commit.
 - A task that is not atomic is split at the plan, not at the diff.
   Discovering midway that one task holds two independent changes means
   splitting the task and committing each; staging hunks is error-prone for
@@ -67,7 +70,9 @@ polishing a small change waits for the whole build and stops verifying.
 
 Encourage branches or worktrees for a doubtful design: build and run each
 candidate, let compilation and tests expose what the design stage could
-not, keep the best, and roll back the rest. Cleanup is part of the
+not, keep the best, and roll back the rest. Candidates run in parallel
+collide on the shared resources `multi-agent.md` lists (ports, test
+databases, caches); namespace them the same way. Cleanup is part of the
 procedure: the temporary worktrees and experiment branches are removed as
 soon as the choice is made.
 
@@ -77,8 +82,11 @@ Where a specification tool exists, reuse its task tracking; progress notes
 exist to expose state to humans early, not as a diary that spends output
 tokens. A handoff or scratch note carries debug logs, environment values,
 and credentials more easily than source, so it is written only to a
-location git does not track — the system temporary directory, or a handoff
-directory listed in the ignore file — and treated as a secret. Session logs
+location git does not track — an ignored handoff directory, or the system
+temporary directory when the note need not survive the session or the
+container — and treated as a secret. This governs scratch notes; the
+pending-decisions list a person must act on lives where
+`authorization.md` says. Session logs
 are the same class: they never enter the repository or a shared drive, and
 any analysis of them happens on the machine that produced them or after
 redaction.

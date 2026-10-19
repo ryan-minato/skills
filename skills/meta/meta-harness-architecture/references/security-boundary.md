@@ -29,9 +29,11 @@ suffices.
    read as a requirement.
 3. **No human in the loop.** When a developer directs the agent and reviews
    the result, treat the agent as a colleague who may err or cut corners,
-   not as an attacker: outward actions are either pre-authorized in the
-   plan or queued, so a hijacked agent can damage the local tree but
-   nothing leaves without a person. This single review of irreversible
+   not as an attacker: outward actions are queued for the person or
+   narrowly pre-authorized (one named branch, nothing more), so a hijacked
+   agent can damage the local tree and reach only what the scoped token
+   and that narrow pre-authorization allow; everything else leaves only
+   through a person. This single review of irreversible
    outward results is not the per-command approval `authorization.md`
    rejects; it reviews few, concentrated, readable outputs, not many
    scattered steps. An unattended agent has no such gate.

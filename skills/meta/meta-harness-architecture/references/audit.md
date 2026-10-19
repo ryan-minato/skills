@@ -35,6 +35,16 @@ rewrite — change what the findings justify.
 - Speculative components serving no current need, and constraints thicker
   than the work justifies.
 - Workflow automation the team never actually delegated.
+- A framework allow or deny list standing in as the security boundary,
+  with no sandbox or token scope behind it (`security-boundary.md`,
+  `authorization.md`).
+- A rule that must hold on every task living only in a subdirectory entry
+  file or a framework carrier (`entrypoint.md`).
+- A hidden rule whose rejection says only "not allowed", with no
+  alternative or owner (`security-boundary.md`).
+- Checkpoints by stash, draft commits pushed, handoff notes in the tree
+  (`runtime.md`); a long-lived harness with no checks of its own
+  (`harness-checks.md`).
 - A project script bound to a skill's bundled script by a sync rule, a
   check, or an instruction to keep it identical. The binding is the
   finding, not matching content; the fix removes the binding so the script

@@ -56,15 +56,22 @@ from whether it is reversible and whether it leaves the machine.
 | Irreversible or outward | push, a comment, deleting data, a release | pre-authorized in the specification's pre-authorized-actions line, or queued as a pending decision |
 
 A local commit and a push are not the same class: local history is
-rewritten freely; after a push the platform keeps unreachable commits
-addressable by hash, links them from the request's events, and needs
-support staff to purge them. The specification therefore carries a line
-naming the branch it pushes and the outward writes it allows.
+rewritten freely; after a push the common hosting platforms keep
+unreachable commits addressable by hash and purge them only on request
+(verify the behaviour of the project's platform). The specification — or,
+where the project has none, the approved plan or the policy file itself —
+therefore carries a line naming the branch it pushes and the outward
+writes it allows, and the harness says which of these holds the line.
+
+The pending-decisions list lives where a person will see it: the handoff
+section of the change request, a tracked file, or an issue, chosen by the
+project and named in the policy. It is not a scratch note; only a
+credential or log excerpt inside an item goes to an untracked place.
 
 ## A refusal is a decision
 
-A refused action means one of three things, and only two responses are
-allowed:
+A refused action means one of two things, and each has one response;
+routing around it is never a third:
 
 - The approach is in the wrong place — a refused write to a file may mean
   the logic belongs elsewhere. Return to the plan and choose differently.

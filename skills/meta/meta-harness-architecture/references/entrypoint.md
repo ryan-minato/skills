@@ -32,7 +32,7 @@ four answers on every section, not for the number itself.
 Skills that are process-critical — a publish gate, a compliance review
 before commit — are routed from the table by situation, naming the skill.
 Description matching is probabilistic and is enough only for an auxiliary
-skill; a one-in-ten miss on a critical one is the same as not having it.
+skill; a miss on a critical one is the same as not having it.
 
 ## What belongs in it
 
