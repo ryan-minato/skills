@@ -76,11 +76,11 @@ databases, caches); namespace them the same way. Cleanup is part of the
 procedure: the temporary worktrees and experiment branches are removed as
 soon as the choice is made.
 
-## Progress and handoff hygiene
+## Progress and scratch-note hygiene
 
 Where a specification tool exists, reuse its task tracking; progress notes
 exist to expose state to humans early, not as a diary that spends output
-tokens. A handoff or scratch note carries debug logs, environment values,
+tokens. A scratch note — a draft handoff, a debugging log — carries environment values
 and credentials more easily than source, so it is written only to a
 location git does not track — an ignored handoff directory, or the system
 temporary directory when the note need not survive the session or the

@@ -150,9 +150,10 @@ atomic commit when the task ends, non-interactively; draft commits never leave
 the machine and every push names one ref; the secret scan runs on every commit
 and the pre-commit hook stays fast enough that nobody bypasses it; "no draft
 commits on the branch" is part of a task's done criteria. Explore alternatives
-on branches or worktrees and clean them up when the choice is made. Handoff
+on branches or worktrees and clean them up when the choice is made. Scratch
 notes and session logs carry credentials more easily than source: they live only
-in untracked locations and are treated as secrets.
+in untracked locations and are treated as secrets; the pending-decisions list is
+not a scratch note and lives where a person will see it.
 
 ### Calibrate thickness per layer
 

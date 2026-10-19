@@ -20,6 +20,8 @@ from it must match it.
 - Agent autonomy (attended / unattended; external inputs agents read; where a human reviews results before they leave):
 - Team size (solo / multi-person; review process):
 - Pre-authorized irreversible actions (branch pushed, outward writes allowed):
+- Document holding the pre-authorized line (specification / plan / policy file):
+- Pending-decisions list location (change request handoff / tracked file / issue):
 - Hard read-only control-plane files:
 - Model class (frontier / weak or local):
 - Existing checks and conventions:

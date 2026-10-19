@@ -56,7 +56,8 @@ host: the host offers no boundary, so the allow list is narrow, the deny
 list is fool-proofing only, outward actions stay pre-authorized or queued
 as `authorization.md` describes, and isolation is recommended to the
 owner; step-by-step approval is only the pairing-mode exception that file
-names, never the standing mode. Prefer a reproducible isolated environment when the
+names (a bootstrap phase, or the project kinds it lists), never the
+standing mode for other work. Prefer a reproducible isolated environment when the
 stack allows one. Capability tools — driving the running software, reading
 logs and metrics, querying telemetry — belong here; add the ones current
 work needs, since each unused tool is description noise in every session.
