@@ -6,7 +6,7 @@ Rules, notes, and references that apply only to skills in this catalog.
 The catalog holds three classes of skills:
 
 - **Methodology skills** (code-refactoring, gitmoji, goal-alignment,
-  knowledge-deposition, session-retrospective):
+  harness-study, knowledge-deposition, session-retrospective):
   approaches that transfer across languages and frameworks.
 - **The brownfield suite** (brownfield-intelligence,
   brownfield-investigation, brownfield-onboarding,
@@ -116,7 +116,11 @@ agent-facing text is written — pointers, pruning, one source of truth — →
 project's complete agent harness — entrypoints, knowledge trees, sync
 mechanisms — → the `meta` catalog's `meta-harness-building`
 (`session-retrospective` and `knowledge-deposition` only evolve an
-existing setup incrementally during normal work); authoring a public or
+existing setup incrementally during normal work); studying, explaining,
+assessing, or comparing the harness of given repositories as evidence,
+whole or one aspect, with no verdict on what another project adopts →
+`harness-study`, which hands
+any application of its report to `meta-harness-building`; authoring a public or
 substantial Agent Skill → `great-skill-writing` in `core`, plus the
 `skill-authoring` project skill for skills in this repository.
 
