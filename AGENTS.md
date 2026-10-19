@@ -66,6 +66,15 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
   merging, and changing settings or this file to widen agent authority are
   the maintainer's. Never edit a check, ruleset, or policy to unblock
   yourself.
+- **Blocked work**: finish everything that does not depend on the
+  decision, then record each pending decision in the handoff — where it is
+  stuck, the options, the recommended option and why, the completed work
+  each option affects — instead of stopping.
+- **Mismatches**: a document, script, or command found to disagree with the
+  repository is corrected in the same change when small and certain,
+  queued as a pending decision when it needs one, or filed as an issue
+  labelled `catalog/repository` when out of scope — never left only in
+  the conversation.
 - **Builders stay**: the `meta` and `scaffold` skills are this repository's
   product. Their "never commit, delete after the build" rules do not apply
   here (`## Use inside this repository` in each catalog's `CONTEXT.md`).

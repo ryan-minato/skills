@@ -89,6 +89,42 @@ the maintainer updates this file. When refusing a request that exceeds
 this policy, state this path — the limit is changeable, but only by the
 maintainer.
 
+## Pre-authorized actions
+
+What an agent *can* do is set by the dev container and the `gh` login
+the user forwards; what it *may* do without a fresh decision is set here
+and by the conversation. The permission file `.claude/settings.json`
+allows the read-only and recipe commands every task runs and denies the
+known-dangerous ones (force and batch pushes, hard resets, branch
+deletion, merge, approve, deletes and settings writes on the platform);
+it is fool-proofing against a careless agent, the container is the
+boundary, and it carries no `ask` entry.
+
+- Reversible internal actions — editing files, branching, local commits,
+  running recipes — proceed without asking.
+- A push goes only to the branch the change's proposal names in its
+  `## Deliverable and pre-authorized actions` section, one named ref per
+  push, and only after the publish gate; the conversation's authorization
+  (change-workflow §1) is still required and covers exactly the writes it
+  lists.
+- Every other outward write — a comment, an issue, a label, a review
+  request, a setting — is pre-authorized in the conversation or queued as
+  a pending decision; a refusal is a decision to re-plan or queue, never
+  to route around with an equivalent command.
+
+## Threat model
+
+Recorded 2026-10-19. No unattended agent runs in this repository: every
+agent session is directed by the maintainer, who reviews results before
+they leave. The workflows that read issue and comment text
+(`issues / triage`, `spec / command`, `spec / labels`) are deterministic
+scripts without a model, run from the default branch with job-level
+permissions (`.agents/knowledge/github-checks.md`). The dev container
+holds no credential beyond the `gh` login the user forwards and no host
+mounts; session logs stay in the container user's home and are not
+collected. The strict isolation tier therefore applies to no role here;
+revisit this section before adding any scheduled or unattended agent run.
+
 ## Update this file when
 
 - The maintainer changes the level, a condition, or a gate owner.
@@ -97,3 +133,5 @@ maintainer.
   revert stops being a complete rollback.
 - The specification workflow changes what "approved", "frozen", or
   "archived" means, or a gate gains a recorded approval.
+- `.claude/settings.json` gains or loses a deny entry, an unattended agent
+  run is added, or the dev container gains a credential or a host mount.
