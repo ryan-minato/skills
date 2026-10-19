@@ -127,7 +127,8 @@ commit non-interactively — `git reset --soft <task start commit>`, then
 one commit under the rules above (interactive rebase is unavailable).
 Draft commits never leave the machine: push only after the task commit,
 and push one named ref (`git push origin <branch>`; `--all`, `--mirror`,
-`--tags`, and force pushes are denied by `.claude/settings.json`;
+`--tags`, and force pushes are denied in their common forms by
+`.claude/settings.json`;
 `agent-authority.md` says why that list is fool-proofing and what is
 pre-authorized). The per-commit hooks — secret scans, validators, ruff —
 run on every draft, so every draft commit must pass them and the commit
