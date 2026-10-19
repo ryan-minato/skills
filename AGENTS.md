@@ -72,9 +72,10 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
   each option affects — instead of stopping.
 - **Mismatches**: a document, script, or command found to disagree with the
   repository is corrected in the same change when small and certain,
-  queued as a pending decision when it needs one, or filed as an issue
-  labelled `catalog/repository` when out of scope — never left only in
-  the conversation.
+  queued as a pending decision when it needs one, or — when out of scope —
+  queued as a decision to file an issue labelled `catalog/repository`,
+  filed only once authorized (Publishing above) — never left only in the
+  conversation.
 - **Builders stay**: the `meta` and `scaffold` skills are this repository's
   product. Their "never commit, delete after the build" rules do not apply
   here (`## Use inside this repository` in each catalog's `CONTEXT.md`).

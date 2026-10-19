@@ -470,7 +470,13 @@ def check_workflows() -> None:
     for workflow in sorted(WORKFLOWS.glob("*.yml")):
         text = read(workflow)
         lines = text.splitlines()
-        if not re.search(r"^permissions:[ \t]*(\{\}|\S)", text, re.MULTILINE):
+        top_permissions = re.search(r"^permissions:[ \t]*(#.*)?$|^permissions:[ \t]*(\{\}|\S)", text, re.MULTILINE)
+        empty_key = (
+            top_permissions
+            and top_permissions.group(2) is None
+            and not re.search(r"^permissions:[ \t]*(#.*)?\n[ \t]+\S", text, re.MULTILINE)
+        )
+        if not top_permissions or empty_key:
             error(f"{rel(workflow)}: no top-level `permissions:`; add `permissions: {{}}` and job-level grants.")
         jobs_at = next((i for i, line in enumerate(lines) if line.startswith("jobs:")), None)
         if jobs_at is None:
@@ -491,11 +497,9 @@ def check_workflows() -> None:
                 error(f"{rel(workflow)}:{number}: `{uses.group(1)}` is not pinned to a commit SHA; pin it.")
             elif not re.search(r"#\s*v?\d", line):
                 error(f"{rel(workflow)}:{number}: pinned action lacks a version comment; add `# v<version>` after it.")
-        on_block = re.search(r"^on:(.*)$", text, re.MULTILINE)
-        inline_on = on_block.group(1) if on_block else ""
-        uses_target = (
-            re.search(r"^\s*pull_request_target:", text, re.MULTILINE) is not None or "pull_request_target" in inline_on
-        )
+        on_block = re.search(r"^on:(.*)\n((?:[ \t]+.*\n|\s*\n)*)", text, re.MULTILINE)
+        on_text = (on_block.group(1) + "\n" + on_block.group(2)) if on_block else ""
+        uses_target = re.search(r"\bpull_request_target\b", on_text) is not None
         if uses_target and workflow.name not in allowed:
             error(
                 f"{rel(workflow)}: uses `pull_request_target` but {rel(CHECKS_DOC)} does not list it; "
@@ -504,9 +508,9 @@ def check_workflows() -> None:
         if uses_target:
             for number, line in enumerate(lines, 1):
                 code = line.split("#", 1)[0]
-                head_pattern = r"github\.(event\.pull_request\.head\.(sha|ref|repo)|head_ref)"
+                head_pattern = r"github\.(event\.pull_request\.(head\.(sha|ref|repo)|merge_commit_sha)|head_ref)"
                 head_ref = re.search(head_pattern, code)
-                head = head_ref or re.search(r"\bgit fetch\b.*\b(head|refs/pull)\b", code)
+                head = head_ref or re.search(r"\bgit fetch\b.*\b(head|refs/pull)\b|refs/pull/|gh pr checkout", code)
                 if head:
                     error(
                         f"{rel(workflow)}:{number}: checks out or fetches the head under `pull_request_target`; "
