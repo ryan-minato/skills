@@ -68,6 +68,15 @@ The deposited file, adapted from the asset, must state:
 - The division of labor with tracked work, phrased so an agent can apply it
   to a concrete work item and change request, including when the work item
   opens and what it may not carry.
+- The artifact roles: for each artifact of a change record what it owns
+  and never holds, the invariant and information tests that place a fact,
+  the two-list acceptance shape, and the line of the record that names the
+  irreversible or outward actions a change pre-authorizes, pointing to the
+  authority policy for what it governs.
+- Where the specification is the source of truth for a machine-readable
+  surface: the surface, the comparison check, its place in the local check
+  command and CI, and what its failure names; otherwise the statement that
+  no such surface exists.
 - The change request shape (combined or split) with its selecting fact, the
   default specification author, where the approval is recorded, what the
   integration branch may hold, and the request body's lines: the
@@ -110,3 +119,12 @@ The deposited file, adapted from the asset, must state:
   in `.agents/knowledge/<platform>-workflow.md`. The contract may point to
   them; it must not restate them.
 - No requirement in the contract: a behavior statement belongs in a spec.
+- Observations, not rules: an empirical fact about the platform or the
+  tool (what the list view shows, how a check behaves on a test request)
+  is written with its date and the request it was seen on and labelled as
+  an observation.
+- No bootstrap narrative: a one-time exception, a readback log, an
+  instruction to execute after a first merge stays out of the durable
+  contract — record it in the hand-off or tracked work — and the
+  contract's "Update this file when" list carries the trigger that removes
+  a transient exception once its condition is met.

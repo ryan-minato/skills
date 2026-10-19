@@ -46,6 +46,28 @@ ready, and after archiving; a red check is a red check.
 | `<archive location>` | completed change records | the archive step only |
 | `<codebase map location>` | as-built description of untouched code, with the commit it was mapped at | re-mapped when the drift gate fires |
 
+## Artifact roles
+
+Each artifact of a change record owns one role; nothing is restated in
+another.
+
+| Artifact | Owns | Never holds |
+|---|---|---|
+| `<proposal-like artifact>` | why, the goal, what changes, how completion is judged, what is not done, what is delivered, which irreversible actions are pre-authorized (the branch pushed, outward writes allowed — within `.agents/knowledge/agent-authority.md`), and `## Acceptance` | the contract, the approach, steps |
+| `<specification artifact>` | requirements and scenarios | implementation choices |
+| `<design artifact>` | the approach, its constraints and preferences, rejected alternatives, information needed only for this change | the goal or acceptance, steps |
+| `<task list>` | steps with their verification, written after the package gate closes | acceptance; anything the gate must see |
+
+- `## Acceptance` holds two checkable lists: **Becomes true** (the end
+  state) and **Stays true** (what must not change); for behavior it points
+  to the scenarios and never restates them.
+- Invariant test: a rule that would still hold under any other approach
+  belongs in Stays true; one that holds only because of the chosen
+  approach belongs in the design.
+- Information test: information needed again the next time the behavior
+  changes goes to the specification; information needed only for this
+  change goes to the design.
+
 ## Source of truth
 
 | Fact | Rules | Points to it |
@@ -55,6 +77,7 @@ ready, and after archiving; a red check is a red check.
 | Behavior of a domain | `<source-of-truth spec>` | knowledge base, <issues | work items> |
 | Acceptance of a change | the scenarios in `<change record>/…` | <pull requests | merge requests>, <issues | work items> |
 | Conventions and mechanics | the knowledge base | specifications never restate them |
+| <A machine-readable surface the specification rules, e.g. option metadata, a schema; delete when none> | `<source-of-truth spec>` | `<the surface's file>`, kept equal by `<comparison check>` in `<local check command>` and CI |
 
 A file listed under "Points to it" may summarize in one line and must link;
 it never restates the fact.
@@ -255,3 +278,5 @@ commit with the current one and re-map when they differ.
 - A gate's mode changes, or a recorded approval is added to or dropped
   from one.
 - The rule for when a design is warranted changes.
+- <A transient exception recorded at bootstrap: the condition that ends
+  it, so the exception is removed; delete when none.>

@@ -59,9 +59,12 @@ rules below until none of them is unanswered.
 
 1. **Specify.** Create the change record with the tool's command, then
    write the requirements and their scenarios for this change only, plus
-   non-goals. Done when: every requirement has at least one scenario a
-   reader who has never seen the code could judge, and the validator
-   passes.
+   the four answers every specification carries (see Specification
+   quality): how completion is judged, what is not done, what is
+   delivered, and which irreversible actions are pre-authorized. Place
+   each fact by the artifact roles below. Done when: every requirement
+   has at least one scenario a reader who has never seen the code could
+   judge, the four answers are written, and the validator passes.
 2. **Clarify.** Interrogate every ambiguity, unstated assumption, and
    missing edge case with the user; record answers in the spec, not in the
    chat. Done when: no `[NEEDS CLARIFICATION]`-class marker remains.
@@ -149,6 +152,56 @@ review.
   a class or a table is a design decision in disguise.
 - A spec describes observable behavior, never the diff: "the API returns
   409 on a duplicate email" is a requirement; "add a unique index" is not.
+- Every specification answers four things, and one missing any of them is
+  not complete — ask for the missing answer in the clarify step rather
+  than assume it:
+  1. **How completion is judged**: acceptance scenarios or a final
+     verification command the implementing agent can execute itself,
+     including the task-level closing conditions the project sets (for
+     example, no draft commits left on the branch). A criterion only the
+     user can judge leaves the agent either stopping early or never
+     stopping.
+  2. **What it does not do**: the non-goals, which curb scope creep
+     better than the goals do.
+  3. **What is delivered**: a change request, a report, a deployment,
+     and the pending decisions handed over with it.
+  4. **Which irreversible or outward actions are pre-authorized**: the
+     branch that is pushed, whether comments or a change request may be
+     opened. An action the record does not name is queued as a pending
+     decision when the implementation reaches it, and the work that does
+     not depend on it continues. The line names actions only within what
+     the project's authority policy allows.
+  Where the tool's record has no field for the last two, they go in its
+  proposal-like artifact or, absent one, at the head of the
+  specification; the framework skill names the spot.
+
+## Artifact roles
+
+Each artifact of a change record owns one role, and no fact is restated
+in another:
+
+| Role | Owns | Never holds |
+|---|---|---|
+| Outcome and acceptance | why, the goal, what changes, the four answers above, the acceptance lists | the behavior contract, the approach, steps |
+| Behavior contract | requirements and scenarios | implementation choices |
+| Approach bounds | the chosen approach, its constraints and preferences, rejected alternatives, information needed only for this change | the goal or acceptance, steps |
+| Steps | ordered tasks, each with its verification, written after the package gate | acceptance; anything the gate must see |
+
+Two tests place a fact:
+
+- **Invariant test**: a rule that would still have to hold under any
+  other approach belongs with the acceptance, as something that stays
+  true; one that holds only because of the chosen approach belongs in the
+  approach bounds.
+- **Information test**: information needed again the next time the
+  behavior changes (an upstream source, a protocol page, a data owner)
+  belongs in the specification; information needed only for this change
+  belongs in the approach bounds.
+
+Acceptance is two checkable lists — **becomes true** (the end state) and
+**stays true** (what must not change) — that point to the scenarios for
+behavior and never restate them. The framework skill names which of the
+tool's files carries each role.
 
 ## The approval package
 
@@ -159,7 +212,9 @@ design; a spec-first kit with a constitution: the specification and the
 plan; an IDE's native spec files: the requirements and the design;
 committed specification documents: the specification with its approach
 section — and the framework skill for the tool carries the details. The
-task list always follows approval.
+task list always follows approval. The gate reads the acceptance lists
+first: what becomes true and what stays true tell the reviewer what the
+scenarios are for.
 
 A design is warranted when more than one reasonable approach exists, when
 the change touches structure, interfaces, dependencies, or files outside

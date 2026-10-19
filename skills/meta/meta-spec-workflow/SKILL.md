@@ -133,7 +133,12 @@ recommendation:
 1. **Level** — spec-first (spec used to build, then archived),
    spec-anchored (spec kept as the living description; default for anything
    maintained past one release), or spec-as-source (only when the user names
-   it and the toolchain regenerates code).
+   it and the toolchain regenerates code). Whatever the level, where the
+   specification is the source of truth for a machine-readable surface
+   (option metadata, a schema, a command surface, a configuration shape),
+   record that surface and the comparison check that keeps it equal to the
+   specification; offer no such check where the specification describes
+   behavior only.
 2. **Approach** — one default by situation, the rest as deviations: no code
    yet and an application delivered feature by feature → the spec-first kit
    (GitHub Spec-Kit); no code yet and a library, framework, or
@@ -169,11 +174,27 @@ recommendation:
    named version, never from team size or pipeline maturity. Both modes
    are defined in
    [contract-design.md](references/contract-design.md), read before this
-   round. Record the owner, the mode of each gate, and the design rule;
-   the authority builder attaches its levels to these gates later.
+   round; when the answer is a recorded approval, offer the
+   implementations it lists with their costs rather than one mechanism.
+   Record the owner, the mode of each gate, and the design rule; the
+   authority builder attaches its levels to these gates later. Settle
+   here too where the record names the irreversible or outward actions a
+   change pre-authorizes (the branch it pushes, whether comments or
+   requests may be opened), pointing to the authority policy for the
+   actions it governs.
 4. **Division of labor** — confirm the default: specifications own what,
    why, and acceptance; tracked work owns who, when, and status and links
-   the specification. Any deviation is recorded with its reason.
+   the specification. Then settle the artifact roles inside the record —
+   for each artifact, what it owns and what it never holds — with the two
+   placement tests (an invariant that would hold under any approach goes
+   with the acceptance as something that stays true, one that holds only
+   under the chosen approach goes in the design; information needed again
+   the next time the behavior changes goes in the specification,
+   information needed only for this change goes in the design) and the
+   acceptance shape (two checkable lists, what becomes true and what
+   stays true, pointing to scenarios and never restating them), as
+   [contract-design.md](references/contract-design.md) states them. Any
+   deviation is recorded with its reason.
 5. **Change request shape** — combined (one change request carries the
    change record from the moment it is committed, opened as a draft, and
    the approval gate is exercised on that draft before implementation) or
