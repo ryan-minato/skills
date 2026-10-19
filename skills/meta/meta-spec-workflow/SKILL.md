@@ -40,7 +40,7 @@ Both must survive this builder and this conversation.
 - The contract records specification discipline only: level, tool, artifact
   map, source of truth per fact, lifecycle, approval gate, and the division
   of labor with tracked work. It adds no management semantic — a
-  specification is the content of a change request's acceptance, never a
+  specification is what a change request's acceptance lists point to, never a
   new work-item kind, objective, or timebox — and it never reopens a
   decision the workflow contract already settled.
 - The design is tool-neutral and platform-neutral; the deposit is not.

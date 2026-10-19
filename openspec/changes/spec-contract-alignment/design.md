@@ -76,4 +76,6 @@ Skipped:
 
 ## Open Questions
 
+- Whether the platform template lines (`assets/<platform>/template-lines.md`, the `ACCEPTANCE_ITEM` and `ACCEPTANCE_SOURCE` slots) should name the acceptance lists beside the scenarios; deferred to a later change of the platform expression, without changing this change's specs.
+
 - Whether this repository adopts the artifact roles and the two-list acceptance into its own contract and schema templates; a separate repository change, settled after this one.

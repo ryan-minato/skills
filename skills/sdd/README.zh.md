@@ -20,6 +20,6 @@ npx skills add ryan-minato/skills --skill <skill-name>
 
 | Skill | 说明 |
 |---|---|
-| [spec-driven-development](spec-driven-development/) | 以工具与平台无关的方式从书面规格出发工作：判断规格驱动开发何时值得、采用哪个级别，让每份规格回答完成如何判定、不做什么、交付什么、预授权了哪些不可逆动作，按产物角色及其两条判定测试安放每个事实，在项目契约之下运行循环——审批包（规格加上有必要时的受约束 design）齐备后才发布草稿，然后停下，门主宣布该轮评议收口后核对，此后才写任务，验证，把 request 标记为 ready 以对完成的实现展开评议，该轮收口后再在 request 内部冻结记录，使批准指向确定的一个版本——没有契约时按文档化的默认值执行，验收标准只保留在规格中，把原型或棕地代码库逐个变更地转换过来而不回填规格，并把项目所用框架交给对应的 `sdd` skill、把项目规则交给 `meta` catalog 的构建技能。 |
+| [spec-driven-development](spec-driven-development/) | 以工具与平台无关的方式从书面规格出发工作：判断规格驱动开发何时值得、采用哪个级别，让每份规格回答完成如何判定、不做什么、交付什么、预授权了哪些不可逆动作，按产物角色及其两条判定测试安放每个事实，在项目契约之下运行循环——审批包（规格加上有必要时的受约束 design）齐备后才发布草稿，然后停下，门主宣布该轮评议收口后核对，此后才写任务，验证，把 request 标记为 ready 以对完成的实现展开评议，该轮收口后再在 request 内部冻结记录，使批准指向确定的一个版本——没有契约时按文档化的默认值执行，验收放在变更记录里、每个场景只保留在规格中，把原型或棕地代码库逐个变更地转换过来而不回填规格，并把项目所用框架交给对应的 `sdd` skill、把项目规则交给 `meta` catalog 的构建技能。 |
 | [openspec-workflow](openspec-workflow/) | 通过 pull/merge request 运行 OpenSpec 变更：审批包（proposal、delta spec、有必要时的 design；tasks 在审批后）、spec-less 标记、严格校验器的运行时机、由实现者在 request 内部执行存档命令、`/spec show` 与 `/spec status` 评论命令、存档轴与进度轴状态标签，以及把它们装进 GitHub（ready 的 request 含未存档变更即失败的检查，评论与标签两个 workflow）或 GitLab（常规与手动作业）的自动化；附带 `spec_changes.py`。 |
 | [spec-kit-workflow](spec-kit-workflow/) | 通过 pull/merge request 运行 Spec-Kit 特性：审批包（规格与计划；tasks 在审批后）、ready 前的完成判据是任务全部勾选（该套件没有存档操作）、以声明代替冻结来锁定特性、覆盖触及特性的 `/spec` 评论命令与进度标签，以及把它们装进 GitHub 或 GitLab 的自动化；附带 `spec_kit_features.py`。 |
