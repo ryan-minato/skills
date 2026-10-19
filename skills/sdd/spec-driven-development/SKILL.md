@@ -158,8 +158,9 @@ review.
 - A spec describes observable behavior, never the diff: "the API returns
   409 on a duplicate email" is a requirement; "add a unique index" is not.
 - Every specification answers four things, and one missing any of them is
-  not complete — ask for the missing answer in the clarify step rather
-  than assume it:
+  not complete — propose a concrete answer (a command, an observable
+  check, a branch) for the user to confirm in the clarify step rather
+  than assume it or stop at naming the gap:
   1. **How completion is judged**: acceptance scenarios or a final
      verification command the implementing agent can execute itself,
      including the task-level closing conditions the project sets (for
