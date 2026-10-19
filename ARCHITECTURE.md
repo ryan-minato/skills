@@ -163,7 +163,11 @@ GitHub registers (`github-checks.md`, `github-settings.md`), the
 synchronization and entropy register (`harness-maintenance.md`), the skill
 quality bar (`skill-quality.md`), and external URLs (`references.md`).
 `AGENTS.md` names every file with the condition that loads it;
-`scripts/validate_harness.py` fails when a knowledge file has no pointer.
+`scripts/validate_harness.py` fails when a knowledge file has no pointer,
+and its `workflows` check keeps every workflow's permissions explicit,
+every action SHA-pinned, and `pull_request_target` confined to the
+workflows `github-checks.md` lists. `harness-maintenance.md` records the
+six-layer calibration the harness is built to.
 
 Source of truth: **the knowledge files on origin's latest default branch**.
 Working-tree edits become authoritative only after merge. GitHub is the only

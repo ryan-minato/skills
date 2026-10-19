@@ -31,12 +31,31 @@ them. The rows below are the pairs no script can check.
 | `scripts/spec_changes.py`, this repository's own management script | its archive command and refusals as `openspec/config.yaml` and the gotchas of `.agents/skills/change-workflow/SKILL.md` state them; the `--shape combined` flag of the `spec-check` recipe as `.agents/knowledge/spec-workflow.md` states it | a subcommand or flag they name changes | author |
 | `skills/sdd/openspec-workflow/assets/github/workflow-spec-{command,labels}.yml` and `job-spec-check.yml`, and the command line of `skills/sdd/openspec-workflow/assets/spec_changes.py` they call | `.github/workflows/spec-{command,labels}.yml` (placeholders resolved; same steps, same `scripts/spec_changes.py` path) and the `checks / spec` job of `checks.yml` (the asset's steps plus the path filter and the generated-skills check, its check step running through the `spec-check` and `spec-changes` recipes that wrap the script); the same subcommands, flags, and output in this repository's own `scripts/spec_changes.py`, which nothing keeps identical to the asset | the skill's assets change | author |
 | the `## Extension slots` tables in `skills/meta/meta-github-workflow/references/durable-harness.md` and `skills/meta/meta-gitlab-workflow/references/durable-harness.md` | the slot tables in `skills/meta/meta-spec-workflow/references/github-expression.md` and `gitlab-expression.md` and the section names in `skills/meta/meta-spec-workflow/assets/<platform>/` (same slot names, same locations) | a slot is added, renamed, or moved in a base | author |
+| the `Workflows allowed to use \`pull_request_target\`` line of `.agents/knowledge/github-checks.md` | the `workflows` check of `scripts/validate_harness.py` reads it; a workflow added to or removed from the event is edited there first | a workflow adopts or drops `pull_request_target` | author |
+| the `## Deliverable and pre-authorized actions` section of `openspec/schemas/skill-change/templates/proposal.md` | the proposal instruction in `schema.yaml`, the artifact-roles paragraph in `.agents/knowledge/spec-workflow.md`, the proposal row of `.github/PULL_REQUEST_TEMPLATE.md`, and the pre-authorized-push rule in `.agents/knowledge/agent-authority.md` | the section is renamed, moved, or removed | author |
 | a workflow's required-check name | `.agents/knowledge/github-checks.md`, the ruleset in `.agents/knowledge/github-settings.md` (workflow first, live on `main`, then the ruleset) | a job rename | maintainer |
 | a remote setting | its row in `.agents/knowledge/github-settings.md`, read back after the write | every authorized remote write | maintainer |
 | `.github/PULL_REQUEST_TEMPLATE.md` (sections, reserved lines, approval line) | the payload and ready steps (§6, §7) of `.agents/skills/change-workflow/SKILL.md`, the tracked-work bullet in `.agents/knowledge/spec-workflow.md` (`check_pr_policy.py` reads the template itself) | the template changes | author |
 | `skills/machine-learning/experiment-provenance/assets/run_manifest.py` | `skills/scaffold/scaffold-ml/assets/run_manifest.py` (byte-identical; `cmp` them) | the durable skill's module changes | author |
 | the section headings of `skills/machine-learning/research-workflow/assets/research-spec.md` | `skills/scaffold/scaffold-ml/assets/openspec/research-task/templates/research.md` (same `##` headings in the same order; the scaffold's one skeleton for both the OpenSpec and the no-tool path) | a research-spec field is added, renamed, or removed | author |
 | a catalog added or removed | catalog scaffold, `ARCHITECTURE.md` catalogs section, `marketplace.json` (`just gen-marketplace`), root `README.md` + `README.zh.md`, `.github/labels.json` `catalog/*`, every issue form's Catalog options (`validate_harness.py` catches the last two); the merge applies the labels through `labels / sync`, and a removed catalog's label, reported there as a prune candidate, is deleted by hand with authorization; a removed catalog also drops its prefix from `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.py` | same pull request; a removed label's deletion after merge | author, maintainer |
+
+## Layer calibration
+
+Read before changing the thickness of any layer. Rated 2026-10-19; the
+variables: error cost high (every skill is installed by other projects),
+maintenance horizon indefinite, isolation a dev container with no secrets
+beyond the forwarded `gh` login, autonomy attended at H1, team one
+maintainer plus agents.
+
+| Layer | Rating | Variable and reason |
+|---|---|---|
+| Environment and sandbox | medium | isolation: container, no mounts, no credential beyond `gh`; no isolation tier needed (`agent-authority.md`, Threat model) |
+| Knowledge and routing | thick | horizon: entrypoint, eight knowledge files, three project skills, pointers checked by `validate_harness.py` |
+| Hard gates | thick | error cost: pre-commit (secret scans, validators, ruff) and CI (`checks / gate`, `pr / policy`, `scan-secrets`) required |
+| Authorization boundary | medium | autonomy attended: allow and deny lists, pre-authorized actions, pending decisions, H1 policy; thick only if a run becomes unattended |
+| Specification and completion criteria | thick | error cost and horizon: OpenSpec spec-anchored, strict validation in CI, two deliberations |
+| Entropy management | thick | horizon: this register, `validate_harness.py`, the review below |
 
 ## Periodic entropy review
 
@@ -58,7 +77,9 @@ settings readback (step 4) is left to the maintainer.
    every row.
 5. Check the "not used" triggers in `.agents/knowledge/github-workflow.md`
    and the omitted-object list; enable only what fired.
-6. Look for constraints thicker than the work justifies and for project
+6. Ask of each constraint whether it has caught anything since the last
+   run; one that has not is a thinning candidate. Look for constraints
+   thicker than the work justifies and for project
    skills whose trigger never fired since the last run.
 7. Record findings as keep / update / remove, apply the unambiguous ones,
    and update the "Last run" date above in the same pull request.

@@ -16,6 +16,12 @@ command that exists and passes locally; CI never chooses its own linters.
 | `issues / triage` | `issue-triage.yml` | `python3 scripts/sync_issue_metadata.py --event "$GITHUB_EVENT_PATH" --apply` | issue opened or edited | automation | Prints the label plan as JSON and applies it; exit 1 means a form answer did not map to a label in `.github/labels.json`. |
 | `labels / sync` | `labels-sync.yml` | `python3 scripts/sync_labels.py --file .github/labels.json --repo "$REPO" --apply`, then a summary of the plan | push to `main` touching `.github/labels.json`, `scripts/sync_labels.py`, or the workflow; weekly schedule; manual dispatch (`main` only) | automation | The repository's labels match `.github/labels.json` in name, color, and description; the summary counts created, updated, and unchanged labels, and each label on GitHub but not in the file is a warning, never a deletion. |
 
+Workflows allowed to use `pull_request_target`: `spec-labels.yml`.
+`scripts/validate_harness.py` reads this line (the `workflows` check) and
+fails any other workflow that uses the event, any workflow or job without
+an explicit `permissions:`, any action not pinned to a commit SHA, and a
+head checkout under `pull_request_target`.
+
 Required-check names are a stable interface: `scripts/validate_harness.py`
 fails when a workflow job name and this table disagree, and the ruleset
 (`.agents/knowledge/github-settings.md`) names `checks / gate`,

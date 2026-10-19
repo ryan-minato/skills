@@ -34,6 +34,11 @@ Checks (errors unless marked warning):
   ruff       the ruff pin agrees across .pre-commit-config.yaml,
              .devcontainer/devcontainer.json, and .github/workflows/checks.yml
              (warning: the pre-commit ruff hooks cover skill scripts)
+  workflows  every workflow has a top-level `permissions:` and every job its
+             own; every third-party action is pinned to a commit SHA;
+             `pull_request_target` appears only in the workflows the
+             `Workflows allowed to use` line of github-checks.md names, and
+             those never check out or fetch the head
 
 Exit codes: 0 = all checks pass (warnings allowed), 1 = at least one error,
 2 = a required file is unreadable or not in the expected shape.
@@ -455,6 +460,52 @@ def check_ruff() -> None:
         warn(f"{rel(PRECOMMIT)}: the ruff hook's files pattern does not cover skill scripts (skills/*/*/scripts).")
 
 
+def check_workflows() -> None:
+    """Workflow shape: explicit permissions, SHA-pinned actions, bounded pull_request_target."""
+    doc = read(CHECKS_DOC)
+    allowed_line = re.search(r"^Workflows allowed to use `pull_request_target`: (.+)$", doc, re.MULTILINE)
+    if not allowed_line:
+        fail(f"{rel(CHECKS_DOC)} has no line 'Workflows allowed to use `pull_request_target`: ...'")
+    allowed = set(re.findall(r"`([^`]+\.yml)`", allowed_line.group(1)))
+    for workflow in sorted(WORKFLOWS.glob("*.yml")):
+        text = read(workflow)
+        lines = text.splitlines()
+        if not re.search(r"^permissions:\s*(\{\}|\S)", text, re.MULTILINE):
+            error(f"{rel(workflow)}: no top-level `permissions:`; add `permissions: {{}}` and job-level grants.")
+        jobs_at = next((i for i, line in enumerate(lines) if line.startswith("jobs:")), None)
+        if jobs_at is None:
+            error(f"{rel(workflow)}: no `jobs:` section.")
+            continue
+        job_lines = [i for i, line in enumerate(lines) if i > jobs_at and re.match(r"  [A-Za-z0-9_-]+:\s*$", line)]
+        for index, start in enumerate(job_lines):
+            end = job_lines[index + 1] if index + 1 < len(job_lines) else len(lines)
+            body = "\n".join(lines[start:end])
+            if not re.search(r"^    permissions:", body, re.MULTILINE):
+                job = lines[start].strip()[:-1]
+                error(f"{rel(workflow)}:{start + 1}: job {job!r} declares no `permissions:`; add the grants it needs.")
+        for number, line in enumerate(lines, 1):
+            uses = re.search(r"uses:\s*([^\s#]+)", line)
+            if not uses or "/" not in uses.group(1) or uses.group(1).startswith("./"):
+                continue
+            if not re.search(r"@[0-9a-f]{40}$", uses.group(1)):
+                error(f"{rel(workflow)}:{number}: `{uses.group(1)}` is not pinned to a 40-hex commit SHA; pin it.")
+        uses_target = re.search(r"^\s*pull_request_target:", text, re.MULTILINE) is not None
+        if uses_target and workflow.name not in allowed:
+            error(
+                f"{rel(workflow)}: uses `pull_request_target` but {rel(CHECKS_DOC)} does not list it; "
+                "add it there with the reason or use `pull_request`."
+            )
+        if uses_target:
+            for number, line in enumerate(lines, 1):
+                head_ref = re.search(r"github\.event\.pull_request\.head\.(sha|ref)", line)
+                head = head_ref or re.search(r"\bgit fetch\b.*\bhead\b", line)
+                if head:
+                    error(
+                        f"{rel(workflow)}:{number}: checks out or fetches the head under `pull_request_target`; "
+                        f"read the head through the REST API instead (see {rel(CHECKS_DOC)})."
+                    )
+
+
 def main() -> int:
     for check in (
         check_labels,
@@ -466,6 +517,7 @@ def main() -> int:
         check_checks_doc,
         check_openspec,
         check_ruff,
+        check_workflows,
     ):
         check()
     for message in warnings:
