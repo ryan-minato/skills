@@ -5,17 +5,17 @@ description: >-
   architecture practice manual for agent harness layers — entrypoints,
   knowledge files, project skills, the sandbox and threat model, the
   authorization boundary (allow and deny lists, pre-authorized actions,
-  pending decisions), runtime conventions (non-interactive execution,
-  checkpoint commits), sync, harness self-checks, entropy, multi-agent
-  topology, and advanced autonomy — with six-layer calibration and
-  starting-shape assets. Use when a harness build reaches one of those
-  layers; when asked how strictly to sandbox an agent, which commands
-  agents may run without asking, how agents should checkpoint or squash,
-  how AGENTS.md, a knowledge file, a project skill, or a keep-in-sync rule
-  should be structured, or where a rule should live so agents find it; or
-  when auditing an existing harness. Not the build workflow itself (the
-  entry builder meta-harness-building), an application test or CI fix, or
-  the study of another repository's harness.
+  pending decisions), runtime conventions (checkpoint commits,
+  non-interactive execution), sync, harness self-checks, entropy,
+  multi-agent topology, advanced autonomy — with six-layer calibration and
+  starting-shape assets. Use when a build reaches one of those layers;
+  when asked how strictly to sandbox an agent, which commands agents may
+  run without asking, how agents checkpoint or squash, how AGENTS.md, a
+  knowledge file, a project skill, or a sync rule should be structured,
+  what belongs in the entrypoint versus a reference, or where a rule
+  should live; or when auditing an existing harness. Not the build
+  workflow (meta-harness-building), an application test or CI fix, or the
+  study of another repository's harness.
 license: Apache-2.0
 ---
 
