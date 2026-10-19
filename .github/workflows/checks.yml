@@ -116,6 +116,7 @@ jobs:
     name: checks / gate
     if: always()
     needs: [quality, spec]
+    permissions: {}
     runs-on: ubuntu-latest
     steps:
       - name: All required jobs succeeded
