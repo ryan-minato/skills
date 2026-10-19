@@ -73,8 +73,7 @@ The deposited file, adapted from the asset, must state:
   the two-list acceptance shape, and the line of the record that names the
   irreversible or outward actions a change pre-authorizes, pointing to the
   authority policy for what it governs.
-- Where the specification is the source of truth for a machine-readable
-  surface: the surface, the comparison check, its place in the local check
+- Where the specification rules a machine-readable surface: the surface, the comparison check, its place in the local check
   command and CI, and what its failure names; otherwise the statement that
   no such surface exists.
 - The change request shape (combined or split) with its selecting fact, the

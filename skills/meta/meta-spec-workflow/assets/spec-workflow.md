@@ -62,8 +62,9 @@ another.
   state) and **Stays true** (what must not change); for behavior it points
   to the scenarios and never restates them.
 - Invariant test: a rule that would still hold under any other approach
-  belongs in Stays true; one that holds only because of the chosen
-  approach belongs in the design.
+  belongs in Stays true as an entry pointing to the requirement or scenario
+  that carries it; one that holds only because of the chosen approach
+  belongs in the design.
 - Information test: information needed again the next time the behavior
   changes goes to the specification; information needed only for this
   change goes to the design.
@@ -75,7 +76,7 @@ another.
 | Project goals | `<goal document>` | principles file, this contract |
 | Engineering principles | `<principles file>` | agent entrypoint |
 | Behavior of a domain | `<source-of-truth spec>` | knowledge base, <issues | work items> |
-| Acceptance of a change | the scenarios in `<change record>/…` | <pull requests | merge requests>, <issues | work items> |
+| Acceptance of a change | the `## Acceptance` lists of `<change record>/<proposal-like artifact>`, pointing to the scenarios in `<change record>/…` | <pull requests | merge requests>, <issues | work items> |
 | Conventions and mechanics | the knowledge base | specifications never restate them |
 | <A machine-readable surface the specification rules, e.g. option metadata, a schema; delete when none> | `<source-of-truth spec>` | `<the surface's file>`, kept equal by `<comparison check>` in `<local check command>` and CI |
 
@@ -220,7 +221,9 @@ and the token variables>; <nothing else | "pipelines must succeed">.
 
 ## Specifications and <issues | work items>
 
-- A specification owns what is built, why, and its acceptance scenarios.
+- A change record owns what is built, why, and its acceptance: the
+  proposal-like artifact the why and the acceptance lists, the
+  specification the scenarios they point to.
 - An <issue | work item> is opened when the requirement appears, carrying
   the raw requirement, owner, and priority and no acceptance criteria; it
   links the change record once that record exists. It owns who does it,
@@ -233,7 +236,9 @@ and the token variables>; <nothing else | "pipelines must succeed">.
   the goal, a section stating the value, the specification block (`Spec:`
   linking the record on the branch, `Phase:` specification or
   implementation, one link per file of the approval package with the task
-  list marked as after-approval, `Approval:` in the mode above), related work with the closing reference (<a split-shape
+  list marked as after-approval, `Approval:` in the mode above, and the
+  pre-authorized actions line of the proposal-like artifact — the branch
+  pushed and nothing else outward unless named), related work with the closing reference (<a split-shape
   specification <pull request | merge request> references the <issue |
   work item> with <`Refs #N` | a bare `#N`> and never closes it; the last
   implementation request does | delete under the combined shape>), and
@@ -278,5 +283,6 @@ commit with the current one and re-map when they differ.
 - A gate's mode changes, or a recorded approval is added to or dropped
   from one.
 - The rule for when a design is warranted changes.
-- <A transient exception recorded at bootstrap: the condition that ends
-  it, so the exception is removed; delete when none.>
+- <The condition a bootstrap-time exception waited for — the protection
+  rule, the first merged check — is confirmed active or found missing:
+  drop the exception recorded in tracked work; delete when none.>

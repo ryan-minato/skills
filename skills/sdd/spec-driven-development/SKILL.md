@@ -66,8 +66,10 @@ rules below until none of them is unanswered.
    has at least one scenario a reader who has never seen the code could
    judge, the four answers are written, and the validator passes.
 2. **Clarify.** Interrogate every ambiguity, unstated assumption, and
-   missing edge case with the user; record answers in the spec, not in the
-   chat. Done when: no `[NEEDS CLARIFICATION]`-class marker remains.
+   missing edge case with the user, including any of the four answers
+   still missing; record answers in the spec, not in the chat. Done when:
+   no `[NEEDS CLARIFICATION]`-class marker remains and the four answers
+   are written.
 3. **Bound the approach, then publish.** When a design is warranted (see
    [The approval package](#the-approval-package)), write it: the approach,
    its technical constraints, the preferences, the rejected alternatives —
@@ -76,8 +78,10 @@ rules below until none of them is unanswered.
    shape) with the complete approval package as its first content. Then
    stop: no task list and no code until the contract's approval mode is
    satisfied (the gate owner closes the discussion in conversation, or
-   posts the fixed comment). Done when: the package is complete and
-   published, and the agent is waiting and says what it waits for.
+   posts the fixed comment). A package whose specification lacks a done
+   criterion the agent can run is not published. Done when: the package is
+   complete and published, and the agent is waiting and says what it waits
+   for.
 4. **Reconcile, then tasks.** When the gate owner closes the discussion,
    read the request's comments and review threads with their resolution
    state; list every unresolved thread, every adjustment requested in the
@@ -91,7 +95,9 @@ rules below until none of them is unanswered.
    confirmed, no task lacks a scenario, and no scenario lacks a task.
 5. **Implement.** Work task by task; when the code must deviate from the
    spec or the design, stop and change the record first, with the user's
-   approval. Done when: every task is closed or its deviation is recorded
+   approval. When a task needs an irreversible or outward action the record
+   does not name, queue it as a pending decision and continue the tasks
+   that do not depend on it. Done when: every task is closed or its deviation is recorded
    as an approved change.
 6. **Verify.** Execute the scenarios — tests, commands, observed states —
    against the running result, not against the diff. When the change
@@ -145,7 +151,6 @@ review.
   requirements.
 - Every requirement carries at least one scenario in a given / when / then
   shape, and one of them covers an edge or failure path.
-- Non-goals are written down; an unstated exclusion is a future dispute.
 - Scope requirements as *now*, *later*, and *out of scope*; only *now* enters
   the design.
 - Requirements and design live in separate files; a requirement that names
@@ -161,8 +166,9 @@ review.
      example, no draft commits left on the branch). A criterion only the
      user can judge leaves the agent either stopping early or never
      stopping.
-  2. **What it does not do**: the non-goals, which curb scope creep
-     better than the goals do.
+  2. **What it does not do**: the non-goals, written down — an unstated
+     exclusion is a future dispute, and non-goals curb scope creep better
+     than goals do.
   3. **What is delivered**: a change request, a report, a deployment,
      and the pending decisions handed over with it.
   4. **Which irreversible or outward actions are pre-authorized**: the
@@ -170,10 +176,15 @@ review.
      opened. An action the record does not name is queued as a pending
      decision when the implementation reaches it, and the work that does
      not depend on it continues. The line names actions only within what
-     the project's authority policy allows.
+     the project's authority policy allows; where no policy exists,
+     nothing outward beyond the named branch is pre-authorized.
   Where the tool's record has no field for the last two, they go in its
-  proposal-like artifact or, absent one, at the head of the
-  specification; the framework skill names the spot.
+  proposal-like artifact or, absent one, at the head of the specification
+  (the framework skill names the spot where it does; otherwise the head of
+  the specification is the default). The pushes and requests the project's
+  contract already prescribes — the draft's branch and the draft itself —
+  are covered by the contract; the line extends beyond them, and a record
+  written before the project adopted it pre-authorizes nothing further.
 
 ## Artifact roles
 
@@ -190,9 +201,11 @@ in another:
 Two tests place a fact:
 
 - **Invariant test**: a rule that would still have to hold under any
-  other approach belongs with the acceptance, as something that stays
-  true; one that holds only because of the chosen approach belongs in the
-  approach bounds.
+  other approach belongs with the acceptance, as a stays-true entry that
+  names it and points to the requirement or scenario carrying it (add
+  one when none does; a non-behavioral invariant such as a size or a
+  dependency rule is stated outright); one that holds only because of the
+  chosen approach belongs in the approach bounds.
 - **Information test**: information needed again the next time the
   behavior changes (an upstream source, a protocol page, a data owner)
   belongs in the specification; information needed only for this change
@@ -245,10 +258,11 @@ by default, or the file the agent entrypoint points to — records the
 level, the tool and its framework skill, the change request shape
 (combined or split), the approval owner and mode, when a design is
 warranted, the archive executor, the specification scope, and what tracked
-work links. Apply those facts without asking them again; the specification
-owns *what*, *why*, and the acceptance criteria, tracked work owns *who*,
-*when*, and *status* and links the record, and acceptance criteria exist in
-exactly one place.
+work links. Apply those facts without asking them again; the change record owns
+*what*, *why*, and the acceptance criteria — its outcome artifact the why
+and the acceptance lists, its specification the scenarios they point to —
+tracked work owns *who*, *when*, and *status* and links the record, and
+every scenario exists in exactly one place.
 
 When no contract exists, apply these defaults and say so in the reply,
 naming the spec workflow builder of the `meta` catalog (offered through
