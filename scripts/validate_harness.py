@@ -470,7 +470,7 @@ def check_workflows() -> None:
     for workflow in sorted(WORKFLOWS.glob("*.yml")):
         text = read(workflow)
         lines = text.splitlines()
-        if not re.search(r"^permissions:\s*(\{\}|\S)", text, re.MULTILINE):
+        if not re.search(r"^permissions:[ \t]*(\{\}|\S)", text, re.MULTILINE):
             error(f"{rel(workflow)}: no top-level `permissions:`; add `permissions: {{}}` and job-level grants.")
         jobs_at = next((i for i, line in enumerate(lines) if line.startswith("jobs:")), None)
         if jobs_at is None:
@@ -488,8 +488,14 @@ def check_workflows() -> None:
             if not uses or "/" not in uses.group(1) or uses.group(1).startswith("./"):
                 continue
             if not re.search(r"@[0-9a-f]{40}$", uses.group(1)):
-                error(f"{rel(workflow)}:{number}: `{uses.group(1)}` is not pinned to a 40-hex commit SHA; pin it.")
-        uses_target = re.search(r"^\s*pull_request_target:", text, re.MULTILINE) is not None
+                error(f"{rel(workflow)}:{number}: `{uses.group(1)}` is not pinned to a commit SHA; pin it.")
+            elif not re.search(r"#\s*v?\d", line):
+                error(f"{rel(workflow)}:{number}: pinned action lacks a version comment; add `# v<version>` after it.")
+        on_block = re.search(r"^on:(.*)$", text, re.MULTILINE)
+        inline_on = on_block.group(1) if on_block else ""
+        uses_target = (
+            re.search(r"^\s*pull_request_target:", text, re.MULTILINE) is not None or "pull_request_target" in inline_on
+        )
         if uses_target and workflow.name not in allowed:
             error(
                 f"{rel(workflow)}: uses `pull_request_target` but {rel(CHECKS_DOC)} does not list it; "
@@ -497,8 +503,10 @@ def check_workflows() -> None:
             )
         if uses_target:
             for number, line in enumerate(lines, 1):
-                head_ref = re.search(r"github\.event\.pull_request\.head\.(sha|ref)", line)
-                head = head_ref or re.search(r"\bgit fetch\b.*\bhead\b", line)
+                code = line.split("#", 1)[0]
+                head_pattern = r"github\.(event\.pull_request\.head\.(sha|ref|repo)|head_ref)"
+                head_ref = re.search(head_pattern, code)
+                head = head_ref or re.search(r"\bgit fetch\b.*\b(head|refs/pull)\b", code)
                 if head:
                     error(
                         f"{rel(workflow)}:{number}: checks out or fetches the head under `pull_request_target`; "

@@ -78,8 +78,8 @@ settings readback (step 4) is left to the maintainer.
 5. Check the "not used" triggers in `.agents/knowledge/github-workflow.md`
    and the omitted-object list; enable only what fired.
 6. Ask of each constraint whether it has caught anything since the last
-   run; one that has not is a thinning candidate. Look for constraints
-   thicker than the work justifies and for project
+   run and whether the work still justifies its thickness; one that
+   catches nothing is a thinning candidate. Look for project
    skills whose trigger never fired since the last run.
 7. Record findings as keep / update / remove, apply the unambiguous ones,
    and update the "Last run" date above in the same pull request.
