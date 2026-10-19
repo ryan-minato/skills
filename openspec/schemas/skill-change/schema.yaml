@@ -36,6 +36,12 @@ artifacts:
         symlink, `marketplace.json`, the catalog `CONTEXT.md`, mirrored files
         listed in `scripts/validate_harness.py`, and any project harness file.
       - **Non-goals**: what stays as it is, so review does not argue about it.
+      - **Deliverable and pre-authorized actions**: what the change delivers
+        (the pull request, a report, the pending decisions handed over) and
+        the branch it pushes plus any other outward write it needs; an
+        action not named here is queued as a pending decision when the
+        implementation reaches it, and the conversation's authorization is
+        still required for every remote write.
       - **Tracked work**: the GitHub issue it serves, or "no issue".
     requires: []
 
