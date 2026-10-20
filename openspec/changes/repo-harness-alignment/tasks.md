@@ -27,9 +27,9 @@
 
 ## 2. External impact
 
-- [ ] 2.1 `.github/dependabot.yml` covers `.github/actions/*`; read-through
-- [ ] 2.2 The `harness-maintenance.md` register row for `scripts/spec_changes.py` becomes a note that the repository's script is its own port; verify no row names a deleted file
-- [ ] 2.3 Stale passages S1–S12, S14, S17 removed or dated; verify grep returns none
+- [x] 2.1 `.github/dependabot.yml` covers `.github/actions/*`; read-through
+- [x] 2.2 The `harness-maintenance.md` register row for `scripts/spec_changes.py` becomes a note that the repository's script is its own port; verify no row names a deleted file
+- [x] 2.3 Stale passages S1–S12, S14, S17 removed or dated; verify grep returns none
 
 ## 3. Tests
 
