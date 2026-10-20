@@ -33,14 +33,14 @@
 
 ## 3. Tests
 
-- [ ] 3.1 Equivalence results for every port, with the intentional differences, recorded for the Validation section — proves the port item
-- [ ] 3.2 Permissions: every script run through its shebang in its real invocation, local and CI — proves the shebang decision
-- [ ] 3.3 The audit's duplication grep re-run, each rule in full only in its owner — proves the owner map
-- [ ] 3.4 Clean-context readbacks of the verification plan (`AGENTS.md`, `spec-workflow.md`, `management-code.md`, `skill-authoring`, `code-review`, the archive question, the settings) — proves the knowledge items
-- [ ] 3.5 Settings readback before ready, with the rows to apply listed in the description — proves the settings-declaration item
-- [ ] 3.6 Untouched product: the `skills/` and generated-file diff empty, ruff over the public skills unchanged from `main`
-- [ ] 3.7 Record the skipped cases (privileged workflows and the live `pr / policy` branch after merge, live `ask` prompts) with reasons
+- [x] 3.1 Equivalence results for every port, with the intentional differences, recorded for the Validation section — proves the port item
+- [x] 3.2 Permissions: every script run through its shebang in its real invocation, local and CI — proves the shebang decision
+- [x] 3.3 The audit's duplication grep re-run, each rule in full only in its owner — proves the owner map
+- [x] 3.4 Clean-context readbacks of the verification plan (`AGENTS.md`, `spec-workflow.md`, `management-code.md`, `skill-authoring`, `code-review`, the archive question, the settings) — proves the knowledge items
+- [x] 3.5 Settings readback before ready, with the rows to apply listed in the description — proves the settings-declaration item
+- [x] 3.6 Untouched product: the `skills/` and generated-file diff empty, ruff over the public skills unchanged from `main`
+- [x] 3.7 Record the skipped cases (privileged workflows and the live `pr / policy` branch after merge, live `ask` prompts) with reasons
 
 ## 4. Finish
 
-- [ ] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, record the harness review in `harness-maintenance.md`, and leave the change unarchived for the maintainer's second deliberation
+- [x] 4.1 Run `just check`, write the results to the pull request's Validation section linking the verification plan, record the harness review in `harness-maintenance.md`, and leave the change unarchived for the maintainer's second deliberation
