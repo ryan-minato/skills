@@ -2,7 +2,7 @@
 # `/spec show [<change>] [proposal|design|tasks|specs|all]`,
 # `/spec status [<change>]`, `/spec help`.
 #
-# `scripts/spec_changes.py` is this repository's own management script,
+# `scripts/spec_changes.ts` is this repository's own management script,
 # not a copy that must match the openspec-workflow skill's script.
 name: spec-command
 
@@ -43,6 +43,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # Deno only: every tool input of the setup action defaults to off.
+      - uses: ./.github/actions/setup-tools
       - id: pr
         name: Resolve the pull request and snapshot its head through the API
         env:
@@ -62,7 +64,7 @@ jobs:
           # The head is read through the REST API and parsed: never fetched
           # into the runner's git store, checked out, installed, or executed.
           # That is what makes this job safe on a pull request from a fork.
-          python3 scripts/spec_changes.py snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
+          ./scripts/spec_changes.ts snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
       - name: Run the command and reply
         env:
           GH_TOKEN: ${{ github.token }}
@@ -92,12 +94,12 @@ jobs:
                 for a in "$@"; do
                   case "$a" in proposal|design|tasks|specs|all) doc="$a" ;; *) change="$a" ;; esac
                 done
-                python3 scripts/spec_changes.py show --snapshot "$RUNNER_TEMP/snapshot.json" \
+                ./scripts/spec_changes.ts show --snapshot "$RUNNER_TEMP/snapshot.json" \
                   ${change:+--change "$change"} --doc "$doc" \
                   --url-prefix "https://github.com/$REPO/blob/$HEAD" --max-chars 60000
                 ;;
               status)
-                python3 scripts/spec_changes.py status --snapshot "$RUNNER_TEMP/snapshot.json" ${1:+--change "$1"}
+                ./scripts/spec_changes.ts status --snapshot "$RUNNER_TEMP/snapshot.json" ${1:+--change "$1"}
                 ;;
               *)
                 printf 'Commands: `/spec show [<change>] [proposal|design|tasks|specs|all]`, `/spec status [<change>]`, `/spec help`.\n'

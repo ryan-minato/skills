@@ -34,6 +34,7 @@ import {
     writeGrants,
 } from "./validate_harness.ts";
 import { ROOT, run } from "./lib/repo.ts";
+import { MANAGED_LABELS } from "./spec_changes.ts";
 
 // --- fixture helpers ---------------------------------------------------------------------------------
 
@@ -691,14 +692,9 @@ Deno.test("spec labels: the taxonomy, labels.json, and the case list agree", () 
     );
 });
 
-Deno.test("spec labels: no case list, or a failing taxonomy command, stops the run", () => {
+Deno.test("spec labels: no case list stops the run; the real taxonomy is spec_changes.ts's", () => {
     assertThrows(() => labelsCaseLine({ jobs: { a: { steps: [{ run: "echo" }] } } }), ShapeError, "no literal `case`");
-    const root = fixture({ "scripts/spec_changes.py": "import sys\nsys.exit(3)\n" });
-    try {
-        assertThrows(() => realDeps.taxonomy(root), ShapeError, "labels --taxonomy` failed");
-    } finally {
-        cleanup(root);
-    }
+    assertEquals(realDeps.taxonomy(ROOT), { managed: [...MANAGED_LABELS] });
 });
 
 Deno.test("checks doc: job names and the table agree both ways", () => {

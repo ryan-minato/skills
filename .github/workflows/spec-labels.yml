@@ -3,7 +3,7 @@
 # and `spec/not-started` | `spec/in-progress` | `spec/done`. A pull request
 # with no related change carries none of them.
 #
-# `scripts/spec_changes.py` is this repository's own management script, not a
+# `scripts/spec_changes.ts` is this repository's own management script, not a
 # copy that must match the openspec-workflow skill's script.
 name: spec-labels
 
@@ -39,6 +39,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # Deno only: every tool input of the setup action defaults to off.
+      - uses: ./.github/actions/setup-tools
       - name: Snapshot the head through the API
         env:
           # The token reaches only the two steps that call the API, so a step
@@ -46,7 +48,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           N: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
-        run: python3 scripts/spec_changes.py snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
+        run: ./scripts/spec_changes.ts snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
       - name: Compute the label plan and apply it
         env:
           GH_TOKEN: ${{ github.token }}
@@ -55,7 +57,7 @@ jobs:
           CURRENT: ${{ join(github.event.pull_request.labels.*.name, ',') }}
         run: |
           set -euo pipefail
-          python3 scripts/spec_changes.py labels --snapshot "$RUNNER_TEMP/snapshot.json" \
+          ./scripts/spec_changes.ts labels --snapshot "$RUNNER_TEMP/snapshot.json" \
             --current "$CURRENT" --json > "$RUNNER_TEMP/plan.json"
           cat "$RUNNER_TEMP/plan.json"
           # The plan may only ever name a label of the fixed taxonomy; anything

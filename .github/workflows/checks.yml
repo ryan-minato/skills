@@ -73,7 +73,7 @@ jobs:
           # Outside the condition, so a failed diff fails the step instead of
           # reading as "no spec paths changed".
           git diff --name-only "$BASE" "$HEAD" > "$RUNNER_TEMP/changed.txt"
-          if grep -Eq '^(openspec/|\.agents/skills/openspec-|\.agents/skills/\.openspec-target|scripts/spec_changes\.py$|justfile$)' "$RUNNER_TEMP/changed.txt"; then
+          if grep -Eq '^(openspec/|\.agents/skills/openspec-|\.agents/skills/\.openspec-target|scripts/spec_changes\.ts$|scripts/lib/|deno\.json$|justfile$)' "$RUNNER_TEMP/changed.txt"; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "No spec-related paths changed; nothing to validate."
