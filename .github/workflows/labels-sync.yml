@@ -1,5 +1,5 @@
 # Applies .github/labels.json to the repository's labels with
-# scripts/sync_labels.py: creates missing labels and corrects drifted colors
+# scripts/sync_labels.ts: creates missing labels and corrects drifted colors
 # and descriptions. It never deletes one — a label absent from the file is
 # reported as a warning, and pruning stays a manual, authorized step
 # (.agents/knowledge/github-settings.md). Runs only code already on main.
@@ -10,7 +10,9 @@ on:
     branches: [main]
     paths:
       - ".github/labels.json"
-      - "scripts/sync_labels.py"
+      - "scripts/sync_labels.ts"
+      - "scripts/lib/**"
+      - "deno.json"
       - ".github/workflows/labels-sync.yml"
   # Weekly, to revert labels edited in the web interface.
   schedule:
@@ -41,11 +43,12 @@ jobs:
           # No step uses git credentials; keep the token out of the git
           # config so it reaches only the step that sets GH_TOKEN.
           persist-credentials: false
+      - uses: ./.github/actions/setup-tools
       - name: Apply labels.json
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-        run: python3 scripts/sync_labels.py --file .github/labels.json --repo "$REPO" --apply > "$RUNNER_TEMP/plan.json"
+        run: ./scripts/sync_labels.ts --file .github/labels.json --repo "$REPO" --apply > "$RUNNER_TEMP/plan.json"
       - name: Report the plan and the prune candidates
         run: |
           set -euo pipefail
