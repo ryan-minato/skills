@@ -2,76 +2,100 @@
 
 Read this before adding, renaming, removing, or debugging a GitHub Actions
 job, and before changing the ruleset's required checks. Every job runs a
-command that exists and passes locally; CI never chooses its own linters.
+recipe or script that exists and passes locally; CI never chooses its own
+linters. `just check` is exactly what `checks / quality` runs, so a green
+`just check` predicts it.
 
-| Check | Workflow | Command | Runs on | Tier | Healthy run |
-|---|---|---|---|---|---|
-| `checks / quality` | `checks.yml` | `just install-tools && just check` (Python 3.12, Node 24, pinned pre-commit, rust-just, ruff; OpenSpec and OpenTofu through `install-tools`) | every pull request; push to `main` | feeds the gate | `just check` exits 0: validators, lint, spec validation, pre-commit hooks (commit-safety skipped by design). |
-| `checks / spec` | `checks.yml` | `just spec-check <base> <head> [--draft]` on a pull request, `just spec-changes check --all` on a push; then `just spec-sync` + `git diff --exit-code -- .agents/skills` | pull requests (opened, synchronized, reopened, ready, converted to draft) that touch `openspec/`, `.agents/skills/openspec-*`, `.agents/skills/.openspec-target`, `scripts/spec_changes.ts`, or `justfile`; every push to `main` | feeds the gate | Strict validation exits 0; a related change still unarchived is a warning on a draft and a failure on a ready pull request — the recipe pins `--shape combined`, so no pull request merges with an unarchived change here, not even one that implemented nothing; on `main` no change sits outside `openspec/changes/archive/`; the regenerated OpenSpec skills are identical to the committed ones. On an untouched pull request the job logs "nothing to validate" and passes. |
-| `checks / devcontainer` | `checks.yml` | builds the dev container (`devcontainers/ci`) and runs `just check` inside | pull request changing the container, setup action, `justfile`, or `deno.json`; push to `main` | via the gate | Green when the container builds and every check passes inside it. |
-| `checks / gate` | `checks.yml` | aggregates the two jobs above (`if: always()`) | every pull request; push to `main` | **required** | Green only when neither dependency failed or was cancelled; a skipped `checks / spec` is fine. |
-| `pr / policy` | `pr-policy.yml` | `./scripts/check_pr_policy.ts --event "$GITHUB_EVENT_PATH"` (the Python original on a base without it) (template and script from the base commit) | pull request opened, edited, synchronized, reopened, ready, converted to draft | **required** | Body carries every template heading, the `Closes`/`N/A` line, and the security checkbox line, and every commit subject (the title, for a fork) follows Conventional Commits; ready pull requests also have Changes and Validation filled (no reserved line, not empty), `Phase: implementation`, every checklist box ticked, and a `Spec:` line (a link to the change directory; a bare URL or path is still accepted). |
-| `scan-secrets` | `secret.yml` | TruffleHog `--only-verified` over the pull request range or the pushed range | every pull request; push to `main` | **required** | No verified secret. The job id is the check name; it predates the other checks. |
-| `spec / command` | `spec-command.yml` | `./scripts/spec_changes.ts snapshot …` then `show|status --snapshot …` from the default branch, replying with `gh pr comment` | a pull request comment starting with `/spec` by a collaborator — owner, member, or collaborator association (`issue_comment`) | automation | One reply comment per command (`/spec show [<change>] [proposal|design|tasks|specs|all]`, `/spec status [<change>]`, `/spec help`); the run is skipped for other comments and for bots. |
-| `spec / labels` | `spec-labels.yml` | `./scripts/spec_changes.ts snapshot …` then `labels --snapshot …`, then `gh api` label writes checked against the literal taxonomy | pull request opened, synchronized, reopened, or ready (`pull_request_target`) | automation | The plan JSON is printed and the `spec/archived`/`spec/unarchived` and `spec/not-started`/`spec/in-progress`/`spec/done` labels match it; a pull request with no related change carries none. |
-| `issues / triage` | `issue-triage.yml` | `./scripts/sync_issue_metadata.ts --event "$GITHUB_EVENT_PATH" --apply` | issue opened or edited | automation | Prints the label plan as JSON and applies it; exit 1 means a form answer did not map to a label in `.github/labels.json`. |
-| `labels / sync` | `labels-sync.yml` | `./scripts/sync_labels.ts --file .github/labels.json --repo "$REPO" --apply`, then a summary of the plan | push to `main` touching `.github/labels.json`, `scripts/sync_labels.ts`, or the workflow; weekly schedule; manual dispatch (`main` only) | automation | The repository's labels match `.github/labels.json` in name, color, and description; the summary counts created, updated, and unchanged labels, and each label on GitHub but not in the file is a warning, never a deletion. |
+| Check | Workflow | Runs on | Runs | Tier |
+|---|---|---|---|---|
+| `checks / quality` | `checks.yml` | every pull request; push to `main` | `just install-tools`, `just check` | feeds the gate |
+| `checks / spec` | `checks.yml` | every pull request; push to `main` | `just spec-check` or `just spec-changes check --all`; `just spec-sync` | feeds the gate |
+| `checks / devcontainer` | `checks.yml` | every pull request; push to `main` | builds the dev container, runs `just check` inside | feeds the gate |
+| `checks / gate` | `checks.yml` | every pull request; push to `main` | `scripts/ci_gate.ts` over the jobs' `needs` | **required** |
+| `pr / policy` | `pr-policy.yml` | pull request opened, edited, synchronized, reopened, ready, to draft | the base's `scripts/check_pr_policy.ts` | **required** |
+| `scan-secrets` | `secret.yml` | every pull request; push to `main` | TruffleHog `--only-verified` over the range | **required** |
+| `spec / command` | `spec-command.yml` | a `/spec` comment by a collaborator | `scripts/spec_changes.ts` `snapshot`, `show`/`status`; one reply | automation |
+| `spec / labels` | `spec-labels.yml` | pull request events, `spec/approved` label events | `scripts/spec_changes.ts` `labels`; `scripts/spec_approval.ts` | automation |
+| `issues / triage` | `issue-triage.yml` | issue opened or edited | `scripts/sync_issue_metadata.ts --apply` | automation |
+| `labels / sync` | `labels-sync.yml` | push to `main` touching the labels or the script; weekly; dispatch | `scripts/sync_labels.ts --apply` | automation |
+
+A healthy run:
+
+- `checks / quality`: `just check` exits 0.
+- `checks / spec`: works only when a pull request touches `openspec/`,
+  `.agents/skills/openspec-*`, `.agents/skills/.openspec-target`,
+  `scripts/spec_changes.ts`, `scripts/lib/`, `deno.json`, or `justfile`,
+  and otherwise logs "nothing to validate" and passes. Strict validation
+  exits 0; an unarchived related change warns on a draft and fails a ready
+  pull request (`.agents/knowledge/spec-workflow.md`
+  `## Archive executor and the freeze`); on `main` no change sits outside
+  `openspec/changes/archive/`; the regenerated `openspec-*` skills equal
+  the committed ones.
+- `checks / devcontainer`: works only when `.devcontainer/`,
+  `.github/actions/setup-tools/`, `justfile`, or `deno.json` change; the
+  container builds and `just check` exits 0 inside it.
+- `checks / gate`: green only when no dependency failed, was cancelled,
+  or was skipped unexpectedly; `ci_gate.ts` names the one that was.
+- `pr / policy`: the body carries every heading of the base's template,
+  the `Closes #N` or `N/A — <reason>` line, and the security checklist
+  line; every commit subject (the title, for a fork) follows Conventional
+  Commits. A ready pull request also has Changes and Validation filled,
+  `Phase: implementation`, every box ticked, and a `Spec:` line that links
+  the change directory or reads `Spec: none — <reason>`; a bare path is
+  refused. The commit-range scan reads each commit: no added line carries
+  a credential pattern, no commit carries an agent-attribution trailer,
+  and on a same-repository pull request every author email is a noreply
+  address. Pull requests by `dependabot[bot]` skip the body checks; their
+  commit subjects are still checked. The job runs the base's
+  `check_pr_policy.ts` when the base has it, else the base's
+  `check_pr_policy.py`, until a follow-up change removes that fallback.
+- `scan-secrets`: no verified secret. The check name is the job id; the
+  job sets no `name:`.
+- `spec / command`: one reply comment per command (`/spec show [<change>]
+  [proposal|design|tasks|specs|all]`, `/spec status [<change>]`,
+  `/spec help`); skipped for other comments and for bots.
+- `spec / labels`: the printed plan and the pull request's `spec/*` axis
+  labels agree, and a pull request with no related change carries none;
+  the `spec/approved` record follows `.agents/knowledge/spec-workflow.md`
+  `## Approval gates`.
+- `issues / triage`: prints the label plan as JSON and applies it; exit 1
+  means a form answer maps to no label in `.github/labels.json`.
+- `labels / sync`: the repository's labels match `.github/labels.json` in
+  name, color, and description; a label missing from the file is a
+  warning, never a deletion.
+
+Required checks: `checks / gate`, `pr / policy`, and `scan-secrets`; the
+ruleset requires exactly these names, and its live state is declared in
+`.agents/knowledge/github-settings.md`. The names are a stable interface:
+the `checks` check of `scripts/validate_harness.ts` fails when a workflow
+job name and this table disagree. Renaming one is three edits in order —
+the workflow, this table, then the ruleset once the new name is live on
+`main`.
+
+## Privileged workflows
 
 Privileged workflows: `spec-labels.yml` (`pull_request_target`), `spec-command.yml` (`issue_comment`), `issue-triage.yml` (`issues`).
-`scripts/validate_harness.ts` reads this line (the `workflows` check) and
-fails any other workflow that uses the event, any workflow or job without
-an explicit `permissions:`, any action not pinned to a commit SHA, and a
-head checkout under `pull_request_target`.
 
-Required-check names are a stable interface: `scripts/validate_harness.ts`
-fails when a workflow job name and this table disagree, and the ruleset
-(`.agents/knowledge/github-settings.md`) names `checks / gate`,
-`pr / policy`, and `scan-secrets`. Renaming one is three coordinated edits:
-the workflow, this table, and the ruleset — in that order, with the new
-name live on `main` before the ruleset requires it.
+The `workflows` check of `scripts/validate_harness.ts` reads the line
+above; the rules these workflows follow live in
+`.agents/knowledge/management-code.md` `## Workflow security`.
 
 ## Diagnosing a red check
 
-1. Reproduce locally with the command in the table; `just check` is
-   byte-for-byte what `checks / quality` runs.
-2. For a failure you cannot reproduce, digest the run instead of reading
-   full logs:
-   `./.agents/skills/change-workflow/scripts/run_log_digest.ts --repo ryan-minato/skills --run-id <id>`.
-3. Never weaken, skip, or delete a check to make it pass; changing a
-   check's strictness is a maintainer decision recorded here first.
-4. A red `checks / spec` on a ready pull request whose change is not
-   archived yet is the expected state, not a failure: the record is
-   frozen only after the maintainer closes the deliberation on the
-   finished implementation, and that red is what blocks the merge until
-   then (`.agents/knowledge/spec-workflow.md`).
-5. The two `spec / *` jobs run with a privileged token on content the
-   request's author controls. The rule that keeps them safe is structural:
-   no object authored by the request reaches the runner. They check out
-   the base and read the head through `spec_changes.ts snapshot`, which
-   pulls the file list and the documents from the REST API. Neither needs
-   the head's working tree, and neither may grant `contents: write`.
-   Never add a checkout or a `git fetch` of the head to either, and if
-   one ever genuinely needs it, guard it with a literal
-   `github.event.pull_request.head.repo.full_name == github.repository`
-   in the step's own `if:`, never behind an `env` variable.
-
-## Tool pins
-
-`checks / quality` and `checks / spec` install the same versions
-the dev container and pre-commit use: `ruff==0.16.4` (pre-commit rev
-`v0.16.4`), `rust-just` and `pre-commit` pinned in the workflows, and
-`@fission-ai/openspec` at the `openspec_version` of the `justfile`
-(`just install-tools`), as is OpenTofu at its `opentofu_version`, installed
-into the ignored `.tools/bin` for `just tf-validate`. `scripts/validate_harness.ts` checks that the ruff
-pins agree in all three places. Bump them together; see
-`.agents/knowledge/harness-maintenance.md`.
-
-The pager variables (`PAGER`, `GIT_PAGER`, `GH_PAGER` set to `cat` in
-`.devcontainer/devcontainer.json`) affect the dev container only; the
-workflows run `gh` and `git` non-interactively already, so they set none.
+1. Reproduce locally with the recipe in the table.
+2. For a failure you cannot reproduce, digest the run with
+   `.agents/skills/change-workflow/scripts/run_log_digest.ts` as the
+   `change-workflow` project skill directs, instead of reading full logs.
+3. A red `checks / spec` on a ready pull request whose change is not yet
+   archived is the expected state until the freeze
+   (`.agents/knowledge/spec-workflow.md` `## Archive executor and the freeze`).
+4. A check turned red by a new tool release names the tool; fix it in its
+   own change (`.agents/knowledge/management-code.md` `## Tool versions`).
+5. Changing a check's strictness is a maintainer decision, recorded here
+   first (`.agents/knowledge/agent-authority.md` `## No self-escalation`).
 
 ## Update this file when
 
-- A job is added, renamed, or removed, or its command changes.
+- A job is added, renamed, or removed, or its command or trigger changes.
 - A required check changes in the ruleset.
-- A tool pin changes.
+- A workflow adopts or drops a privileged trigger.

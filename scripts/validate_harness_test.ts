@@ -523,8 +523,8 @@ Deno.test("budget: a table row over 200 columns, with file and line", () => {
     ]);
 });
 
-Deno.test("budget: is exported but not run by main()", () => {
-    assert(!CHECKS.includes(checkBudget));
+Deno.test("budget: main() runs it", () => {
+    assert(CHECKS.includes(checkBudget));
 });
 
 // --- the existing checks on fixtures -----------------------------------------------------------------

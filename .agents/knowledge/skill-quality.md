@@ -46,8 +46,8 @@ catalog's `CONTEXT.md` may add to or override it in a `## Naming` section.
   four words. A default name is the body alone.
 - **Prefix** (off by default): what the skill belongs to. A catalog prefix
   is reserved by the catalog's `CONTEXT.md` and listed in
-  `CATALOG_NAME_PREFIXES` (`meta-`, `scaffold-`), which the validator
-  enforces for that catalog's members; an ownership prefix marks a skill
+  `scripts/validate_skills.ts` (`meta-`, `scaffold-`), which enforces it
+  for that catalog's members; an ownership prefix marks a skill
   bound to one named owner or product (`ryan-minato-skills-installing`). A
   proper-noun body that happens to start with a reserved prefix
   (`meta-harness`) is not using the prefix.
@@ -207,27 +207,23 @@ Rules for anything in a skill's `scripts/`:
 - Pin versions in one-off commands (`npx tool@1.2.3`) and state runtime
   prerequisites (or use the `compatibility` field) instead of assuming them.
 
-A script a skill deposits into a target from `assets/` is management code:
-`## Management code` below governs how it is written, and the interface
-rules above (`--help`, streams, exit codes, idempotence) apply to it too.
+A script a skill deposits into a target from `assets/` also follows
+`## Script assets` below.
 
-## Management code
+## Script assets
 
-Management code is code that never ships in the product: quality checks,
-environment preparation, CI and administration scripts, git hooks, inline
-workflow shell, and scripts inside a project skill. Here that is
-`scripts/`, the `run:` steps of `.github/workflows/`, the scripts of the
-project skills under `.agents/skills/`, and the script assets skills
-deposit into their targets. A skill's own `scripts/` follow `## Scripts`
-alone. Management code:
+A script asset is a script a skill deposits into its target from
+`assets/` (the Python under `skills/meta/*/assets/` and
+`skills/sdd/*/assets/` today). In the target it becomes management code,
+so beyond `## Scripts` it:
 
 - **Is written for its role and owned where it runs (R1).** It need not
-  be identical to a skill's bundled script, and no rule, check, or
-  instruction keeps the two identical; their content may still match
-  where the role needs the same code. A skill ships an asset written for
-  the management role, and the target owns its copy.
+  be identical to a skill's bundled script or to this repository's own
+  scripts, and no rule, check, or instruction keeps them identical; their
+  content may still match where the role needs the same code. The target
+  owns its copy.
 - **Is written in a language its community scripts in (R2):** the
-  project's language when its community widely and maturely scripts in
+  target's language when its community widely and maturely scripts in
   it, otherwise Python or Deno, and Bash only for simple operations in a
   controlled Linux environment.
 - **Keeps its dependencies self-contained (R3)** where the ecosystem has
@@ -235,7 +231,8 @@ alone. Management code:
   standard library only when it solves the task cleanly, and never
   reimplements a mature library.
 - **Runs through `uv run` only where uv exists in every environment it
-  runs in (R4)**, and through the interpreter otherwise.
+  runs in (R4)**, and through the interpreter otherwise; the skill says
+  how the target runs it.
 - **Hides no unexpected failure behind a fallback (R5).** Readability
   comes first, and an unexpected failure is left to crash. Where the code
   relies on an external tool, command, API, or a file another step
@@ -259,17 +256,18 @@ failure, a gate that decides on collected results, a reply posted before
 the run fails. Such a deferral is written explicitly where it happens,
 and the failure still reaches where the design sends it.
 
-This repository's `scripts/` use the standard library only, run with
-`python3`, and carry no PEP 723 header, because CI installs no uv; the
-choice is revisited with the first third-party dependency. `just lint`
-fails a blind `except` (BLE001) and a `try`/`except`/`pass` (S110) in
-them and in the script assets; a justified exception carries
+Python floor: script assets are Python 3.10 or later, standard library
+first; one that needs a third-party package declares it in PEP 723. A
+skill's own `scripts/` keep the floor its `compatibility` field promises,
+mirrored in `[per-file-target-version]` of `ruff.toml`.
+
+Lint: `just lint` runs ruff over every skill's `scripts/` and the script
+assets. In the script assets it fails a blind `except` (BLE001) and a
+`try`/`except`/`pass` (S110); a justified exception carries
 `# noqa: BLE001` or `# noqa: S110` with its reason. Neither rule sees
 `contextlib.suppress(Exception)`, so SIM105, which suggests that rewrite,
-is off there, and review catches a blind `suppress`. Script assets
-are Python 3.10 or later, standard library first; one that needs a
-third-party package declares it in PEP 723 and says how the target runs
-it.
+is off for them, and review catches a blind `suppress`. A skill's own
+`scripts/` follow `## Scripts` alone and are exempt from BLE001 and S110.
 
 ## Checklist before committing
 
