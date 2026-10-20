@@ -64,7 +64,7 @@ validate:
 
 # Lint specific skill directories (spec + quality checks)
 check-skill +PATHS:
-    python3 scripts/check_skill.py {{PATHS}}
+    ./scripts/check_skill.ts {{PATHS}}
 
 # Regenerate marketplace.json skills[] from the catalogs on disk
 gen-marketplace:
