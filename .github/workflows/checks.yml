@@ -1,7 +1,7 @@
 # The quality gate. Every job mirrors a `just` recipe that exists and
 # passes locally; .agents/knowledge/github-checks.md maps jobs to commands.
-# Job names are what the ruleset requires (only `checks / gate`), so keep
-# them unique across all workflows and update that file when one changes.
+# The ruleset requires `checks / gate` from this workflow; keep job names
+# unique across all workflows and update that file when one changes.
 name: checks
 
 on:
@@ -118,21 +118,22 @@ jobs:
           fi
 
   gate:
-    # The aggregator: the ONLY job name the ruleset requires. A skipped job
-    # reports success, so this job inspects its dependencies' results.
+    # The aggregator: the ONLY job name the ruleset requires from this
+    # workflow. A skipped job reports success, so scripts/ci_gate.ts fails
+    # on a failed, cancelled, or skipped dependency and names it.
     name: checks / gate
     if: always()
     needs: [quality, spec]
-    permissions: {}
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-tools
       - name: All required jobs succeeded
         env:
-          RESULTS: ${{ toJSON(needs) }}
-        run: |
-          echo "$RESULTS"
-          if printf '%s' "$RESULTS" | grep -Eq '"result": *"(failure|cancelled)"'; then
-            echo "ERROR: a required job failed or was cancelled. Fix that job; never weaken this gate." >&2
-            exit 1
-          fi
+          NEEDS: ${{ toJSON(needs) }}
+        run: ./scripts/ci_gate.ts
