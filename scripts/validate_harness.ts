@@ -390,13 +390,13 @@ export function checkTemplate(h: Harness): void {
     const headings = [...text.matchAll(/^## (.+?)\s*$/gm)].map((m) => m[1].toLowerCase());
     for (const role of ["related", "changes", "validation", "checklist"]) {
         if (!headings.some((heading) => heading.includes(role))) {
-            h.error(`${PR_TEMPLATE}: no '## ' heading contains ${quote(role)}; scripts/check_pr_policy.py needs one.`);
+            h.error(`${PR_TEMPLATE}: no '## ' heading contains ${quote(role)}; scripts/check_pr_policy.ts needs one.`);
         }
     }
     if (!/^\s*- \[ \].*secrets/im.test(text)) {
         h.error(
             `${PR_TEMPLATE}: the checklist needs an unticked line containing 'secrets' ` +
-                "(check_pr_policy.py keys on it).",
+                "(check_pr_policy.ts keys on it).",
         );
     }
     if (!/^Spec:/m.test(text)) {
