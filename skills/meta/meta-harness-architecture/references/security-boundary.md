@@ -70,7 +70,7 @@ each of these:
   services or the corporate network through bridged networking?
 - **Session logs.** The framework's transcript records every file read and
   every command output, so it carries credentials and personal data more
-  easily than a handoff note. Record where it is written — the framework's
+  easily than a scratch note. Record where it is written — the framework's
   default directory when the project sets nothing — and whether it is
   collected centrally; both are explicit privacy decisions, never left as
   an open question.

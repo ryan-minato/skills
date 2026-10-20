@@ -42,7 +42,7 @@ rewrite — change what the findings justify.
   file or a framework carrier (`entrypoint.md`).
 - A hidden rule whose rejection says only "not allowed", with no
   alternative or owner (`security-boundary.md`).
-- Checkpoints by stash, draft commits pushed, handoff notes in the tree
+- Checkpoints by stash, draft commits pushed, scratch notes in the tree
   (`runtime.md`); a long-lived harness with no checks of its own
   (`harness-checks.md`).
 - A project script bound to a skill's bundled script by a sync rule, a
