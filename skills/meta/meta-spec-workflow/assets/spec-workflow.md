@@ -53,7 +53,7 @@ another.
 
 | Artifact | Owns | Never holds |
 |---|---|---|
-| `<proposal-like artifact>` | why, the goal, what changes, how completion is judged, what is not done, what is delivered, which irreversible actions are pre-authorized (the branch pushed, outward writes allowed — within `.agents/knowledge/agent-authority.md`; any other outward action, a comment or an issue included, is queued as a pending decision for <the approval owner>), and `## Acceptance` | the contract, the approach, steps |
+| `<proposal-like artifact>` | why, the goal, what changes, how completion is judged, what is not done, what is delivered, which irreversible actions are pre-authorized (the branch pushed, outward writes allowed — within `.agents/knowledge/agent-authority.md`; any other outward action, a comment or <an issue | a work item> included, is queued as a pending decision for <the approval owner>), and `## Acceptance` | the contract, the approach, steps |
 | `<specification artifact>` | requirements and scenarios | implementation choices |
 | `<design artifact>` | the approach, its constraints and preferences, rejected alternatives, information needed only for this change | the goal or acceptance, steps |
 | `<task list>` | steps with their verification, written after the package gate closes | acceptance; anything the gate must see |
