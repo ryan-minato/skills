@@ -76,7 +76,7 @@ Public skills are grouped into catalogs under `skills/`:
 
 Adding a catalog requires: the catalog scaffold (`README.md`, `README.zh.md`,
 `CONTEXT.md`), an entry in this list, and — once it has a skill — a plugin
-entry in `.claude-plugin/marketplace.json`. `scripts/validate_skills.py`
+entry in `.claude-plugin/marketplace.json`. `scripts/validate_skills.ts`
 cross-checks this list against the directories in `skills/`.
 
 Skill names follow a recommended `[<prefix>-]<body>[-<suffix>]` shape,
@@ -84,7 +84,7 @@ described in `.agents/knowledge/skill-quality.md` and refined per catalog in
 its `CONTEXT.md` `## Naming` section; the shape is advisory. What is enforced
 is the prefix the two disposable catalogs reserve for their members: every
 skill in `meta` is named `meta-*` and every skill in `scaffold` is named
-`scaffold-*`, via `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.py`.
+`scaffold-*`, via `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.ts`.
 The prefix groups a catalog's builders, which matters because installed skills
 are read far from this repository.
 
@@ -93,7 +93,7 @@ the check runs in one direction only: `core/meta-harness` is durable, globally
 installed, and `meta-`-prefixed. What identifies a disposable builder is the
 marker its description opens with — the same sentence in both catalogs,
 `Disposable builder skill (delete after the harness is built):`, enforced by
-`check_disposable_markers()` in `scripts/validate_skills.py`. That marker is
+`check_disposable_markers()` in `scripts/validate_skills.ts`. That marker is
 what `meta-disposal` matches on, and the only key it may use, so one disposal
 skill removes both catalogs' builders together.
 
@@ -121,7 +121,7 @@ code review expects its review skill at `.github/skills/code-review/`, so
 clients (Codex, and anything following the spec) scan `.agents/skills/`
 directly.
 
-`scripts/validate_skills.py` (via `just validate` and pre-commit) enforces
+`scripts/validate_skills.ts` (via `just validate` and pre-commit) enforces
 that symlinks exist, don't dangle, and point to the right targets.
 
 ## Plugin Marketplace
@@ -215,7 +215,7 @@ may ready a pull request under the H1 policy; the maintainer merges.
 
 ## Quality Gates
 
-- `just check` = `validate` (`scripts/validate_skills.py` +
+- `just check` = `validate` (`scripts/validate_skills.ts` +
   `scripts/validate_harness.py`) + `lint` (ruff over `scripts/`, every
   `skills/*/*/scripts/`, and the script assets under `skills/meta/*/assets/`
   and `skills/sdd/*/assets/`; in all but the skills' own `scripts/`, a

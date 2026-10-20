@@ -59,7 +59,7 @@ install-opentofu:
 
 # Validate skill layout, harness synchronization, and catalog consistency
 validate:
-    python3 scripts/validate_skills.py
+    ./scripts/validate_skills.ts
     python3 scripts/validate_harness.py
 
 # Lint specific skill directories (spec + quality checks)
