@@ -30,7 +30,8 @@ suffices.
 3. **No human in the loop.** When a developer directs the agent and reviews
    the result, treat the agent as a colleague who may err or cut corners,
    not as an attacker: outward actions are queued for the person or
-   narrowly pre-authorized (one named branch, nothing more), so a hijacked
+   narrowly pre-authorized (typically one named branch and the few
+   outward writes the pre-authorization line names), so a hijacked
    agent can damage the local tree and reach only what the scoped token
    and that narrow pre-authorization allow; everything else leaves only
    through a person. This single review of irreversible

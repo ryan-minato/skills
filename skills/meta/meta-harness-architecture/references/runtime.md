@@ -47,9 +47,9 @@ polishing a small change waits for the whole build and stops verifying.
 - Draft commits never leave the machine. Push only after the task-level
   commit, and push one named ref; batch pushes of all branches, mirrors,
   or tags are denied. Only unpushed history is rewritten; pushed history
-  is reverted. A draft that needs remote CI to verify is a publication and
-  passes the same gate as any push; unattended runs prefer the local
-  scoped check.
+  is reverted. A change that needs remote CI to verify is squashed into
+  its task-level commit first and then pushed under the same gate as any
+  push; unattended runs prefer the local scoped check.
 - Squashing changes no content. A debug credential file still in the tree
   at task end enters the squashed commit unchanged, so the secret scan runs
   on every checkpoint commit, not only before publication. This is also
