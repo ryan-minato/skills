@@ -201,7 +201,7 @@ closed on the draft by the maintainer and reconciled with nothing open,
 every task done, `just check` green locally and every required check
 green except `checks / spec`, which is red until the freeze
 (`.agents/knowledge/github-checks.md`; digest a red run with
-`python3 .agents/skills/change-workflow/scripts/run_log_digest.py --repo ryan-minato/skills --run-id <id>`
+`./.agents/skills/change-workflow/scripts/run_log_digest.ts --repo ryan-minato/skills --run-id <id>`
 rather than reading full logs), scenarios verified and recorded, publish
 gate passed for the final body, remote writes authorized. Then:
 
