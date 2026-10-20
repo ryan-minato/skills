@@ -31,14 +31,11 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      - name: Install Deno, just, pre-commit, and ruff (latest, as in the dev container)
+        uses: ./.github/actions/setup-tools
         with:
-          python-version: "3.12"
-      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
-        with:
-          deno-version: vx.x.x
-      - name: Install check tools (latest, as in the dev container)
-        run: python3 -m pip install --quiet pre-commit rust-just ruff
+          just: "true"
+          python-tools: "true"
       - name: Install the repository tools `just install-tools` names
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -79,14 +76,15 @@ jobs:
             echo "No spec-related paths changed; nothing to validate."
           fi
       - if: steps.changed.outputs.run == 'true'
-        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        name: Install Deno and just
+        uses: ./.github/actions/setup-tools
         with:
-          deno-version: vx.x.x
+          just: "true"
       - if: steps.changed.outputs.run == 'true'
-        name: Install just and the pinned OpenSpec CLI
-        run: |
-          python3 -m pip install --quiet rust-just
-          just install-tools
+        name: Install the pinned OpenSpec CLI
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: just install-tools
       - if: steps.changed.outputs.run == 'true'
         name: Validate strictly and refuse an unarchived related change
         # A pull request: strict validation, then every related change that
@@ -117,13 +115,56 @@ jobs:
             exit 1
           fi
 
+  devcontainer:
+    # Builds the dev container and runs `just check` inside it when the
+    # container, the setup action, the justfile, or deno.json change. Path
+    # filtering happens inside the job, as in `spec`, so the gate never sees
+    # it skipped.
+    name: checks / devcontainer
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: changed
+        name: Decide whether the toolchain changed
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" != "pull_request" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only "$BASE" "$HEAD" > "$RUNNER_TEMP/changed.txt"
+          if grep -Eq '^(\.devcontainer/|\.github/actions/setup-tools/|justfile$|deno\.json$)' "$RUNNER_TEMP/changed.txt"; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "The dev container, setup action, justfile, and deno.json are unchanged; nothing to build."
+          fi
+      - if: steps.changed.outputs.run == 'true'
+        name: Build the dev container and run every check inside it
+        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          imageName: skills-devcontainer
+          push: never
+          env: GITHUB_TOKEN
+          runCmd: just check
+
   gate:
     # The aggregator: the ONLY job name the ruleset requires from this
     # workflow. A skipped job reports success, so scripts/ci_gate.ts fails
     # on a failed, cancelled, or skipped dependency and names it.
     name: checks / gate
     if: always()
-    needs: [quality, spec]
+    needs: [quality, spec, devcontainer]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

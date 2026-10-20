@@ -50,13 +50,13 @@ repos:
         entry: ruff check --force-exclude
         language: system
         types_or: [python, pyi]
-        files: ^(scripts|skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
+        files: ^(skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
       - id: ruff-format
         name: ruff format
         entry: ruff format --force-exclude
         language: system
         types_or: [python, pyi]
-        files: ^(scripts|skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
+        files: ^(skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
 
   - repo: local
     hooks:

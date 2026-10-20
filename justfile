@@ -71,13 +71,13 @@ gen-marketplace:
     ./scripts/gen_marketplace.ts
 
 # Lint and check formatting: the TypeScript management code with Deno (the paths
-# deno.json includes, never a skill), the Python scripts with ruff
+# deno.json includes, never a skill), the public skills' Python with ruff
 lint:
     deno lint
     deno fmt --check
     deno check scripts/ .agents/skills/change-workflow/scripts/
-    ruff check scripts skills/*/*/scripts skills/meta/*/assets skills/sdd/*/assets
-    ruff format --check scripts skills/*/*/scripts skills/meta/*/assets skills/sdd/*/assets
+    ruff check skills/*/*/scripts skills/meta/*/assets skills/sdd/*/assets
+    ruff format --check skills/*/*/scripts skills/meta/*/assets skills/sdd/*/assets
 
 # Run the management code's tests (the *_test.ts files deno.json includes)
 test:
