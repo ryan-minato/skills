@@ -240,7 +240,7 @@ closes the issue through the closing keyword.
 - Authorization is task-scoped; a successful `gh auth status` is not
   permission to publish.
 - Never tick a task that is not done: a fully ticked task list is what
-  the archive consumes, and `spec_changes.py archive` refuses every
+  the archive consumes, and `spec_changes.ts archive` refuses every
   change of the PR while any has an open task.
 - A red `checks / spec` on a ready PR is the expected state, not a
   failure to chase: it says the record is not frozen yet. Freezing early

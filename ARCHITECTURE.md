@@ -196,7 +196,7 @@ rule, and `just spec-sync` regenerates the `openspec-*` skills. The
 request automation — the check, the slash-spec comment commands, the
 spec status labels, all of them read-only — was installed from the
 `openspec-workflow` skill's assets into `.github/workflows/`, and runs
-`scripts/spec_changes.py`, this repository's own management script.
+`scripts/spec_changes.ts`, this repository's own management script.
 
 ## GitHub Workflow
 

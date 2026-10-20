@@ -17,7 +17,7 @@ command, run `openspec --help`; commands and skill names have changed
 between releases and are not recorded here. Framework skill:
 `openspec-workflow` (`skills/sdd/openspec-workflow`), which supplies the
 request automation below; this repository owns its installed copy,
-`scripts/spec_changes.py` included.
+`scripts/spec_changes.ts` included.
 
 ## Artifacts
 
@@ -181,7 +181,7 @@ and ask again.
 ## Request automation
 
 `openspec-workflow`'s automation, installed into `.github/workflows/`
-and run by this repository's own `scripts/spec_changes.py`: a pull
+and run by this repository's own `scripts/spec_changes.ts`: a pull
 request's *related changes* are the change directories its diff touches
 (an archived directory counts under its change name). `checks / spec` runs the strict validator and fails a
 ready pull request holding an unarchived related change (a warning while

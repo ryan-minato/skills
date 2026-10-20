@@ -125,11 +125,11 @@ spec-sync:
 # Strict validation plus the unarchived-change rule for the changes this branch touches (what `checks / spec` runs on a pull request)
 # This repository is combined-shape: every pull request ends with its record archived, so no request may merge unarchived.
 spec-check BASE="origin/main" HEAD="HEAD" *ARGS:
-    python3 scripts/spec_changes.py check --base {{BASE}} --head {{HEAD}} --shape combined {{ARGS}}
+    ./scripts/spec_changes.ts check --base {{BASE}} --head {{HEAD}} --shape combined {{ARGS}}
 
 # Related-change tooling for a pull request: snapshot, status, show, check, archive, labels (see --help)
 spec-changes *ARGS:
-    python3 scripts/spec_changes.py {{ARGS}}
+    ./scripts/spec_changes.ts {{ARGS}}
 
 # Review threads of pull request N through one fixed read-only GraphQL query (JSON: resolved, path, author, body)
 [positional-arguments]
