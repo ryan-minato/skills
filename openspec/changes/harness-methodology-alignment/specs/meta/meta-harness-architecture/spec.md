@@ -61,15 +61,15 @@ When the build reaches the authorization layer, the builder SHALL deposit, in th
 - **THEN** the policy tells it to either re-plan where the logic belongs or queue the item as a pending decision, and forbids retrying with an equivalent command or a script around the check
 
 ### Requirement: Behavior: Runtime conventions are deposited for non-interactive execution and commit checkpoints
-When the build reaches the runtime conventions of the harness, the builder SHALL deposit non-interactive settings (pager, confirmation prompts, watch modes disabled by environment or flags), a seconds-scale scoped verification command beside the full check, checkpoint rules (a checkpoint is a commit; a task's draft commits are squashed into one atomic commit at task end with a non-interactive recipe; draft commits never leave the machine and pushes name one ref; the secret scan runs on every commit and the pre-commit hook stays seconds-fast; "no draft commits on the branch" is in the task's done criteria; rollback preconditions are enforced by a recipe, not by instruction), worktree exploration with mandatory cleanup, and handoff hygiene (handoff files and session logs live only in untracked locations and are treated as secrets).
+When the build reaches the runtime conventions of the harness, the builder SHALL deposit non-interactive settings (pager, confirmation prompts, watch modes disabled by environment or flags), a seconds-scale scoped verification command beside the full check, checkpoint rules (a checkpoint is a commit; a task's draft commits are squashed into one atomic commit at task end with a non-interactive recipe; draft commits never leave the machine and pushes name one ref; the secret scan runs on every commit and the pre-commit hook stays seconds-fast; "no draft commits on the branch" is in the task's done criteria; rollback preconditions are enforced by a recipe, not by instruction), worktree exploration with mandatory cleanup, and scratch-note hygiene (scratch notes — drafts of the final report, debugging logs — and session logs live only in untracked locations and are treated as secrets; the pending-decisions list is not a scratch note and lives where a person sees it).
 
 #### Scenario: Checkpoint recipe
 - **WHEN** the build deposits the checkpoint rule for a project whose agents cannot run interactive rebase
 - **THEN** the harness names a non-interactive squash (reset to the task's start commit, then one commit under the project's message convention), states that draft commits are never pushed, and makes the secret scan a per-commit hook
 
-#### Scenario: Handoff file requested
-- **WHEN** a deposited harness is read by an agent asked to leave a handoff note for the next session
-- **THEN** the harness directs the note to an untracked location and says why (handoff notes carry logs, environment values, and credentials more easily than source)
+#### Scenario: Scratch note requested
+- **WHEN** a deposited harness is read by an agent asked to leave a scratch note — a draft of the final report — for the next session
+- **THEN** the harness directs the note to an untracked location and says why (scratch notes carry logs, environment values, and credentials more easily than source)
 
 ### Requirement: Behavior: The harness gets deterministic checks of its own
 When the project is long-lived, the builder SHALL design harness self-checks in two tiers — reference integrity (entrypoint and knowledge paths exist; documented commands exist as task-runner recipes; mirrored files match) and structural compliance (skill layout and frontmatter, strict specification validation, entrypoint length budget) — run in CI or a hook, written as the project's own management code, never calling a script inside a skill directory, failing with a message that names the file and the fix, and never skipping silently.
