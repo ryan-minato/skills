@@ -17,7 +17,7 @@ Binding constraints:
 - The `openspec-*` skills change only through `just spec-sync`.
 - `agent-authority.md` may narrow but not widen agent authority.
 
-Overlapping open drafts: #105 rewrites `check_pr_policy.py`, `sync_issue_metadata.py`, `validate_harness.py`, and `run_log_digest.py`; the repository-side parts of #102, #103, and #104 change `spec_changes.py`, `checks.yml`, `spec-command.yml`, and register rows. See proposal.md for motivation.
+Other open pull requests that edit these scripts are closed by the maintainer after this change and its two siblings land; the ports do not track them. See proposal.md for motivation.
 
 ## Placement
 
@@ -42,7 +42,9 @@ Overlapping open drafts: #105 rewrites `check_pr_policy.py`, `sync_issue_metadat
 | Wide tables, budgets | knowledge files, `ARCHITECTURE.md`, the template; `validate_harness.ts` `budget` check | budget check and its tests |
 | Contradictions D1–D4, D6, D7, D9, D10 and CONTRIBUTING setup | `skill-authoring`, `code-review`, `spec-workflow.md ## Archive executor and the freeze`, `openspec/config.yaml` archive guidance, `validate_skills.ts` (message and install-command check), `github-checks.md`, `.github/CONTRIBUTING.md` | readbacks; install-command test; grep |
 | Stale passages S1–S12, S14, S17 | the files the audit names | grep for each stale string; S8 and S9 through the review record |
-| S13, S15, S16 | unchanged; pending decisions in the description | decision recorded before ready |
+| S13 (bare `Spec:` path) | dropped from `check_pr_policy.ts` and from `github-checks.md`; only pull request #78, closed, used it | a test refusing a bare path; grep |
+| S15 (plugin-manifest guard) | not stale: the guard and the `references.md` line are kept and ported unchanged | the guard's test with a fixture `plugin.json` |
+| S16 (`backup-*` note) | the note is removed from `github-workflow.md`: no `backup-*` tag exists on GitHub; the two local tags are the maintainer's | grep |
 | Register, calibration, review record | `harness-maintenance.md` | the settings readback; readback |
 
 ### Rule owners
@@ -66,7 +68,7 @@ Overlapping open drafts: #105 rewrites `check_pr_policy.py`, `sync_issue_metadat
 
 - Deno 2.9.7 (the version the maintainer's container runs and the reference harness pins), `jsr:@std/yaml`, `@std/assert`, `@std/path`, `@std/cli`, pinned in `deno.json` and locked.
 - Container features `ghcr.io/hoshiori-dev/devcontainer-features/deno:1`, `uv:1`, `openspec:1` (public), each with an exact `version` option, resolved to digests by the committed lockfile; `denoland/setup-deno` and `devcontainers/ci` pinned by SHA.
-- Overlapping drafts: the equivalence baseline is `main` at `f013357` (recorded now). A draft merged before the first port starts is ported as merged, with the baseline moved to that merge; a draft still open afterwards rebases its repository-side part onto the TypeScript after this change merges, and its skill-side part is unaffected. The alternative — carrying #105's script changes into the ports and closing it as superseded — is queued as a pending decision.
+- Equivalence baseline: `main` at `f013357`.
 
 ## External impact
 
@@ -78,7 +80,7 @@ Overlapping open drafts: #105 rewrites `check_pr_policy.py`, `sync_issue_metadat
 
 - **Deno for all management code, TypeScript files executed directly**: one runtime for every harness script, permissions stated in the shebang so a reader sees what a script can touch, the standard library's YAML parser, tests in the same toolchain. Rejected: keeping Python with `uv` and PEP 723 — workable, but permissions stay implicit and the reference harness's tested workflow checks cannot be reused in shape.
 - **Shebang `#!/usr/bin/env -S deno run --no-prompt <permissions>`**: a missing permission is an error, never a prompt an unattended agent waits on. Read access is scoped to repository paths, relative to the repository root every caller runs from (recipes, hooks, workflow steps); a script that reads a caller-named file (event payloads) gets unscoped read; `--allow-run` names each command and is treated as unconfined for it; network access names the host.
-- **Equivalence before deletion**: each port runs beside its Python original on the baseline tree, on fixture repositories, and on recorded event payloads; stdout and exit status must match except for the intentional differences — diagnostics on stderr, the dropped modes, the dropped `--allow-private-email`, and `run_log_digest` failing on an unfetchable log or a run without `jobs`. The comparison harness lives in the scratch directory; its results go to the pull request.
+- **Equivalence before deletion**: each port runs beside its Python original on the baseline tree, on fixture repositories, and on recorded event payloads; stdout and exit status must match except for the intentional differences — diagnostics on stderr, the dropped modes, the dropped `--allow-private-email`, the dropped bare `Spec:` path, and `run_log_digest` failing on an unfetchable log or a run without `jobs`. The comparison harness lives in the scratch directory; its results go to the pull request.
 - **Order**: the toolchain commit first — the working-tree dev container pinned exactly, Python kept, so every check passes from the first commit; then the ports from the leaves inward — `check_skill`, `validate_skills`, `gen_marketplace`, `validate_harness` (with the `tools`, `workflows`, and `budget` checks; the setup action lands in the same commit, because the `tools` check reads it), `check_commit_safety`, `check_pr_policy` (with the guarded transition), `sync_labels`, `sync_issue_metadata`, `run_log_digest`, `review_threads` (new), `ci_gate` (new), `spec_changes`, `spec_approval` (new); then the knowledge rebuild; the `devcontainer` job and Python's removal from the container land in the commit after the last Python caller is ported. Each port is one task and one commit.
 - **`pr / policy` guarded transition**: after the base checkout the job installs Deno with the SHA-pinned `denoland/setup-deno` (not the local action, which the base lacks) and runs `./scripts/check_pr_policy.ts` when that file exists, else `python3 scripts/check_pr_policy.py` with the runner's Python. On this pull request the base has only Python, so the Python branch runs; from the next one on, the Deno branch. Rejected: two pull requests in sequence — slower for the same result; a branch-copy fallback as the reference uses — it lets the pull request check itself.
 - **Workflow security as a validator check, the approval workflow's bounds as a test**: rules every workflow must follow belong to the check every commit runs, with a fix-it message; the exact bounds of the one label-writing workflow (job permissions, job timeout, a deciding-step timeout below it, the failure step, checkout without a ref and with `persist-credentials: false`, setup with Deno only, the token only in the API steps' environment, no cache) are asserted by a test over that file, as the reference does. Privileged means a write token near untrusted input: `pull_request_target`, `issue_comment`, `issues`. `workflow_run` is forbidden outright.
@@ -140,7 +142,7 @@ Before the pull request is marked ready:
   Also: the bounds test over `spec-labels.yml`; `just spec-approval 117` read-only against the live pull request.
 - Settings: JSON parses; no allow entry is a prefix of `gh api graphql`, of a `gh api` write form, or of `gh pr edit`/`gh issue edit`; `just review-threads 117` lists threads with `isResolved`; a clean-context reader given `agent-authority.md` and the settings states which commands stop for a decision, why, and that agents never set `spec/approved`.
 - Knowledge: the audit's duplication grep re-run, each rule found in full only in its owner; the budget check passes; clean-context readbacks of `AGENTS.md` (where the freeze rule lives, what to do when blocked), `spec-workflow.md` (the archive executor, the approval label), `management-code.md` (how to write a new script), `skill-authoring` and `code-review` (no archive before ready, no block on an unarchived ready pull request), and — given `AGENTS.md`, the change workflow, and the installed `openspec-archive-change` skill — "the maintainer says 'archive it'; what do you run?" answered with `just spec-changes archive`.
-- Stale passages: grep for each of S1–S12, S14, S17 returns nothing.
+- Stale passages: grep for each of S1–S14, S16, S17 returns nothing.
 - Settings readback (periodic review step 4): read-only `gh api` reads of the ruleset, repository settings, branch protection, labels, and security features, compared row by row with `github-settings.md`, whose `## Last verification` becomes one dated result.
 - Untouched product: `git diff --stat origin/main...HEAD -- skills/ .agents/skills/openspec-* openspec/changes/archive README.md README.zh.md .claude-plugin/` empty; `ruff check` over the public skills' Python gives the same result as on `main`.
 
