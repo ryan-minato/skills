@@ -10,9 +10,6 @@
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/git-lfs:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/python:1": {
-      "installTools": false
-    },
     "ghcr.io/hoshiori-dev/devcontainer-features/deno:1": {},
     "ghcr.io/hoshiori-dev/devcontainer-features/uv:1": {
       "toolsToInstall": "pre-commit,rust-just,ruff"
