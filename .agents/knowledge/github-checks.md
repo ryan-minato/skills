@@ -12,7 +12,7 @@ linters. `just check` is exactly what `checks / quality` runs, so a green
 | `checks / spec` | `checks.yml` | every pull request; push to `main` | `just spec-check` or `just spec-changes check --all`; `just spec-sync` | feeds the gate |
 | `checks / devcontainer` | `checks.yml` | every pull request; push to `main` | builds the dev container, runs `just check` inside | feeds the gate |
 | `checks / gate` | `checks.yml` | every pull request; push to `main` | `scripts/ci_gate.ts` over the jobs' `needs` | **required** |
-| `pr / policy` | `pr-policy.yml` | pull request opened, edited, synchronized, reopened, ready, to draft | the base's `scripts/check_pr_policy.ts` | **required** |
+| `pr / policy` | `pr-policy.yml` | pull request events | the base's `check_pr_policy.ts`, then `check_commit_safety.ts --range` | **required** |
 | `scan-secrets` | `secret.yml` | every pull request; push to `main` | TruffleHog `--only-verified` over the range | **required** |
 | `spec / command` | `spec-command.yml` | a `/spec` comment by a collaborator | `scripts/spec_changes.ts` `snapshot`, `show`/`status`; one reply | automation |
 | `spec / labels` | `spec-labels.yml` | pull request events, `spec/approved` label events | `scripts/spec_changes.ts` `labels`; `scripts/spec_approval.ts` | automation |

@@ -216,8 +216,8 @@ from `.github/labels.json` by prefix. The `labels / sync` workflow applies
 `.github/labels.json` to the repository with `scripts/sync_labels.ts`
 whenever it changes on `main` and weekly, reporting labels it would prune
 instead of deleting them. `scripts/check_pr_policy.ts` checks each pull
-request against the base's template, the commit convention, and the
-commit-range scan. `scripts/review_threads.ts` (`just review-threads <n>`)
+request against the base's template and the commit convention, and
+`scripts/check_commit_safety.ts --range` scans each of its commits. `scripts/review_threads.ts` (`just review-threads <n>`)
 reads a pull request's review threads through one fixed GraphQL query.
 
 Where each workflow finds its code:

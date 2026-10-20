@@ -63,8 +63,9 @@ validate:
     ./scripts/validate_harness.ts
 
 # Lint specific skill directories (spec + quality checks)
+[positional-arguments]
 check-skill +PATHS:
-    ./scripts/check_skill.ts {{PATHS}}
+    ./scripts/check_skill.ts "$@"
 
 # Regenerate marketplace.json skills[] from the catalogs on disk
 gen-marketplace:
@@ -124,12 +125,14 @@ spec-sync:
 
 # Strict validation plus the unarchived-change rule for the changes this branch touches (what `checks / spec` runs on a pull request)
 # This repository is combined-shape: every pull request ends with its record archived, so no request may merge unarchived.
+[positional-arguments]
 spec-check BASE="origin/main" HEAD="HEAD" *ARGS:
-    ./scripts/spec_changes.ts check --base {{BASE}} --head {{HEAD}} --shape combined {{ARGS}}
+    base="$1"; head="$2"; shift 2; ./scripts/spec_changes.ts check --base "$base" --head "$head" --shape combined "$@"
 
 # Related-change tooling for a pull request: snapshot, status, show, check, archive, labels (see --help)
+[positional-arguments]
 spec-changes *ARGS:
-    ./scripts/spec_changes.ts {{ARGS}}
+    ./scripts/spec_changes.ts "$@"
 
 # Review threads of pull request N through one fixed read-only GraphQL query (JSON: resolved, path, author, body)
 [positional-arguments]
@@ -148,4 +151,4 @@ commit-gate:
 # Run every check (validators, lint, tests, spec validation, the remaining pre-commit hooks;
 # the hooks the recipes above already ran are skipped)
 check: validate lint test spec-validate tf-validate
-    SKIP=commit-safety,validate-skills,validate-harness,ruff-check,ruff-format pre-commit run --all-files
+    SKIP=commit-safety,no-commit-to-branch,validate-skills,validate-harness,ruff-check,ruff-format pre-commit run --all-files
