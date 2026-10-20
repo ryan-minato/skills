@@ -65,6 +65,10 @@ into the ignored `.tools/bin` for `just tf-validate`. `scripts/validate_harness.
 pins agree in all three places. Bump them together; see
 `.agents/knowledge/harness-maintenance.md`.
 
+The pager variables (`PAGER`, `GIT_PAGER`, `GH_PAGER` set to `cat` in
+`.devcontainer/devcontainer.json`) affect the dev container only; the
+workflows run `gh` and `git` non-interactively already, so they set none.
+
 ## Update this file when
 
 - A job is added, renamed, or removed, or its command changes.
