@@ -1,22 +1,44 @@
-# .github/workflows/spec-labels.yml — keeps two label axes on every pull
-# request from its related OpenSpec changes: `spec/archived` | `spec/unarchived`
-# and `spec/not-started` | `spec/in-progress` | `spec/done`. A pull request
-# with no related change carries none of them.
+# .github/workflows/spec-labels.yml — keeps the labels of every pull request
+# that follow from its OpenSpec changes:
+#
+# - `spec/approved`, the maintainer's approval of the approval package
+#   (.agents/knowledge/spec-workflow.md, `## Approval gates`):
+#   `scripts/spec_approval.ts` records it in one comment when the maintainer
+#   adds the label, and withdraws it when the package changes after the
+#   recorded commit, when a person removes it, or when no valid record answers
+#   it; `just spec-approval <n>` prints the same decision without writing;
+# - `spec/archived` | `spec/unarchived` and `spec/not-started` |
+#   `spec/in-progress` | `spec/done` from the related changes. A pull request
+#   with no related change carries none of them.
 #
 # `scripts/spec_changes.ts` is this repository's own management script, not a
 # copy that must match the openspec-workflow skill's script.
+#
+# This is a privileged workflow (.agents/knowledge/github-checks.md): it runs
+# main's copy of this file and of the scripts with a token that can label a
+# pull request from a fork. It stays within these bounds, which
+# scripts/spec_approval_test.ts asserts on this file: it never checks out,
+# fetches, or runs anything of the pull request; event values reach a `run:`
+# line only through `env:`; the job alone holds contents: read and
+# pull-requests: write; the token is set only on the steps that call gh; no
+# secret, no cache, and no action but the checkout and the tool setup with
+# Deno alone.
 name: spec-labels
 
 on:
   # `pull_request_target` runs with a writable token even for a fork, which a
   # plain `pull_request` run does not have — and a fork cannot be labelled
   # without one, because the setting that grants a fork's own run write access
-  # exists for private repositories only.
+  # exists for private repositories only. `labeled` and `unlabeled` start the
+  # run that records or withdraws the approval; a label written with the
+  # workflow's own token starts no run.
   pull_request_target:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
 
 permissions: {}
 
+# One group per pull request. A running run finishes; a pending run is replaced
+# by a newer one, which decides from the pull request's present state.
 concurrency:
   group: spec-labels-${{ github.event.pull_request.number }}
   cancel-in-progress: false
@@ -29,21 +51,36 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # the labels and the approval record comment
     steps:
       # No object authored by the request ever reaches this runner: the
-      # checkout is the BASE (the event's default), and the head is read
-      # through the REST API by the base's own script, which parses it and
-      # never executes it. Never add a checkout of the head, a `git fetch`
-      # of it, an install from it, or a `run:` of its files.
+      # checkout is the BASE (the event's default; no ref is named), and the
+      # head is read through the REST API by the base's own scripts, which
+      # parse it and never execute it. Never add a checkout of the head, a
+      # `git fetch` of it, an install from it, or a `run:` of its files.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       # Deno only: every tool input of the setup action defaults to off.
       - uses: ./.github/actions/setup-tools
+      # First, so that no later step can delay or skip the approval decision.
+      # The step's own limit turns a hung script into a failed step, so that
+      # the last step runs; the job's limit alone would cancel the job, which
+      # runs no step conditioned on failure().
+      - name: Decide the approval label
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          EVENT_ACTION: ${{ github.event.action }}
+          EVENT_LABEL: ${{ github.event.label.name }}
+          EVENT_SENDER: ${{ github.event.sender.login }}
+          # A value, compared with the head the API returns; never checked out.
+          EVENT_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: ./scripts/spec_approval.ts --apply
       - name: Snapshot the head through the API
         env:
-          # The token reaches only the two steps that call the API, so a step
+          # The token reaches only the steps that call the API, so a step
           # added later starts without it and has to ask for it on purpose.
           GH_TOKEN: ${{ github.token }}
           N: ${{ github.event.pull_request.number }}
@@ -94,3 +131,25 @@ jobs:
               esac
             fi
           done < "$RUNNER_TEMP/remove.txt"
+      # A run that failed or whose deciding step timed out may leave
+      # spec/approved where it is wrong; this takes it off, on a closed pull
+      # request as well. The maintainer approves again by adding it again. A
+      # label that is not there is no failure.
+      - name: Remove spec/approved after a failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          if ! [[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]; then
+            echo "PR_NUMBER is not a pull request number: '${PR_NUMBER}'" >&2
+            exit 1
+          fi
+          path="repos/${REPO}/issues/${PR_NUMBER}/labels/spec%2Fapproved"
+          if ! err="$(gh api -X DELETE "${path}" 2>&1 >/dev/null)"; then
+            case "${err}" in
+              *"HTTP 404"*) echo "spec/approved was not on the pull request." ;;
+              *) printf '%s\n' "${err}" >&2; exit 1 ;;
+            esac
+          fi

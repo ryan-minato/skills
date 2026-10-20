@@ -259,6 +259,57 @@ Deno.test("workflows: a head checkout under pull_request_target", () => {
     assertOne(workflowFindings({ "labels.yml": text }), LABELS_WF, 18, "checks out with `ref:`");
 });
 
+/** GOOD_PRIVILEGED's deciding step with the head commit id in its own env (a value it compares). */
+const HEAD_ENV = GOOD_PRIVILEGED.replace(
+    "          N: ${{ github.event.pull_request.number }}\n",
+    "          N: ${{ github.event.pull_request.number }}\n          EVENT_HEAD: ${{ github.event.pull_request.head.sha }}\n",
+);
+
+Deno.test("workflows: the head commit id in a privileged step's own env passes", () => {
+    assertEquals(workflowFindings({ "labels.yml": HEAD_ENV }), []);
+});
+
+Deno.test("workflows: the head commit id in a job-level env under pull_request_target", () => {
+    const text = GOOD_PRIVILEGED.replace(
+        "    timeout-minutes: 10\n",
+        "    timeout-minutes: 10\n    env:\n      EVENT_HEAD: ${{ github.event.pull_request.head.sha }}\n",
+    );
+    assertOne(workflowFindings({ "labels.yml": text }), LABELS_WF, 12, "pull request content");
+});
+
+Deno.test("workflows: the head commit id in env of a step that runs git", () => {
+    const text = HEAD_ENV.replace('run: ./scripts/plan.ts --pr "$N"', 'run: git fetch origin "$EVENT_HEAD"');
+    assertOne(workflowFindings({ "labels.yml": text }), LABELS_WF, 22, "pull request content");
+});
+
+Deno.test("workflows: the head commit id inside a longer env value, or the head ref, stays a finding", () => {
+    for (
+        const value of [
+            "refs/pull/${{ github.event.pull_request.head.sha }}",
+            "${{ github.event.pull_request.head.ref }}",
+        ]
+    ) {
+        const text = HEAD_ENV.replace("${{ github.event.pull_request.head.sha }}", value);
+        assertOne(workflowFindings({ "labels.yml": text }), LABELS_WF, 22, "pull request content");
+    }
+});
+
+Deno.test("workflows: the head commit id in a privileged step's run: or with: stays a finding", () => {
+    const inRun = GOOD_PRIVILEGED.replace(
+        'run: ./scripts/plan.ts --pr "$N"',
+        "run: ./scripts/plan.ts --head ${{ github.event.pull_request.head.sha }}",
+    );
+    const errors = workflowFindings({ "labels.yml": inRun });
+    assertEquals(errors.length, 2, errors.join("\n"));
+    assertStringIncludes(errors[0], "reaches a `run:` line");
+    assertStringIncludes(errors[1], "pull request content");
+    const inWith = HEAD_ENV.replace(
+        "          persist-credentials: false\n",
+        "          persist-credentials: false\n          ref: ${{ github.event.pull_request.head.sha }}\n",
+    );
+    assertOne(workflowFindings({ "labels.yml": inWith }), LABELS_WF, 18, "checks out with `ref:`");
+});
+
 Deno.test("workflows: a head checkout under issue_comment", () => {
     const text = GOOD_PRIVILEGED.replace("  pull_request_target:\n    types: [opened]", "  issue_comment:")
         .replace('run: ./scripts/plan.ts --pr "$N"', 'run: gh pr checkout "$N"');
@@ -557,7 +608,7 @@ Deno.test("labels: each inconsistency is a finding", () => {
     const badApplier = findings(labelFiles([...LABEL_ROWS, { name: "x", applied_by: "bot" }]), checkLabels).errors;
     assertStringIncludes(
         badApplier[0],
-        `label 'x' needs "applied_by" set to one of ['form', 'human', 'triage', 'workflow'].`,
+        `label 'x' needs "applied_by" set to one of ['form', 'human', 'maintainer', 'triage', 'workflow'].`,
     );
     const workflow = findings(labelFiles([...LABEL_ROWS, { name: "y", applied_by: "workflow" }]), checkLabels).errors;
     assertEquals(workflow.length, 2);
@@ -569,6 +620,14 @@ Deno.test("labels: each inconsistency is a finding", () => {
     const noDropdown = findings(labelFiles(undefined, FORM.replace("label: Catalog", "label: Area")), checkLabels)
         .errors;
     assertStringIncludes(noDropdown[0], "no dropdown labelled 'Catalog'");
+});
+
+Deno.test("labels: a label applied by the maintainer is applied by something", () => {
+    assertEquals(
+        findings(labelFiles([...LABEL_ROWS, { name: "spec/approved", applied_by: "maintainer" }]), checkLabels)
+            .errors,
+        [],
+    );
 });
 
 Deno.test("labels: invalid labels.json stops the run", () => {
@@ -666,13 +725,18 @@ function specDeps(managed: string[]): Deps {
     return { ...noDeps, taxonomy: () => ({ managed }) };
 }
 
+const SPEC_APPROVAL_SCRIPT = 'import { x } from "./lib/x.ts";\n\nexport const LABEL = "spec/approved";\n';
+const APPROVAL_ROW = { name: "spec/approved", applied_by: "maintainer" };
+
 Deno.test("spec labels: the taxonomy, labels.json, and the case list agree", () => {
     const files = {
         ".github/labels.json": JSON.stringify([
             { name: "spec/archived", applied_by: "workflow" },
             { name: "spec/done", applied_by: "workflow" },
+            APPROVAL_ROW,
         ]),
         ".github/workflows/spec-labels.yml": SPEC_WORKFLOW,
+        "scripts/spec_approval.ts": SPEC_APPROVAL_SCRIPT,
     };
     assertEquals(findings(files, checkSpecLabels, specDeps(["spec/archived", "spec/done"])).errors, []);
     const drift = findings(files, checkSpecLabels, specDeps(["spec/archived", "spec/done", "spec/new"])).errors;
@@ -684,12 +748,79 @@ Deno.test("spec labels: the taxonomy, labels.json, and the case list agree", () 
         ".github/labels.json": JSON.stringify([
             { name: "spec/archived", applied_by: "human" },
             { name: "spec/done", applied_by: "workflow" },
+            APPROVAL_ROW,
         ]),
     };
     assertStringIncludes(
         findings(human, checkSpecLabels, specDeps(["spec/archived", "spec/done"])).errors[0],
         "must say applied_by workflow",
     );
+});
+
+Deno.test("spec labels: the approval label is the maintainer's, outside the spec_changes taxonomy", () => {
+    const managed = specDeps(["spec/archived", "spec/done"]);
+    const files = (rows: unknown[], script = SPEC_APPROVAL_SCRIPT) => ({
+        ".github/labels.json": JSON.stringify([
+            { name: "spec/archived", applied_by: "workflow" },
+            { name: "spec/done", applied_by: "workflow" },
+            ...rows,
+        ]),
+        ".github/workflows/spec-labels.yml": SPEC_WORKFLOW,
+        "scripts/spec_approval.ts": script,
+    });
+    assertEquals(findings(files([APPROVAL_ROW]), checkSpecLabels, managed).errors, []);
+    assertEquals(findings(files([]), checkSpecLabels, managed).errors, [
+        ".github/labels.json lacks 'spec/approved', which scripts/spec_approval.ts keeps; add the row, applied_by " +
+        "maintainer.",
+    ]);
+    assertEquals(findings(files([{ ...APPROVAL_ROW, applied_by: "workflow" }]), checkSpecLabels, managed).errors, [
+        ".github/labels.json: the approval label 'spec/approved' must say applied_by maintainer.",
+    ]);
+    // Another spec/* label applied by the maintainer is not exempt.
+    assertEquals(
+        findings(files([APPROVAL_ROW, { name: "spec/frozen", applied_by: "maintainer" }]), checkSpecLabels, managed)
+            .errors,
+        [
+            ".github/labels.json: 'spec/frozen' is not a label scripts/spec_changes.ts declares; remove it or teach " +
+            "the script.",
+        ],
+    );
+    // The label follows the script: renamed there, the old row is undeclared and the new one missing.
+    const renamed = findings(
+        files([APPROVAL_ROW], SPEC_APPROVAL_SCRIPT.replace("spec/approved", "spec/agreed")),
+        checkSpecLabels,
+        managed,
+    ).errors;
+    assertEquals(renamed.length, 2, renamed.join("\n"));
+    assertStringIncludes(renamed[0], "lacks 'spec/agreed', which scripts/spec_approval.ts keeps");
+    assertStringIncludes(renamed[1], "'spec/approved' is not a label scripts/spec_changes.ts declares");
+    // spec_changes.ts may never plan it.
+    const planned = findings(
+        files([APPROVAL_ROW]),
+        checkSpecLabels,
+        specDeps(["spec/archived", "spec/done", "spec/approved"]),
+    ).errors;
+    assertStringIncludes(planned[0], "scripts/spec_changes.ts declares 'spec/approved', which only");
+});
+
+Deno.test("spec labels: spec_approval.ts without its LABEL line, or missing, stops the run", () => {
+    const variants: Record<string, string>[] = [{ "scripts/spec_approval.ts": "export const OTHER = 1;\n" }, {}];
+    for (const extra of variants) {
+        const root = fixture({
+            ".github/labels.json": "[]",
+            ".github/workflows/spec-labels.yml": SPEC_WORKFLOW,
+            ...extra,
+        });
+        try {
+            assertThrows(
+                () => checkSpecLabels(new Harness(root, specDeps([]))),
+                ShapeError,
+                "scripts/spec_approval.ts",
+            );
+        } finally {
+            cleanup(root);
+        }
+    }
 });
 
 Deno.test("spec labels: no case list stops the run; the real taxonomy is spec_changes.ts's", () => {

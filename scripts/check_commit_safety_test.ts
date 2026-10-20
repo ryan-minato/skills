@@ -20,8 +20,11 @@ const VENDOR_NOREPLY = ["noreply", "anthropic.com"].join("@");
 const NOREPLY = "1+dev@users.noreply.github.com";
 const SCRIPT = new URL("./check_commit_safety.ts", import.meta.url).pathname;
 
-// Fixture repositories must not read the developer's git configuration (identity, hooks, signing).
+// Fixture repositories must not read the developer's git configuration (identity, hooks, signing). The
+// variables are process-wide and other test files run git on the repository itself, so the replacement
+// keeps only the ownership exception a container checkout can need.
 const emptyConfig = Deno.makeTempFileSync();
+Deno.writeTextFileSync(emptyConfig, "[safe]\n\tdirectory = *\n");
 Deno.env.set("GIT_CONFIG_GLOBAL", emptyConfig);
 Deno.env.set("GIT_CONFIG_NOSYSTEM", "1");
 for (const name of ["GIT_DIR", "GIT_INDEX_FILE", "GIT_WORK_TREE"]) Deno.env.delete(name);
