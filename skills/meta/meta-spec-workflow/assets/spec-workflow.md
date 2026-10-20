@@ -78,7 +78,7 @@ another.
 | Behavior of a domain | `<source-of-truth spec>` | knowledge base, <issues | work items> |
 | Acceptance of a change | the `## Acceptance` lists of `<change record>/<proposal-like artifact>`, pointing to the scenarios in `<change record>/…` | <pull requests | merge requests>, <issues | work items> |
 | Conventions and mechanics | the knowledge base | specifications never restate them |
-| <A machine-readable surface the specification rules, e.g. option metadata, a schema; delete when none> | `<source-of-truth spec>` | `<the surface's file>`, kept equal by `<comparison check>` in `<local check command>` and CI |
+| <A machine-readable surface the specification rules, e.g. option metadata, a schema; when none, replace this row with one stating that no machine-readable surface is derived from the specifications> | `<source-of-truth spec>` | `<the surface's file>`, kept equal by `<comparison check>` in `<local check command>` and CI |
 
 A file listed under "Points to it" may summarize in one line and must link;
 it never restates the fact.

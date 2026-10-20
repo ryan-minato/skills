@@ -183,9 +183,10 @@ review.
   proposal-like artifact or, absent one, at the head of the specification
   (the framework skill names the spot where it does; otherwise the head of
   the specification is the default). Every action the project's contract
-  prescribes for the loop itself — pushing the branch, opening the draft,
-  replying to review threads, marking the request ready, the freeze — is
-  covered by the contract; the line extends beyond them, and a record
+  (or, when none exists, the defaults below) prescribes for the loop
+  itself — pushing the branch, opening the draft, replying to review
+  threads, marking the request ready, the freeze — is covered by that
+  prescription; the line extends beyond them, and a record
   written before the project adopted it pre-authorizes nothing further.
 
 ## Artifact roles
