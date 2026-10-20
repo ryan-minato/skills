@@ -53,7 +53,7 @@ another.
 
 | Artifact | Owns | Never holds |
 |---|---|---|
-| `<proposal-like artifact>` | why, the goal, what changes, how completion is judged, what is not done, what is delivered, which irreversible actions are pre-authorized (the branch pushed, outward writes allowed — within `.agents/knowledge/agent-authority.md`; any other outward action, a comment or <an issue | a work item> included, is queued as a pending decision for <the approval owner>), and `## Acceptance` | the contract, the approach, steps |
+| `<proposal-like artifact>` | why, the goal, what changes, how completion is judged, what is not done, what is delivered, which irreversible actions are pre-authorized (the branch pushed, outward writes allowed — within `.agents/knowledge/agent-authority.md`; any other outward action outside the loop's own steps on this request, a comment or <an issue | a work item> included, is queued as a pending decision for <the approval owner>), and `## Acceptance` | the contract, the approach, steps |
 | `<specification artifact>` | requirements and scenarios | implementation choices |
 | `<design artifact>` | the approach, its constraints and preferences, rejected alternatives, information needed only for this change | the goal or acceptance, steps |
 | `<task list>` | steps with their verification, written after the package gate closes | acceptance; anything the gate must see |
@@ -63,8 +63,9 @@ another.
   to the scenarios and never restates them.
 - Invariant test: a rule that would still hold under any other approach
   belongs in Stays true as an entry pointing to the requirement or scenario
-  that carries it; one that holds only because of the chosen approach
-  belongs in the design.
+  that carries it (a non-behavioral invariant — a size or a dependency
+  rule — is stated outright); one that holds only because of the chosen
+  approach belongs in the design.
 - Information test: information needed again the next time the behavior
   changes goes to the specification; information needed only for this
   change goes to the design.
@@ -286,4 +287,4 @@ commit with the current one and re-map when they differ.
 - The rule for when a design is warranted changes.
 - <The condition a bootstrap-time exception waited for — the protection
   rule, the first merged check — is confirmed active or found missing:
-  drop the exception recorded in tracked work; delete when none.>
+  drop the exception recorded in <the issue | the work item>; delete when none.>

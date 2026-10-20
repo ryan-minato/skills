@@ -181,8 +181,9 @@ review.
      nothing outward beyond the named branch is pre-authorized.
   Where the tool's record has no field for the last two, they go in its
   proposal-like artifact or, absent one, at the head of the specification
-  (the framework skill names the spot where it does; otherwise the head of
-  the specification is the default). Every action the project's contract
+  (the framework skill names the spot where it does; otherwise the
+  proposal-like artifact, or the head of the specification where the
+  record has none). Every action the project's contract
   (or, when none exists, the defaults below) prescribes for the loop
   itself — pushing the branch, opening the draft, replying to review
   threads, marking the request ready, the freeze — is covered by that

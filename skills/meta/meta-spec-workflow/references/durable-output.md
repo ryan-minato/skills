@@ -73,7 +73,8 @@ The deposited file, adapted from the asset, must state:
   the two-list acceptance shape, and the line of the record that names the
   irreversible or outward actions a change pre-authorizes, pointing to the
   authority policy for what it governs and saying that every other outward
-  action is queued as a pending decision for the approval owner.
+  action beyond the loop's own steps is queued as a pending decision for
+  the approval owner.
 - Where the specification rules a machine-readable surface: the surface, the comparison check, its place in the local check
   command and CI, and what its failure names; otherwise the statement that
   no such surface exists.
