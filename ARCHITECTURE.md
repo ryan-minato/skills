@@ -204,7 +204,7 @@ Every change is a branch and a pull request; issues are optional and link
 their OpenSpec change instead of restating its acceptance. The issue forms
 apply type and `status/needs-triage` labels; the `issues / triage`
 workflow derives `priority/*` and `catalog/*` from the form answers with
-`scripts/sync_issue_metadata.py`, whose mapping comes from
+`scripts/sync_issue_metadata.ts`, whose mapping comes from
 `.github/labels.json` by prefix. The `labels / sync` workflow applies
 `.github/labels.json` to the repository with `scripts/sync_labels.ts`
 whenever it changes on `main` and weekly, reporting labels it would
