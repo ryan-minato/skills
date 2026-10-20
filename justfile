@@ -131,6 +131,11 @@ spec-check BASE="origin/main" HEAD="HEAD" *ARGS:
 spec-changes *ARGS:
     python3 scripts/spec_changes.py {{ARGS}}
 
+# Review threads of pull request N through one fixed read-only GraphQL query (JSON: resolved, path, author, body)
+[positional-arguments]
+review-threads N:
+    ./scripts/review_threads.ts "$1"
+
 # Safety gate for staged changes (also runs as the first pre-commit hook)
 commit-gate:
     ./scripts/check_commit_safety.ts
