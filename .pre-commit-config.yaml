@@ -6,8 +6,8 @@ repos:
       # Runs first, on `git commit` only: needs staged content and the
       # author email. `just check` and CI skip it with SKIP=commit-safety.
       - id: commit-safety
-        name: staged-change safety gate (author email, credentials, layers)
-        entry: python3 scripts/check_commit_safety.py
+        name: staged-change safety gate (author email, credentials, personal emails)
+        entry: scripts/check_commit_safety.ts
         language: system
         pass_filenames: false
         always_run: true
