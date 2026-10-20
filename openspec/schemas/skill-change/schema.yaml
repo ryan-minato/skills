@@ -34,7 +34,7 @@ artifacts:
       - **Impact**: which of the synchronized surfaces move with the change -
         the catalog `README.md` and `README.zh.md` rows, the `.agents/skills/`
         symlink, `marketplace.json`, the catalog `CONTEXT.md`, mirrored files
-        listed in `scripts/validate_harness.py`, and any project harness file.
+        listed in `scripts/validate_harness.ts`, and any project harness file.
       - **Non-goals**: what stays as it is, so review does not argue about it.
       - **Deliverable and pre-authorized actions**: what the change delivers
         (the pull request, a report, the pending decisions handed over) and

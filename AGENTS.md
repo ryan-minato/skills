@@ -119,7 +119,7 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
 
 ## Keep In Sync
 
-Mechanically checked pairs are listed in `scripts/validate_harness.py`
+Mechanically checked pairs are listed in `scripts/validate_harness.ts`
 and fail `just check`. The rest, with owners and triggers, live in
 `.agents/knowledge/harness-maintenance.md`; the three that bite most often:
 

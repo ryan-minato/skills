@@ -31,6 +31,7 @@ jobs:
     # A dispatch from another branch must not apply an unmerged taxonomy.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       issues: write

@@ -68,7 +68,7 @@ repos:
         always_run: true
       - id: validate-harness
         name: validate harness synchronization
-        entry: python3 scripts/validate_harness.py
+        entry: scripts/validate_harness.ts
         language: system
         pass_filenames: false
         always_run: true

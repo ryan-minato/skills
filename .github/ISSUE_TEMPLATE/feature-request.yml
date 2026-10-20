@@ -1,5 +1,5 @@
 # Labels must exist in .github/labels.json (checked by
-# scripts/validate_harness.py). Final acceptance is never recorded here: it
+# scripts/validate_harness.ts). Final acceptance is never recorded here: it
 # lives in the OpenSpec change's scenarios once the request is accepted.
 name: Feature request
 description: Propose a new skill or a new capability for an existing skill or repository tool.
