@@ -35,7 +35,7 @@ name live on `main` before the ruleset requires it.
    byte-for-byte what `checks / quality` runs.
 2. For a failure you cannot reproduce, digest the run instead of reading
    full logs:
-   `python3 .agents/skills/change-workflow/scripts/run_log_digest.py --repo ryan-minato/skills --run-id <id>`.
+   `./.agents/skills/change-workflow/scripts/run_log_digest.ts --repo ryan-minato/skills --run-id <id>`.
 3. Never weaken, skip, or delete a check to make it pass; changing a
    check's strictness is a maintainer decision recorded here first.
 4. A red `checks / spec` on a ready pull request whose change is not
