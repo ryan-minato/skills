@@ -133,7 +133,7 @@ spec-changes *ARGS:
 
 # Safety gate for staged changes (also runs as the first pre-commit hook)
 commit-gate:
-    python3 scripts/check_commit_safety.py
+    ./scripts/check_commit_safety.ts
 
 # Run every check (validators, lint, tests, spec validation, the remaining pre-commit hooks;
 # the hooks the recipes above already ran are skipped)

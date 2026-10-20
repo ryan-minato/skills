@@ -57,7 +57,7 @@ is missing or unapproved.
 - A required check is unavailable, unreliable, or contradicts other
   evidence.
 - The change unexpectedly touches a published skill's behavior that no
-  change record covers, `scripts/check_commit_safety.py`, secret
+  change record covers, `scripts/check_commit_safety.ts`, secret
   scanning, or any workflow's permissions.
 - Reverting the merge would not restore the previous installed behavior.
 - Review evidence conflicts, or confidence is insufficient for a decision
