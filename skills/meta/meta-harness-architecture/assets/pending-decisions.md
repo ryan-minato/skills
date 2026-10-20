@@ -1,9 +1,9 @@
 <!-- The shape of one pending decision, for the rule the harness deposits
 (entrypoint or policy file). The list itself lives where a person will see
 it — the description of the change request, a tracked file, or an
-issue — named in the policy; it is not a scratch note. Rework the field names to the project's vocabulary;
-keep all four fields, since a list missing any of them is per-command
-fatigue delivered in one lump. -->
+issue — named in the policy; it is not a scratch note. Rework the field
+names to the project's vocabulary; keep all four fields, since a list
+missing any of them is per-command fatigue delivered in one lump. -->
 
 ## Pending decisions
 

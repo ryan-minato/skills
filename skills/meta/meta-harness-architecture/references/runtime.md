@@ -28,12 +28,10 @@ polishing a small change waits for the whole build and stops verifying.
   framework's own rewind lives only in the session and is invisible to
   humans. A commit is addressable, named, and inspectable by everyone with
   `git log`.
-- A task-level commit is an atomic commit. Define "a verified sub-step" as
-  the completion of one task of the plan or specification (the smallest
-  verified step the plan names, where no task list exists); each
-  checkpoint is then
-  one atomic commit under the project's message convention, with nothing to
-  tidy afterwards.
+- A task-level commit is an atomic commit: one task of the plan or
+  specification (or, where no task list exists, the smallest verified step
+  the plan names) lands as one commit under the project's message
+  convention, with nothing to tidy afterwards.
 - Draft commits inside a task are squashed into that task's commit when the
   task ends. The unit of squashing is the task, not the whole plan: a
   plan with three tasks lands as three commits. Do not postpone the

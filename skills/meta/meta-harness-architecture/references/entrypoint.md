@@ -46,7 +46,8 @@ skill; a miss on a critical one is the same as not having it.
   nothing else reveals those files exist.
 - Validation commands, and the approval or safety boundaries that apply to
   most tasks: which actions proceed, which are pre-authorized by the
-  specification, which are queued as pending decisions.
+  specification (or, without one, the approved plan or the policy file),
+  which are queued as pending decisions.
 - The keep-current rule, or a pointer to whatever mechanism owns it.
 
 ## Subdirectory files and framework carriers

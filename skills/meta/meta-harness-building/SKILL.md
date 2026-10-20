@@ -95,8 +95,9 @@ and whether a human reviews results before they leave, which irreversible
 or outward actions are pre-authorized (which branch is pushed, whether
 comments or requests may be opened), which document holds that line and
 where the pending-decisions list lives so a person sees it, which
-control-plane files are hard read-only, the review structure, the confidentiality boundary, who
-approves what — what must be preserved, and the user's preferences. Bring
+control-plane files are hard read-only, the review structure, the
+confidentiality boundary, who approves what — what must be preserved, and
+the user's preferences. Bring
 the open questions from step 1 into these rounds and present the inferred
 variables as facts to confirm rather than questions. Do not produce a plan
 before this converges.
