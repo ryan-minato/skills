@@ -1,8 +1,7 @@
-<!-- scripts/check_pr_policy.ts reads the `## ` headings of this file from
-the base branch and requires each one in the PR body. Keep the word
-"secrets" in the security checklist line: the check keys on it. Sections
-beyond these may be added or updated when the change needs them; every
-section passes the publish gate before it is published. -->
+<!-- `pr / policy` reads the `## ` headings of this file from the base
+branch and requires each one in the PR body; it keys on the word "secrets"
+in the security checklist line. Sections beyond these may be added; every
+section passes the publish gate (.agents/knowledge/agent-authority.md). -->
 
 <!-- Opening paragraph, no heading: the goal of the change — what is true
 once it merges — not the work done. -->
@@ -13,28 +12,20 @@ once it merges — not the work done. -->
 
 ## Specification
 
-<!-- The OpenSpec change this PR implements, as a link reviewers can click
-(one line per change; a companion repository change gets its own):
-`Spec: [openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`.
-`Spec: none — <reason>` only for a change too small to plan. -->
+<!-- One `Spec:` line per change, linking its directory on this branch, or
+`Spec: none — <reason>`; Phase and Approval lines as
+.agents/knowledge/spec-workflow.md (Approval gates) says. -->
 Spec: [openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)
-<!-- `specification` until the maintainer closes the discussion; `implementation` after. -->
 Phase: specification
 
-<!-- The approval package, one link each: the draft opens once proposal, delta specs, and design (when the schema requires one) are written; tasks.md follows the closing. -->
-| Record | What it holds |
-|---|---|
-| [proposal.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/proposal.md) | Why, what changes, skills touched, installed behavior, impact, non-goals, deliverable and pre-authorized actions |
-| [specs/<catalog>/<skill-name>/spec.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/specs/<catalog>/<skill-name>/spec.md) | Delta spec: requirements and scenarios (omit for a repository change) |
-| [design.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/design.md) | The approach's bounds — placement, decisions, risks — and the verification plan (omit only when the schema does not require one) |
-| tasks.md | Written after the package deliberation is closed |
+<!-- The approval package, one link per file; drop a line the change does not have. -->
+- [proposal.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/proposal.md)
+- [specs/<catalog>/<skill-name>/spec.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/specs/<catalog>/<skill-name>/spec.md)
+- [design.md](https://github.com/ryan-minato/skills/blob/<branch>/openspec/changes/<slug>/design.md)
+- tasks.md: written after the package deliberation is closed
 
-<!-- The approval line names the deliberation that is open. Replace it with
-"Approval: package deliberation closed <date>, reconciled with nothing open"
-(or naming the confirmed open items) when the first one closes, then with
-the implementation line below, then with "Approval: implementation
-deliberation closed <date>, frozen in <sha>". -->
-Approval: package deliberation open on this draft — the maintainer discusses the proposal, the delta specs, and the design here (the task list is not part of it), directs record changes in conversation, and closes the deliberation in conversation; the agent then reconciles the review threads and the package before writing the task list. Marking this pull request ready opens the second deliberation, on the finished implementation, and `checks / spec` stays red until the maintainer closes it and the record is archived.
+<!-- Replace this line at each closing, then at the freeze, with the date and commit. -->
+Approval: package deliberation open on this draft (`.agents/knowledge/spec-workflow.md`, Approval gates).
 
 ## Related work
 
@@ -43,27 +34,29 @@ Closes #
 
 ## Changes
 
-<!-- Filled in when the PR is marked ready. Each touched file or directory
-as a permalink to the commit that changed it: the exact lines
+<!-- Keep the reserved line until the PR is marked ready; `pr / policy`
+fails a ready PR that still holds it. Then list each touched file or
+directory as a permalink to the commit that changed it: the exact lines
 (`blob/<sha>/<path>#L10-L20`) for a local change, the whole file or
 directory (`blob/<sha>/<path>`, `tree/<sha>/<dir>`) for a broad one. -->
-_Reserved: filled in when the pull request is marked ready, as permalinks to its commits — the exact lines for a local change, the whole file or directory for a broad one._
+_Reserved: filled in when the pull request is marked ready._
 
 ## Validation
 
-<!-- Filled in when the PR is marked ready. Every command or behavioral
-test run and its result: scores, evidence, isolation degradations, skipped
-cases with reasons. Name the scenarios that passed and link the change's
-design.md verification plan for the cases and rubric instead of restating
-them. -->
-_Reserved: filled in when the pull request is marked ready, naming each scenario with its result and linking the verification plan in `design.md`._
+<!-- Keep the reserved line until the PR is marked ready. Then record every
+command or behavioral test run and its result: scores, evidence, isolation
+degradations, skipped cases with reasons. Name each scenario with its
+result and link the change's design.md verification plan instead of
+restating the cases or rubric. -->
+_Reserved: filled in when the pull request is marked ready._
 
 ## Checklist
 
+<!-- Every item is true when the PR is marked ready; `pr / policy` fails a ready PR with an open box. -->
 - [ ] `just check` passes locally
-- [ ] The maintainer closed the package deliberation on this draft and the agent reconciled it before implementation, or `Spec: none` is justified
+- [ ] The package approval is recorded and reconciled, or `Spec: none` is justified
 - [ ] The scenarios of the linked change, or the acceptance criteria of the linked issue, are met and recorded above
-- [ ] Every task of the linked change is done and verified, or `Spec: none` is justified — the record is frozen after the maintainer closes the deliberation on the finished implementation, and `checks / spec` stays red until it is
+- [ ] Every task of the linked change is done and verified, or `Spec: none` is justified
 - [ ] No secrets, credentials, or personal data in the diff, description, or commits
 - [ ] Documentation and paired `README.zh.md` translations are updated where required
 - [ ] Catalog READMEs and `marketplace.json` are synchronized where a public skill changed

@@ -38,8 +38,8 @@
 //              actions/checkout and ./.github/actions/setup-tools (with no inputs), and run only scripts
 //              whose imports are local, transitively; no `workflow_run`; no `pull_request` workflow grants
 //              a write permission
-// `checkBudget` (AGENTS.md line budget, Markdown table width) is exported and tested but not run by main()
-// yet; the knowledge rebuild turns it on.
+//   budget     AGENTS.md at most 110 lines; no Markdown table row over 200 columns in AGENTS.md,
+//              ARCHITECTURE.md, or .agents/knowledge/*.md
 //
 // Usage: ./scripts/validate_harness.ts   (from the repository root)
 // Called by: `just validate` (hence `just check` and CI) and the validate-harness pre-commit hook.
@@ -100,7 +100,7 @@ const OPENSPEC_CORE_SKILLS = [
     "openspec-sync-specs",
     "openspec-update-change",
 ];
-const LABEL_PREFIX_SKIP = ["catalog/", "priority/", "status/", "http"];
+const LABEL_PREFIX_SKIP = ["catalog/", "priority/", "status/", "spec/", "http"];
 
 export const PRIVILEGED_TRIGGERS = ["pull_request_target", "issue_comment", "issues"];
 export const AGENTS_MAX_LINES = 110;
@@ -743,7 +743,7 @@ export function checkTools(h: Harness): void {
     }
 }
 
-// --- budget (exported, not run by main() yet) --------------------------------------------------------
+// --- budget --------------------------------------------------------------------------------------
 
 export function checkBudget(h: Harness): void {
     const agents = h.read(AGENTS_MD);
@@ -1235,6 +1235,7 @@ export const CHECKS: ((h: Harness) => void)[] = [
     checkOpenspec,
     checkTools,
     checkWorkflows,
+    checkBudget,
 ];
 
 /** Runs the checks over `root` and reports; returns the exit status. */
