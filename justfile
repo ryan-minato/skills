@@ -70,10 +70,18 @@ check-skill +PATHS:
 gen-marketplace:
     python3 scripts/gen_marketplace.py
 
-# Lint and check formatting of repository and skill scripts
+# Lint and check formatting: the TypeScript management code with Deno (the paths
+# deno.json includes, never a skill), the Python scripts with ruff
 lint:
+    deno lint
+    deno fmt --check
+    deno check scripts/ .agents/skills/change-workflow/scripts/
     ruff check scripts skills/*/*/scripts skills/meta/*/assets skills/sdd/*/assets
     ruff format --check scripts skills/*/*/scripts skills/meta/*/assets skills/sdd/*/assets
+
+# Run the management code's tests (the *_test.ts files deno.json includes)
+test:
+    deno test --allow-read --allow-write --allow-run --allow-env --allow-net --no-prompt
 
 # Format-check and validate every .tf skill asset with the pinned OpenTofu, in temp copies
 tf-validate:
@@ -127,6 +135,7 @@ spec-changes *ARGS:
 commit-gate:
     python3 scripts/check_commit_safety.py
 
-# Run every check (validators, lint, spec validation, pre-commit hooks)
-check: validate lint spec-validate tf-validate
-    SKIP=commit-safety pre-commit run --all-files
+# Run every check (validators, lint, tests, spec validation, the remaining pre-commit hooks;
+# the hooks the recipes above already ran are skipped)
+check: validate lint test spec-validate tf-validate
+    SKIP=commit-safety,validate-skills,validate-harness,ruff-check,ruff-format pre-commit run --all-files
