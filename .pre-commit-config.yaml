@@ -62,7 +62,7 @@ repos:
     hooks:
       - id: validate-skills
         name: validate skill layout and harness consistency
-        entry: python3 scripts/validate_skills.py
+        entry: scripts/validate_skills.ts
         language: system
         pass_filenames: false
         always_run: true

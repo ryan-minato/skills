@@ -154,7 +154,7 @@ symlinks, marketplace sync, path self-containment, catalog files, the
 `## Harness Methodology` copy between `core/meta-harness` and
 `meta-harness-architecture`, label and form consistency, knowledge-file
 pointers, and strict OpenSpec validation
-(`scripts/validate_skills.py`, `scripts/validate_harness.py`, `just
+(`scripts/validate_skills.ts`, `scripts/validate_harness.py`, `just
 spec-validate`). Run it (or trust its CI result) and spend review attention
 only on what it cannot see. A name that departs from the
 recommended `[<prefix>-]<body>[-<suffix>]` shape is not a defect either: the
