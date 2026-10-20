@@ -1,4 +1,4 @@
-<!-- scripts/check_pr_policy.py reads the `## ` headings of this file from
+<!-- scripts/check_pr_policy.ts reads the `## ` headings of this file from
 the base branch and requires each one in the PR body. Keep the word
 "secrets" in the security checklist line: the check keys on it. Sections
 beyond these may be added or updated when the change needs them; every

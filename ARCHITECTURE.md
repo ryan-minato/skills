@@ -208,7 +208,7 @@ workflow derives `priority/*` and `catalog/*` from the form answers with
 `.github/labels.json` by prefix. The `labels / sync` workflow applies
 `.github/labels.json` to the repository with `scripts/sync_labels.py`
 whenever it changes on `main` and weekly, reporting labels it would
-prune instead of deleting them. `scripts/check_pr_policy.py` validates
+prune instead of deleting them. `scripts/check_pr_policy.ts` validates
 each pull request against the template's own headings and the commit
 convention (commit range for in-repo branches, title for forks). Agents
 may ready a pull request under the H1 policy; the maintainer merges.
