@@ -312,9 +312,9 @@ Load only the reference for the artifact being audited or built:
 
 Use the corresponding [assets](assets/) only as starting shapes. Rework every
 line against inspected facts, delete inapplicable sections, and remove every
-placeholder. AGENTS.md is the discovery root: skills and registered tools may
-self-announce, but every knowledge or reference file needs an explicit
-when-to-read pointer.
+placeholder. AGENTS.md is the discovery root: auxiliary skills and
+registered tools may self-announce, but every knowledge or reference file
+and every process-critical skill needs an explicit when-to-read pointer.
 
 For scripts, tests, linters, CI, hooks, task runners, and framework settings,
 implement the approved feedback and safety layers as management code the

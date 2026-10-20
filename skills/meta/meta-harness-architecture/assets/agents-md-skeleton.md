@@ -45,9 +45,11 @@ too detailed. -->
 
 ## When To Read What
 
-<!-- Knowledge and reference files are invisible without these pointers.
-Skills and registered tools announce themselves; scripts only need their
-usage documented elsewhere in this file. -->
+<!-- Knowledge and reference files are invisible without these pointers,
+and a process-critical skill (publish gate, compliance review) is routed
+here by situation, named; only auxiliary skills and registered tools may
+rely on self-announcement. Scripts only need their usage documented
+elsewhere in this file. -->
 
 | Situation | Read |
 |---|---|
