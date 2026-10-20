@@ -136,6 +136,11 @@ spec-changes *ARGS:
 review-threads N:
     ./scripts/review_threads.ts "$1"
 
+# The approval label's state on pull request N, recomputed from its labels, events, and record (read-only)
+[positional-arguments]
+spec-approval N:
+    ./scripts/spec_approval.ts "$1"
+
 # Safety gate for staged changes (also runs as the first pre-commit hook)
 commit-gate:
     ./scripts/check_commit_safety.ts

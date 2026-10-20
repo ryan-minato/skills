@@ -27,6 +27,7 @@
   {"name": "spec/not-started", "color": "ededed", "description": "No task of the related OpenSpec changes is done (set by the labels workflow)", "applied_by": "workflow"},
   {"name": "spec/in-progress", "color": "1d76db", "description": "Some tasks of the related OpenSpec changes are done (set by the labels workflow)", "applied_by": "workflow"},
   {"name": "spec/done", "color": "0e8a16", "description": "Every task of the related OpenSpec changes is done (set by the labels workflow)", "applied_by": "workflow"},
+  {"name": "spec/approved", "color": "2ea44f", "description": "The maintainer approved the approval package (maintainer only; the labels workflow withdraws it)", "applied_by": "maintainer"},
   {"name": "status/blocked", "color": "000000", "description": "Cannot proceed; the body says on what", "applied_by": "human"},
   {"name": "goal", "color": "6f42c1", "description": "Tracking issue for a theme spanning several pull requests", "applied_by": "human"}
 ]
