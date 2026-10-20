@@ -63,8 +63,8 @@ where the project has none, the approved plan or the policy file itself —
 therefore carries a line naming the branch it pushes and the outward
 writes it allows, and the harness says which of these holds the line.
 
-The pending-decisions list lives where a person will see it: the handoff
-section of the change request, a tracked file, or an issue, chosen by the
+The pending-decisions list lives where a person will see it: the
+description of the change request, a tracked file, or an issue, chosen by the
 project and named in the policy. It is not a scratch note; only a
 credential or log excerpt inside an item goes to an untracked place.
 

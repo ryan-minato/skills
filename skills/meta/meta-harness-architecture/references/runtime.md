@@ -80,9 +80,9 @@ soon as the choice is made.
 
 Where a specification tool exists, reuse its task tracking; progress notes
 exist to expose state to humans early, not as a diary that spends output
-tokens. A scratch note — a draft handoff, a debugging log — carries environment values
-and credentials more easily than source, so it is written only to a
-location git does not track — an ignored handoff directory, or the system
+tokens. A scratch note — a draft of the final report, a debugging log — carries
+environment values and credentials more easily than source, so it is written
+only to a location git does not track — an ignored scratch directory, or the system
 temporary directory when the note need not survive the session or the
 container — and treated as a secret. This governs scratch notes; the
 pending-decisions list a person must act on lives where

@@ -128,7 +128,8 @@ Move approval to both ends — the plan approves results and bounds, never a ste
 list; the end collects decisions the plan did not cover. Reversibility is the
 key: reversible internal actions (editing files, branching, local commits,
 running tests) proceed; irreversible or outward ones (push, comments, deletion,
-publication) are pre-authorized in the specification or queued. A blocked agent
+publication) are pre-authorized in the specification (or, without one, the
+approved plan or the policy file) or queued. A blocked agent
 finishes everything that does not depend on the decision and records each
 pending item with where it is stuck, the options, the recommended option with
 its reason, and the completed work each option affects. A refusal is a decision:

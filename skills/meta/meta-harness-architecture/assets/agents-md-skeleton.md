@@ -29,7 +29,7 @@ when blocked. They come first because attention decays with position. -->
 - **Checkpoints**: commits, never stashes; a task's drafts squashed into its
   one commit before the task is ticked; drafts never pushed; secret scan on
   every commit.
-- **Pending decisions** live in [the handoff section of the change request,
+- **Pending decisions** live in [the description of the change request,
   a tracked file, or an issue] — a place a person sees, never only a
   scratch note.
 
