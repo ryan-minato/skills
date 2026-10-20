@@ -68,7 +68,7 @@ check-skill +PATHS:
 
 # Regenerate marketplace.json skills[] from the catalogs on disk
 gen-marketplace:
-    python3 scripts/gen_marketplace.py
+    ./scripts/gen_marketplace.ts
 
 # Lint and check formatting: the TypeScript management code with Deno (the paths
 # deno.json includes, never a skill), the Python scripts with ruff

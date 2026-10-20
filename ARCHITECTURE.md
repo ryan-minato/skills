@@ -138,7 +138,7 @@ No skill files move. The real directories in `.agents/skills/` (project-only
 and OpenSpec-generated skills) are excluded because the generator reads
 `skills/` only.
 
-`scripts/gen_marketplace.py` (via `just gen-marketplace`) regenerates the
+`scripts/gen_marketplace.ts` (via `just gen-marketplace`) regenerates the
 `skills` arrays from the catalogs on disk, and the validator fails if any
 plugin's list drifts from its catalog — so the lists are never hand-edited.
 
