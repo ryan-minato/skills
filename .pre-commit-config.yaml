@@ -25,6 +25,8 @@ repos:
         args: ['--maxkb=2000']
       - id: mixed-line-ending
         args: [ "--fix=auto" ]
+      - id: no-commit-to-branch
+        args: ['--branch', 'main']
 
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
@@ -40,12 +42,20 @@ repos:
         name: secret and PII scanning with gitleaks (.gitleaks.toml)
         args: ['--config', '.gitleaks.toml']
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.4
+  # The installed ruff (latest, as in `just lint` and CI), not a pinned copy.
+  - repo: local
     hooks:
       - id: ruff-check
+        name: ruff check
+        entry: ruff check --force-exclude
+        language: system
+        types_or: [python, pyi]
         files: ^(scripts|skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
       - id: ruff-format
+        name: ruff format
+        entry: ruff format --force-exclude
+        language: system
+        types_or: [python, pyi]
         files: ^(scripts|skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
 
   - repo: local

@@ -2,13 +2,14 @@
 # Agents and humans should run checks through these recipes (not ad-hoc
 # commands) so results stay consistent across environments.
 
-# Pinned tool versions. These variables are the single source for the pins;
-# scripts/validate_harness.py checks that generated files and CI agree.
+# OpenSpec is the one pinned tool: the generated openspec-* skills must equal
+# this version's output byte for byte. Every other tool follows its latest
+# release. scripts/validate_harness.py checks that no other file names it.
 openspec_version := "1.12.0"
-opentofu_version := "1.13.0"
 
-# Repository-local tool directory (ignored by git); recipes call tools from here.
+# Repository-local tool directory (ignored by git); recipes find tools here first.
 tools_bin := justfile_directory() / ".tools" / "bin"
+export PATH := tools_bin + ":" + env_var("PATH")
 
 # List available recipes
 default:
@@ -19,16 +20,21 @@ setup: install-tools
     pre-commit install
     git config commit.template .gitmessage
 
-# Install the pinned tools `just check` needs beyond the dev container features
+# Install the tools `just check` needs beyond the dev container features:
+# OpenSpec at the pinned version, run by Deno (no Node), into .tools/bin
 install-tools: install-opentofu
-    npm install -g "@fission-ai/openspec@{{openspec_version}}"
+    OPENSPEC_NO_UPDATE_CHECK=1 deno install --global --force --quiet --root "{{justfile_directory()}}/.tools" --name openspec --allow-read --allow-write --allow-env --allow-sys=cpus,homedir,uid "npm:@fission-ai/openspec@{{openspec_version}}"
 
-# Install the pinned OpenTofu release into .tools/bin, checking it against the
+# Install the latest OpenTofu release into .tools/bin, checking it against the
 # release's SHA256SUMS (download layout per opentofu.org standalone install docs, read 2026-10-14)
 install-opentofu:
     #!/usr/bin/env bash
     set -euo pipefail
-    version="{{opentofu_version}}"
+    auth=()
+    if [ -n "${GITHUB_TOKEN:-}" ]; then auth=(-H "Authorization: Bearer ${GITHUB_TOKEN}"); fi
+    release="$(curl --proto '=https' --tlsv1.2 -fsSL "${auth[@]}" https://api.github.com/repos/opentofu/opentofu/releases/latest)"
+    version="$(printf '%s\n' "$release" | sed -n 's/^ *"tag_name": *"v\([0-9][0-9.]*\)".*/\1/p')"
+    [ -n "$version" ] || { echo "install-opentofu: the latest-release response has no tag_name; read it at https://api.github.com/repos/opentofu/opentofu/releases/latest" >&2; exit 1; }
     bin="{{tools_bin}}/tofu"
     if [ -x "$bin" ] && "$bin" version -json | grep -q "\"terraform_version\": *\"$version\""; then
         echo "OpenTofu $version already installed at $bin"
@@ -101,7 +107,7 @@ tf-validate:
 
 # Validate every OpenSpec spec and change (strict)
 spec-validate:
-    @command -v openspec >/dev/null || { echo "openspec CLI missing: run 'just setup' (installs @fission-ai/openspec@{{openspec_version}})" >&2; exit 1; }
+    @command -v openspec >/dev/null || { echo "openspec CLI missing: run 'just install-tools' (installs @fission-ai/openspec@{{openspec_version}} through Deno)" >&2; exit 1; }
     OPENSPEC_NO_UPDATE_CHECK=1 openspec validate --all --strict --no-interactive
 
 # Regenerate the OpenSpec-managed skills after bumping openspec_version; commit the result

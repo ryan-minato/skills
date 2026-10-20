@@ -31,12 +31,14 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
-          node-version: "24"
-      - name: Install check tools (pins match the dev container and pre-commit)
-        run: python3 -m pip install --quiet pre-commit==4.6.2 rust-just==1.58.0 ruff==0.16.4
-      - name: Install pinned repository tools
+          deno-version: vx.x.x
+      - name: Install check tools (latest, as in the dev container)
+        run: python3 -m pip install --quiet pre-commit rust-just ruff
+      - name: Install the repository tools `just install-tools` names
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: just install-tools
       - name: Run every repository check
         run: just check
@@ -72,13 +74,13 @@ jobs:
             echo "No spec-related paths changed; nothing to validate."
           fi
       - if: steps.changed.outputs.run == 'true'
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
-          node-version: "24"
+          deno-version: vx.x.x
       - if: steps.changed.outputs.run == 'true'
         name: Install just and the pinned OpenSpec CLI
         run: |
-          python3 -m pip install --quiet rust-just==1.58.0
+          python3 -m pip install --quiet rust-just
           just install-tools
       - if: steps.changed.outputs.run == 'true'
         name: Validate strictly and refuse an unarchived related change
