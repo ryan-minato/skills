@@ -4,7 +4,7 @@
 
 # OpenSpec is the one pinned tool: the generated openspec-* skills must equal
 # this version's output byte for byte. Every other tool follows its latest
-# release. scripts/validate_harness.py checks that no other file names it.
+# release. The `tools` check in scripts/validate_harness.ts fails any other file naming it.
 openspec_version := "1.12.0"
 
 # Repository-local tool directory (ignored by git); recipes find tools here first.
@@ -60,7 +60,7 @@ install-opentofu:
 # Validate skill layout, harness synchronization, and catalog consistency
 validate:
     ./scripts/validate_skills.ts
-    python3 scripts/validate_harness.py
+    ./scripts/validate_harness.ts
 
 # Lint specific skill directories (spec + quality checks)
 check-skill +PATHS:

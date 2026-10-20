@@ -16,13 +16,13 @@ command that exists and passes locally; CI never chooses its own linters.
 | `issues / triage` | `issue-triage.yml` | `python3 scripts/sync_issue_metadata.py --event "$GITHUB_EVENT_PATH" --apply` | issue opened or edited | automation | Prints the label plan as JSON and applies it; exit 1 means a form answer did not map to a label in `.github/labels.json`. |
 | `labels / sync` | `labels-sync.yml` | `python3 scripts/sync_labels.py --file .github/labels.json --repo "$REPO" --apply`, then a summary of the plan | push to `main` touching `.github/labels.json`, `scripts/sync_labels.py`, or the workflow; weekly schedule; manual dispatch (`main` only) | automation | The repository's labels match `.github/labels.json` in name, color, and description; the summary counts created, updated, and unchanged labels, and each label on GitHub but not in the file is a warning, never a deletion. |
 
-Workflows allowed to use `pull_request_target`: `spec-labels.yml`.
-`scripts/validate_harness.py` reads this line (the `workflows` check) and
+Privileged workflows: `spec-labels.yml` (`pull_request_target`), `spec-command.yml` (`issue_comment`), `issue-triage.yml` (`issues`).
+`scripts/validate_harness.ts` reads this line (the `workflows` check) and
 fails any other workflow that uses the event, any workflow or job without
 an explicit `permissions:`, any action not pinned to a commit SHA, and a
 head checkout under `pull_request_target`.
 
-Required-check names are a stable interface: `scripts/validate_harness.py`
+Required-check names are a stable interface: `scripts/validate_harness.ts`
 fails when a workflow job name and this table disagree, and the ruleset
 (`.agents/knowledge/github-settings.md`) names `checks / gate`,
 `pr / policy`, and `scan-secrets`. Renaming one is three coordinated edits:
@@ -61,7 +61,7 @@ the dev container and pre-commit use: `ruff==0.16.4` (pre-commit rev
 `v0.16.4`), `rust-just` and `pre-commit` pinned in the workflows, and
 `@fission-ai/openspec` at the `openspec_version` of the `justfile`
 (`just install-tools`), as is OpenTofu at its `opentofu_version`, installed
-into the ignored `.tools/bin` for `just tf-validate`. `scripts/validate_harness.py` checks that the ruff
+into the ignored `.tools/bin` for `just tf-validate`. `scripts/validate_harness.ts` checks that the ruff
 pins agree in all three places. Bump them together; see
 `.agents/knowledge/harness-maintenance.md`.
 

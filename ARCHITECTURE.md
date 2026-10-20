@@ -163,7 +163,7 @@ GitHub registers (`github-checks.md`, `github-settings.md`), the
 synchronization and entropy register (`harness-maintenance.md`), the skill
 quality bar (`skill-quality.md`), and external URLs (`references.md`).
 `AGENTS.md` names every file with the condition that loads it;
-`scripts/validate_harness.py` fails when a knowledge file has no pointer,
+`scripts/validate_harness.ts` fails when a knowledge file has no pointer,
 and its `workflows` check keeps every workflow's permissions explicit,
 every action SHA-pinned, and `pull_request_target` confined to the
 workflows `github-checks.md` lists. `harness-maintenance.md` records the
@@ -216,7 +216,7 @@ may ready a pull request under the H1 policy; the maintainer merges.
 ## Quality Gates
 
 - `just check` = `validate` (`scripts/validate_skills.ts` +
-  `scripts/validate_harness.py`) + `lint` (ruff over `scripts/`, every
+  `scripts/validate_harness.ts`) + `lint` (ruff over `scripts/`, every
   `skills/*/*/scripts/`, and the script assets under `skills/meta/*/assets/`
   and `skills/sdd/*/assets/`; in all but the skills' own `scripts/`, a
   blind `except` and a `try`/`except`/`pass` fail it, and SIM105 is off so

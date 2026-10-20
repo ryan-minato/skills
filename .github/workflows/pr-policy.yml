@@ -18,6 +18,7 @@ jobs:
   policy:
     name: pr / policy
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
@@ -25,8 +26,11 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           fetch-depth: 0
+          persist-credentials: false
       - name: Fetch the pull request head for the commit-range check
         if: ${{ !github.event.pull_request.head.repo.fork }}
-        run: git fetch --no-tags origin "refs/pull/${{ github.event.pull_request.number }}/head"
+        env:
+          N: ${{ github.event.pull_request.number }}
+        run: git fetch --no-tags origin "refs/pull/$N/head"
       - name: Check the pull request against the template and commit convention
         run: python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"

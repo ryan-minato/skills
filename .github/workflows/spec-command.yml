@@ -29,6 +29,7 @@ jobs:
       && github.event.comment.user.type != 'Bot'
       && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       # The reply is an issue comment; reading the request and its files is a
@@ -40,6 +41,8 @@ jobs:
       # DEFAULT branch, so every script below comes from there, never from the
       # pull request.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - id: pr
         name: Resolve the pull request and snapshot its head through the API
         env:

@@ -26,6 +26,7 @@ jobs:
     name: spec / labels
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       pull-requests: write
@@ -36,6 +37,8 @@ jobs:
       # never executes it. Never add a checkout of the head, a `git fetch`
       # of it, an install from it, or a `run:` of its files.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Snapshot the head through the API
         env:
           # The token reaches only the two steps that call the API, so a step
