@@ -6,4 +6,4 @@
 
 ## 2. Verification
 
-- [ ] 2.1 Run the verification plan of `design.md` and `just check`
+- [x] 2.1 Run the verification plan of `design.md` and `just check`
