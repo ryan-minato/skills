@@ -149,12 +149,14 @@ and by the conversation.
 ## Permission entries
 
 Two configurations carry one policy: `.claude/settings.json` for Claude
-Code and `.codex/config.toml` with `.codex/rules/default.rules` for Codex.
-Both agents run in their classifier mode — Claude Code's auto mode, Codex
-with `approvals_reviewer = "auto_review"` — so a model reviewer, reading
-this knowledge base, judges every command no entry decides. A human prompt
-costs a review of an agent-written command and halts the run; under that
-load approval degrades into approving everything, so no entry asks.
+Code and `.codex/rules/default.rules` for Codex. Both agents run in their
+classifier mode — Claude Code's auto mode, Codex with
+`approvals_reviewer = "auto_review"` in the maintainer's global
+configuration, which also holds Codex's sandbox — so a model reviewer,
+reading this knowledge base, judges every command no entry decides. A
+human prompt costs a review of an agent-written command and halts the
+run; under that load approval degrades into approving everything, so no
+entry asks.
 
 - **deny** (`forbidden` for Codex) — a clear security risk: force,
   mirror, all-refs, and tag pushes and remote branch deletion; `gh pr
@@ -178,8 +180,9 @@ Prefix rules are fool-proofing against a careless agent, not a boundary:
 a reordered flag or a wrapper gets past them. The container is the
 boundary. The mode is the maintainer's setting: Claude Code ignores
 `defaultMode: "auto"` and `autoMode` in a project file (auto mode is its
-default starting mode), and Codex reads `.codex/` only for a trusted
-project. In Claude Code's Manual mode an unmatched command prompts, as
+default starting mode); Codex's approvals and sandbox live in the
+maintainer's global configuration, and its project rules load only for a
+trusted project. In Claude Code's Manual mode an unmatched command prompts, as
 before.
 
 ## Threat model

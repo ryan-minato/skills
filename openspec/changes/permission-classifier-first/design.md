@@ -13,7 +13,6 @@ See proposal.md for motivation.
 |---|---|---|
 | Policy | `agent-authority.md ## Permission entries` | readback; `just validate` |
 | Claude Code lists | `.claude/settings.json` | JSON parses; ask empty; each deny and allow entry traceable to the policy |
-| Codex config | `.codex/config.toml` | TOML parses; keys as listed in Context |
 | Codex rules | `.codex/rules/default.rules` | `codex execpolicy check` on one denied and one allowed command, when the CLI is available |
 | Threat model, register, calibration | `agent-authority.md ## Threat model`; `harness-maintenance.md` register row and `## Layer calibration` | readback |
 | Layout | `ARCHITECTURE.md` layout block | `just validate` (pointers) |
@@ -21,14 +20,14 @@ See proposal.md for motivation.
 ## External impact
 
 - `skills/**`: unchanged.
-- The maintainer's own settings: Claude Code runs in auto mode by default in current versions; Codex needs the project trusted and reads `approvals_reviewer` from the project file. Recorded in `agent-authority.md`, not committed as user settings.
+- The maintainer's global settings decide the mode and the sandbox: Claude Code runs in auto mode by default in current versions; Codex's `approvals_reviewer`, `approval_policy`, and sandbox stay in the maintainer's global `~/.codex/config.toml`, and the project's rules load only when it is trusted. Recorded in `agent-authority.md`, not committed.
 
 ## Decisions
 
 - **Ask empty**: a prompt on a command the classifier could judge buys no safety once approval fatigue sets in, and it halts the run. The publish rule stays in `AGENTS.md` and `agent-authority.md ## Publishing`, which the classifier reads. Rejected: keeping `git push` as the one ask — the push is pre-authorized per change already, so the prompt only re-confirms.
 - **Deny for clear risk only**: irreversible or authority-crossing acts (history rewrite on the remote, merge, approval, the approval label, repository settings and deletion, credential disclosure, privilege escalation, destroying local work). Kept as fool-proofing; the container stays the boundary.
 - **Allow only the per-task checks**: they run repository code the agent edits anyway, run on every task, and are documented commands; the built-in read-only set covers `git status`, `git diff`, `gh pr view`, and the like. Rejected: the broad read allows — they skip the classifier for nothing.
-- **Codex `workspace-write` with network**: every task needs `gh`, `git push`, and Deno's registry; a network-less sandbox would turn each into an escalation. The reviewer judges escalations; the container stays the boundary.
+- **Codex approvals and sandbox stay global** (the maintainer's direction): the project adds only command rules; `.codex/config.toml` keeps only the MCP server. Rejected: a project-level `approval_policy`, reviewer, and sandbox — they would override the maintainer's global choice per repository.
 
 ## Risks / Trade-offs
 
@@ -40,7 +39,7 @@ See proposal.md for motivation.
 
 Script and tool harnesses:
 - `.claude/settings.json` parses; `permissions.ask` is empty; allow has only the listed recipes; each deny entry maps to a policy item.
-- `.codex/config.toml` parses as TOML (`python3 -c 'import tomllib'`); `.codex/rules/default.rules` checked with `codex execpolicy check` when the CLI is installed, else skipped with the reason.
+- `.codex/config.toml` unchanged from `main`; `.codex/rules/default.rules` checked with `codex execpolicy check` when the CLI is installed, else skipped with the reason.
 - `just check` passes.
 - Clean-context readback of `agent-authority.md ## Permission entries`: which commands are refused, which run unreviewed, and who judges the rest.
 
