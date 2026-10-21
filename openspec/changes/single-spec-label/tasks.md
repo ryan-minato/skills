@@ -1,7 +1,7 @@
 ## 1. The state label
 
-- [ ] 1.1 `scripts/spec_approval.ts`: `STATE_LABELS`, the state decision of design.md `## The state label` (head tree, file list, the `spec/pending` withdrawal), writes that add the wanted state and remove the others, fail closed with `spec/pending` on an open pull request; header, usage, and the record's wording
-- [ ] 1.2 `scripts/spec_approval_test.ts`: one case per row of the state table, a package change after the recorded commit, a `tasks.md`-only change and an archive commit, the `spec/pending` withdrawal, write order, both fail-closed paths, the file-list read
+- [x] 1.1 `scripts/spec_approval.ts`: `STATE_LABELS`, the state decision of design.md `## The state label` (head tree, file list, the `spec/pending` withdrawal), writes that add the wanted state and remove the others, fail closed with `spec/pending` on an open pull request; header, usage, and the record's wording
+- [x] 1.2 `scripts/spec_approval_test.ts`: one case per row of the state table, a package change after the recorded commit, a `tasks.md`-only change and an archive commit, the `spec/pending` withdrawal, write order, both fail-closed paths, the file-list read
 
 ## 2. The labels workflow and the taxonomy
 
