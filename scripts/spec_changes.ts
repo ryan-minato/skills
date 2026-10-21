@@ -1,17 +1,15 @@
 #!/usr/bin/env -S deno run --no-prompt --allow-read --allow-write --allow-run=git,openspec --allow-env=GH_TOKEN,GITHUB_TOKEN,GITHUB_API_URL,OPENSPEC_NO_UPDATE_CHECK --allow-net=api.github.com
 // Operate on the OpenSpec changes a pull request touches.
 //
-// This repository's own management script: `checks / spec` and `spec / labels` call it,
-// `just spec-check` and `just spec-changes` wrap it, and the archive executor runs its `archive` command.
-// It exports its label taxonomy (MANAGED_LABELS) for `scripts/validate_harness.ts` to import.
+// This repository's own management script: `checks / spec` and `checks / archive-verdict` (the base's copy) call
+// it, `just spec-check` and `just spec-changes` wrap it, and the archive executor runs its `archive` command.
 //
 // Commands (global options --root DIR and --changes-dir DIR go before the command):
 //   snapshot --repo OWNER/NAME --pr N [--out FILE] [--api-url URL] [--max-files N] [--max-file-bytes N]
 //            [--max-total-bytes N] [--max-calls N]          build a head snapshot from the GitHub REST API
 //   status   SOURCE [--change NAME]... [--json]             progress table of the related changes
-//   check    SOURCE | --all  [--draft] [--shape combined|split] [--no-validate] [--openspec EXE]
+//   check    SOURCE | --all  [--shape combined|split] [--no-validate] [--openspec EXE]
 //   archive  --base REF --head REF [--dry-run] [--json] [--openspec EXE]   archive every complete change
-//   labels   SOURCE [--current A,B] [--json] | --taxonomy   the archive-axis and progress-axis labels
 // SOURCE is `--base REF --head REF` (git plumbing) or `--snapshot FILE` (from the snapshot command).
 //
 // A request's *related changes* are the directories under the changes directory (default `openspec/changes/`)
@@ -30,7 +28,7 @@
 // Exit codes: 0 success; 1 a failure, a finding, or a refusal; 2 bad arguments, an unknown change name
 // included. An unexpected error ends with its stack trace (exit 1).
 //
-// It runs beside a write token in `spec / labels`, so it imports local modules only.
+// It runs in `checks / archive-verdict` over a pull request's objects, so it imports local modules only.
 // Permissions: read and write anywhere (the snapshot file is caller-named, under $RUNNER_TEMP in CI), git and
 // the OpenSpec CLI, the two token variables, GITHUB_API_URL, OPENSPEC_NO_UPDATE_CHECK, and api.github.com.
 import { parseArgs } from "./lib/args.ts";
@@ -48,13 +46,6 @@ const ARCHIVE_DATE = /^\p{Nd}{4}-\p{Nd}{2}-\p{Nd}{2}-/u;
 const WS_RUN = new RegExp(`${WS}+`);
 const WS_LEAD = new RegExp(`^${WS}+`);
 const WS_TRAIL = new RegExp(`${WS}+$`);
-
-/** The archive axis: one of the two is on every request with a live related change. */
-export const ARCHIVED_LABELS = ["spec/unarchived", "spec/archived"] as const;
-/** The progress axis. */
-export const PROGRESS_LABELS = ["spec/not-started", "spec/in-progress", "spec/done"] as const;
-/** Every label `labels` may add or remove; `labels --taxonomy` prints it. */
-export const MANAGED_LABELS: readonly string[] = [...ARCHIVED_LABELS, ...PROGRESS_LABELS];
 
 export const SNAPSHOT_SCHEMA = "spec-snapshot/1";
 type Kind = "object" | "list" | "string";
@@ -909,17 +900,6 @@ export function statusMarkdown(changes: Change[]): string {
     return lines.join("\n") + "\n";
 }
 
-export function desiredLabels(changes: Change[]): string[] {
-    const live = changes.filter((c) => c.state !== "removed");
-    if (!live.length) return [];
-    const archived = live.every((c) => c.state === "archived") ? ARCHIVED_LABELS[1] : ARCHIVED_LABELS[0];
-    const progressSet = new Set(live.map((c) => c.tasks.progress));
-    let progress: string = PROGRESS_LABELS[1];
-    if (progressSet.size === 1 && progressSet.has("done")) progress = PROGRESS_LABELS[2];
-    else if (progressSet.size === 1 && progressSet.has("not-started")) progress = PROGRESS_LABELS[0];
-    return [archived, progress];
-}
-
 // --- commands ----------------------------------------------------------------------------------------------
 
 /** Where the commands write and what they read from the environment; tests replace it. */
@@ -944,7 +924,7 @@ export const realIo: Io = {
     sleep: (ms) => new Promise((done) => setTimeout(done, ms)),
 };
 
-const COMMANDS = ["snapshot", "status", "check", "archive", "labels"] as const;
+const COMMANDS = ["snapshot", "status", "check", "archive"] as const;
 type CommandName = typeof COMMANDS[number];
 
 /** The parsed command line, with the original's defaults. */
@@ -958,13 +938,10 @@ export interface Options {
     change: string[];
     json: boolean;
     all: boolean;
-    draft: boolean;
     shape: string;
     noValidate: boolean;
     openspec: string;
     dryRun: boolean;
-    current: string;
-    taxonomy: boolean;
     repo: string;
     pr: number;
     out?: string;
@@ -1099,23 +1076,14 @@ function cmdCheck(opts: Options, root: string, changesDir: string, io: Io): numb
         }
     } else {
         for (const c of relatedChanges(source, changesDir)) {
+            // Waiting for the archive is a state, not a failure: the archive gate withholds `checks / archived`
+            // until no related change is unarchived, so the merge waits and nothing here turns red.
             if (c.state === "active") {
-                const message = `unarchived change ${c.name}: ${c.tasks.open} open task(s) — archive it in this ` +
-                    "pull request once the deliberation on the finished implementation closes; " +
-                    "the request stays red until then.";
-                // The one request that may merge with an unarchived record is the split shape's specification
-                // request: it carries the record and no implementation, and the implementation requests that
-                // follow archive it. A request that implemented something is not that request, whatever its shape.
-                if (opts.draft) {
-                    io.out(`warning: ${message}\n`);
-                } else if (split && c.tasks.done === 0) {
-                    io.out(
-                        `warning: unarchived change ${c.name} carries no implemented task; ` +
-                            "allowed for a specification request under the split shape.\n",
-                    );
-                } else {
-                    findings.push(message);
-                }
+                io.out(
+                    `warning: unarchived change ${c.name}: ${c.tasks.open} open task(s) — archive it in this pull ` +
+                        "request once the deliberation on the finished implementation closes; until then the " +
+                        "archive gate holds the merge.\n",
+                );
             } else if (c.state === "archived" && c.tasks.open) {
                 io.out(`warning: archived change ${c.name} still has ${c.tasks.open} open task(s).\n`);
             }
@@ -1197,25 +1165,6 @@ function cmdArchive(opts: Options, root: string, changesDir: string, io: Io): nu
     return 0;
 }
 
-function cmdLabels(opts: Options, root: string, changesDir: string, io: Io): number {
-    if (opts.taxonomy) {
-        io.out(pyJson({ managed: MANAGED_LABELS }) + "\n");
-        return 0;
-    }
-    const desired = desiredLabels(relatedChanges(needSource(opts, root, changesDir), changesDir));
-    const current = opts.current.split(",").map(pyStrip).filter((label) => label !== "");
-    const add = desired.filter((label) => !current.includes(label));
-    const remove = current.filter((label) => MANAGED_LABELS.includes(label) && !desired.includes(label));
-    if (opts.json) {
-        io.out(pyJson({ desired, add, remove }) + "\n");
-    } else {
-        io.out(`desired: ${desired.join(" ") || "(none)"}\n`);
-        io.out(`add: ${add.join(" ") || "(none)"}\n`);
-        io.out(`remove: ${remove.join(" ") || "(none)"}\n`);
-    }
-    return 0;
-}
-
 // --- argument parsing --------------------------------------------------------------------------------------
 
 const SOURCE_HELP = `head source (one of):
@@ -1227,14 +1176,13 @@ const SOURCE_HELP = `head source (one of):
 const HELP: Record<CommandName | "main", string> = {
     main: `usage: spec_changes.ts [-h] [--root ROOT] [--changes-dir CHANGES_DIR] <command> ...
 
-Resolve, check, archive, and label the OpenSpec changes a pull request touches.
+Resolve, check, and archive the OpenSpec changes a pull request touches.
 
 commands:
   snapshot              build a head snapshot from the GitHub REST API (no checkout, no fetch)
   status                print a progress table (markdown) for the related changes
   check                 strict validation plus the unarchived-change rule
   archive               archive every complete related change through the OpenSpec CLI
-  labels                compute the archive-axis and progress-axis labels
 
 options (before the command):
   -h, --help            show this help message and exit
@@ -1244,8 +1192,7 @@ options (before the command):
 
 Run \`spec_changes.ts <command> --help\` for a command's options.
 Examples: scripts/spec_changes.ts status --base origin/main --head HEAD; scripts/spec_changes.ts snapshot --repo
-owner/name --pr 12 --out snapshot.json; scripts/spec_changes.ts labels --snapshot snapshot.json --current
-'spec/unarchived'
+owner/name --pr 12 --out snapshot.json; scripts/spec_changes.ts status --snapshot snapshot.json --json
 Exit codes: 0 success; 1 a failure, a finding, or a refusal; 2 bad arguments.
 `,
     snapshot: `usage: spec_changes.ts snapshot [-h] --repo REPO --pr PR [--out OUT] [--api-url API_URL]
@@ -1275,19 +1222,19 @@ options:
   --json                print the changes as JSON
 
 ${SOURCE_HELP}`,
-    check: `usage: spec_changes.ts check [-h] [--base BASE] [--head HEAD] [--snapshot SNAPSHOT] [--all] [--draft]
+    check: `usage: spec_changes.ts check [-h] [--base BASE] [--head HEAD] [--snapshot SNAPSHOT] [--all]
                              [--shape {combined,split}] [--no-validate] [--openspec OPENSPEC]
 
-Strict validation plus the unarchived-change rule.
+Strict validation plus the unarchived-change rule. With a head source, an unarchived related change is a
+warning, never a failure: the archive gate (\`checks / archived\`) holds the merge instead.
 
 options:
   -h, --help            show this help message and exit
   --all                 fail on any change outside archive/ (integration branch)
-  --draft               report unarchived related changes as warnings
   --shape {combined,split}
                         the change request shape the project's contract records (default: combined). Under
-                        split, a related change with no implemented task is allowed unarchived: that is the
-                        specification request, which the implementation requests archive later.
+                        split, --all only warns on an unarchived change: the integration branch holds every
+                        approved record whose implementation has not landed yet.
   --no-validate         skip the OpenSpec validator
   --openspec OPENSPEC   OpenSpec CLI executable (default: openspec)
 
@@ -1305,18 +1252,6 @@ options:
   --json                print the plan as JSON
 
 ${SOURCE_HELP}`,
-    labels: `usage: spec_changes.ts labels [-h] [--base BASE] [--head HEAD] [--snapshot SNAPSHOT] [--current CURRENT]
-                              [--taxonomy] [--json]
-
-Compute the archive-axis and progress-axis labels.
-
-options:
-  -h, --help            show this help message and exit
-  --current CURRENT     comma-separated labels currently on the request
-  --taxonomy            print the managed label names
-  --json                print the plan as JSON
-
-${SOURCE_HELP}`,
 };
 
 const SOURCE_OPTIONS = ["base", "head", "snapshot"];
@@ -1326,9 +1261,8 @@ const SPECS: Record<CommandName, { string: string[]; boolean: string[]; multiple
         boolean: [],
     },
     status: { string: SOURCE_OPTIONS, boolean: ["json"], multiple: ["change"] },
-    check: { string: [...SOURCE_OPTIONS, "shape", "openspec"], boolean: ["all", "draft", "no-validate"] },
+    check: { string: [...SOURCE_OPTIONS, "shape", "openspec"], boolean: ["all", "no-validate"] },
     archive: { string: [...SOURCE_OPTIONS, "openspec"], boolean: ["dry-run", "json"] },
-    labels: { string: [...SOURCE_OPTIONS, "current"], boolean: ["taxonomy", "json"] },
 };
 
 function positive(name: string, value: string): number {
@@ -1372,7 +1306,7 @@ export function parseCommandLine(argv: string[], env: (name: string) => string |
     }
     const command = argv[i];
     if (command === undefined) {
-        throw new UsageError("a command is required: snapshot, status, check, archive, or labels");
+        throw new UsageError("a command is required: snapshot, status, check, or archive");
     }
     if (!(COMMANDS as readonly string[]).includes(command)) {
         throw new UsageError(
@@ -1409,13 +1343,10 @@ export function parseCommandLine(argv: string[], env: (name: string) => string |
         change: name === "status" ? parsed.lists.change : [],
         json: flag("json"),
         all: flag("all"),
-        draft: flag("draft"),
         shape: v.shape === undefined ? "combined" : choice("shape", v.shape, ["combined", "split"]),
         noValidate: flag("no-validate"),
         openspec: v.openspec ?? "openspec",
         dryRun: flag("dry-run"),
-        current: v.current ?? "",
-        taxonomy: flag("taxonomy"),
         repo: v.repo ?? "",
         pr: number("pr", 0),
         out: v.out,
@@ -1450,7 +1381,6 @@ const HANDLERS: Record<CommandName, Handler> = {
     status: cmdStatus,
     check: cmdCheck,
     archive: cmdArchive,
-    labels: cmdLabels,
 };
 
 export async function main(argv: string[], io: Io = realIo): Promise<number> {

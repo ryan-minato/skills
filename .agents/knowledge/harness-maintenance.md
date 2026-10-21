@@ -28,7 +28,7 @@ are the pairs no script checks, or checks only in part.
 | a third-party `uses:` in a workflow or `.github/actions/*` | the Actions allowlist row in `github-settings.md` | author | an action is added or dropped |
 | a privileged trigger in a workflow | the `## Privileged workflows` line in `github-checks.md` (`workflows` check) | author | a workflow adopts or drops one |
 | a workflow job holding a write token | the write-token script list in `management-code.md` `## Workflow security` | author | a job gains a write permission |
-| an `ask` or `deny` entry in `.claude/settings.json` | its reason in `agent-authority.md` `## Permission entries` | author | an entry is added or removed |
+| an `allow` or `deny` entry in `.claude/settings.json` | the same rule in `.codex/rules/default.rules`; `agent-authority.md` `## Permission entries` | author | an entry is added or removed |
 | a remote setting | its row in `github-settings.md` | maintainer | every applied setting, read back |
 | `skills/machine-learning/experiment-provenance/assets/run_manifest.py` | `skills/scaffold/scaffold-ml/assets/run_manifest.py`, byte-identical | author | `cmp` them when either changes |
 | `##` headings of `research-workflow/assets/research-spec.md` | `skills/scaffold/scaffold-ml/assets/openspec/research-task/templates/research.md` | author | a research-spec field changes |
@@ -53,7 +53,7 @@ attended at H1, team one maintainer plus agents.
 | Environment and sandbox | medium | isolation: container with the latest tools, no mounts, `gh` only; `checks / devcontainer` builds it |
 | Knowledge and routing | thick | horizon: one owner per rule, entrypoint in budget; `pointers` and `budget` checks |
 | Hard gates | thick | error cost: pre-commit, tested management scripts, parsed `workflows` check, commit-range scan, three required checks |
-| Authorization boundary | medium | autonomy attended: H1, `ask` and `deny` entries, approval label kept by automation; thick only if a run is unattended |
+| Authorization boundary | medium | autonomy attended: H1, the agents' classifiers, deny entries, approval label kept by automation; thick only if a run is unattended |
 | Specification and completion criteria | thick | error cost and horizon: OpenSpec strict, two deliberations, the approval label recomputed |
 | Entropy management | medium | horizon: this register, two validators, budget check; duplication is found only by the review below |
 

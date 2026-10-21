@@ -18,8 +18,8 @@ import {
     frontmatter,
     Harness,
     importSpecifiers,
+    jobNames,
     justRecipes,
-    labelsCaseLine,
     main,
     markdownSection,
     pathLike,
@@ -34,7 +34,7 @@ import {
     writeGrants,
 } from "./validate_harness.ts";
 import { ROOT, run } from "./lib/repo.ts";
-import { MANAGED_LABELS } from "./spec_changes.ts";
+import { LABEL, STATE_LABELS } from "./spec_approval.ts";
 
 // --- fixture helpers ---------------------------------------------------------------------------------
 
@@ -752,124 +752,75 @@ Deno.test("suite: markdownSection stops at the next level-2 heading or the end",
     assertEquals(markdownSection("# T\n", "## Evidence discipline"), null);
 });
 
-const SPEC_WORKFLOW = `on: pull_request_target
-jobs:
-  labels:
-    steps:
-      - run: |
-          check() {
-            case "$1" in
-              spec/archived|spec/done) ;;
-              *) exit 1 ;;
-            esac
-          }
-`;
+const STATES = ["spec/pending", "spec/approved", "spec/archived"];
 
-function specDeps(managed: string[]): Deps {
-    return { ...noDeps, taxonomy: () => ({ managed }) };
+function specDeps(states: string[] = STATES, approval = "spec/approved"): Deps {
+    return { ...noDeps, taxonomy: () => ({ states, approval }) };
 }
 
-const SPEC_APPROVAL_SCRIPT = 'import { x } from "./lib/x.ts";\n\nexport const LABEL = "spec/approved";\n';
-const APPROVAL_ROW = { name: "spec/approved", applied_by: "maintainer" };
+const STATE_ROWS = [
+    { name: "spec/pending", applied_by: "workflow" },
+    { name: "spec/approved", applied_by: "maintainer" },
+    { name: "spec/archived", applied_by: "workflow" },
+];
 
-Deno.test("spec labels: the taxonomy, labels.json, and the case list agree", () => {
-    const files = {
-        ".github/labels.json": JSON.stringify([
-            { name: "spec/archived", applied_by: "workflow" },
-            { name: "spec/done", applied_by: "workflow" },
-            APPROVAL_ROW,
-        ]),
-        ".github/workflows/spec-labels.yml": SPEC_WORKFLOW,
-        "scripts/spec_approval.ts": SPEC_APPROVAL_SCRIPT,
-    };
-    assertEquals(findings(files, checkSpecLabels, specDeps(["spec/archived", "spec/done"])).errors, []);
-    const drift = findings(files, checkSpecLabels, specDeps(["spec/archived", "spec/done", "spec/new"])).errors;
-    assertEquals(drift.length, 2);
-    assertStringIncludes(drift[0], "lacks 'spec/new'");
-    assertStringIncludes(drift[1], "admits ['spec/archived', 'spec/done']");
-    const human = {
-        ...files,
-        ".github/labels.json": JSON.stringify([
-            { name: "spec/archived", applied_by: "human" },
-            { name: "spec/done", applied_by: "workflow" },
-            APPROVAL_ROW,
-        ]),
-    };
-    assertStringIncludes(
-        findings(human, checkSpecLabels, specDeps(["spec/archived", "spec/done"])).errors[0],
-        "must say applied_by workflow",
-    );
-});
+const stateLabelFiles = (rows: unknown[]) => ({ ".github/labels.json": JSON.stringify(rows) });
 
-Deno.test("spec labels: the approval label is the maintainer's, outside the spec_changes taxonomy", () => {
-    const managed = specDeps(["spec/archived", "spec/done"]);
-    const files = (rows: unknown[], script = SPEC_APPROVAL_SCRIPT) => ({
-        ".github/labels.json": JSON.stringify([
-            { name: "spec/archived", applied_by: "workflow" },
-            { name: "spec/done", applied_by: "workflow" },
-            ...rows,
-        ]),
-        ".github/workflows/spec-labels.yml": SPEC_WORKFLOW,
-        "scripts/spec_approval.ts": script,
-    });
-    assertEquals(findings(files([APPROVAL_ROW]), checkSpecLabels, managed).errors, []);
-    assertEquals(findings(files([]), checkSpecLabels, managed).errors, [
-        ".github/labels.json lacks 'spec/approved', which scripts/spec_approval.ts keeps; add the row, applied_by " +
+Deno.test("spec labels: labels.json declares exactly the state labels, the approval label the maintainer's", () => {
+    assertEquals(findings(stateLabelFiles(STATE_ROWS), checkSpecLabels, specDeps()).errors, []);
+    // A state the script writes and labels.json lacks.
+    assertEquals(findings(stateLabelFiles(STATE_ROWS.slice(1)), checkSpecLabels, specDeps()).errors, [
+        ".github/labels.json lacks 'spec/pending', which scripts/spec_approval.ts writes; add the row, applied_by " +
+        "workflow.",
+    ]);
+    assertEquals(findings(stateLabelFiles([STATE_ROWS[0], STATE_ROWS[2]]), checkSpecLabels, specDeps()).errors, [
+        ".github/labels.json lacks 'spec/approved', which scripts/spec_approval.ts writes; add the row, applied_by " +
         "maintainer.",
     ]);
-    assertEquals(findings(files([{ ...APPROVAL_ROW, applied_by: "workflow" }]), checkSpecLabels, managed).errors, [
+    // A retired axis label, or any other spec/* label, is not exempt, whoever applies it.
+    for (const applier of ["workflow", "maintainer"]) {
+        assertEquals(
+            findings(
+                stateLabelFiles([...STATE_ROWS, { name: "spec/frozen", applied_by: applier }]),
+                checkSpecLabels,
+                specDeps(),
+            )
+                .errors,
+            [
+                ".github/labels.json: 'spec/frozen' is not a state label scripts/spec_approval.ts writes; remove it or " +
+                "teach the script.",
+            ],
+        );
+    }
+    // The approval label is the maintainer's; the others the workflow's.
+    const swapped = [
+        { name: "spec/pending", applied_by: "human" },
+        { name: "spec/approved", applied_by: "workflow" },
+        STATE_ROWS[2],
+    ];
+    assertEquals(findings(stateLabelFiles(swapped), checkSpecLabels, specDeps()).errors, [
+        ".github/labels.json: the state label 'spec/pending' must say applied_by workflow.",
         ".github/labels.json: the approval label 'spec/approved' must say applied_by maintainer.",
     ]);
-    // Another spec/* label applied by the maintainer is not exempt.
-    assertEquals(
-        findings(files([APPROVAL_ROW, { name: "spec/frozen", applied_by: "maintainer" }]), checkSpecLabels, managed)
-            .errors,
-        [
-            ".github/labels.json: 'spec/frozen' is not a label scripts/spec_changes.ts declares; remove it or teach " +
-            "the script.",
-        ],
+    // An approval label outside the states is a mistake in the script.
+    assertStringIncludes(
+        findings(stateLabelFiles(STATE_ROWS), checkSpecLabels, specDeps(STATES, "spec/agreed")).errors[0],
+        "the approval label 'spec/agreed' is not one of its STATE_LABELS",
     );
-    // The label follows the script: renamed there, the old row is undeclared and the new one missing.
-    const renamed = findings(
-        files([APPROVAL_ROW], SPEC_APPROVAL_SCRIPT.replace("spec/approved", "spec/agreed")),
-        checkSpecLabels,
-        managed,
-    ).errors;
-    assertEquals(renamed.length, 2, renamed.join("\n"));
-    assertStringIncludes(renamed[0], "lacks 'spec/agreed', which scripts/spec_approval.ts keeps");
-    assertStringIncludes(renamed[1], "'spec/approved' is not a label scripts/spec_changes.ts declares");
-    // spec_changes.ts may never plan it.
-    const planned = findings(
-        files([APPROVAL_ROW]),
-        checkSpecLabels,
-        specDeps(["spec/archived", "spec/done", "spec/approved"]),
-    ).errors;
-    assertStringIncludes(planned[0], "scripts/spec_changes.ts declares 'spec/approved', which only");
 });
 
-Deno.test("spec labels: spec_approval.ts without its LABEL line, or missing, stops the run", () => {
-    const variants: Record<string, string>[] = [{ "scripts/spec_approval.ts": "export const OTHER = 1;\n" }, {}];
-    for (const extra of variants) {
-        const root = fixture({
-            ".github/labels.json": "[]",
-            ".github/workflows/spec-labels.yml": SPEC_WORKFLOW,
-            ...extra,
-        });
-        try {
-            assertThrows(
-                () => checkSpecLabels(new Harness(root, specDeps([]))),
-                ShapeError,
-                "scripts/spec_approval.ts",
-            );
-        } finally {
-            cleanup(root);
-        }
+Deno.test("spec labels: a taxonomy of the wrong shape stops the run; the real one is spec_approval.ts's", () => {
+    const root = fixture(stateLabelFiles(STATE_ROWS));
+    try {
+        assertThrows(
+            () => checkSpecLabels(new Harness(root, { ...noDeps, taxonomy: () => ({ managed: [] }) })),
+            ShapeError,
+            "scripts/spec_approval.ts",
+        );
+    } finally {
+        cleanup(root);
     }
-});
-
-Deno.test("spec labels: no case list stops the run; the real taxonomy is spec_changes.ts's", () => {
-    assertThrows(() => labelsCaseLine({ jobs: { a: { steps: [{ run: "echo" }] } } }), ShapeError, "no literal `case`");
-    assertEquals(realDeps.taxonomy(ROOT), { managed: [...MANAGED_LABELS] });
+    assertEquals(realDeps.taxonomy(ROOT), { states: [...STATE_LABELS], approval: LABEL });
 });
 
 Deno.test("checks doc: job names and the table agree both ways", () => {
@@ -886,6 +837,21 @@ Deno.test("checks doc: job names and the table agree both ways", () => {
         assertThrows(() => checkChecksDoc(new Harness(root, noDeps)), ShapeError, "no top-level jobs");
     } finally {
         cleanup(root);
+    }
+});
+
+Deno.test("checks doc: a conditional job name counts as both of its names; any other expression stops the run", () => {
+    const carrier = "jobs:\n  carry:\n    name: ${{ needs.v.outputs.ok == 'true' && 'a / done' || 'a / waiting' }}\n";
+    const both = "| `a / done` | x |\n| `a / waiting` | y |\n";
+    const files = { ".github/workflows/a.yml": carrier, ".agents/knowledge/github-checks.md": both };
+    assertEquals(findings(files, checkChecksDoc).errors, []);
+    assertEquals(
+        findings({ ...files, ".agents/knowledge/github-checks.md": "| `a / done` | x |\n" }, checkChecksDoc).errors,
+        ["workflow job 'a / waiting' is not in the table of .agents/knowledge/github-checks.md."],
+    );
+    assertEquals(jobNames("w", "plain / name"), ["plain / name"]);
+    for (const name of ["${{ matrix.os }}", "build ${{ matrix.os }}", "${{ a && 'x' }}"]) {
+        assertThrows(() => jobNames("w", name), ShapeError, "is an expression other than");
     }
 });
 

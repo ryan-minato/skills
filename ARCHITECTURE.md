@@ -15,9 +15,10 @@ skills/<catalog>/<skill-name>/   Public, distributable skills
   knowledge/                     Rules and registers, each with a pointer in AGENTS.md
 openspec/                        Specifications: specs/ (source of truth), changes/, changes/archive/
 .claude/skills -> ../.agents/skills
-.claude/settings.json            Claude Code permission entries (allow, ask, deny)
+.claude/settings.json            Claude Code permission entries (allow, deny)
 .claude-plugin/marketplace.json  Plugin marketplace (one plugin per catalog)
 .codex/config.toml               agentskills MCP server (Codex)
+.codex/rules/default.rules       Codex command rules (forbidden, allow)
 .mcp.json                        agentskills MCP server (Claude Code)
 .devcontainer/                   Dev container: latest tools, MCP server, `just setup` on create
 .github/                         Issue forms, PR template, workflows, labels, health files
@@ -190,19 +191,26 @@ them is `.agents/knowledge/spec-workflow.md`.
 
 The OpenSpec CLI runs through Deno at the version the `justfile` pins:
 `just install-tools` installs it into the ignored .tools/bin,
-`just spec-validate` runs its strict validator, `just spec-check` adds the
-unarchived-change rule for the changes a branch touches, and
+`just spec-validate` runs its strict validator, `just spec-check` adds a
+warning for each unarchived change a branch touches, and
 `just spec-sync` regenerates the `openspec-*` skills.
 `scripts/spec_changes.ts` is the related-change tool behind
-`just spec-changes` (`snapshot`, `status`, `check`, `archive`, `labels`);
-`checks / spec` and `spec / labels` run it.
+`just spec-changes` (`snapshot`, `status`, `check`, `archive`);
+`checks / spec` and `checks / archive-verdict`, which runs the base's
+copy, use it. The archive gate holds a pull request into
+`main` with an unarchived change on the required `checks / archived`,
+which its carrier job reports only once nothing is unarchived; waiting
+is never a failing check (`.agents/knowledge/github-checks.md`
+`## No standing failure`).
 
-The package approval is the label `spec/approved`. The maintainer adds it;
-`spec / labels` then runs `scripts/spec_approval.ts`, which decides from
-the pull request's current labels and timeline, writes one record comment
-as `github-actions[bot]` naming the approved head, the account, and the
-label event, and withdraws the label when the package changes after the
-recorded head, when a run fails, or when its deciding step times out.
+A pull request carries one specification-state label: `spec/pending`,
+`spec/approved`, `spec/archived`, or none. The package approval is
+`spec/approved`. The maintainer adds it; `spec / labels` then runs
+`scripts/spec_approval.ts`, which decides from the pull request's head
+and base trees, file list, labels, and timeline, writes one record comment as
+`github-actions[bot]` naming the approved head, the account, and the
+label event, and puts `spec/pending` back when the package changes after
+the recorded head, when a run fails, or when its deciding step times out.
 `just spec-approval <n>` recomputes the state without writing. The rules
 around the label are in `.agents/knowledge/spec-workflow.md`
 `## Approval gates`.
@@ -222,7 +230,9 @@ reads a pull request's review threads through one fixed GraphQL query.
 
 Where each workflow finds its code:
 
-- `checks / *` and `scan-secrets` run the pull request's own copy.
+- `checks / *` and `scan-secrets` run the pull request's own copy, except
+  that `checks / archive-verdict` checks out the base and runs the base's
+  `scripts/spec_changes.ts` over the fetched head.
 - `pr / policy` takes its workflow file from the pull request's merge ref
   but checks out the base and runs the base's script, so a change to its
   script takes effect from the next pull request.

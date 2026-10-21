@@ -1,6 +1,12 @@
 #!/usr/bin/env -S deno run --no-prompt --allow-run=gh --allow-env=PR_NUMBER,EVENT_ACTION,EVENT_LABEL,EVENT_SENDER,EVENT_HEAD
-// Keeps the `spec/approved` label of one pull request: the maintainer's approval of the OpenSpec
-// approval package (.agents/knowledge/spec-workflow.md, ## Approval gates).
+// Keeps the one specification-state label of a pull request (.agents/knowledge/spec-workflow.md,
+// ## Approval gates): `spec/approved` while the pull request holds an unarchived change of its own and the
+// maintainer's approval of its package holds, `spec/pending` while it holds one and the approval does not,
+// `spec/archived` when it holds none and adds a path under openspec/changes/archive/, and none otherwise.
+// Its own changes are the unarchived changes at the head that the base does not hold identically, so a
+// pull request into another pull request's branch answers only for what it brings. When the file list is
+// cut short and the pull request holds no change of its own, `spec/archived` is left as it is. The wanted
+// label is added, then every other state label removed.
 //
 //   scripts/spec_approval.ts <n>        print the state the rules give now and the writes they call for;
 //                                       writes nothing (`just spec-approval <n>`)
@@ -8,30 +14,33 @@
 //                                       the pull request and its event come from PR_NUMBER, EVENT_ACTION,
 //                                       EVENT_LABEL, EVENT_SENDER, and EVENT_HEAD; makes the writes
 //
-// The rules. The run started by a person adding `spec/approved` records the approval in one comment
-// from github-actions[bot] (the approved commit, the account, the id of the label event) when the pull
-// request is open, its head is still the commit the event named, that adding is the latest adding of
-// the label by a person and no person removed the label after it, the account has write or admin
-// permission, the head holds at least one unarchived change and no link or submodule in the package,
-// at most one record comment exists, and all of that still holds when the pull request and its label
-// history are read again at the end. Every other run decides from the pull request's present labels,
-// label history, and comments, not from its event: the label holds while exactly one record from
-// github-actions[bot] answers the latest adding by a person, is not withdrawn, no person removed the
-// label after that adding, and the approval package at the head equals the package at the recorded
-// commit. Otherwise the label is removed and every live record is marked withdrawn (fail closed). A
-// closed pull request is never written to by a run that succeeds.
+// The approval rules, which apply while the pull request holds a change of its own. The run started by a
+// person adding `spec/approved` records the approval in one comment from github-actions[bot] (the
+// approved commit, the account, the id of the label event) when the pull request is open, its head is
+// still the commit the event named, that adding is the latest adding of the label by a person and no
+// person withdrew it after (removed `spec/approved` or added `spec/pending`), the account has write or
+// admin permission, the package holds no link or submodule, at most one record comment exists, and all
+// of that still holds when the pull request and its label history are read again at the end. Every
+// other run decides from the pull request's present labels, label history, and comments, not from its
+// event: the approval holds while `spec/approved` is on the pull request, exactly one record from
+// github-actions[bot] answers the latest adding by a person, is not withdrawn, no person withdrew it
+// after that adding, and the approval package at the head equals the package at the recorded commit.
+// Otherwise the state is `spec/pending` and every live record is marked withdrawn (fail closed). With
+// no change of its own, no record is written; a person's withdrawal after the latest adding still holds
+// when the pull request archives its change: the state is `spec/pending` and every live record is marked
+// withdrawn. A closed pull request is never written to by a run that succeeds.
 //
-// The approval package of a commit: every path under each unarchived change in openspec/changes/
+// The approval package of a commit: every path under each of the pull request's own changes in openspec/changes/
 // except its own tasks.md, by mode and blob, and openspec/specs/<capability>/spec.md (or its absence)
 // for each delta openspec/changes/<change>/specs/<capability>/spec.md. A change the head holds only as
 // openspec/changes/archive/<date>-<change>/ is compared through that copy, without its main specs,
 // which the archive rewrites: an archive is not a package change. A symbolic link or a submodule in a
 // package refuses the approval.
 //
-// Exit codes: 0 the approval holds (read-only) or the writes were made (--apply); 1 the approval does
-// not hold (read-only); 2 a usage error, or gh or the API failed (with --apply, after removing the
-// label). Any other error is a bug: with --apply the label is removed, then the script crashes with a
-// stack trace. Everything is read through `gh api` with the token the environment gives gh; nothing of the
+// Exit codes: 0 the state is `spec/approved` (read-only) or the writes were made (--apply); 1 any
+// other state (read-only); 2 a usage error, or gh or the API failed (with --apply, after failing
+// closed: `spec/pending` added to an open pull request, `spec/approved` removed). Any other error is a
+// bug: with --apply the script fails closed, then crashes with a stack trace. Everything is read through `gh api` with the token the environment gives gh; nothing of the
 // pull request is checked out or run. A value a pull request controls reaches `gh api` only in a
 // request body or percent-encoded in a path, and is printed only escaped, on one line. The script
 // imports only local modules that import nothing remote, so no dependency loads beside the job's token
@@ -40,6 +49,13 @@ import { parseArgs } from "./lib/args.ts";
 import { CommandError, REPO, runAsync, UsageError } from "./lib/repo.ts";
 
 export const LABEL = "spec/approved";
+export const PENDING = "spec/pending";
+export const ARCHIVED = "spec/archived";
+/** The state labels this script writes; a pull request carries at most one. */
+export const STATE_LABELS: readonly string[] = [PENDING, LABEL, ARCHIVED];
+
+/** The most files the pull request file list returns. */
+export const MAX_FILES = 3000;
 
 /** The account the workflow's comments carry, with the type the API gives it. */
 export const RECORDER = { login: "github-actions[bot]", type: "Bot" } as const;
@@ -55,15 +71,16 @@ const LINK_MODE = "120000";
 export const USAGE = `usage: scripts/spec_approval.ts <pull-request-number>
        scripts/spec_approval.ts --apply
 
-Decides the spec/approved label of one pull request from its labels, label history, comments, and
-approval package (.agents/knowledge/spec-workflow.md, ## Approval gates).
+Decides the one spec/* state label of a pull request (spec/pending, spec/approved, spec/archived, or
+none) from its head, file list, labels, label history, comments, and approval package
+(.agents/knowledge/spec-workflow.md, ## Approval gates).
 
   <n>       print the state and the writes the rules call for; write nothing (just spec-approval <n>)
   --apply   the spec / labels workflow only: read the pull request and its event from ${EVENT_VARIABLES.join(", ")},
-            then record the approval or withdraw it
+            then record or withdraw the approval and write the state label
 
-Exit codes: 0 approved (read-only) or written (--apply); 1 not approved (read-only); 2 usage error or a
-failure of gh or the API.`;
+Exit codes: 0 spec/approved (read-only) or written (--apply); 1 any other state (read-only); 2 usage
+error or a failure of gh or the API.`;
 
 const NUMBER = /^[1-9][0-9]{0,9}$/;
 // The three fields of the record, as patterns without anchors; the writer and the reader are built from the same ones.
@@ -85,7 +102,18 @@ export interface Pull {
     state: "open" | "closed";
     /** The head commit id. */
     head: string;
+    /** The base commit id: the commit of the base branch the pull request is compared with. */
+    base: string;
     labels: string[];
+    /** The number of files the pull request changes. */
+    changedFiles: number;
+}
+
+/** One entry of the pull request file list. */
+export interface ChangedFile {
+    path: string;
+    /** added, removed, modified, renamed, copied, changed, unchanged. */
+    status: string;
 }
 
 export interface TreeEntry {
@@ -121,17 +149,19 @@ export interface Comment {
     author: Actor | null;
 }
 
-/** The reads the decision makes and the writes it calls for; the writes name no label but spec/approved. */
+/** The reads the decision makes and the writes it calls for; the writes name no label but STATE_LABELS. */
 export interface Api {
     pull(number: number): Promise<Pull>;
     tree(commit: string): Promise<Tree>;
+    /** The pull request file list, at most MAX_FILES entries. */
+    files(number: number): Promise<ChangedFile[]>;
     labelEvents(number: number): Promise<LabelEvent[]>;
     comments(number: number): Promise<Comment[]>;
     /** admin, write, read, or none. */
     permission(login: string): Promise<string>;
-    addLabel(number: number): Promise<void>;
+    addLabel(number: number, label: string): Promise<void>;
     /** false when the label was not on the pull request. */
-    removeLabel(number: number): Promise<boolean>;
+    removeLabel(number: number, label: string): Promise<boolean>;
     createComment(number: number, body: string): Promise<void>;
     updateComment(id: number, body: string): Promise<void>;
 }
@@ -164,13 +194,16 @@ export interface ApprovalRecord {
     withdrawn: boolean;
 }
 
+/** One state label, null for none, undefined when a cut-short file list leaves spec/archived undecided. */
+export type State = string | null | undefined;
+
 export interface Decision {
-    approved: boolean;
+    state: State;
     reason: string;
     /** Whether the pull request was open at the last read; a run that succeeds writes nothing to a closed one. */
     open: boolean;
-    /** Whether spec/approved was on the pull request at the last read. */
-    labeled: boolean;
+    /** The labels on the pull request at the last read. */
+    labels: string[];
     /** The record this run writes; `commentId` when it replaces the one record comment. */
     record?: { body: string; commit: string; commentId?: number };
     /** Live records to mark withdrawn before the label is removed. */
@@ -213,6 +246,26 @@ export function changesOf(tree: Tree): Change[] {
         if (kind) changes.push({ name, kind });
     }
     return changes.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
+}
+
+/** Every entry at or under openspec/changes/<name>, as "path mode sha" lines: the change as a tree holds it. */
+function entriesOf(tree: Tree, name: string): string {
+    const dir = `${CHANGES}${name}`;
+    return tree.entries
+        .filter((entry) => entry.path === dir || entry.path.startsWith(`${dir}/`))
+        .map((entry) => `${entry.path} ${entry.mode} ${entry.sha}`)
+        .sort()
+        .join("\n");
+}
+
+/**
+ * The pull request's own unarchived changes: those of `tree` that `base` does not hold identically. A change
+ * a stacked base already carries belongs to the pull request that brought it, so it is not this one's.
+ */
+export function ownChanges(tree: Tree, base: Tree): Set<string> {
+    return new Set(
+        changesOf(tree).map((change) => change.name).filter((name) => entriesOf(tree, name) !== entriesOf(base, name)),
+    );
 }
 
 interface Files {
@@ -266,12 +319,13 @@ function mainSpecOf(pathInChange: string): string | undefined {
     return delta ? `${SPECS}${delta[1]}/spec.md` : undefined;
 }
 
-/** The approval package of a tree. */
-export function packageOf(tree: Tree): Package {
+/** The approval package of a tree: of the changes named in `only` when given, else of every unarchived change. */
+export function packageOf(tree: Tree, only?: Set<string>): Package {
     const changes = new Map<string, Map<string, string>>();
     const specs = new Map<string, string>();
     const refused: string[] = [];
     for (const change of changesOf(tree)) {
+        if (only !== undefined && !only.has(change.name)) continue;
         if (change.kind !== "directory") {
             refused.push(`${CHANGES}${change.name}`);
             continue;
@@ -306,10 +360,13 @@ function differing(a: Map<string, string>, b: Map<string, string>): string[] {
     return [...new Set([...a.keys(), ...b.keys()])].filter((path) => a.get(path) !== b.get(path)).sort();
 }
 
-/** How the approval package at `head` differs from the one at `recorded`; empty when it is the same. */
-export function packageProblems(recorded: Tree, head: Tree): string[] {
-    const before = packageOf(recorded);
-    const now = packageOf(head);
+/**
+ * How the approval package at `head` differs from the one at `recorded`, both of the changes named in `only`
+ * when given; empty when it is the same.
+ */
+export function packageProblems(recorded: Tree, head: Tree, only?: Set<string>): string[] {
+    const before = packageOf(recorded, only);
+    const now = packageOf(head, only);
     const problems: string[] = [];
     if (before.changes.size === 0) problems.push("the recorded commit holds no unarchived change");
     if (before.refused.length > 0) problems.push(`the recorded package holds ${list(before.refused)}`);
@@ -359,7 +416,7 @@ export function recordBody(commit: string, login: string, eventId: number, withd
     const link = `https://github.com/${REPO}/commit/${commit}`;
     const text = withdrawn
         ? `The approval recorded above no longer holds: the approval package changed after that commit, a person ` +
-            `removed \`${LABEL}\`, or a run could not stand behind it. The maintainer approves again by adding ` +
+            `removed \`${LABEL}\` or added \`${PENDING}\`, or a run could not stand behind it. The maintainer approves again by adding ` +
             `\`${LABEL}\` again.`
         : `The account named above approved the specification package of this pull request at ${link} by adding ` +
             `\`${LABEL}\`. The \`spec / labels\` workflow keeps the label while the approval package at the head ` +
@@ -398,9 +455,12 @@ export function latestApproval(events: LabelEvent[]): LabelEvent | undefined {
     return latest;
 }
 
-/** Whether a person removed spec/approved in an event with a greater id than `id`. */
-export function removedAfter(events: LabelEvent[], id: number): boolean {
-    return events.some((event) => event.id > id && !event.added && event.label === LABEL && isPerson(event.actor));
+/** Whether a person removed spec/approved or added spec/pending in an event with a greater id than `id`. */
+export function withdrawnAfter(events: LabelEvent[], id: number): boolean {
+    return events.some((event) =>
+        event.id > id && isPerson(event.actor) &&
+        ((!event.added && event.label === LABEL) || (event.added && event.label === PENDING))
+    );
 }
 
 // ---- The decision ----------------------------------------------------------------------------------
@@ -411,12 +471,13 @@ type Outcome =
 
 /**
  * Why the run its event started may not record the approval, or, after reading both again, the pull
- * request and the label event it records.
+ * request and the label event it records. `found` is the package of the pull request's own changes at `pull.head`.
  */
 async function recordingRefusal(
     api: Api,
     number: number,
     pull: Pull,
+    found: Package,
     event: Event,
     events: LabelEvent[],
     records: ApprovalRecord[],
@@ -430,13 +491,9 @@ async function recordingRefusal(
     if (latest === undefined || latest.actor?.login !== event.sender) {
         return { refusal: `the latest adding of ${LABEL} by a person is not this event` };
     }
-    if (removedAfter(events, latest.id)) return { refusal: `a person removed ${LABEL} after this event` };
+    if (withdrawnAfter(events, latest.id)) return { refusal: `a person withdrew ${LABEL} after this event` };
     if (records.length > 1) {
         return { refusal: "more than one record comment exists; the maintainer deletes all but one" };
-    }
-    const found = packageOf(await api.tree(pull.head));
-    if (found.changes.size === 0 && found.refused.length === 0) {
-        return { refusal: "the head holds no unarchived change" };
     }
     if (found.refused.length > 0) {
         return { refusal: `a link or submodule in the package at the head: ${list(found.refused)}` };
@@ -448,27 +505,66 @@ async function recordingRefusal(
     const again = await api.pull(number);
     if (again.state !== "open") return { refusal: "the pull request was closed during the run", pull: again };
     if (again.head !== event.head) return { refusal: "the head moved during the run", pull: again };
-    // The label history once more, after every other read: a removal that landed while this run was
-    // reading is not restored, and a later adding belongs to the run it started.
+    // The label history once more, after every other read: a withdrawal that landed while this run was
+    // reading is not undone, and a later adding belongs to the run it started.
     const now = await api.labelEvents(number);
     if (latestApproval(now)?.id !== latest.id) {
         return { refusal: `${LABEL} was added again during the run`, pull: again, events: now };
     }
-    if (removedAfter(now, latest.id)) {
-        return { refusal: `a person removed ${LABEL} during the run`, pull: again, events: now };
+    if (withdrawnAfter(now, latest.id)) {
+        return { refusal: `a person withdrew ${LABEL} during the run`, pull: again, events: now };
     }
     return { pull: again, eventId: latest.id, events: now };
 }
 
-/** Decides spec/approved for pull request `number`, whose present state `pull` was just read. */
+/**
+ * The state of a pull request that holds no unarchived change of its own: archived, none, or undecided. A
+ * withdrawal by a person after the latest adding of spec/approved still holds after the archive: the state is
+ * spec/pending and every live record is marked withdrawn, until the maintainer adds spec/approved again.
+ */
+async function archiveState(api: Api, number: number, pull: Pull): Promise<Decision> {
+    const base = { open: pull.state === "open", labels: pull.labels, withdraw: [] };
+    const files = await api.files(number);
+    const complete = pull.changedFiles <= MAX_FILES && files.length >= pull.changedFiles;
+    // A file that arrives under the archive, added there or moved there from a change.
+    if (files.some((file) => (file.status === "added" || file.status === "renamed") && file.path.startsWith(ARCHIVE))) {
+        const events = await api.labelEvents(number);
+        const latest = latestApproval(events);
+        if (latest !== undefined && withdrawnAfter(events, latest.id)) {
+            const live = recordsOf(await api.comments(number)).filter((record) => !record.withdrawn);
+            return {
+                ...base,
+                state: PENDING,
+                reason: `the pull request archives its change, but a person withdrew ${LABEL} after its latest adding`,
+                withdraw: live,
+            };
+        }
+        return { ...base, state: ARCHIVED, reason: "no unarchived change of its own; the pull request archives one" };
+    }
+    if (!complete) {
+        return {
+            ...base,
+            state: undefined,
+            reason: "no unarchived change of its own; the file list is cut short, so whether the pull request " +
+                `archives one is not decided and ${ARCHIVED} is left as it is`,
+        };
+    }
+    return { ...base, state: null, reason: "no unarchived change of its own, and the pull request archives none" };
+}
+
+/** Decides the state label of pull request `number`, whose present state `pull` was just read. */
 export async function decide(api: Api, number: number, pull: Pull, event: Event | undefined): Promise<Decision> {
+    const head = await api.tree(pull.head);
+    const baseTree = await api.tree(pull.base);
+    const own = ownChanges(head, baseTree);
+    if (own.size === 0) return await archiveState(api, number, pull);
     let events = await api.labelEvents(number);
     const records = recordsOf(await api.comments(number));
     const live = records.filter((record) => !record.withdrawn);
     let current = pull;
     let refused = "";
     if (event !== undefined && event.action === "labeled" && event.label === LABEL) {
-        const outcome = await recordingRefusal(api, number, pull, event, events, records);
+        const outcome = await recordingRefusal(api, number, pull, packageOf(head, own), event, events, records);
         if ("refusal" in outcome) {
             refused = `; not recorded: ${outcome.refusal}`;
             // The pull request as the refusal last read it, so that a closing meanwhile stops the writes.
@@ -476,11 +572,11 @@ export async function decide(api: Api, number: number, pull: Pull, event: Event 
             if (outcome.events) events = outcome.events;
         } else {
             return {
-                approved: true,
+                state: LABEL,
                 reason: `this run records the approval of ${event.head} by ${shown(event.sender)} ` +
                     `(label event ${outcome.eventId})`,
                 open: true,
-                labeled: outcome.pull.labels.includes(LABEL),
+                labels: outcome.pull.labels,
                 record: {
                     body: recordBody(event.head, event.sender, outcome.eventId, false),
                     commit: event.head,
@@ -490,12 +586,12 @@ export async function decide(api: Api, number: number, pull: Pull, event: Event 
             };
         }
     }
-    const base = { open: current.state === "open", labeled: current.labels.includes(LABEL) };
+    const base = { open: current.state === "open", labels: current.labels };
     const problems: string[] = [];
-    if (!base.labeled) problems.push(`${LABEL} is not on the pull request`);
+    if (!current.labels.includes(LABEL)) problems.push(`${LABEL} is not on the pull request`);
     const latest = latestApproval(events);
     if (latest === undefined) problems.push(`no person added ${LABEL}`);
-    else if (removedAfter(events, latest.id)) problems.push(`a person removed ${LABEL} after adding it`);
+    else if (withdrawnAfter(events, latest.id)) problems.push(`a person withdrew ${LABEL} after adding it`);
     if (records.length === 0) problems.push("no record comment");
     else if (records.length > 1) problems.push("more than one record comment; the maintainer deletes all but one");
     else if (records[0].withdrawn) problems.push("the record is withdrawn");
@@ -504,21 +600,31 @@ export async function decide(api: Api, number: number, pull: Pull, event: Event 
         if (latest !== undefined && record.eventId !== latest.id) {
             problems.push(`the record answers an earlier adding of ${LABEL} than the latest`);
         }
-        const head = await api.tree(current.head);
-        const recorded = record.commit === current.head ? head : await api.tree(record.commit);
-        problems.push(...packageProblems(recorded, head));
+        const now = current.head === pull.head ? head : await api.tree(current.head);
+        const recorded = record.commit === current.head ? now : await api.tree(record.commit);
+        // The pull request's own changes: those at the head, and those at the recorded commit that the present
+        // base does not hold unarchived (archived or dropped since); a base change that moved on is not its own.
+        const inBase = new Set(changesOf(baseTree).map((change) => change.name));
+        const only = new Set([
+            ...ownChanges(now, baseTree),
+            ...[...ownChanges(recorded, baseTree)].filter((name) => !inBase.has(name)),
+        ]);
+        problems.push(...packageProblems(recorded, now, only));
     }
     if (problems.length === 0) {
         const [record] = records;
         return {
             ...base,
-            approved: true,
+            state: LABEL,
             reason: `the approval of ${record.commit} by ${shown(record.login)} (label event ${record.eventId}) holds`,
             withdraw: [],
         };
     }
-    return { ...base, approved: false, reason: `${problems.join("; ")}${refused}`, withdraw: live };
+    return { ...base, state: PENDING, reason: `${problems.join("; ")}${refused}`, withdraw: live };
 }
+
+/** How a state reads in the output. */
+export const stateText = (state: State) => state === undefined ? "undecided" : state ?? "none";
 
 // ---- Writing ---------------------------------------------------------------------------------------
 
@@ -528,11 +634,17 @@ export interface Write {
     make(api: Api, number: number): Promise<string>;
 }
 
-/** The writes a decision calls for, in the order they are made: the record first, the label last. */
+const removal = (label: string): Write => ({
+    text: `remove ${label}`,
+    make: async (api, number) =>
+        (await api.removeLabel(number, label)) ? `removed ${label}` : `${label} was already gone`,
+});
+
+/** The writes a decision calls for, in the order they are made: the records first, then the wanted label, then the removals. */
 export function writesOf(decision: Decision): Write[] {
     if (!decision.open) return [];
     const writes: Write[] = [];
-    const { record } = decision;
+    const { record, state, labels } = decision;
     if (record) {
         const { commentId } = record;
         writes.push({
@@ -553,21 +665,18 @@ export function writesOf(decision: Decision): Write[] {
             },
         });
     }
-    if (decision.approved && !decision.labeled) {
+    if (typeof state === "string" && !labels.includes(state)) {
         writes.push({
-            text: `add ${LABEL}`,
+            text: `add ${state}`,
             make: async (api, number) => {
-                await api.addLabel(number);
-                return `added ${LABEL}`;
+                await api.addLabel(number, state);
+                return `added ${state}`;
             },
         });
     }
-    if (!decision.approved && decision.labeled) {
-        writes.push({
-            text: `remove ${LABEL}`,
-            make: async (api, number) =>
-                (await api.removeLabel(number)) ? `removed ${LABEL}` : `${LABEL} was already gone`,
-        });
+    for (const label of STATE_LABELS) {
+        if (!labels.includes(label) || label === state || (state === undefined && label === ARCHIVED)) continue;
+        writes.push(removal(label));
     }
     return writes;
 }
@@ -579,10 +688,29 @@ export interface Output {
     note(line: string): void;
 }
 
-/** After an error: spec/approved off the pull request, open or closed. The error itself is still reported. */
-async function failClosed(api: Api, number: number, out: Output): Promise<void> {
+/**
+ * After an error: on a pull request read as open, spec/pending added and a spec/archived it carried removed, so
+ * that one state label remains; then spec/approved removed, open or closed. The error itself is still reported.
+ */
+async function failClosed(api: Api, number: number, pull: Pull | undefined, out: Output): Promise<void> {
+    if (pull?.state === "open") {
+        try {
+            await api.addLabel(number, PENDING);
+            out.note(`after the error: added ${PENDING}`);
+        } catch (error) {
+            out.note(`after the error: could not add ${PENDING}: ${oneLine(errorText(error))}`);
+        }
+        if (pull.labels.includes(ARCHIVED)) {
+            try {
+                const removed = await api.removeLabel(number, ARCHIVED);
+                out.note(`after the error: ${removed ? `removed ${ARCHIVED}` : `${ARCHIVED} was already gone`}`);
+            } catch (error) {
+                out.note(`after the error: could not remove ${ARCHIVED}: ${oneLine(errorText(error))}`);
+            }
+        }
+    }
     try {
-        const removed = await api.removeLabel(number);
+        const removed = await api.removeLabel(number, LABEL);
         out.note(`after the error: ${removed ? `removed ${LABEL}` : `${LABEL} was not on the pull request`}`);
     } catch (error) {
         // Deliberate: the original error decides the exit status; the workflow's failure step tries again.
@@ -593,19 +721,21 @@ async function failClosed(api: Api, number: number, out: Output): Promise<void> 
 /** Decides, prints, and with `apply` writes; returns the exit status. */
 export async function run(input: Input, api: Api, out: Output): Promise<number> {
     const { number, apply } = input;
+    let pull: Pull | undefined;
     try {
-        const decision = await decide(api, number, await api.pull(number), input.event);
-        out.print(`${decision.approved ? "approved" : "not approved"}: ${decision.reason}`);
+        pull = await api.pull(number);
+        const decision = await decide(api, number, pull, input.event);
+        out.print(`${stateText(decision.state)}: ${decision.reason}`);
         if (!decision.open) out.print("the pull request is closed: nothing is written");
         const writes = writesOf(decision);
         for (const planned of writes) out.print(`write: ${planned.text}`);
-        if (!apply) return decision.approved ? 0 : 1;
+        if (!apply) return decision.state === LABEL ? 0 : 1;
         for (const planned of writes) out.note(`done: ${await planned.make(api, number)}`);
         if (writes.length === 0) out.note("done: nothing to write");
         return 0;
     } catch (error) {
         out.note(`error: ${oneLine(errorText(error))}`);
-        if (apply) await failClosed(api, number, out);
+        if (apply) await failClosed(api, number, pull, out);
         if (error instanceof CommandError) return 2;
         throw error;
     }
@@ -688,10 +818,14 @@ function parseJson(text: string, what: string): unknown {
  */
 export function ghApi(gh: Gh = runGh, repo: string = REPO): Api {
     const issues = `repos/${repo}/issues`;
-    const label = encodeURIComponent(LABEL);
     const checked = (number: number) => {
         if (!NUMBER.test(String(number))) throw new Error("the pull request number must be digits");
         return String(number);
+    };
+    // The only labels this token writes.
+    const stateLabel = (name: string) => {
+        if (!STATE_LABELS.includes(name)) throw new Error(`not a state label: ${shown(name)}`);
+        return name;
     };
     const get = async (path: string) => parseJson(await gh(["api", path]), `gh api ${path}`);
     const all = async (path: string): Promise<unknown[]> => {
@@ -714,14 +848,27 @@ export function ghApi(gh: Gh = runGh, repo: string = REPO): Api {
             const pull = await get(path);
             if (
                 !isObject(pull) || (pull.state !== "open" && pull.state !== "closed") || !isObject(pull.head) ||
-                typeof pull.head.sha !== "string" || !COMMIT.test(pull.head.sha) || !Array.isArray(pull.labels) ||
-                !pull.labels.every((item) => isObject(item) && typeof item.name === "string")
+                typeof pull.head.sha !== "string" || !COMMIT.test(pull.head.sha) || !isObject(pull.base) ||
+                typeof pull.base.sha !== "string" || !COMMIT.test(pull.base.sha) || !Array.isArray(pull.labels) ||
+                !pull.labels.every((item) => isObject(item) && typeof item.name === "string") ||
+                !Number.isSafeInteger(pull.changed_files) || (pull.changed_files as number) < 0
             ) throw shapeError(`gh api ${path}`, pull);
             return {
                 state: pull.state,
                 head: pull.head.sha,
+                base: pull.base.sha,
                 labels: (pull.labels as Json[]).map((item) => item.name as string),
+                changedFiles: pull.changed_files as number,
             };
+        },
+        files: async (number) => {
+            const path = `repos/${repo}/pulls/${checked(number)}/files`;
+            return (await all(path)).map((file) => {
+                if (!isObject(file) || typeof file.filename !== "string" || typeof file.status !== "string") {
+                    throw shapeError(`a file of ${path}`, file);
+                }
+                return { path: file.filename, status: file.status };
+            });
         },
         tree: async (commit) => {
             if (!COMMIT.test(commit)) throw new CommandError("a tree is read for a commit id of 40 hexadecimal digits");
@@ -780,11 +927,12 @@ export function ghApi(gh: Gh = runGh, repo: string = REPO): Api {
             if (!isObject(answer) || typeof answer.permission !== "string") throw shapeError(`gh api ${path}`, answer);
             return answer.permission;
         },
-        addLabel: async (number) =>
-            void await send(["-X", "POST", `${issues}/${checked(number)}/labels`], { labels: [LABEL] }),
-        removeLabel: async (number) => {
+        addLabel: async (number, name) =>
+            void await send(["-X", "POST", `${issues}/${checked(number)}/labels`], { labels: [stateLabel(name)] }),
+        removeLabel: async (number, name) => {
             try {
-                await gh(["api", "-X", "DELETE", `${issues}/${checked(number)}/labels/${label}`]);
+                const path = `${issues}/${checked(number)}/labels/${encodeURIComponent(stateLabel(name))}`;
+                await gh(["api", "-X", "DELETE", path]);
                 return true;
             } catch (error) {
                 // A label already gone answers 404, which is what the removal wants; anything else fails.

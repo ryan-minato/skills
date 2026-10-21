@@ -86,22 +86,19 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: just install-tools
       - if: steps.changed.outputs.run == 'true'
-        name: Validate strictly and refuse an unarchived related change
-        # A pull request: strict validation, then every related change that
-        # is still unarchived warns on a draft and fails when ready — the
-        # request stays red through the deliberation, and the freeze is what
-        # turns it green. A push to main: strict validation, then any change
-        # outside archive/ fails.
+        name: Validate strictly and report an unarchived related change
+        # A pull request: strict validation, then a warning for every related
+        # change that is still unarchived — waiting for the freeze is a state,
+        # not a failure, and `checks / archived` holds the merge until then. A
+        # push to main: strict validation, then any change outside archive/
+        # fails.
         env:
           EVENT: ${{ github.event_name }}
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
-          DRAFT: ${{ github.event.pull_request.draft }}
         run: |
           if [ "$EVENT" = "pull_request" ]; then
-            flag=""
-            [ "$DRAFT" = "true" ] && flag="--draft"
-            just spec-check "$BASE" "$HEAD" $flag
+            just spec-check "$BASE" "$HEAD"
           else
             just spec-changes check --all
           fi
@@ -113,6 +110,97 @@ jobs:
             git --no-pager diff --stat -- .agents/skills
             echo "ERROR: .agents/skills/openspec-* differ from what the pinned OpenSpec CLI generates. Run 'just spec-sync' and commit the result." >&2
             exit 1
+          fi
+
+  archive-verdict:
+    # The archive gate (.agents/knowledge/github-checks.md, `## No standing
+    # failure`): decides whether a pull request into the default branch still
+    # holds an unarchived related change. Waiting for the freeze is a state,
+    # not a failure, so the job succeeds either way and only the carrier
+    # below says which; it fails only when the verdict cannot be reached. It
+    # runs the BASE's copy of scripts/spec_changes.ts over git objects, so a
+    # pull request cannot relax its own verdict by editing the script; the
+    # head is fetched, never checked out. Outside the gate: it runs on pull
+    # requests only, and ci_gate.ts fails a skipped dependency.
+    name: checks / archive-verdict
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      archived: ${{ steps.verdict.outputs.archived }}
+    steps:
+      - id: branch
+        name: Hold only a pull request into the default branch
+        # A pull request into another pull request's branch may keep its
+        # change open; the request that reaches main archives it.
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$BASE_REF" = "$DEFAULT_BRANCH" ]; then
+            echo "held=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "The base is not the default branch: the archive gate holds only pull requests into it."
+          fi
+      - if: steps.branch.outputs.held == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - if: steps.branch.outputs.held == 'true'
+        uses: ./.github/actions/setup-tools
+      - if: steps.branch.outputs.held == 'true'
+        name: Fetch the pull request head without checking it out
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: git fetch --no-tags origin "refs/pull/${PR_NUMBER}/head"
+      - if: steps.branch.outputs.held == 'true'
+        name: List the related changes with the base's script
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          ./scripts/spec_changes.ts status --base "$BASE" --head "$HEAD"
+          ./scripts/spec_changes.ts status --base "$BASE" --head "$HEAD" --json > "$RUNNER_TEMP/status.json"
+      - id: verdict
+        name: Write the verdict
+        # Only the literal true or false reaches the job's output; no change
+        # name the pull request chose does.
+        env:
+          HELD: ${{ steps.branch.outputs.held }}
+        run: |
+          if [ "$HELD" != "true" ]; then
+            echo "archived=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          archived="$(jq -r '[.changes[] | select(.state == "active")] | length == 0' "$RUNNER_TEMP/status.json")"
+          case "$archived" in
+            true | false) echo "archived=${archived}" >> "$GITHUB_OUTPUT" ;;
+            *) echo "The status JSON gave no verdict." >&2; exit 1 ;;
+          esac
+
+  archived:
+    # Carries the required check: it succeeds either way, but under the
+    # required name `checks / archived` only when no related change is
+    # unarchived. While one is, it reports `checks / awaiting-archive`, which
+    # no ruleset requires, so the merge waits on an expected check and the
+    # run stays green. A failed verdict skips it: neither name succeeds.
+    name: ${{ needs.archive-verdict.outputs.archived == 'true' && 'checks / archived' || 'checks / awaiting-archive' }}
+    needs: archive-verdict
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - env:
+          ARCHIVED: ${{ needs.archive-verdict.outputs.archived }}
+        run: |
+          if [ "$ARCHIVED" = "true" ]; then
+            echo "No related change is unarchived, or the base is not the default branch."
+          else
+            echo "Waiting for the archive; checks / archive-verdict names the unarchived changes."
           fi
 
   devcontainer:

@@ -12,9 +12,12 @@ linters. `just check` is exactly what `checks / quality` runs, so a green
 | `checks / spec` | `checks.yml` | every pull request; push to `main` | `just spec-check` or `just spec-changes check --all`; `just spec-sync` | feeds the gate |
 | `checks / devcontainer` | `checks.yml` | every pull request; push to `main` | builds the dev container, runs `just check` inside | feeds the gate |
 | `checks / gate` | `checks.yml` | every pull request; push to `main` | `scripts/ci_gate.ts` over the jobs' `needs` | **required** |
+| `checks / archive-verdict` | `checks.yml` | every pull request | the base's `scripts/spec_changes.ts status --json` over the fetched head | feeds the carrier |
+| `checks / archived` | `checks.yml` | every pull request, when no related change into `main` is unarchived | the carrier job, under the required name | **required** |
+| `checks / awaiting-archive` | `checks.yml` | every pull request into `main` holding an unarchived related change | the carrier job, under a name no ruleset requires | never required |
 | `pr / policy` | `pr-policy.yml` | pull request events | the base's `check_pr_policy.ts`, then `check_commit_safety.ts --range` | **required** |
 | `scan-secrets` | `secret.yml` | every pull request; push to `main` | TruffleHog `--only-verified` over the range | **required** |
-| `spec / labels` | `spec-labels.yml` | pull request events, `spec/approved` label events | `scripts/spec_changes.ts` `labels`; `scripts/spec_approval.ts` | automation |
+| `spec / labels` | `spec-labels.yml` | pull request events, label events | `scripts/spec_approval.ts --apply` | automation |
 | `issues / triage` | `issue-triage.yml` | issue opened or edited | `scripts/sync_issue_metadata.ts --apply` | automation |
 | `labels / sync` | `labels-sync.yml` | push to `main` touching the labels or the script; weekly; dispatch | `scripts/sync_labels.ts --apply` | automation |
 
@@ -25,11 +28,18 @@ A healthy run:
   `.agents/skills/openspec-*`, `.agents/skills/.openspec-target`,
   `scripts/spec_changes.ts`, `scripts/lib/`, `deno.json`, or `justfile`,
   and otherwise logs "nothing to validate" and passes. Strict validation
-  exits 0; an unarchived related change warns on a draft and fails a ready
-  pull request (`.agents/knowledge/spec-workflow.md`
-  `## Archive executor and the freeze`); on `main` no change sits outside
+  exits 0; an unarchived related change is a warning, never a failure
+  (`## No standing failure`); on `main` no change sits outside
   `openspec/changes/archive/`; the regenerated `openspec-*` skills equal
   the committed ones.
+- `checks / archive-verdict`: on a pull request into `main`, prints the
+  related changes' table from the base's script and writes `archived=true`
+  or `archived=false`; on any other base, writes `archived=true` without
+  reading. It fails only when the verdict cannot be reached.
+- `checks / archived` | `checks / awaiting-archive`: one of the two
+  succeeds on every pull request; `checks / awaiting-archive` means the
+  merge waits for the freeze (`.agents/knowledge/spec-workflow.md`
+  `## Archive executor and the freeze`).
 - `checks / devcontainer`: works only when `.devcontainer/`,
   `.github/actions/setup-tools/`, `justfile`, or `deno.json` change; the
   container builds and `just check` exits 0 inside it.
@@ -50,23 +60,45 @@ A healthy run:
   `check_pr_policy.py`, until a follow-up change removes that fallback.
 - `scan-secrets`: no verified secret. The check name is the job id; the
   job sets no `name:`.
-- `spec / labels`: the printed plan and the pull request's `spec/*` axis
-  labels agree, and a pull request with no related change carries none;
-  the `spec/approved` record follows `.agents/knowledge/spec-workflow.md`
-  `## Approval gates`.
+- `spec / labels`: the printed state and the pull request's one `spec/*`
+  label agree, and a pull request with no unarchived change that archives
+  none carries none; the `spec/approved` record follows
+  `.agents/knowledge/spec-workflow.md` `## Approval gates`.
 - `issues / triage`: prints the label plan as JSON and applies it; exit 1
   means a form answer maps to no label in `.github/labels.json`.
 - `labels / sync`: the repository's labels match `.github/labels.json` in
   name, color, and description; a label missing from the file is a
   warning, never a deletion.
 
-Required checks: `checks / gate`, `pr / policy`, and `scan-secrets`; the
-ruleset requires exactly these names, and its live state is declared in
-`.agents/knowledge/github-settings.md`. The names are a stable interface:
-the `checks` check of `scripts/validate_harness.ts` fails when a workflow
-job name and this table disagree. Renaming one is three edits in order —
-the workflow, this table, then the ruleset once the new name is live on
-`main`.
+Required checks: `checks / gate`, `pr / policy`, `scan-secrets`, and
+`checks / archived`; the ruleset requires exactly these names, and its
+live state is declared in `.agents/knowledge/github-settings.md`. The
+names are a stable interface: the `checks` check of
+`scripts/validate_harness.ts` fails when a workflow job name and this
+table disagree, and reads a conditional name
+`${{ <condition> && '<a>' || '<b>' }}` as both of its names. Renaming one
+is three edits in order — the workflow, this table, then the ruleset once
+the new name is live on `main`.
+
+## No standing failure
+
+No check fails as a standing state. A check that stays red for days fills
+the maintainer's notifications and hides real failures behind the same
+mark, so red always means something to fix now.
+
+- A pull request that is valid but may not merge into `main` yet is held
+  by a withheld required check: a carrier job succeeds under the required
+  name only when the condition holds, and under a name no ruleset requires
+  while it waits. GitHub shows the required check as expected; the run is
+  green. `checks / archived` is the one such check today.
+- The hold applies only to pull requests into `main`, the one long-lived
+  branch. A pull request into another pull request's branch may keep its
+  change unarchived; the request that reaches `main` archives it.
+- A verdict that cannot be reached fails its own job and withholds the
+  required name, so the merge still waits.
+- Known gap: retargeting a pull request's base starts no `checks.yml` run,
+  so the verdict stays as the last push left it until the next push or a
+  rerun; rerun `checks` after retargeting a pull request onto `main` (#127).
 
 ## Privileged workflows
 
@@ -82,9 +114,10 @@ above; the rules these workflows follow live in
 2. For a failure you cannot reproduce, digest the run with
    `.agents/skills/change-workflow/scripts/run_log_digest.ts` as the
    `change-workflow` project skill directs, instead of reading full logs.
-3. A red `checks / spec` on a ready pull request whose change is not yet
-   archived is the expected state until the freeze
-   (`.agents/knowledge/spec-workflow.md` `## Archive executor and the freeze`).
+3. No check is red by design. A pull request waiting for its freeze shows
+   `checks / awaiting-archive` and an expected `checks / archived`
+   (`## No standing failure`); a red `checks / archive-verdict` is a real
+   failure to fix.
 4. A check turned red by a new tool release names the tool; fix it in its
    own change (`.agents/knowledge/management-code.md` `## Tool versions`).
 5. Changing a check's strictness is a maintainer decision, recorded here
@@ -94,4 +127,6 @@ above; the rules these workflows follow live in
 
 - A job is added, renamed, or removed, or its command or trigger changes.
 - A required check changes in the ruleset.
+- A check would fail while a pull request merely waits: hold it with a
+  withheld required check instead (`## No standing failure`).
 - A workflow adopts or drops a privileged trigger.

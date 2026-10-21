@@ -136,7 +136,8 @@ the result, not the diff: for a skill, the behavioral tests in the
 a repository change, the proofs its `design.md` names. Tick each task as
 `spec-workflow.md ## Lifecycle` says, then run `just check`. Leave the
 change unarchived (`spec-workflow.md ## Archive executor and the
-freeze`). `just spec-check` reproduces `checks / spec` locally;
+freeze`); until it is, `checks / archived` stays unreported and nothing
+is red. `just spec-check` reproduces `checks / spec` locally;
 `just spec-changes status` shows the related changes' progress. Record
 what ran and the outcome for the PR's Validation section.
 
