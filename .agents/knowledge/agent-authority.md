@@ -148,35 +148,42 @@ and by the conversation.
 
 ## Permission entries
 
-`.claude/settings.json` holds three lists. They are fool-proofing against
-a careless agent, not a boundary: a prefix rule matches the start of a
-command, so a reordered flag or a wrapper gets past it. The container is
-the boundary.
+Two configurations carry one policy: `.claude/settings.json` for Claude
+Code and `.codex/rules/default.rules` for Codex. Both agents run in their
+classifier mode — Claude Code's auto mode, Codex with
+`approvals_reviewer = "auto_review"` in the maintainer's global
+configuration, which also holds Codex's sandbox — so a model reviewer,
+reading this knowledge base, judges every command no entry decides. A
+human prompt costs a review of an agent-written command and halts the
+run; under that load approval degrades into approving everything, so no
+entry asks.
 
-- **allow**: the read-only commands and recipes every task runs. The
-  review-thread read is `just review-threads <n>` (a fixed read-only
-  query) and the comment read is `gh pr view --json comments`, because a
-  wildcard `gh api` allow would also match writes.
-- **ask** — each family stops for a decision because it writes outside
-  the machine:
-
-  | Family | Reason |
-  |---|---|
-  | `git push` | publishes commits; the publish gate's decision point (confirm the ref) |
-  | `gh pr create`, `edit`, `ready`, `comment`, `review`, `close`, `reopen` | public pull request state; `ready` is review admission |
-  | `gh issue create`, `edit`, `comment`, `close` | public tracker state |
-  | `gh label` | labels drive the automation; `spec/approved` is the maintainer's |
-  | `gh workflow run`, `gh run rerun`, `gh run cancel` | start or stop workflows that hold tokens |
-  | `gh api graphql` | mutations share the endpoint with reads |
-  | `gh api` with `-f`, `-F`, `--field`, `--raw-field`, `--input`, `-X`, `--method` | a field, body, or method flag turns a read into a write |
-
-- **deny**: any command naming `spec/approved`; force, mirror, all-refs,
-  and tag pushes and remote branch deletion; hard resets, `git clean`,
-  and discarding the working tree; `gh pr merge` and approving reviews;
+- **deny** (`forbidden` for Codex) — a clear security risk: force,
+  mirror, all-refs, and tag pushes and remote branch deletion; `gh pr
+  merge` and approving a review; any command naming `spec/approved`;
   `gh api` with `DELETE`, `PUT`, or `PATCH`; `gh repo delete` and
-  `gh repo edit`; `sudo`; broad `rm -rf`. The `spec/approved` entry also
-  stops a read-only command that names the label: read the approval with
-  `just spec-approval <n>` or the search tools instead.
+  `gh repo edit`; printing the `gh` token; `sudo`; broad `rm -rf`; hard
+  resets, `git clean`, and discarding the working tree. Claude Code
+  denies any command naming `spec/approved`, read-only ones included (read
+  the approval with `just spec-approval <n>`); Codex rules match prefixes
+  only, so they forbid the `gh pr edit` label forms and the reviewer
+  judges the rest.
+- **allow** — only the checks every task runs: `just check`, `test`,
+  `validate`, `lint`, `spec-validate`, `check-skill`, `spec-check`,
+  `review-threads`, `spec-approval`, `commit-gate`. An allow entry skips
+  the classifier, so the list stays this short; read-only commands are
+  already approved by the agents' built-in read-only handling.
+- **ask** — none. Outward writes stay bound by `## Publishing`; the
+  classifier holds the agent to it.
+
+Prefix rules are fool-proofing against a careless agent, not a boundary:
+a reordered flag or a wrapper gets past them. The container is the
+boundary. The mode is the maintainer's setting: Claude Code ignores
+`defaultMode: "auto"` and `autoMode` in a project file (auto mode is its
+default starting mode); Codex's approvals and sandbox live in the
+maintainer's global configuration, and its project rules load only for a
+trusted project. In Claude Code's Manual mode an unmatched command prompts, as
+before.
 
 ## Threat model
 
@@ -202,6 +209,11 @@ Accepted risks:
   recorded commit (`spec-workflow.md ## Approval gates`).
 - The deny entry on `spec/approved` blocks read-only commands that name
   the label; `just spec-approval <n>` is the read path.
+- Outward writes (pushes, pull request and issue writes, labels) are
+  judged by the agent's classifier, not a human prompt. It reads
+  `## Publishing` and the conversation; the irreversible acts are denied
+  outright, a push lands only on a branch, and `main` changes only through
+  the maintainer's merge.
 
 ## Update this file when
 
@@ -211,6 +223,6 @@ Accepted risks:
   revert stops being a complete rollback.
 - The specification workflow changes what "approved", "frozen", or
   "archived" means, or how an approval is recorded.
-- `.claude/settings.json` gains or loses an ask or deny entry, an
+- `.claude/settings.json` or `.codex/` gains or loses an entry, an
   unattended agent run is added, or the dev container gains a credential
   or a host mount.
