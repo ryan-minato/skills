@@ -238,9 +238,9 @@ function fakeGh(world: World, repo = TEST_REPO) {
 /** An open pull request whose record of C1 answers the maintainer's adding (event 10) and whose head is C2. */
 function approvedWorld(head: Record<string, string> = CHANGE): World {
     return {
-        pull: { state: "open", head: C2, labels: [LABEL, "spec/unarchived"] },
+        pull: { state: "open", head: C2, labels: [LABEL, "documentation"] },
         trees: { [C1]: treeOf(CHANGE), [C2]: treeOf(head) },
-        events: [labeled(5, "spec/unarchived", BOT), labeled(10)],
+        events: [labeled(5, "documentation", BOT), labeled(10)],
         comments: [{ id: 2, body: "Looks good.", user: person() }, record(1, C1, 10)],
         permissions: { [MAINTAINER]: "write" },
     };
@@ -249,9 +249,9 @@ function approvedWorld(head: Record<string, string> = CHANGE): World {
 /** The moment the maintainer added spec/approved at head C2 (event 10), before any record. */
 function recordingWorld(): World {
     return {
-        pull: { state: "open", head: C2, labels: ["spec/unarchived", LABEL] },
+        pull: { state: "open", head: C2, labels: ["documentation", LABEL] },
         trees: { [C2]: treeOf(CHANGE) },
-        events: [labeled(5, "spec/unarchived", BOT), labeled(10)],
+        events: [labeled(5, "documentation", BOT), labeled(10)],
         comments: [],
         permissions: { [MAINTAINER]: "admin" },
     };
@@ -418,7 +418,7 @@ Deno.test("the maintainer's account adds the label at the current head, and a re
 
 Deno.test("the recording run replaces the one withdrawn record and puts back a label a run took off", async () => {
     const world = recordingWorld();
-    world.pull.labels = ["spec/unarchived"];
+    world.pull.labels = ["documentation"];
     world.events.push(unlabeled(11, LABEL, BOT));
     world.comments = [record(3, C1, 2, true)];
     const result = await ran(world, { event: APPROVAL_EVENT });
@@ -570,7 +570,7 @@ Deno.test("after the record: a package change withdraws; an unrelated change or 
         `write: add ${PENDING}`,
         `write: remove ${LABEL}`,
     ]);
-    assertEquals(changed.world.pull.labels.filter((name) => name.startsWith("spec/")), ["spec/unarchived", PENDING]);
+    assertEquals(changed.world.pull.labels.filter((name) => name.startsWith("spec/")), [PENDING]);
     // The maintainer approves the new package by adding the label again; the next run then records it.
     changed.world.events.push(labeled(30));
     changed.world.pull.labels.push(LABEL);
@@ -661,7 +661,7 @@ Deno.test("the label present with no record (the recording run was cancelled) is
 Deno.test("a person's removal marks the record withdrawn; no label and no record writes nothing", async () => {
     const world = approvedWorld();
     world.events.push(unlabeled(11));
-    world.pull.labels = ["spec/unarchived"];
+    world.pull.labels = ["documentation"];
     const result = await ran(world, { event: { ...PUSH_EVENT, action: "unlabeled", label: LABEL } });
     assertEquals(result.calls, ["update comment 1", `add ${PENDING}`]);
     assertMatch(result.printed[0], /spec\/approved is not on the pull request; a person withdrew spec\/approved/);
@@ -904,7 +904,7 @@ Deno.test("ghApi passes what a pull request controls only in a body or percent-e
     await api.files(5);
     assertEquals(calls.at(-1)!.args, ["api", "--paginate", "--slurp", "repos/o/r/pulls/5/files?per_page=100"]);
     // No label but the three states is ever written.
-    for (const name of ["documentation", "spec/done", "../x"]) {
+    for (const name of ["documentation", "spec/frozen", "../x"]) {
         await assertRejects(() => api.addLabel(5, name), Error, "not a state label");
         await assertRejects(() => api.removeLabel(5, name), Error, "not a state label");
     }

@@ -781,13 +781,13 @@ Deno.test("spec labels: labels.json declares exactly the state labels, the appro
     for (const applier of ["workflow", "maintainer"]) {
         assertEquals(
             findings(
-                stateLabelFiles([...STATE_ROWS, { name: "spec/done", applied_by: applier }]),
+                stateLabelFiles([...STATE_ROWS, { name: "spec/frozen", applied_by: applier }]),
                 checkSpecLabels,
                 specDeps(),
             )
                 .errors,
             [
-                ".github/labels.json: 'spec/done' is not a state label scripts/spec_approval.ts writes; remove it or " +
+                ".github/labels.json: 'spec/frozen' is not a state label scripts/spec_approval.ts writes; remove it or " +
                 "teach the script.",
             ],
         );
