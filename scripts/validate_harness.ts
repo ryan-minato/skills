@@ -596,7 +596,7 @@ export function checkSpecLabels(h: Harness): void {
 // --- checks doc --------------------------------------------------------------------------------------
 
 function workflowFiles(h: Harness): string[] {
-    return h.list(WORKFLOWS).filter((n) => n.endsWith(".yml")).map((n) => `${WORKFLOWS}/${n}`);
+    return h.list(WORKFLOWS).filter((n) => /\.ya?ml$/.test(n)).map((n) => `${WORKFLOWS}/${n}`);
 }
 
 /** `jobs.<id>.name` when present, else `<id>`, per job. */
@@ -724,6 +724,9 @@ export function checkOpenspec(h: Harness): void {
 
 /** An extended regular expression for `git grep`: an OpenSpec package reference that names a version. */
 export const OPENSPEC_VERSION_PATTERN = "@fission-ai/openspec@[0-9]";
+/** An extended regular expression for `git grep`: an OpenTofu setup or version pin, which the tools never take. */
+// Built from parts so this tracked file does not match itself.
+export const OPENTOFU_PIN_PATTERN = ["setup", "-opentofu|tofu[_-]version[[:space:]]*[:=]"].join("");
 
 export function checkTools(h: Harness): void {
     for (const file of h.deps.trackedFiles(h.root)) {
@@ -739,6 +742,13 @@ export function checkTools(h: Harness): void {
         h.error(
             `${hit.file}:${hit.line}: names an OpenSpec version; the justfile's openspec_version is the only ` +
                 "pin. Use `{{openspec_version}}` in a recipe or run `just install-tools`.",
+        );
+    }
+    for (const hit of h.deps.grepTracked(h.root, OPENTOFU_PIN_PATTERN)) {
+        if (hit.file.startsWith("skills/") || hit.file.startsWith("openspec/changes/archive/")) continue;
+        h.error(
+            `${hit.file}:${hit.line}: pins or sets up a fixed OpenTofu; the tools follow the latest release. ` +
+                "Use `just install-opentofu` (or the setup action's `opentofu` input).",
         );
     }
 }
@@ -1217,8 +1227,10 @@ export function checkWorkflows(h: Harness): void {
     const privileged = privilegedList(h.read(CHECKS_DOC));
     for (const workflow of workflowFiles(h)) checkWorkflowFile(h, workflow, privileged);
     for (const action of h.list(ACTIONS)) {
-        const file = `${ACTIONS}/${action}/action.yml`;
-        if (h.isFile(file)) checkActionFile(h, file);
+        for (const name of ["action.yml", "action.yaml"]) {
+            const file = `${ACTIONS}/${action}/${name}`;
+            if (h.isFile(file)) checkActionFile(h, file);
+        }
     }
 }
 

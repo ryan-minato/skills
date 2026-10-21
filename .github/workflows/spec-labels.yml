@@ -38,7 +38,8 @@ on:
 permissions: {}
 
 # One group per pull request. A running run finishes; a pending run is replaced
-# by a newer one, which decides from the pull request's present state.
+# by a newer one, which decides from the pull request's present state: a
+# replaced recording run leaves the label without a record, so it is withdrawn.
 concurrency:
   group: spec-labels-${{ github.event.pull_request.number }}
   cancel-in-progress: false

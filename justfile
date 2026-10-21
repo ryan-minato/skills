@@ -142,7 +142,7 @@ review-threads N:
 # The approval label's state on pull request N, recomputed from its labels, events, and record (read-only)
 [positional-arguments]
 spec-approval N:
-    ./scripts/spec_approval.ts "$1"
+    case "$1" in ''|0*|*[!0-9]*) echo "usage: just spec-approval <pull request number>" >&2; exit 2 ;; esac; ./scripts/spec_approval.ts "$1"
 
 # Safety gate for staged changes (also runs as the first pre-commit hook)
 commit-gate:

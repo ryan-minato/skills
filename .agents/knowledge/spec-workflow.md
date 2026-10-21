@@ -135,6 +135,9 @@ pull request as in step 2, then continue.
   when a run fails, or when its deciding step times out. The package is
   every file of each unarchived change except `tasks.md`, plus the main
   spec under each delta; an archive commit is not a package change.
+  Only the run the label event starts writes the record; if that run is
+  replaced while pending, the next run finds the label without a record
+  and withdraws it, and the maintainer adds the label again.
   The label proves a deliberate write-access act bound to one package,
   not the maintainer's identity, so:
   - after asking for approval, the agent pushes nothing to the package

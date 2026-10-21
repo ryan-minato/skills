@@ -14,7 +14,7 @@
 // Output: one JSON object on stdout:
 //   {"run_id": ..., "status": ..., "conclusion": ...,
 //    "failed_jobs": [{"name": ..., "job_id": ..., "failed_steps": [...], "log_tail": [...]}]}
-// A job or step is unsuccessful when its conclusion is failure, timed_out, cancelled, or startup_failure.
+// A job or step is unsuccessful when its conclusion is failure, timed_out, or startup_failure (a cancelled job was superseded, not failed).
 // Diagnostics go to stderr.
 //
 // Exit codes: 0 digest produced (a green run digests to an empty failed_jobs list), 1 gh missing, gh
@@ -38,7 +38,7 @@ missing/errored/run not found/job log unfetchable, 2 bad arguments or an
 unexpected run JSON shape.`;
 
 /** Conclusions that make a job or step unsuccessful. */
-export const UNSUCCESSFUL = new Set(["failure", "timed_out", "cancelled", "startup_failure"]);
+export const UNSUCCESSFUL = new Set(["failure", "timed_out", "startup_failure"]);
 
 /** Runs gh; tests pass a stub. Throws Deno.errors.NotFound when gh is not installed. */
 export interface GhRunner {
