@@ -1,6 +1,7 @@
 import { assert, assertEquals, assertMatch, assertRejects, assertThrows } from "@std/assert";
 import { parse as parseYaml } from "@std/yaml";
 import {
+    ARCHIVED,
     archivedCopy,
     changesOf,
     type Event,
@@ -12,6 +13,7 @@ import {
     packageOf,
     packageProblems,
     parseInput,
+    PENDING,
     RECORD_LINE,
     recordBody,
     RECORDER,
@@ -105,6 +107,9 @@ interface World {
     events: RawEvent[];
     comments: RawComment[];
     permissions: Record<string, string>;
+    /** The pull request file list; `changedFiles`, when set, is the count the pull request reports instead of its length. */
+    files?: { filename: string; status: string }[];
+    changedFiles?: number;
     /** Called before a read is answered with its endpoint and how often it was read before; may change the world. */
     before?: (endpoint: string, count: number, world: World) => void;
     /** A call whose arguments include this text fails as gh fails. */
@@ -194,8 +199,14 @@ function fakeGh(world: World, repo = TEST_REPO) {
         if (world.raw?.[endpoint] !== undefined) return world.raw[endpoint];
         if (endpoint === `pulls/${NUMBER}`) {
             const { state, head, labels } = world.pull;
-            return JSON.stringify({ state, head: { sha: head }, labels: labels.map((name) => ({ name })) });
+            return JSON.stringify({
+                state,
+                head: { sha: head },
+                labels: labels.map((name) => ({ name })),
+                changed_files: world.changedFiles ?? world.files?.length ?? 0,
+            });
         }
+        if (endpoint === `pulls/${NUMBER}/files?per_page=100`) return JSON.stringify([world.files ?? []]);
         const tree = /^git\/trees\/([0-9a-f]{40})\?recursive=1$/.exec(endpoint);
         if (tree) {
             const found = world.trees[tree[1]];
@@ -390,13 +401,13 @@ Deno.test("the maintainer's account adds the label at the current head, and a re
     assertEquals(result.records, [{ commentId: 1000, commit: C2, login: MAINTAINER, eventId: 10, withdrawn: false }]);
     assert(labelsOf(result.world));
     assertEquals(result.printed, [
-        `approved: this run records the approval of ${C2} by "maint" (label event 10)`,
+        `spec/approved: this run records the approval of ${C2} by "maint" (label event 10)`,
         `write: post the record of ${C2}`,
     ]);
     // The next run, from any event, keeps it and writes nothing; the read-only run says approved.
     const next = await ran(result.world, { event: PUSH_EVENT });
     assertEquals([next.status, next.calls], [0, []]);
-    assertMatch(next.printed[0], /^approved: the approval of b{40} by "maint" \(label event 10\) holds$/);
+    assertMatch(next.printed[0], /^spec\/approved: the approval of b{40} by "maint" \(label event 10\) holds$/);
     const read = await ran(result.world, { apply: false });
     assertEquals([read.status, read.calls], [0, []]);
     // A rerun of the recording run replaces the one record with the same text.
@@ -449,10 +460,6 @@ Deno.test("recording is refused, and the label withdrawn, when the approval cann
             (world) => world.trees[C2] = treeOf({ ...CHANGE, "openspec/changes/add-x/specs/core/x/spec.md": "link:x" }),
             /link or submodule/,
         ],
-        "no unarchived change at the head": [
-            (world) => world.trees[C2] = treeOf(archivedChange()),
-            /no unarchived change/,
-        ],
         "more than one record comment": [
             (world) => world.comments = [record(1, C1, 2, true), record(2, C1, 3, true)],
             /more than one record comment/,
@@ -469,7 +476,7 @@ Deno.test("recording is refused, and the label withdrawn, when the approval cann
         const result = await ran(world, { event: events[name] ?? APPROVAL_EVENT });
         assertEquals(result.status, 0, name);
         assert(!result.calls.includes("create comment"), `${name}: no record`);
-        assertMatch(result.printed[0], /^not approved: .*; not recorded: /, name);
+        assertMatch(result.printed[0], /^spec\/pending: .*; not recorded: /, name);
         assertMatch(result.printed[0], why, name);
         assert(!labelsOf(result.world), `${name}: the label is withdrawn`);
         assert(result.records.every((item) => item.withdrawn), `${name}: no live record`);
@@ -487,8 +494,8 @@ Deno.test("a person re-added or removed the label during the run: nothing is rec
     };
     const gone = await ran(removed, { event: APPROVAL_EVENT });
     assertEquals(gone.status, 0);
-    assertEquals(gone.calls, [`remove ${LABEL}`]);
-    assertMatch(gone.printed[0], /not recorded: a person removed spec\/approved during the run/);
+    assertEquals(gone.calls, [`add ${PENDING}`, `remove ${LABEL}`]);
+    assertMatch(gone.printed[0], /not recorded: a person withdrew spec\/approved during the run/);
     assert(gone.notes.includes(`done: ${LABEL} was already gone`), gone.notes.join("|"));
     // Removed and added again while this run read: this run records nothing; the run of the new adding does.
     const again = recordingWorld();
@@ -501,14 +508,30 @@ Deno.test("a person re-added or removed the label during the run: nothing is rec
     assert(!first.calls.includes("create comment"));
     assertMatch(first.printed[0], /spec\/approved was added again during the run/);
     again.before = undefined;
-    // The first run's removal is the workflow's own, which withdraws nothing a person did.
+    // The first run's writes are the workflow's own, which withdraw nothing a person did.
     const second = await ran(first.world, { event: APPROVAL_EVENT });
-    assertEquals(second.calls, ["create comment", `add ${LABEL}`]);
+    assertEquals(second.calls, ["create comment", `add ${LABEL}`, `remove ${PENDING}`]);
     assertEquals(second.records.map((item) => item.eventId), [12]);
-    // The same events by a bot stop no record.
+    // The same events by a bot stop no record, nor does spec/pending added by the workflow.
     const bots = recordingWorld();
-    bots.events.push(unlabeled(11, LABEL, BOT), labeled(12, "spec/done", BOT));
+    bots.events.push(unlabeled(11, LABEL, BOT), labeled(12, PENDING, BOT));
     assertEquals((await ran(bots, { event: APPROVAL_EVENT })).calls, ["create comment"]);
+    // spec/pending added by a person after the adding withdraws it, during the run or before.
+    const pendingDuring = recordingWorld();
+    pendingDuring.before = (endpoint, count, world) => {
+        if (endpoint === `issues/${NUMBER}/events?per_page=100` && count === 1) {
+            world.events.push(labeled(11, PENDING));
+            world.pull.labels.push(PENDING);
+        }
+    };
+    const during = await ran(pendingDuring, { event: APPROVAL_EVENT });
+    assert(!during.calls.includes("create comment"));
+    assertMatch(during.printed[0], /not recorded: a person withdrew spec\/approved during the run/);
+    const pendingBefore = recordingWorld();
+    pendingBefore.events.push(labeled(11, PENDING));
+    const before = await ran(pendingBefore, { event: APPROVAL_EVENT });
+    assertEquals(before.calls, [`add ${PENDING}`, `remove ${LABEL}`]);
+    assertMatch(before.printed[0], /not recorded: a person withdrew spec\/approved after this event/);
 });
 
 Deno.test("a closed pull request is never written to by a run that succeeds", async () => {
@@ -534,24 +557,35 @@ Deno.test("a closed pull request is never written to by a run that succeeds", as
 
 // ---- Every other run -------------------------------------------------------------------------------
 
-Deno.test("after the record: a package change withdraws; an unrelated change or an archive keeps it", async () => {
+Deno.test("after the record: a package change withdraws; an unrelated change or ticked tasks keep it", async () => {
     const changed = await ran(approvedWorld({ ...CHANGE, "openspec/changes/add-x/proposal.md": "p2" }), {
         event: PUSH_EVENT,
     });
     assertEquals(changed.status, 0);
-    assertEquals(changed.calls, ["update comment 1", `remove ${LABEL}`]);
-    assertMatch(changed.printed[0], /^not approved: the change "add-x" differs in "proposal.md"$/);
+    assertEquals(changed.calls, ["update comment 1", `add ${PENDING}`, `remove ${LABEL}`]);
+    assertMatch(changed.printed[0], /^spec\/pending: the change "add-x" differs in "proposal.md"$/);
     assertEquals(changed.records.map((item) => item.withdrawn), [true]);
-    assertEquals(changed.printed.slice(1), [`write: mark the record of ${C1} withdrawn`, `write: remove ${LABEL}`]);
+    assertEquals(changed.printed.slice(1), [
+        `write: mark the record of ${C1} withdrawn`,
+        `write: add ${PENDING}`,
+        `write: remove ${LABEL}`,
+    ]);
+    assertEquals(changed.world.pull.labels.filter((name) => name.startsWith("spec/")), ["spec/unarchived", PENDING]);
+    // The maintainer approves the new package by adding the label again; the next run then records it.
+    changed.world.events.push(labeled(30));
+    changed.world.pull.labels.push(LABEL);
+    const again = await ran(changed.world, { event: APPROVAL_EVENT });
+    assertEquals(again.calls, ["update comment 1", `remove ${PENDING}`]);
+    assertEquals(again.records.map((item) => [item.commit, item.eventId, item.withdrawn]), [[C2, 30, false]]);
     for (
         const [name, head] of Object.entries({
             "an unrelated change": { ...CHANGE, "README.md": "r2", "openspec/changes/add-x/tasks.md": "t2" },
-            "an archive commit": archivedChange(),
+            "a second commit that only ticks tasks": { ...CHANGE, "openspec/changes/add-x/tasks.md": "t-done" },
         })
     ) {
         const kept = await ran(approvedWorld(head), { event: PUSH_EVENT });
         assertEquals([kept.status, kept.calls], [0, []], name);
-        assertMatch(kept.printed[0], /^approved: /, name);
+        assertMatch(kept.printed[0], /^spec\/approved: /, name);
         assert(kept.notes.includes("done: nothing to write"), name);
     }
 });
@@ -565,7 +599,7 @@ Deno.test(".openspec.yaml, a main spec under a delta, a second change, or a new 
     };
     for (const [name, head] of Object.entries(changes)) {
         const result = await ran(approvedWorld(head), { event: PUSH_EVENT });
-        assertEquals(result.calls, ["update comment 1", `remove ${LABEL}`], name);
+        assertEquals(result.calls, ["update comment 1", `add ${PENDING}`, `remove ${LABEL}`], name);
         assert(!labelsOf(result.world), name);
     }
 });
@@ -574,50 +608,54 @@ Deno.test("two records, a record by another account, or a record of an earlier a
     const cases: Record<string, [(world: World) => void, string[]]> = {
         "two records": [
             (world) => world.comments.push(record(3, C1, 10)),
-            ["update comment 1", "update comment 3", `remove ${LABEL}`],
+            ["update comment 1", "update comment 3", `add ${PENDING}`, `remove ${LABEL}`],
         ],
         "a record comment by a person": [(world) => world.comments = [record(1, C1, 10, false, person())], [
+            `add ${PENDING}`,
             `remove ${LABEL}`,
         ]],
         "a record comment by a person with the bot's login": [
             (world) => world.comments = [record(1, C1, 10, false, { login: RECORDER.login, type: "User" })],
-            [`remove ${LABEL}`],
+            [`add ${PENDING}`, `remove ${LABEL}`],
         ],
         "a record comment by another bot": [
             (world) => world.comments = [record(1, C1, 10, false, { login: "other[bot]", type: "Bot" })],
-            [`remove ${LABEL}`],
+            [`add ${PENDING}`, `remove ${LABEL}`],
         ],
         "a record answering an earlier adding": [
             (world) => world.events.push(unlabeled(20), labeled(21)),
-            ["update comment 1", `remove ${LABEL}`],
+            ["update comment 1", `add ${PENDING}`, `remove ${LABEL}`],
         ],
         "a record whose first line lost its form": [
             (world) => world.comments = [{ id: 1, body: ` ${recordBody(C1, MAINTAINER, 10, false)}`, user: BOT }],
-            [`remove ${LABEL}`],
+            [`add ${PENDING}`, `remove ${LABEL}`],
         ],
-        "a withdrawn record": [(world) => world.comments = [record(1, C1, 10, true)], [`remove ${LABEL}`]],
+        "a withdrawn record": [(world) => world.comments = [record(1, C1, 10, true)], [
+            `add ${PENDING}`,
+            `remove ${LABEL}`,
+        ]],
     };
     for (const [name, [change, calls]] of Object.entries(cases)) {
         const world = approvedWorld();
         change(world);
         const result = await ran(world, { event: PUSH_EVENT });
         assertEquals([result.status, result.calls], [0, calls], name);
-        assertMatch(result.printed[0], /^not approved: /, name);
+        assertMatch(result.printed[0], /^spec\/pending: /, name);
     }
 });
 
 Deno.test("the label present with no record (the recording run was cancelled) is withdrawn", async () => {
     const world = recordingWorld();
     const result = await ran(world, { event: PUSH_EVENT });
-    assertEquals([result.status, result.calls], [0, [`remove ${LABEL}`]]);
-    assertMatch(result.printed[0], /^not approved: no record comment$/);
+    assertEquals([result.status, result.calls], [0, [`add ${PENDING}`, `remove ${LABEL}`]]);
+    assertMatch(result.printed[0], /^spec\/pending: no record comment$/);
     // Another label added by a person is not this event either.
     const other = await ran(recordingWorld(), { event: { ...APPROVAL_EVENT, label: "documentation" } });
-    assertEquals(other.calls, [`remove ${LABEL}`]);
+    assertEquals(other.calls, [`add ${PENDING}`, `remove ${LABEL}`]);
     // The read-only run reports it and writes nothing.
     const read = await ran(recordingWorld(), { apply: false });
     assertEquals([read.status, read.calls], [1, []]);
-    assertEquals(read.printed, ["not approved: no record comment", `write: remove ${LABEL}`]);
+    assertEquals(read.printed, ["spec/pending: no record comment", `write: add ${PENDING}`, `write: remove ${LABEL}`]);
 });
 
 Deno.test("a person's removal marks the record withdrawn; no label and no record writes nothing", async () => {
@@ -625,13 +663,14 @@ Deno.test("a person's removal marks the record withdrawn; no label and no record
     world.events.push(unlabeled(11));
     world.pull.labels = ["spec/unarchived"];
     const result = await ran(world, { event: { ...PUSH_EVENT, action: "unlabeled", label: LABEL } });
-    assertEquals(result.calls, ["update comment 1"]);
-    assertMatch(result.printed[0], /spec\/approved is not on the pull request; a person removed spec\/approved/);
-    const nothing = await ran({ ...recordingWorld(), events: [], pull: { state: "open", head: C2, labels: [] } });
+    assertEquals(result.calls, ["update comment 1", `add ${PENDING}`]);
+    assertMatch(result.printed[0], /spec\/approved is not on the pull request; a person withdrew spec\/approved/);
+    // An unarchived change with no approval at all is pending; once pending, nothing more is written.
+    const fresh = await ran({ ...recordingWorld(), events: [], pull: { state: "open", head: C2, labels: [] } });
+    assertEquals([fresh.status, fresh.calls], [0, [`add ${PENDING}`]]);
+    const nothing = await ran(fresh.world);
     assertEquals([nothing.status, nothing.calls], [0, []]);
-    const read = await ran({ ...recordingWorld(), events: [], pull: { state: "open", head: C2, labels: [] } }, {
-        apply: false,
-    });
+    const read = await ran(fresh.world, { apply: false });
     assertEquals([read.status, read.printed.length], [1, 1]);
 });
 
@@ -640,7 +679,7 @@ Deno.test("a link in the package at the head withdraws a recorded approval", asy
         approvedWorld({ ...CHANGE, "openspec/changes/add-x/extra.md": "link:/etc/passwd" }),
         { event: PUSH_EVENT },
     );
-    assertEquals(result.calls, ["update comment 1", `remove ${LABEL}`]);
+    assertEquals(result.calls, ["update comment 1", `add ${PENDING}`, `remove ${LABEL}`]);
     assertMatch(
         result.printed[0],
         /link or submodule in the package at the head: "openspec\/changes\/add-x\/extra.md"/,
@@ -656,10 +695,12 @@ Deno.test("a failed run removes the label and exits 2; a read-only run writes no
         const event = failing === "/permission" ? APPROVAL_EVENT : PUSH_EVENT;
         const result = await ran(world, { event });
         assertEquals(result.status, 2, failing);
-        assertEquals(result.calls, [`remove ${LABEL}`], failing);
+        // An open pull request gets spec/pending; when the pull request itself could not be read, only the removal.
+        const known = failing !== `pulls/${NUMBER}`;
+        assertEquals(result.calls, [...known ? [`add ${PENDING}`] : [], `remove ${LABEL}`], failing);
         assert(!labelsOf(result.world), failing);
         assertMatch(result.notes[0], /^error: gh api .*HTTP 502/, failing);
-        assertEquals(result.notes[1], `after the error: removed ${LABEL}`, failing);
+        assertEquals(result.notes.at(-1), `after the error: removed ${LABEL}`, failing);
         // A read-only run reads no permission; every other read fails it without a write.
         if (failing !== "/permission") {
             const read = await ran({ ...approvedWorld(), failing }, { apply: false });
@@ -670,24 +711,30 @@ Deno.test("a failed run removes the label and exits 2; a read-only run writes no
     const write = approvedWorld({ ...CHANGE, "openspec/changes/add-x/design.md": "d2" });
     write.failing = "PATCH";
     const result = await ran(write, { event: PUSH_EVENT });
-    assertEquals([result.status, result.calls], [2, [`remove ${LABEL}`]]);
+    assertEquals([result.status, result.calls], [2, [`add ${PENDING}`, `remove ${LABEL}`]]);
     // Taking it off after an error tolerates its absence, and reports a failure of its own without hiding the first.
     const absent = recordingWorld();
     absent.pull.labels = [];
     absent.failing = "/comments";
-    assertEquals((await ran(absent)).notes[1], `after the error: ${LABEL} was not on the pull request`);
+    assertEquals((await ran(absent)).notes.at(-1), `after the error: ${LABEL} was not on the pull request`);
     const both = approvedWorld();
     both.failing = "issues/7";
     const failed = await ran(both);
     assertEquals(failed.status, 2);
-    assertMatch(failed.notes[1], /^after the error: could not remove spec\/approved: gh api -X DELETE/);
+    assertMatch(failed.notes[1], /^after the error: could not add spec\/pending: gh api -X POST/);
+    assertMatch(failed.notes[2], /^after the error: could not remove spec\/approved: gh api -X DELETE/);
+    // A closed pull request gets no spec/pending after an error.
+    const closed = approvedWorld();
+    closed.pull.state = "closed";
+    closed.failing = "/comments";
+    assertEquals((await ran(closed)).calls, [`remove ${LABEL}`]);
 });
 
 Deno.test("a truncated tree, an answer that is no JSON, or one of an unexpected shape fails the run", async () => {
     const truncated = approvedWorld();
     truncated.trees[C1] = { ...truncated.trees[C1], truncated: true };
     const cut = await ran(truncated, { event: PUSH_EVENT });
-    assertEquals([cut.status, cut.calls], [2, [`remove ${LABEL}`]]);
+    assertEquals([cut.status, cut.calls], [2, [`add ${PENDING}`, `remove ${LABEL}`]]);
     assertMatch(cut.notes[0], /truncated/);
     const answers: Record<string, string> = {
         [`pulls/${NUMBER}`]: "<html>",
@@ -730,8 +777,64 @@ Deno.test("an error that is no interface failure still takes the label off, then
         TypeError,
         "a bug",
     );
+    // The pull request was never read, so only the removal.
     assertEquals(calls, [`remove ${LABEL}`]);
     assertEquals(notes, ["error: a bug", `after the error: removed ${LABEL}`]);
+});
+
+// ---- The state without an unarchived change --------------------------------------------------------
+
+Deno.test("no unarchived change: archived when the pull request archives one, else none; no record is touched", async () => {
+    const archiving = approvedWorld(archivedChange());
+    archiving.trees[C2] = treeOf(archivedChange());
+    archiving.files = [
+        { filename: "openspec/changes/archive/2026-10-20-add-x/proposal.md", status: "renamed" },
+        { filename: "openspec/changes/archive/2026-10-20-add-x/tasks.md", status: "added" },
+        { filename: "openspec/changes/add-x/tasks.md", status: "removed" },
+    ];
+    // The freeze: spec/archived replaces spec/approved, and the record stays live as the evidence.
+    const frozen = await ran(archiving, { event: PUSH_EVENT });
+    assertEquals([frozen.status, frozen.calls], [0, [`add ${ARCHIVED}`, `remove ${LABEL}`]]);
+    assertEquals(frozen.printed[0], `${ARCHIVED}: no unarchived change at the head; the pull request archives one`);
+    assertEquals(frozen.records.map((item) => item.withdrawn), [false]);
+    const again = await ran(frozen.world, { event: PUSH_EVENT });
+    assertEquals(again.calls, []);
+    assertEquals((await ran(frozen.world, { apply: false })).status, 1);
+    // Unrelated to OpenSpec: no state label, and any one present is removed.
+    const unrelated: World = {
+        ...recordingWorld(),
+        trees: { [C2]: treeOf(without(archivedChange(), "openspec/changes/archive/2026-10-20-add-x/proposal.md")) },
+        files: [{ filename: "README.md", status: "modified" }],
+    };
+    unrelated.pull.labels = ["documentation", PENDING, LABEL];
+    const none = await ran(unrelated, { event: APPROVAL_EVENT });
+    assertEquals(none.calls, [`remove ${PENDING}`, `remove ${LABEL}`]);
+    assertEquals(none.printed[0], "none: no unarchived change at the head, and the pull request archives none");
+    assertEquals(none.world.pull.labels, ["documentation"]);
+    assert(!none.calls.includes("create comment"));
+});
+
+Deno.test("no unarchived change and a cut-short file list: spec/archived is left as it is", async () => {
+    for (const [name, changedFiles] of [["more files than listed", 5], ["more than the API lists", 3001]] as const) {
+        const world: World = {
+            ...recordingWorld(),
+            trees: { [C2]: treeOf(archivedChange()) },
+            files: [{ filename: "README.md", status: "modified" }],
+            changedFiles,
+        };
+        world.pull.labels = [ARCHIVED, PENDING];
+        const result = await ran(world, { event: PUSH_EVENT });
+        assertEquals(result.calls, [`remove ${PENDING}`], name);
+        assertMatch(result.printed[0], /^undecided: .*cut short/, name);
+    }
+    // An archive found in the part that was listed still decides it.
+    const found: World = {
+        ...recordingWorld(),
+        trees: { [C2]: treeOf(archivedChange()) },
+        files: [{ filename: "openspec/changes/archive/2026-10-20-add-x/design.md", status: "added" }],
+        changedFiles: 4000,
+    };
+    assertEquals((await ran(found, { event: PUSH_EVENT })).calls, [`add ${ARCHIVED}`, `remove ${LABEL}`]);
 });
 
 // ---- The record comment ----------------------------------------------------------------------------
@@ -793,11 +896,18 @@ Deno.test("ghApi passes what a pull request controls only in a body or percent-e
     assertEquals(calls.at(-1)!.args, ["api", "repos/o/r/collaborators/..%2F../permission"]);
     await api.permission("a b@c");
     assertEquals(calls.at(-1)!.args[1], "repos/o/r/collaborators/a%20b%40c/permission");
-    await api.removeLabel(5);
+    await api.removeLabel(5, LABEL);
     assertEquals(calls.at(-1)!.args, ["api", "-X", "DELETE", "repos/o/r/issues/5/labels/spec%2Fapproved"]);
-    await api.addLabel(5);
+    await api.addLabel(5, PENDING);
     assertEquals(calls.at(-1)!.args, ["api", "-X", "POST", "repos/o/r/issues/5/labels", "--input", "-"]);
-    assertEquals(calls.at(-1)!.stdin, '{"labels":["spec/approved"]}');
+    assertEquals(calls.at(-1)!.stdin, '{"labels":["spec/pending"]}');
+    await api.files(5);
+    assertEquals(calls.at(-1)!.args, ["api", "--paginate", "--slurp", "repos/o/r/pulls/5/files?per_page=100"]);
+    // No label but the three states is ever written.
+    for (const name of ["documentation", "spec/done", "../x"]) {
+        await assertRejects(() => api.addLabel(5, name), Error, "not a state label");
+        await assertRejects(() => api.removeLabel(5, name), Error, "not a state label");
+    }
     await api.createComment(5, "@file\n::error::x");
     assertEquals(calls.at(-1)!.args, ["api", "-X", "POST", "repos/o/r/issues/5/comments", "--input", "-"]);
     assertEquals(calls.at(-1)!.stdin, '{"body":"@file\\n::error::x"}');
@@ -814,11 +924,11 @@ Deno.test("ghApi passes what a pull request controls only in a body or percent-e
     }
     // A failure other than 404 on the removal is a failure.
     const failing = ghApi(() => Promise.reject(new CommandError("gh api exited 1: gh: Forbidden (HTTP 403)")), "o/r");
-    await assertRejects(() => failing.removeLabel(5), CommandError, "HTTP 403");
+    await assertRejects(() => failing.removeLabel(5, LABEL), CommandError, "HTTP 403");
     const missing = ghApi(() =>
         Promise.reject(new CommandError("gh api exited 1: gh: Label does not exist (HTTP 404)"))
     );
-    assertEquals(await missing.removeLabel(5), false);
+    assertEquals(await missing.removeLabel(5, LABEL), false);
 });
 
 Deno.test("parseInput: a number for a read, the environment for --apply, and nothing else", () => {
