@@ -1,4 +1,16 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
+# Read only when this project is trusted. Policy and reasons:
+# .agents/knowledge/agent-authority.md, `## Permission entries`.
+# Escalations go to Codex's reviewer, not to the user; rules/default.rules
+# forbids the clearly risky commands and allows the per-task checks.
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+# gh, git push, and Deno's module registry are part of every task.
+network_access = true
+
 [mcp_servers.agentskills]
 url = "https://agentskills.io/mcp"
