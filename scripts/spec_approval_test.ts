@@ -27,6 +27,8 @@ import { CommandError, exists, REPO, ROOT, UsageError } from "./lib/repo.ts";
 const C1 = "a".repeat(40);
 const C2 = "b".repeat(40);
 const C3 = "c".repeat(40);
+/// The base commit the stub answers by default: the tree of CHANGE without any change of the pull request.
+const C0 = "0".repeat(40);
 const MAINTAINER = "maint";
 const NUMBER = 7;
 const TEST_REPO = "o/r";
@@ -65,6 +67,11 @@ const CHANGE: Record<string, string> = {
 const without = (files: Record<string, string>, ...paths: string[]) =>
     Object.fromEntries(Object.entries(files).filter(([path]) => !paths.includes(path)));
 
+/** The base the pull request is compared with: CHANGE without the change it brings. */
+const BASE_FILES = Object.fromEntries(
+    Object.entries(CHANGE).filter(([path]) => !path.startsWith("openspec/changes/add-x/")),
+);
+
 /** CHANGE after `just spec-changes archive`: moved under the archive, tasks ticked, main spec rewritten. */
 function archivedChange(overrides: Record<string, string> = {}): Record<string, string> {
     const moved: Record<string, string> = {};
@@ -102,7 +109,7 @@ interface RawComment {
 }
 
 interface World {
-    pull: { state: "open" | "closed"; head: string; labels: string[] };
+    pull: { state: "open" | "closed"; head: string; labels: string[]; base?: string };
     trees: Record<string, Tree>;
     events: RawEvent[];
     comments: RawComment[];
@@ -202,6 +209,7 @@ function fakeGh(world: World, repo = TEST_REPO) {
             return JSON.stringify({
                 state,
                 head: { sha: head },
+                base: { sha: world.pull.base ?? C0 },
                 labels: labels.map((name) => ({ name })),
                 changed_files: world.changedFiles ?? world.files?.length ?? 0,
             });
@@ -209,7 +217,7 @@ function fakeGh(world: World, repo = TEST_REPO) {
         if (endpoint === `pulls/${NUMBER}/files?per_page=100`) return JSON.stringify([world.files ?? []]);
         const tree = /^git\/trees\/([0-9a-f]{40})\?recursive=1$/.exec(endpoint);
         if (tree) {
-            const found = world.trees[tree[1]];
+            const found = world.trees[tree[1]] ?? (tree[1] === C0 ? treeOf(BASE_FILES) : undefined);
             if (!found) fail(args, "gh: Not Found (HTTP 404)");
             return JSON.stringify({ sha: tree[1], tree: found.entries, truncated: found.truncated });
         }
@@ -795,7 +803,7 @@ Deno.test("no unarchived change: archived when the pull request archives one, el
     // The freeze: spec/archived replaces spec/approved, and the record stays live as the evidence.
     const frozen = await ran(archiving, { event: PUSH_EVENT });
     assertEquals([frozen.status, frozen.calls], [0, [`add ${ARCHIVED}`, `remove ${LABEL}`]]);
-    assertEquals(frozen.printed[0], `${ARCHIVED}: no unarchived change at the head; the pull request archives one`);
+    assertEquals(frozen.printed[0], `${ARCHIVED}: no unarchived change of its own; the pull request archives one`);
     assertEquals(frozen.records.map((item) => item.withdrawn), [false]);
     const again = await ran(frozen.world, { event: PUSH_EVENT });
     assertEquals(again.calls, []);
@@ -809,7 +817,7 @@ Deno.test("no unarchived change: archived when the pull request archives one, el
     unrelated.pull.labels = ["documentation", PENDING, LABEL];
     const none = await ran(unrelated, { event: APPROVAL_EVENT });
     assertEquals(none.calls, [`remove ${PENDING}`, `remove ${LABEL}`]);
-    assertEquals(none.printed[0], "none: no unarchived change at the head, and the pull request archives none");
+    assertEquals(none.printed[0], "none: no unarchived change of its own, and the pull request archives none");
     assertEquals(none.world.pull.labels, ["documentation"]);
     assert(!none.calls.includes("create comment"));
 });
@@ -835,6 +843,88 @@ Deno.test("no unarchived change and a cut-short file list: spec/archived is left
         changedFiles: 4000,
     };
     assertEquals((await ran(found, { event: PUSH_EVENT })).calls, [`add ${ARCHIVED}`, `remove ${LABEL}`]);
+});
+
+// ---- A pull request into another pull request's branch --------------------------------------------------
+
+/** A parent pull request's unarchived change, which a stacked base carries. */
+const PARENT = (version: string): Record<string, string> => ({
+    "openspec/changes/add-p/.openspec.yaml": "pm",
+    "openspec/changes/add-p/proposal.md": `pp-${version}`,
+});
+
+Deno.test("a stacked pull request answers only for the changes it brings, not its base's", async () => {
+    const C4 = "d".repeat(40);
+    // No change of its own: the parent's unarchived change in the base makes it neither pending nor approvable.
+    const bare: World = {
+        ...recordingWorld(),
+        pull: { state: "open", head: C2, base: C4, labels: [PENDING] },
+        trees: {
+            [C2]: treeOf({ ...BASE_FILES, ...PARENT("1"), "README.md": "r2" }),
+            [C4]: treeOf({ ...BASE_FILES, ...PARENT("1") }),
+        },
+        files: [{ filename: "README.md", status: "modified" }],
+    };
+    const none = await ran(bare, { event: PUSH_EVENT });
+    assertEquals(none.calls, [`remove ${PENDING}`]);
+    assertMatch(none.printed[0], /^none: /);
+    // A change of its own: the parent editing its change, merged into this branch, withdraws nothing here.
+    const stacked = approvedWorld({ ...CHANGE, ...PARENT("2") });
+    stacked.pull.base = C4;
+    stacked.trees[C1] = treeOf({ ...CHANGE, ...PARENT("1") });
+    stacked.trees[C4] = treeOf({ ...BASE_FILES, ...PARENT("2") });
+    const kept = await ran(stacked, { event: PUSH_EVENT });
+    assertEquals([kept.status, kept.calls], [0, []]);
+    assertMatch(kept.printed[0], /^spec\/approved: /);
+    // Its own change still withdraws it.
+    const own = approvedWorld({ ...CHANGE, ...PARENT("2"), "openspec/changes/add-x/design.md": "d2" });
+    own.pull.base = C4;
+    own.trees[C1] = treeOf({ ...CHANGE, ...PARENT("1") });
+    own.trees[C4] = treeOf({ ...BASE_FILES, ...PARENT("2") });
+    const withdrawn = await ran(own, { event: PUSH_EVENT });
+    assertEquals(withdrawn.calls, ["update comment 1", `add ${PENDING}`, `remove ${LABEL}`]);
+    assertMatch(withdrawn.printed[0], /^spec\/pending: the change "add-x" differs in "design.md"$/);
+    // A change of the base that this pull request edits is its own as well.
+    const edited = approvedWorld({ ...CHANGE, ...PARENT("3") });
+    edited.pull.base = C4;
+    edited.trees[C1] = treeOf({ ...CHANGE, ...PARENT("2") });
+    edited.trees[C4] = treeOf({ ...BASE_FILES, ...PARENT("2") });
+    assertMatch((await ran(edited, { event: PUSH_EVENT })).printed[0], /^spec\/pending: .*"add-p"/);
+});
+
+// ---- A withdrawal after the archive ---------------------------------------------------------------------
+
+Deno.test("a person's withdrawal after the archive holds: spec/pending, the record withdrawn", async () => {
+    const world = approvedWorld(archivedChange());
+    world.files = [{ filename: "openspec/changes/archive/2026-10-20-add-x/proposal.md", status: "renamed" }];
+    world.events.push(labeled(20, PENDING));
+    world.pull.labels = [LABEL, PENDING];
+    const result = await ran(world, { event: { ...PUSH_EVENT, action: "labeled", label: PENDING } });
+    assertEquals(result.calls, ["update comment 1", `remove ${LABEL}`]);
+    assertMatch(result.printed[0], /^spec\/pending: the pull request archives its change, but a person withdrew/);
+    assertEquals(result.records.map((item) => item.withdrawn), [true]);
+    assertEquals(result.world.pull.labels, [PENDING]);
+    // Removing spec/approved after the archive withdraws it the same way.
+    const removed = approvedWorld(archivedChange());
+    removed.files = world.files;
+    removed.events.push(unlabeled(20));
+    removed.pull.labels = [];
+    assertEquals((await ran(removed, { event: PUSH_EVENT })).calls, ["update comment 1", `add ${PENDING}`]);
+    // The maintainer adds spec/approved again: the latest adding stands, and the archived state returns.
+    result.world.events.push(labeled(30));
+    result.world.pull.labels.push(LABEL);
+    const again = await ran(result.world, { event: APPROVAL_EVENT });
+    assertEquals(again.calls, [`add ${ARCHIVED}`, `remove ${PENDING}`, `remove ${LABEL}`]);
+});
+
+Deno.test("failing closed on an archived pull request leaves spec/pending alone", async () => {
+    const world = approvedWorld(archivedChange());
+    world.pull.labels = [ARCHIVED];
+    world.failing = "/files";
+    const result = await ran(world, { event: PUSH_EVENT });
+    assertEquals(result.status, 2);
+    assertEquals(result.calls, [`add ${PENDING}`, `remove ${ARCHIVED}`, `remove ${LABEL}`]);
+    assertEquals(result.world.pull.labels, [PENDING]);
 });
 
 // ---- The record comment ----------------------------------------------------------------------------
