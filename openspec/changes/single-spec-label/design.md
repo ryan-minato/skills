@@ -1,8 +1,12 @@
 ## Context
 
-`spec-labels.yml` (`pull_request_target`, main's copy, `pull-requests: write`) runs three steps: `scripts/spec_approval.ts --apply` decides `spec/approved` from the label history, the record comment, and the approval package at the head; `spec_changes.ts snapshot` reads the head through the API; `spec_changes.ts labels` plans the archive axis and the progress axis from the related changes, and a shell loop applies the plan against a literal `case` list. `validate_harness.ts` (`spec`) checks `labels.json` against `MANAGED_LABELS` from `spec_changes.ts` and that `case` list. The reference model is `scripts/sync_pr_labels.ts` in hoshiori-dev/devcontainer-features: one state label of `pending | approved | archived`, or none, decided from the head tree and the file list. Binding constraint: nothing under `skills/` changes. See proposal.md for motivation.
+`spec-labels.yml` (`pull_request_target`, main's copy, `pull-requests: write`) runs three steps: `scripts/spec_approval.ts --apply` decides `spec/approved` from the label history, the record comment, and the approval package at the head; `spec_changes.ts snapshot` reads the head through the API; `spec_changes.ts labels` plans the archive axis and the progress axis from the related changes, and a shell loop applies the plan against a literal `case` list. `validate_harness.ts` (`spec`) checks `labels.json` against `MANAGED_LABELS` from `spec_changes.ts` and that `case` list.
 
-## The state
+`checks.yml` (`pull_request`, the pull request's own copy, read-only token) runs `checks / spec`: strict validation, then `spec_changes.ts check`, which fails a ready pull request holding an unarchived related change (a warning on a draft, `--draft`), then the `openspec-*` sync; `checks / gate` aggregates it and is the required check. `pr-policy.yml` already runs the base's copy of its script, checking out the base and fetching `refs/pull/<n>/head`.
+
+The reference is hoshiori-dev/devcontainer-features: `scripts/sync_pr_labels.ts` keeps one state label of `pending | approved | archived`, or none; `pr.yml` splits an `archive-verdict` job from a carrier job named `spec-archived` when no change is unarchived and `awaiting-archive` otherwise, with `spec-archived` required. Binding constraint: nothing under `skills/` changes. See proposal.md for motivation.
+
+## The state label
 
 Decided by `spec_approval.ts` from the pull request's present state, in this order:
 
@@ -21,42 +25,62 @@ Decided by `spec_approval.ts` from the pull request's present state, in this ord
 - After an error, on an open pull request: add `spec/pending`, then remove `spec/approved`; on a closed one: remove `spec/approved`. The workflow's failure step keeps removing `spec/approved`.
 - Read-only `just spec-approval <n>` prints the state, the reason, and the writes; exit 0 for `spec/approved`, 1 for any other state.
 
+## The archive gate
+
+Two jobs in `checks.yml`, on `pull_request` only, outside `checks / gate`:
+
+- `checks / archive-verdict`: checks out the base commit (`ref: base.sha`, `fetch-depth: 0`, no credentials), fetches `refs/pull/<n>/head`, installs Deno, and runs the base's `./scripts/spec_changes.ts status --base <base> --head <head> --json` into a file under `$RUNNER_TEMP`. A non-zero exit fails the job. `jq` then writes `archived=true` when no related change has `"state": "active"` and `archived=false` otherwise; nothing else from the file reaches `$GITHUB_OUTPUT`, so a change name the pull request chose never does. The step prints the related changes' table from `status` without `--json` for the reader.
+- The carrier job: `needs: archive-verdict`, named `${{ needs.archive-verdict.outputs.archived == 'true' && 'checks / archived' || 'checks / awaiting-archive' }}`, one step that says which, and succeeds either way. A failed verdict skips it, so neither name succeeds.
+
+The ruleset requires `checks / archived`. While a change is unarchived, GitHub shows the required check as expected and the merge waits; the run is green. The verdict depends on the commits alone, never on the draft state.
+
+`checks / spec` on a pull request: strict validation and the sync as now; `spec_changes.ts check` with a request source reports every unarchived related change as a warning naming the archive gate and never as a finding, and `--draft` is removed. With `--all` (a push to `main`) an unarchived change stays a finding.
+
 ## Placement
 
 | Item | File and section | Check that proves it |
 |---|---|---|
-| State decision and writes | `scripts/spec_approval.ts`: `STATE_LABELS`, `decide`, `writesOf`, `failClosed`, the `Api` label calls taking one of `STATE_LABELS`, a `files` read; header and usage | `just test` (`spec_approval_test.ts`: one case per table row, the `spec/pending` withdrawal, fail-closed on open and closed) |
-| Workflow | `.github/workflows/spec-labels.yml`: the snapshot and plan steps removed; header | `spec_approval_test.ts` assertions on the file; `just validate` (`workflows`) |
+| State decision and writes | `scripts/spec_approval.ts`: `STATE_LABELS`, `decide`, `writesOf`, `failClosed`, the `Api` label calls taking one of `STATE_LABELS`, a `files` read; header and usage | `just test` (`spec_approval_test.ts`: one case per table row, the `spec/pending` withdrawal, write order, fail-closed on open and closed) |
+| Labels workflow | `.github/workflows/spec-labels.yml`: the snapshot and plan steps removed; header | `spec_approval_test.ts` assertions on the file; `just validate` (`workflows`) |
 | Taxonomy | `.github/labels.json`: three `spec/*` rows; `validate_harness.ts` `spec` check imports `STATE_LABELS`, drops the `case`-list check | `just validate`; `validate_harness_test.ts` |
-| `labels` command removed | `scripts/spec_changes.ts` command table, parser, taxonomy constants, usage; `spec_changes_test.ts`; `justfile` comment | `just test`; `spec_changes.ts labels` exits 2 |
-| Docs | `spec-workflow.md ## Approval gates`, `## Request automation`; `github-workflow.md` label table; `github-checks.md` `spec / labels` row; `ARCHITECTURE.md` approval section; `CONTRIBUTING.md` | `git grep -nE 'spec/(unarchived|not-started|in-progress|done)'` outside `skills/`, `openspec/specs/`, archives returns nothing |
+| `labels` command and `--draft` removed | `scripts/spec_changes.ts` command table, parser, taxonomy constants, `cmdCheck`, usage; `spec_changes_test.ts`; `justfile` comments | `just test`; `spec_changes.ts labels` and `check --draft` exit 2 |
+| Archive gate | `.github/workflows/checks.yml`: the two jobs, the `checks / spec` step without `--draft`; header | `just validate` (`checks`, `workflows`); `validate_harness.ts` `checks` check reads a name of the form `${{ <cond> && '<a>' \|\| '<b>' }}` as the two names `<a>` and `<b>`; `validate_harness_test.ts` |
+| Required checks | `github-checks.md` table, healthy runs, `## Diagnosing a red check` item 3; `github-settings.md` required-checks row | `just validate` (`checks`) |
+| Docs | `spec-workflow.md` (lifecycle, `## Approval gates`, `## Archive executor and the freeze`, `## Request automation`); `github-workflow.md` label table; `agent-authority.md` ready conditions; `ARCHITECTURE.md`; `CONTRIBUTING.md`; `change-workflow` §5 | `git grep -nE 'spec/(unarchived\|not-started\|in-progress\|done)\|red until the freeze\|red for the whole'` outside `skills/`, `openspec/specs/`, archives returns nothing |
 
 ## External impact
 
 - `skills/**`, `openspec/specs/**`, archived changes: unchanged; `git diff --stat origin/main -- skills openspec/specs openspec/changes/archive` is empty.
-- GitHub: `labels / sync` creates `spec/pending` after merge and corrects the descriptions; the four retired labels remain until the maintainer prunes them. The first `spec / labels` run on each open pull request replaces its state labels; retired labels on it stay until the prune.
+- GitHub, after merge: the maintainer adds `checks / archived` to ruleset `19602018`'s required checks and reads it back (`github-settings.md ## Applying and reading back`); `labels / sync` creates `spec/pending`; the maintainer prunes the four retired labels. The first `spec / labels` run on each open pull request replaces its state labels; retired labels stay until the prune.
 
 ## Decisions
 
-- **One script, `spec_approval.ts`**: it already reads the head tree and owns the fail-closed path; the state needs one more read (the file list). Rejected: keeping `spec_changes.ts labels` for `spec/archived` (two writers of one label set reintroduce the problem); renaming the script (churn in the recipe, the deny-safe read path, and every document, for no behavior).
-- **Head tree, not related changes**: `main` never holds an unarchived change (`checks / spec` fails the push), so the head's unarchived changes are the pull request's own; the approval rules already use the head tree.
+- **One script, `spec_approval.ts`, for the state label**: it already reads the head tree and owns the fail-closed path; the state needs one more read (the file list). Rejected: keeping `spec_changes.ts labels` for `spec/archived` (two writers of one label set reintroduce the problem); renaming the script (churn in the recipe, the deny-safe read path, and every document, for no behavior).
+- **Head tree, not related changes, for the label**: `main` never holds an unarchived change (`checks / spec` fails the push), so the head's unarchived changes are the pull request's own; the approval rules already use the head tree.
 - **Drop the progress axis**: `tasks.md` and `just spec-changes status` show it; no rule reads the labels.
 - **`spec/archived` replaces `spec/approved` after the freeze**: nothing after the freeze reads the label; the record comment stays as the approval's evidence.
+- **A withheld required check, not a failing one**: waiting for the freeze is a state, so it shows as pending and keeps `checks / gate` meaningful. Rejected: naming `checks / gate` conditionally (a real failure and a wait would look alike); a commit status posted by `spec / labels` (a write token for what a read-only run decides).
+- **The verdict from the base's `status --json`**: `status` exists on `main` today, so the gate works on this pull request without a bootstrap fallback, and the base's copy keeps a pull request from relaxing its own verdict by editing the script. The workflow file itself still comes from the pull request; review guards it, as in the reference.
+- **Outside the gate**: the verdict runs on pull requests only; `ci_gate.ts` fails a skipped dependency, so on a push to `main` the gate would go red. A failed verdict is red on its own job and withholds `checks / archived`.
 - **No migration code**: the prune is one maintainer command; a script that deletes retired labels would widen what the token writes.
 
 ## Risks / Trade-offs
 
+- [Between the merge and the ruleset update, an unarchived pull request can merge] → the maintainer updates the ruleset right after the merge; the order (name live on `main`, then the ruleset) is the one `github-checks.md` prescribes.
+- [A pull request edits `checks.yml` to report `checks / archived` regardless] → review of workflow edits, as for every `pull_request` workflow; the verdict's script is the base's.
 - [An archive commit is reverted after the freeze] → `spec/approved` is no longer on the pull request, so the state is `spec/pending` and the record is withdrawn; the maintainer approves again. Fail closed, rare.
-- [The pull request lists more than 3000 files] → `spec/archived` is left as it is; the reason says so.
+- [The pull request lists more than 3000 files] → `spec/archived` is left as it is; the reason says so. The archive gate reads git, not the API, and is unaffected.
 - [Merge order with #122] → this branch rebases after #122 merges and resolves the overlapping edits.
 
 ## Verification plan
 
 Script and tool harnesses:
-- `just check` passes; `just test` covers every row of the state table, the `spec/pending` withdrawal, the write order, and both fail-closed paths.
-- Read-only `./scripts/spec_approval.ts <n>` from this branch against #122 and against this pull request prints one state each, and the writes it would make, with no write.
-- `./scripts/spec_changes.ts labels` exits 2; `just spec-changes status` and `just spec-check origin/main HEAD --draft` still work.
+- `just check` passes; `just test` covers every row of the state table, the `spec/pending` withdrawal, the write order, both fail-closed paths, `check` warning instead of failing on an unarchived related change, and the validator's reading of a conditional job name.
+- Read-only `./scripts/spec_approval.ts <n>` from this branch against #122 and against this pull request prints one state each and the writes it would make, with no write.
+- On this pull request, which holds an unarchived change: `checks / archive-verdict` succeeds with `archived=false`, `checks / awaiting-archive` succeeds, no `checks / archived` is reported, `checks / spec` and `checks / gate` are green. After the archive commit: `checks / archived` succeeds.
+- `./scripts/spec_changes.ts labels` and `check --draft` exit 2; `just spec-changes status` and `just spec-check origin/main HEAD` still work.
 - The `git grep` in Placement returns nothing; `git diff --stat origin/main -- skills openspec/specs openspec/changes/archive` is empty.
 
 Skipped:
-- A live `spec / labels` run with the new code before merge: the workflow runs `main`'s copy, so the first live run is on the next pull request event after merge; the maintainer can dispatch nothing else to try it earlier.
+- A live `spec / labels` run with the new code before merge: the workflow runs `main`'s copy, so the first live run is on the next pull request event after merge.
+- The merge block itself before the ruleset update: the ruleset changes only after merge; until then the pending check is shown but not required.
