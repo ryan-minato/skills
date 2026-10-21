@@ -17,7 +17,6 @@ linters. `just check` is exactly what `checks / quality` runs, so a green
 | `checks / awaiting-archive` | `checks.yml` | every pull request into `main` holding an unarchived related change | the carrier job, under a name no ruleset requires | never required |
 | `pr / policy` | `pr-policy.yml` | pull request events | the base's `check_pr_policy.ts`, then `check_commit_safety.ts --range` | **required** |
 | `scan-secrets` | `secret.yml` | every pull request; push to `main` | TruffleHog `--only-verified` over the range | **required** |
-| `spec / command` | `spec-command.yml` | a `/spec` comment by a collaborator | `scripts/spec_changes.ts` `snapshot`, `show`/`status`; one reply | automation |
 | `spec / labels` | `spec-labels.yml` | pull request events, label events | `scripts/spec_approval.ts --apply` | automation |
 | `issues / triage` | `issue-triage.yml` | issue opened or edited | `scripts/sync_issue_metadata.ts --apply` | automation |
 | `labels / sync` | `labels-sync.yml` | push to `main` touching the labels or the script; weekly; dispatch | `scripts/sync_labels.ts --apply` | automation |
@@ -61,9 +60,6 @@ A healthy run:
   `check_pr_policy.py`, until a follow-up change removes that fallback.
 - `scan-secrets`: no verified secret. The check name is the job id; the
   job sets no `name:`.
-- `spec / command`: one reply comment per command (`/spec show [<change>]
-  [proposal|design|tasks|specs|all]`, `/spec status [<change>]`,
-  `/spec help`); skipped for other comments and for bots.
 - `spec / labels`: the printed state and the pull request's one `spec/*`
   label agree, and a pull request with no unarchived change that archives
   none carries none; the `spec/approved` record follows
@@ -106,7 +102,7 @@ mark, so red always means something to fix now.
 
 ## Privileged workflows
 
-Privileged workflows: `spec-labels.yml` (`pull_request_target`), `spec-command.yml` (`issue_comment`), `issue-triage.yml` (`issues`).
+Privileged workflows: `spec-labels.yml` (`pull_request_target`), `issue-triage.yml` (`issues`).
 
 The `workflows` check of `scripts/validate_harness.ts` reads the line
 above; the rules these workflows follow live in

@@ -1,15 +1,13 @@
-#!/usr/bin/env -S deno run --quiet --no-prompt --allow-read --allow-write --allow-run=git,openspec --allow-env=GH_TOKEN,GITHUB_TOKEN,GITHUB_API_URL,OPENSPEC_NO_UPDATE_CHECK --allow-net=api.github.com
+#!/usr/bin/env -S deno run --no-prompt --allow-read --allow-write --allow-run=git,openspec --allow-env=GH_TOKEN,GITHUB_TOKEN,GITHUB_API_URL,OPENSPEC_NO_UPDATE_CHECK --allow-net=api.github.com
 // Operate on the OpenSpec changes a pull request touches.
 //
-// This repository's own management script: `checks / spec`, `checks / archive-verdict` (the base's copy), and
-// `spec / command` call it, `just spec-check` and `just spec-changes` wrap it, and the archive executor runs its
-// `archive` command.
+// This repository's own management script: `checks / spec` and `checks / archive-verdict` (the base's copy) call
+// it, `just spec-check` and `just spec-changes` wrap it, and the archive executor runs its `archive` command.
 //
 // Commands (global options --root DIR and --changes-dir DIR go before the command):
 //   snapshot --repo OWNER/NAME --pr N [--out FILE] [--api-url URL] [--max-files N] [--max-file-bytes N]
 //            [--max-total-bytes N] [--max-calls N]          build a head snapshot from the GitHub REST API
 //   status   SOURCE [--change NAME]... [--json]             progress table of the related changes
-//   show     SOURCE [--change NAME] [--doc DOC] [--url-prefix URL] [--max-chars N]   documents in fences
 //   check    SOURCE | --all  [--shape combined|split] [--no-validate] [--openspec EXE]
 //   archive  --base REF --head REF [--dry-run] [--json] [--openspec EXE]   archive every complete change
 // SOURCE is `--base REF --head REF` (git plumbing) or `--snapshot FILE` (from the snapshot command).
@@ -30,11 +28,9 @@
 // Exit codes: 0 success; 1 a failure, a finding, or a refusal; 2 bad arguments, an unknown change name
 // included. An unexpected error ends with its stack trace (exit 1).
 //
-// It runs beside a write token in `spec / command`, so it imports local modules only.
+// It runs in `checks / archive-verdict` over a pull request's objects, so it imports local modules only.
 // Permissions: read and write anywhere (the snapshot file is caller-named, under $RUNNER_TEMP in CI), git and
 // the OpenSpec CLI, the two token variables, GITHUB_API_URL, OPENSPEC_NO_UPDATE_CHECK, and api.github.com.
-// `--quiet` keeps Deno's own notice about an absent `openspec` binary out of the `/spec` reply, which carries
-// stderr.
 import { parseArgs } from "./lib/args.ts";
 import { UsageError } from "./lib/repo.ts";
 
@@ -50,8 +46,6 @@ const ARCHIVE_DATE = /^\p{Nd}{4}-\p{Nd}{2}-\p{Nd}{2}-/u;
 const WS_RUN = new RegExp(`${WS}+`);
 const WS_LEAD = new RegExp(`^${WS}+`);
 const WS_TRAIL = new RegExp(`${WS}+$`);
-
-export const DOCS = ["proposal", "design", "tasks", "specs"] as const;
 
 export const SNAPSHOT_SCHEMA = "spec-snapshot/1";
 type Kind = "object" | "list" | "string";
@@ -72,8 +66,6 @@ const SAFE_REPO = /^[A-Za-z0-9._-]{1,100}\/[A-Za-z0-9._-]{1,100}$/;
 // The documents inside a change directory the commands read; nothing else is fetched.
 const CHANGE_DOCS = ["proposal.md", "design.md", "tasks.md", ".openspec.yaml"];
 export const MAX_FILES = 3000;
-// Room `show` keeps for its closing line that counts the documents cut for size.
-const OMITTED_RESERVE = 80;
 export const MAX_FILE_BYTES = 1_000_000;
 export const MAX_TOTAL_BYTES = 8_000_000;
 // The platform token's REST budget is shared by every workflow of the repository.
@@ -97,11 +89,6 @@ export class Failure extends Error {}
 /** `str.strip()`. */
 export function pyStrip(text: string): string {
     return text.replace(WS_LEAD, "").replace(WS_TRAIL, "");
-}
-
-/** `str.rstrip()`. */
-function pyRstrip(text: string): string {
-    return text.replace(WS_TRAIL, "");
 }
 
 /** `str.split()` with no separator. */
@@ -312,8 +299,6 @@ export interface Source {
     existsDir(side: Side, path: string): boolean;
     /** Names directly under a directory; empty when the directory is absent. */
     entries(side: Side, path: string): string[];
-    /** Every file path under a directory at the head. */
-    headFiles(path: string): string[];
     /** A change document's text at the head, or null when the head has no such document. */
     headText(path: string): string | null;
 }
@@ -363,10 +348,6 @@ export class GitSource implements Source {
         return this.ls(side, `${path}/`).map(([, child]) => child.slice(child.lastIndexOf("/") + 1));
     }
 
-    headFiles(path: string): string[] {
-        return this.ls("head", `${path}/`, true).filter(([kind]) => kind === "blob").map(([, child]) => child);
-    }
-
     headText(path: string): string | null {
         const records = this.ls("head", path);
         if (!(records.length === 1 && records[0][0] === "blob" && records[0][1] === path)) return null;
@@ -388,7 +369,7 @@ export interface Snapshot {
 
 /**
  * Reads a snapshot document built from the GitHub REST API. Use it in every privileged workflow
- * (`pull_request_target`, `issue_comment`): the head's bytes arrive as data to parse, so no object authored by
+ * (`pull_request_target`): the head's bytes arrive as data to parse, so no object authored by
  * the request ever reaches the runner's git store, and nothing it carries is ever executed.
  */
 export class SnapshotSource implements Source {
@@ -439,10 +420,6 @@ export class SnapshotSource implements Source {
             }
         }
         return names;
-    }
-
-    headFiles(path: string): string[] {
-        return this.paths.head.filter((p) => p.startsWith(`${path}/`));
     }
 
     headText(path: string): string | null {
@@ -904,10 +881,6 @@ export function codeSpan(text: string, inTable = false): string {
     return `${ticks}${pad}${text}${pad}${ticks}`;
 }
 
-function linkTo(urlPrefix: string, path: string): string {
-    return `${urlPrefix.replace(/\/+$/, "")}/${pyQuote(path, "/")}`;
-}
-
 export function statusMarkdown(changes: Change[]): string {
     if (!changes.length) return NO_CHANGE;
     const lines = ["| Change | State | Tasks | Progress |", "|---|---|---|---|"];
@@ -925,81 +898,6 @@ export function statusMarkdown(changes: Change[]): string {
         }
     }
     return lines.join("\n") + "\n";
-}
-
-function fenceFor(text: string): string {
-    return "`".repeat(Math.max(3, longestRun(text) + 1));
-}
-
-function docPaths(source: Source, path: string, doc: string): string[] {
-    if (doc === "specs") return source.headFiles(`${path}/specs`).filter((p) => p.endsWith("/spec.md"));
-    return [`${path}/${doc}.md`];
-}
-
-/**
- * The documents as Markdown, at most `maxChars` code points long. The document that crosses the budget is cut
- * and linked; every document after it is counted in one closing line instead of listed, so the output stays
- * within `maxChars` however many documents follow.
- */
-export function showMarkdown(
-    source: Source,
-    changes: Change[],
-    doc: string,
-    urlPrefix: string,
-    maxChars: number,
-): string {
-    const docs: readonly string[] = doc === "all" ? DOCS : [doc];
-    const out: string[] = [];
-    let used = 0;
-    let overflow = false;
-    let omitted = 0;
-    const emit = (block: string) => {
-        out.push(block);
-        used += cpLen(block);
-    };
-
-    for (const change of changes) {
-        if (change.path === null) {
-            if (!overflow) emit(`### ${codeSpan(change.name)} — removed at the head; nothing to show.\n\n`);
-            continue;
-        }
-        for (const d of docs) {
-            const paths = docPaths(source, change.path, d);
-            if (!paths.length) {
-                if (!overflow) emit(`**${codeSpan(change.path + "/specs/")}** — _no delta spec yet_\n\n`);
-                continue;
-            }
-            for (const p of paths) {
-                const text = source.headText(p);
-                if (text === null) {
-                    if (!overflow) emit(`**${codeSpan(p)}** — _no ${p.slice(p.lastIndexOf("/") + 1)} yet_\n\n`);
-                    continue;
-                }
-                if (overflow) {
-                    omitted++;
-                    continue;
-                }
-                const view = urlPrefix ? ` ([view](${linkTo(urlPrefix, p)}))` : "";
-                const header = `**${codeSpan(p)}**${view}\n\n`;
-                const fence = fenceFor(text);
-                const block = `${header}${fence}markdown\n${pyRstrip(text)}\n${fence}\n\n`;
-                const budget = maxChars - used - OMITTED_RESERVE;
-                if (cpLen(block) > budget) {
-                    overflow = true;
-                    const opening = `${header}${fence}markdown\n`;
-                    const tail = urlPrefix ? `: ${linkTo(urlPrefix, p)}` : "";
-                    const closing = `\n${fence}\n… truncated — full file${tail}\n\n`;
-                    let keep = cpSlice(text, Math.max(0, budget - cpLen(opening) - cpLen(closing)));
-                    if (keep.includes("\n")) keep = keep.slice(0, keep.lastIndexOf("\n"));
-                    emit(`${opening}${keep}${closing}`);
-                    continue;
-                }
-                emit(block);
-            }
-        }
-    }
-    if (omitted) emit(`_${omitted} more document${omitted === 1 ? "" : "s"} omitted for size._\n`);
-    return out.join("") || NO_CHANGE;
 }
 
 // --- commands ----------------------------------------------------------------------------------------------
@@ -1026,7 +924,7 @@ export const realIo: Io = {
     sleep: (ms) => new Promise((done) => setTimeout(done, ms)),
 };
 
-const COMMANDS = ["snapshot", "status", "show", "check", "archive"] as const;
+const COMMANDS = ["snapshot", "status", "check", "archive"] as const;
 type CommandName = typeof COMMANDS[number];
 
 /** The parsed command line, with the original's defaults. */
@@ -1039,9 +937,6 @@ export interface Options {
     snapshot?: string;
     change: string[];
     json: boolean;
-    doc: string;
-    urlPrefix: string;
-    maxChars: number;
     all: boolean;
     shape: string;
     noValidate: boolean;
@@ -1139,13 +1034,6 @@ function cmdStatus(opts: Options, root: string, changesDir: string, io: Io): num
     } else {
         io.out(statusMarkdown(changes));
     }
-    return 0;
-}
-
-function cmdShow(opts: Options, root: string, changesDir: string, io: Io): number {
-    const source = needSource(opts, root, changesDir);
-    const changes = select(relatedChanges(source, changesDir), opts.change[0] ? [opts.change[0]] : []);
-    io.out(showMarkdown(source, changes, opts.doc, opts.urlPrefix, opts.maxChars));
     return 0;
 }
 
@@ -1288,12 +1176,11 @@ const SOURCE_HELP = `head source (one of):
 const HELP: Record<CommandName | "main", string> = {
     main: `usage: spec_changes.ts [-h] [--root ROOT] [--changes-dir CHANGES_DIR] <command> ...
 
-Resolve, show, check, and archive the OpenSpec changes a pull request touches.
+Resolve, check, and archive the OpenSpec changes a pull request touches.
 
 commands:
   snapshot              build a head snapshot from the GitHub REST API (no checkout, no fetch)
   status                print a progress table (markdown) for the related changes
-  show                  print a change's documents inside fenced blocks
   check                 strict validation plus the unarchived-change rule
   archive               archive every complete related change through the OpenSpec CLI
 
@@ -1335,21 +1222,6 @@ options:
   --json                print the changes as JSON
 
 ${SOURCE_HELP}`,
-    show: `usage: spec_changes.ts show [-h] [--base BASE] [--head HEAD] [--snapshot SNAPSHOT] [--change CHANGE]
-                            [--doc {proposal,design,tasks,specs,all}] [--url-prefix URL_PREFIX] [--max-chars N]
-
-Print a change's documents inside fenced blocks.
-
-options:
-  -h, --help            show this help message and exit
-  --change CHANGE       one related change (default: every related change)
-  --doc {proposal,design,tasks,specs,all}
-                        the document to print (default: all)
-  --url-prefix URL_PREFIX
-                        link prefix, e.g. https://github.com/o/r/blob/<sha>
-  --max-chars N         truncate the output at this size (default 60000)
-
-${SOURCE_HELP}`,
     check: `usage: spec_changes.ts check [-h] [--base BASE] [--head HEAD] [--snapshot SNAPSHOT] [--all]
                              [--shape {combined,split}] [--no-validate] [--openspec OPENSPEC]
 
@@ -1389,7 +1261,6 @@ const SPECS: Record<CommandName, { string: string[]; boolean: string[]; multiple
         boolean: [],
     },
     status: { string: SOURCE_OPTIONS, boolean: ["json"], multiple: ["change"] },
-    show: { string: [...SOURCE_OPTIONS, "change", "doc", "url-prefix", "max-chars"], boolean: [] },
     check: { string: [...SOURCE_OPTIONS, "shape", "openspec"], boolean: ["all", "no-validate"] },
     archive: { string: [...SOURCE_OPTIONS, "openspec"], boolean: ["dry-run", "json"] },
 };
@@ -1435,7 +1306,7 @@ export function parseCommandLine(argv: string[], env: (name: string) => string |
     }
     const command = argv[i];
     if (command === undefined) {
-        throw new UsageError("a command is required: snapshot, status, show, check, or archive");
+        throw new UsageError("a command is required: snapshot, status, check, or archive");
     }
     if (!(COMMANDS as readonly string[]).includes(command)) {
         throw new UsageError(
@@ -1469,11 +1340,8 @@ export function parseCommandLine(argv: string[], env: (name: string) => string |
         base: v.base,
         head: v.head,
         snapshot: v.snapshot,
-        change: name === "status" ? parsed.lists.change : v.change === undefined ? [] : [v.change],
+        change: name === "status" ? parsed.lists.change : [],
         json: flag("json"),
-        doc: v.doc === undefined ? "all" : choice("doc", v.doc, [...DOCS, "all"]),
-        urlPrefix: v["url-prefix"] ?? "",
-        maxChars: number("max-chars", 60000),
         all: flag("all"),
         shape: v.shape === undefined ? "combined" : choice("shape", v.shape, ["combined", "split"]),
         noValidate: flag("no-validate"),
@@ -1511,7 +1379,6 @@ type Handler = (opts: Options, root: string, changesDir: string, io: Io) => numb
 const HANDLERS: Record<CommandName, Handler> = {
     snapshot: cmdSnapshot,
     status: cmdStatus,
-    show: cmdShow,
     check: cmdCheck,
     archive: cmdArchive,
 };

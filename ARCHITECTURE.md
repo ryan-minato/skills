@@ -195,9 +195,9 @@ The OpenSpec CLI runs through Deno at the version the `justfile` pins:
 warning for each unarchived change a branch touches, and
 `just spec-sync` regenerates the `openspec-*` skills.
 `scripts/spec_changes.ts` is the related-change tool behind
-`just spec-changes` (`snapshot`, `status`, `show`, `check`, `archive`);
-`checks / spec`, `spec / command`, and `checks / archive-verdict`, which
-runs the base's copy, use it. The archive gate holds a pull request into
+`just spec-changes` (`snapshot`, `status`, `check`, `archive`);
+`checks / spec` and `checks / archive-verdict`, which runs the base's
+copy, use it. The archive gate holds a pull request into
 `main` with an unarchived change on the required `checks / archived`,
 which its carrier job reports only once nothing is unarchived; waiting
 is never a failing check (`.agents/knowledge/github-checks.md`
@@ -236,8 +236,8 @@ Where each workflow finds its code:
 - `pr / policy` takes its workflow file from the pull request's merge ref
   but checks out the base and runs the base's script, so a change to its
   script takes effect from the next pull request.
-- `spec / labels` (`pull_request_target`), `spec / command`
-  (`issue_comment`), and `issues / triage` (`issues`) run `main`'s
+- `spec / labels` (`pull_request_target`) and `issues / triage`
+  (`issues`) run `main`'s
   workflow and scripts; `labels / sync` runs on `main` only. A change to
   their scripts takes effect after merge.
 

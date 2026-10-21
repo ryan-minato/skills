@@ -221,16 +221,12 @@ touches (an archived directory counts under its change name), resolved by
 - `checks / archive-verdict` and its carrier hold a pull request into
   `main` with an unarchived related change on the required
   `checks / archived` (`github-checks.md ## No standing failure`).
-- `/spec show [<slug>] [proposal|design|tasks|specs|all]` and
-  `/spec status [<slug>]`, posted as a pull request comment by a
-  collaborator (owner, member, or collaborator association), get a reply
-  from `spec / command`.
 - `spec / labels` keeps one state label: `spec/pending` while the head
   holds an unarchived change whose approval does not hold, `spec/approved`
   while it holds, `spec/archived` when the pull request archives its
   change, and none otherwise (`## Approval gates`). Only the maintainer
   adds `spec/approved` or `spec/pending` by hand; task progress is
-  `just spec-changes status`.
+  `just spec-changes status --base origin/main --head HEAD`.
 
 Locally, `just spec-check` reproduces the check and
 `just spec-changes <command>` the rest.

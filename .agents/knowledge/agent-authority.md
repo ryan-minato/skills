@@ -189,8 +189,8 @@ before.
 
 Recorded 2026-10-19. No unattended agent runs in this repository: every
 agent session is directed by the maintainer, who reviews results before
-they leave. The workflows that read issue and comment text
-(`issues / triage`, `spec / command`, `spec / labels`) are deterministic
+they leave. The workflows that read issue and pull request text
+(`issues / triage`, `spec / labels`) are deterministic
 scripts without a model, run from the default branch with job-level
 permissions (`github-checks.md ## Privileged workflows`). The dev
 container holds no credential beyond the `gh` login the user forwards and
