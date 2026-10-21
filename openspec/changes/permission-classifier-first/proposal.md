@@ -9,9 +9,9 @@ The Claude Code settings stop for a human decision on 26 families of outward wri
   - **allow** holds only the checks the workflow runs on every task: `just check`, `test`, `validate`, `lint`, `spec-validate`, `check-skill`, `spec-check`, `review-threads`, `spec-approval`, `commit-gate`. Read-only `git` and `gh` reads are left to the built-in read-only set and the classifier.
   - **ask** is empty. Everything else — pushes, pull request and issue writes, labels, workflow runs — is judged by the agent's classifier against the conversation and `AGENTS.md`, which already states that nothing reaches GitHub without the user's authorization and a publish review.
 - `.claude/settings.json`: rewritten to that policy.
-- `.codex/config.toml`: `approval_policy = "on-request"`, `sandbox_mode = "workspace-write"` with network access (the workflow needs `gh`, `git`, and Deno's registry), and `approvals_reviewer = "auto_review"`, so escalations go to Codex's reviewer instead of the user.
+- `.codex/config.toml` is unchanged: Codex's approval policy, reviewer, and sandbox stay in the maintainer's global configuration.
 - `.codex/rules/default.rules` (new): `forbidden` prefix rules for the deny list and `allow` rules for the same recipes; no `prompt` rule.
-- `agent-authority.md ## Permission entries` and `## Threat model` restated for the new policy, including that both agents run in their classifier mode (Claude Code auto mode, Codex `auto_review`), which a project file cannot switch on for Claude Code; `harness-maintenance.md` register row and layer calibration updated; `ARCHITECTURE.md` lists `.codex/rules/`.
+- `agent-authority.md ## Permission entries` and `## Threat model` restated for the new policy, including that both agents run in their classifier mode (Claude Code auto mode, Codex `auto_review`), set in the maintainer's global configuration; `harness-maintenance.md` register row and layer calibration updated; `ARCHITECTURE.md` lists `.codex/rules/`.
 
 ## Skills touched
 
@@ -23,7 +23,7 @@ An agent in this repository meets a prompt only when its own classifier escalate
 
 ## Impact
 
-- Files: `.claude/settings.json`; `.codex/config.toml`; `.codex/rules/default.rules` (new); `.agents/knowledge/agent-authority.md`, `harness-maintenance.md`; `ARCHITECTURE.md`.
+- Files: `.claude/settings.json`; `.codex/rules/default.rules` (new); `.agents/knowledge/agent-authority.md`, `harness-maintenance.md`; `ARCHITECTURE.md`.
 - Untouched: everything under `skills/`; the workflows; the repository settings.
 - The maintainer's user-level settings decide the mode: Claude Code ignores `auto` as `defaultMode` and the `autoMode` block in a project file, and Codex reads project `.codex/` files only for a trusted project.
 
