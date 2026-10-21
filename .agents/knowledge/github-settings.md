@@ -32,7 +32,7 @@ escape for `|`). "Current" is the readback of the date in
 | Ruleset bypass | none | none | `R/rulesets/19602018` | `.bypass_actors` |
 | Legacy branch protection | none (HTTP 404) | none | `R/branches/main/protection` | HTTP 404 means none |
 | Actions allowed | all | GitHub-owned plus the allowlist below | `R/actions/permissions` | `.allowed_actions` |
-| Actions allowlist | none (all allowed) | `denoland/setup-deno`, `trufflesecurity/trufflehog`, `devcontainers/ci` | `R/actions/permissions/selected-actions` | `.patterns_allowed` |
+| Actions allowlist | none (all allowed) | `denoland/setup-deno@*`, `trufflesecurity/trufflehog@*`, `devcontainers/ci@*` | `R/actions/permissions/selected-actions` | `.patterns_allowed` |
 | Full-length SHA pinning | not required | required | `R/actions/permissions` | `.sha_pinning_required` |
 | Default workflow permissions | read; Actions cannot approve reviews | same | `R/actions/permissions/workflow` | `.` |
 | Secret scanning | on | on | `R` | `.security_and_analysis.secret_scanning.status` |
