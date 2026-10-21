@@ -26,5 +26,5 @@
 
 ## 6. Verification
 
-- [ ] 6.1 `just check`; the read-only `spec_approval.ts` runs against #122 and #123; `labels` and `check --draft` exit 2; the `git grep` of design.md Placement; no diff under `skills/`, `openspec/specs/`, archives
+- [x] 6.1 `just check`; the read-only `spec_approval.ts` runs against #122 and #123; `labels` and `check --draft` exit 2; the `git grep` of design.md Placement; no diff under `skills/`, `openspec/specs/`, archives
 - [ ] 6.2 On #123: `checks / archive-verdict`, `checks / awaiting-archive`, `checks / spec`, `checks / gate` green and no `checks / archived`; a throwaway draft pull request into `chore/single-spec-label` reports `checks / archived`, then is closed and its branch deleted
