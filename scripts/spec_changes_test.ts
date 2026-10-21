@@ -9,13 +9,11 @@ import {
     codeSpan,
     cpLen,
     cpSlice,
-    desiredLabels,
     Failure,
     type FetchFn,
     headDir,
     type Io,
     main,
-    MANAGED_LABELS,
     parseCommandLine,
     pyJson,
     pyQuote,
@@ -185,18 +183,6 @@ Deno.test("changeNames and headDir resolve active and archived directories", () 
     assertEquals(headDir(dirs, "openspec/changes", "a"), "openspec/changes/archive/2026-03-01-a");
     assertEquals(headDir(dirs, "openspec/changes", "b"), "openspec/changes/b");
     assertEquals(headDir(dirs, "openspec/changes", "c"), null);
-});
-
-Deno.test("desiredLabels covers both axes and ignores removed changes", () => {
-    assertEquals(desiredLabels([]), []);
-    assertEquals(desiredLabels([change("x", "removed", "not-started")]), []);
-    assertEquals(desiredLabels([change("x", "archived", "done")]), ["spec/archived", "spec/done"]);
-    assertEquals(desiredLabels([change("x", "active", "not-started")]), ["spec/unarchived", "spec/not-started"]);
-    assertEquals(
-        desiredLabels([change("x", "archived", "done"), change("y", "active", "not-started")]),
-        ["spec/unarchived", "spec/in-progress"],
-    );
-    assertEquals(MANAGED_LABELS.length, 5);
 });
 
 Deno.test("select refuses a change the request does not touch", () => {
@@ -546,9 +532,14 @@ Deno.test("main exits 2 on bad arguments and 0 with help", async () => {
     io = capture();
     assertEquals(await main(["-h"], io), 0);
     assertStringIncludes(io.stdout, "commands:");
+    // The label command and check's --draft are gone: the state label is spec_approval.ts's, and a request
+    // never fails for an unarchived change.
     io = capture();
-    assertEquals(await main(["labels", "--taxonomy"], io), 0);
-    assertEquals(JSON.parse(io.stdout), { managed: [...MANAGED_LABELS] });
+    assertEquals(await main(["labels", "--taxonomy"], io), 2);
+    assertStringIncludes(io.stderr, "invalid choice: 'labels'");
+    io = capture();
+    assertEquals(await main(["check", "--all", "--draft"], io), 2);
+    assertStringIncludes(io.stderr, "unknown option --draft");
 });
 
 // --- the commands over a fixture repository ----------------------------------------------------------------
@@ -572,13 +563,6 @@ Deno.test("status, labels, show, and check read the git source", async () => {
         );
 
         io = capture();
-        assertEquals(await main(["--root", root, "labels", ...src, "--current", "spec/done, bug"], io), 0);
-        assertEquals(
-            io.stdout,
-            "desired: spec/unarchived spec/in-progress\nadd: spec/unarchived spec/in-progress\nremove: spec/done\n",
-        );
-
-        io = capture();
         assertEquals(await main(["--root", root, "show", ...src, "--change", "open", "--doc", "specs"], io), 0);
         assertEquals(
             io.stdout,
@@ -590,13 +574,17 @@ Deno.test("status, labels, show, and check read the git source", async () => {
         assertStringIncludes(io.stderr, "not a change this request touches: `nope`");
 
         io = capture();
-        assertEquals(await main(["--root", root, "check", ...src, "--no-validate"], io), 1);
+        // A request with unarchived changes passes with a warning for each: the archive gate holds the merge.
+        assertEquals(await main(["--root", root, "check", ...src, "--no-validate"], io), 0);
         assertEquals(
-            io.stdout.split("\n").filter((line) => line).map((line) => line.split(":")[0]),
-            ["warning", "unarchived change open", "unarchived change repo"],
+            io.stdout.split("\n").filter((line) => line).map((line) => line.split(":").slice(0, 2).join(":")),
+            [
+                "warning: archived change moving still has 1 open task(s).",
+                "warning: unarchived change open",
+                "warning: unarchived change repo",
+            ],
         );
-        io = capture();
-        assertEquals(await main(["--root", root, "check", ...src, "--no-validate", "--draft"], io), 0);
+        assertStringIncludes(io.stdout, "the archive gate holds the merge");
         io = capture();
         assertEquals(await main(["--root", root, "check", "--all", "--no-validate"], io), 1);
         assertEquals(
@@ -663,9 +651,12 @@ Deno.test("snapshot writes the document the snapshot source replays", async () =
         assertStringIncludes(Deno.readTextFileSync(out), '"\\u2014 \\n"');
 
         io = capture();
-        assertEquals(await main(["labels", "--snapshot", out, "--json"], io), 0);
+        assertEquals(await main(["status", "--snapshot", out, "--json"], io), 0);
         // `a` is done; the archived `c` has a task list with no task, so it has not started.
-        assertEquals(JSON.parse(io.stdout).desired, ["spec/unarchived", "spec/in-progress"]);
+        assertEquals(
+            JSON.parse(io.stdout).changes.map((c: Change) => [c.name, c.state, c.tasks.progress]),
+            [["a", "active", "done"], ["c", "archived", "not-started"]],
+        );
         io = capture();
         assertEquals(await main(["archive", "--snapshot", out], io), 2);
         io = capture();

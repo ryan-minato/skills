@@ -123,13 +123,13 @@ spec-validate:
 spec-sync:
     OPENSPEC_NO_UPDATE_CHECK=1 openspec update --force
 
-# Strict validation plus the unarchived-change rule for the changes this branch touches (what `checks / spec` runs on a pull request)
-# This repository is combined-shape: every pull request ends with its record archived, so no request may merge unarchived.
+# Strict validation for the changes this branch touches, warning on each unarchived one (what `checks / spec` runs on a pull request)
+# This repository is combined-shape: every pull request into main ends with its record archived; `checks / archived` holds the merge until then.
 [positional-arguments]
 spec-check BASE="origin/main" HEAD="HEAD" *ARGS:
     base="$1"; head="$2"; shift 2; ./scripts/spec_changes.ts check --base "$base" --head "$head" --shape combined "$@"
 
-# Related-change tooling for a pull request: snapshot, status, show, check, archive, labels (see --help)
+# Related-change tooling for a pull request: snapshot, status, show, check, archive (see --help)
 [positional-arguments]
 spec-changes *ARGS:
     ./scripts/spec_changes.ts "$@"
@@ -139,7 +139,7 @@ spec-changes *ARGS:
 review-threads N:
     ./scripts/review_threads.ts "$1"
 
-# The approval label's state on pull request N, recomputed from its labels, events, and record (read-only)
+# The spec/* state label of pull request N, recomputed from its head, files, labels, events, and record (read-only)
 [positional-arguments]
 spec-approval N:
     case "$1" in ''|0*|*[!0-9]*) echo "usage: just spec-approval <pull request number>" >&2; exit 2 ;; esac; ./scripts/spec_approval.ts "$1"

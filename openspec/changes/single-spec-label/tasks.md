@@ -11,8 +11,8 @@
 
 ## 3. `spec_changes.ts`
 
-- [ ] 3.1 Remove the `labels` command and its taxonomy constants; `check` with a request source warns on an unarchived change and `--draft` is gone; usage, header, and `justfile` comments
-- [ ] 3.2 `scripts/spec_changes_test.ts` follows
+- [x] 3.1 Remove the `labels` command and its taxonomy constants; `check` with a request source warns on an unarchived change and `--draft` is gone; usage, header, and `justfile` comments
+- [x] 3.2 `scripts/spec_changes_test.ts` follows
 
 ## 4. The archive gate
 
