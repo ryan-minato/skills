@@ -15,9 +15,10 @@ skills/<catalog>/<skill-name>/   Public, distributable skills
   knowledge/                     Rules and registers, each with a pointer in AGENTS.md
 openspec/                        Specifications: specs/ (source of truth), changes/, changes/archive/
 .claude/skills -> ../.agents/skills
-.claude/settings.json            Claude Code permission entries (allow, ask, deny)
+.claude/settings.json            Claude Code permission entries (allow, deny)
 .claude-plugin/marketplace.json  Plugin marketplace (one plugin per catalog)
-.codex/config.toml               agentskills MCP server (Codex)
+.codex/config.toml               Codex approvals, sandbox, agentskills MCP server
+.codex/rules/default.rules       Codex command rules (forbidden, allow)
 .mcp.json                        agentskills MCP server (Claude Code)
 .devcontainer/                   Dev container: latest tools, MCP server, `just setup` on create
 .github/                         Issue forms, PR template, workflows, labels, health files
