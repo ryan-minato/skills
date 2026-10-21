@@ -35,6 +35,7 @@
     }
   },
   "remoteEnv": {
+    "PATH": "${containerWorkspaceFolder}/.tools/bin:${containerEnv:PATH}",
     "OPENSPEC_NO_UPDATE_CHECK": "1",
     "DO_NOT_TRACK": "1",
     "PAGER": "cat",
