@@ -60,6 +60,8 @@ export const DISPOSABLE_CATALOGS = ["meta", "scaffold"];
 // The one public skill allowed to name an install command: it owns installing.
 export const INSTALLER_SKILL = "skills/core/ryan-minato-skills-installing";
 export const INSTALL_COMMAND = "npx skills add";
+/** Any package runner invoking `skills add` (npx, pnpm dlx, bunx, yarn dlx, npm exec), with flags between. */
+export const INSTALL_COMMAND_RE = /\b(?:npx|pnpm\s+dlx|bunx|yarn\s+dlx|npm\s+exec)(?:\s+-\S+)*\s+skills\s+add\b/;
 
 const ESCAPING_LINK = /\]\((?:\.\.\/|\/)[^)]*\)/g;
 
@@ -166,10 +168,10 @@ class Validator {
                 // Every file counts, binary ones included, so bytes that are not UTF-8 decode lossily here.
                 const text = new TextDecoder().decode(this.bytes(file));
                 text.split("\n").forEach((line, index) => {
-                    if (!line.includes(INSTALL_COMMAND)) return;
+                    if (!INSTALL_COMMAND_RE.test(line)) return;
                     this.fail(
                         `${this.rel(file)}:${index + 1}: contains the install command ` +
-                            `\`${INSTALL_COMMAND}\`. A public skill never prints an install ` +
+                            `\`${line.match(INSTALL_COMMAND_RE)![0]}\`. A public skill never prints an install ` +
                             `command: the installing skill owns runner choice and install ` +
                             `scope, and every handoff routes through it. Fix: replace the ` +
                             `command with a handoff that loads the ` +

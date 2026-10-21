@@ -41,6 +41,8 @@ import { MANAGED_LABELS } from "./spec_changes.ts";
 const SHA = "3d3c42e5".repeat(5); // any 40-hex commit id
 // Built by concatenation so this tracked file does not itself trip the `tools` check.
 const OPENSPEC_PIN = "@fission-ai/openspec" + "@1.2.3";
+const SETUP_TOFU = "setup-" + "opentofu";
+const TOFU_PIN = "tofu_" + "version: 1.8.0";
 
 function fixture(files: Record<string, string>): string {
     const root = Deno.makeTempDirSync({ prefix: "validate_harness_" });
@@ -450,6 +452,38 @@ Deno.test("tools: an OpenSpec version outside the justfile, with file and line; 
         checkTools(h);
         assertEquals(h.errors.length, 1, h.errors.join("\n"));
         assert(h.errors[0].startsWith(".github/workflows/a.yml:2: "), h.errors[0]);
+    } finally {
+        cleanup(root);
+    }
+});
+
+Deno.test("tools: an OpenTofu pin outside skills/ and archived changes, with file and line", () => {
+    const root = gitFixture({
+        ".github/workflows/a.yml": `steps:\n  - uses: opentofu/${SETUP_TOFU}@x\n    with:\n      ${TOFU_PIN}\n`,
+        "skills/x/y/assets/ci.yml": `${TOFU_PIN}\n`,
+        "openspec/changes/archive/old/design.md": `${SETUP_TOFU}\n`,
+    });
+    try {
+        const h = new Harness(root, realDeps);
+        checkTools(h);
+        assertEquals(h.errors.map((e) => e.split(": ")[0]), [".github/workflows/a.yml:2", ".github/workflows/a.yml:4"]);
+    } finally {
+        cleanup(root);
+    }
+});
+
+Deno.test("workflows: a .yaml workflow and an action.yaml are checked too", () => {
+    const root = fixture({
+        ".agents/knowledge/github-checks.md": CHECKS_DOC_LINE,
+        ".github/workflows/x.yaml": "on: pull_request_target\npermissions: {}\njobs:\n  a:\n    runs-on: x\n" +
+            "    timeout-minutes: 1\n    permissions: {}\n    steps:\n      - run: echo\n",
+        ".github/actions/y/action.yaml": "runs:\n  using: composite\n  steps:\n    - uses: evil/act@main\n",
+    });
+    try {
+        const h = new Harness(root, noDeps);
+        checkWorkflows(h);
+        assert(h.errors.some((e) => e.startsWith(".github/workflows/x.yaml")), h.errors.join("\n"));
+        assert(h.errors.some((e) => e.startsWith(".github/actions/y/action.yaml")), h.errors.join("\n"));
     } finally {
         cleanup(root);
     }

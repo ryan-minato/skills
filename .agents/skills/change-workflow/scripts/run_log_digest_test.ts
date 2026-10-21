@@ -75,7 +75,7 @@ Deno.test("validateRun requires a jobs array of objects with numeric ids", () =>
     assertEquals(validateRun({ jobs: [{ databaseId: 1, steps: null }] }).jobs.length, 1);
 });
 
-Deno.test("selectJobs takes every unsuccessful conclusion", () => {
+Deno.test("selectJobs takes every unsuccessful conclusion but cancelled", () => {
     const run = validateRun({
         conclusion: "failure",
         jobs: ["failure", "timed_out", "cancelled", "startup_failure", "success", "skipped", null].map((c, i) =>
@@ -83,7 +83,7 @@ Deno.test("selectJobs takes every unsuccessful conclusion", () => {
         ),
     });
     const selected = selectJobs(run);
-    assertEquals(selected.jobs.map((j) => j.databaseId), [0, 1, 2, 3]);
+    assertEquals(selected.jobs.map((j) => j.databaseId), [0, 1, 3]);
     assertEquals(selected.note, undefined);
 });
 

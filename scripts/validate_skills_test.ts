@@ -4,6 +4,7 @@ import {
     catalogSkillSubdirs,
     DISPOSABLE_MARKER,
     INSTALL_COMMAND,
+    INSTALL_COMMAND_RE,
     main,
     markdownSection,
     pyListRepr,
@@ -345,4 +346,13 @@ Deno.test("main: OK line on stdout, findings on stderr, argument errors exit 2",
     const help = capture(() => main(["-h"]));
     assertEquals(help.result, 0);
     assert(help.stdout.startsWith("usage: "));
+});
+
+Deno.test("install command: any package runner invoking skills add is found", () => {
+    for (
+        const line of ["npx skills add a/b", "pnpm dlx skills add a/b", "npx -y skills add a/b", "bunx skills add x"]
+    ) {
+        assert(INSTALL_COMMAND_RE.test(line), line);
+    }
+    assert(!INSTALL_COMMAND_RE.test("the skills add-on list"));
 });
