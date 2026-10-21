@@ -136,9 +136,14 @@ pull request as in step 2, then continue.
   a person removes `spec/approved` or adds `spec/pending`, when a run
   fails, or when its deciding step times out; the maintainer approves
   the new package by adding `spec/approved` again. The package is every
-  file of each unarchived change except `tasks.md`, plus the main spec
-  under each delta; an archive commit is not a package change, and after
-  it `spec/archived` replaces `spec/approved` with the record left live.
+  file of each of the pull request's own unarchived changes except
+  `tasks.md`, plus the main spec under each delta; its own changes are
+  those the base does not hold identically, so a pull request into
+  another pull request's branch answers only for what it brings. An
+  archive commit is not a package change, and after it `spec/archived`
+  replaces `spec/approved` with the record left live; a withdrawal by a
+  person after the archive still gives `spec/pending` and withdraws the
+  record.
   Only the run the label event starts writes the record; if that run is
   replaced while pending, the next run finds the label without a record
   and withdraws it, and the maintainer adds the label again.

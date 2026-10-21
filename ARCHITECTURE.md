@@ -206,8 +206,8 @@ is never a failing check (`.agents/knowledge/github-checks.md`
 A pull request carries one specification-state label: `spec/pending`,
 `spec/approved`, `spec/archived`, or none. The package approval is
 `spec/approved`. The maintainer adds it; `spec / labels` then runs
-`scripts/spec_approval.ts`, which decides from the pull request's head,
-file list, labels, and timeline, writes one record comment as
+`scripts/spec_approval.ts`, which decides from the pull request's head
+and base trees, file list, labels, and timeline, writes one record comment as
 `github-actions[bot]` naming the approved head, the account, and the
 label event, and puts `spec/pending` back when the package changes after
 the recorded head, when a run fails, or when its deciding step times out.

@@ -28,3 +28,8 @@
 
 - [x] 6.1 `just check`; the read-only `spec_approval.ts` runs against #122 and #123; `labels` and `check --draft` exit 2; the `git grep` of design.md Placement; no diff under `skills/`, `openspec/specs/`, archives
 - [x] 6.2 On #123: `checks / archive-verdict`, `checks / awaiting-archive`, `checks / spec`, `checks / gate` green and no `checks / archived`; a throwaway draft pull request into `chore/single-spec-label` reports `checks / archived`, then is closed and its branch deleted
+
+## 7. Review fixes (Codex review on #123, plan A)
+
+- [x] 7.1 `spec_approval.ts`: only the pull request's own changes against its base count; a withdrawal after the archive holds; failing closed removes `spec/archived` too; tests for each
+- [x] 7.2 design.md, proposal.md, `spec-workflow.md ## Approval gates`, `ARCHITECTURE.md` follow

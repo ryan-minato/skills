@@ -10,7 +10,7 @@ The reference is hoshiori-dev/devcontainer-features: `scripts/sync_pr_labels.ts`
 
 Decided by `spec_approval.ts` from the pull request's present state, in this order:
 
-| Head holds an unarchived change | Approval holds (rules unchanged) | Pull request adds a path under `openspec/changes/archive/` | State |
+| The pull request holds an unarchived change of its own | Approval holds (rules unchanged) | Pull request adds a path under `openspec/changes/archive/` | State |
 |---|---|---|---|
 | yes | yes | — | `spec/approved` |
 | yes | no | — | `spec/pending` |
@@ -18,12 +18,12 @@ Decided by `spec_approval.ts` from the pull request's present state, in this ord
 | no | — | no | none |
 | no | — | file list cut short | `spec/archived` left as it is; the other two removed |
 
-- *Unarchived change*: a directory directly under `openspec/changes/` other than `archive/`, read from the head tree the script already reads.
+- *Unarchived change of its own*: a directory directly under `openspec/changes/` other than `archive/` at the head whose entries the base commit (`pull.base.sha`, one more tree read) does not hold identically: new, or edited by this pull request. A change a stacked base already carries belongs to the pull request that brought it, so a pull request into another pull request's branch neither inherits its parent's `spec/pending` nor has its approval bound to the parent's package. The package comparison takes the own changes at the head, plus those of the recorded commit that the present base does not hold unarchived.
 - *Adds a path*: a file of the pull request's file list (`pulls/<n>/files`) with status `added` or `renamed` under the archive directory. The list is cut short when it holds fewer entries than the pull request's `changed_files`, or that count exceeds 3000, the API's limit.
 - *Approval holds* binds the approval to the package at the recorded commit. A change to the package after that commit (any file of an unarchived change except `tasks.md`, or the main spec under a delta; an archive commit is not one) ends it: the next run sets `spec/pending` in place of `spec/approved` and marks the record withdrawn, and the maintainer approves the new package by adding `spec/approved` again. The state never stays at `spec/approved` on a fact the run cannot confirm.
-- One more withdrawal: a person adding `spec/pending` after the latest adding of `spec/approved` withdraws the approval, as a person removing `spec/approved` does.
+- One more withdrawal: a person adding `spec/pending` after the latest adding of `spec/approved` withdraws the approval, as a person removing `spec/approved` does. The withdrawal holds after the archive too: when the pull request holds no change of its own but archives one, a person's withdrawal after the latest adding of `spec/approved` gives `spec/pending` and marks every live record withdrawn, until the maintainer adds `spec/approved` again.
 - Writes: the record and withdrawn records first, as now; then the wanted state label is added, then every other state label on the pull request is removed. Labels outside the three are never touched.
-- After an error, on an open pull request: add `spec/pending`, then remove `spec/approved`; on a closed one: remove `spec/approved`. The workflow's failure step keeps removing `spec/approved`.
+- After an error, on an open pull request: add `spec/pending`, remove `spec/archived` if the pull request carried it, then remove `spec/approved`; on a closed one: remove `spec/approved`. One state label remains either way. The workflow's failure step keeps removing `spec/approved`.
 - Read-only `just spec-approval <n>` prints the state, the reason, and the writes; exit 0 for `spec/approved`, 1 for any other state.
 
 ## The archive gate
@@ -62,7 +62,7 @@ The ruleset requires `checks / archived`. While a change is unarchived, GitHub s
 ## Decisions
 
 - **One script, `spec_approval.ts`, for the state label**: it already reads the head tree and owns the fail-closed path; the state needs one more read (the file list). Rejected: keeping `spec_changes.ts labels` for `spec/archived` (two writers of one label set reintroduce the problem); renaming the script (churn in the recipe, the deny-safe read path, and every document, for no behavior).
-- **Head tree, not related changes, for the label**: `main` never holds an unarchived change (`checks / spec` fails the push), so the head's unarchived changes are the pull request's own; the approval rules already use the head tree.
+- **The pull request's own changes, against its base**: a pull request into `main` holds only its own unarchived changes (`checks / spec` keeps `main` free of them), but a stacked base carries its parent's; reading every change of the head tree would give a child the parent's state and couple their approvals. Adopted on review of the Codex finding on #123 (plan A, approved by the maintainer in conversation), with the fail-closed and post-archive withdrawal fixes below. Rejected: the head tree alone (wrong for stacked bases, which this change permits); the diff's related changes (a file list cut short would leave a change unseen, and the base tree is one read).
 - **Drop the progress axis**: `tasks.md` and `just spec-changes status` show it; no rule reads the labels.
 - **`spec/archived` replaces `spec/approved` after the freeze**: nothing after the freeze reads the label; the record comment stays as the approval's evidence.
 - **A withheld required check, not a failing one**: waiting for the freeze is a state, so it shows as pending and keeps `checks / gate` meaningful. Rejected: naming `checks / gate` conditionally (a real failure and a wait would look alike); a commit status posted by `spec / labels` (a write token for what a read-only run decides).
@@ -83,7 +83,7 @@ The ruleset requires `checks / archived`. While a change is unarchived, GitHub s
 ## Verification plan
 
 Script and tool harnesses:
-- `just check` passes; `just test` covers every row of the state table, a package change after the recorded commit (`spec/approved` → `spec/pending`, record withdrawn), a `tasks.md`-only change and an archive commit (approval kept), the `spec/pending` withdrawal, the write order, both fail-closed paths, `check` warning instead of failing on an unarchived related change, and the validator's reading of a conditional job name.
+- `just check` passes; `just test` covers every row of the state table, a package change after the recorded commit (`spec/approved` → `spec/pending`, record withdrawn), a `tasks.md`-only change and an archive commit (approval kept), a stacked base whose change is not the pull request's own (no inherited state, approval unbound from the parent), a withdrawal after the archive, failing closed on an archived pull request, the `spec/pending` withdrawal, the write order, both fail-closed paths, `check` warning instead of failing on an unarchived related change, and the validator's reading of a conditional job name.
 - Read-only `./scripts/spec_approval.ts <n>` from this branch against #122 and against this pull request prints one state each and the writes it would make, with no write.
 - On this pull request, which holds an unarchived change: `checks / archive-verdict` succeeds with `archived=false`, `checks / awaiting-archive` succeeds, no `checks / archived` is reported, `checks / spec` and `checks / gate` are green. After the archive commit: `checks / archived` succeeds.
 - A throwaway draft pull request into `chore/single-spec-label` holding an unarchived change reports `checks / archived` without running `status`; it is closed and its branch deleted afterwards.
