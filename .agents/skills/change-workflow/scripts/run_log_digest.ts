@@ -220,9 +220,9 @@ export async function digest(opts: Options, runner: GhRunner, log: (line: string
     const failedJobs: FailedJob[] = [];
     for (const job of selected.jobs) {
         const name = job.name ?? "";
-        const failedSteps = (job.steps ?? []).filter((s) => UNSUCCESSFUL.has(s.conclusion ?? "")).map((s) =>
-            s.name ?? ""
-        );
+        const failedSteps = (job.steps ?? []).filter((s) =>
+            UNSUCCESSFUL.has(s.conclusion ?? "") || (s.conclusion === "cancelled" && run.conclusion !== "cancelled")
+        ).map((s) => s.name ?? "");
         const logArgs = ["run", "view", "-R", repo, "--job", String(job.databaseId), "--log-failed"];
         const out = await callGh(runner, logArgs);
         if (out.code !== 0) {
