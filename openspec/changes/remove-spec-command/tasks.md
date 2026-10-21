@@ -6,4 +6,4 @@
 
 ## 2. Verification
 
-- [ ] 2.1 Run the verification plan of `design.md`: `just check`; the `git grep` for `spec / command`, `spec-command`, and `/spec` commands outside `skills/`, `openspec/specs/`, and archives returns nothing; no `issue_comment` under `.github/`; no diff under `skills/`, `openspec/specs/`, or archived changes
+- [x] 2.1 Run the verification plan of `design.md`: `just check`; the `git grep` for `spec / command`, `spec-command`, and `/spec` commands outside `skills/`, `openspec/specs/`, and archives returns nothing; no `issue_comment` under `.github/`; no diff under `skills/`, `openspec/specs/`, or archived changes
