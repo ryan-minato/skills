@@ -917,7 +917,7 @@ Deno.test("a person's withdrawal after the archive holds: spec/pending, the reco
     assertEquals(again.calls, [`add ${ARCHIVED}`, `remove ${PENDING}`, `remove ${LABEL}`]);
 });
 
-Deno.test("failing closed on an archived pull request leaves spec/pending alone", async () => {
+Deno.test("failing closed on an archived pull request leaves only spec/pending", async () => {
     const world = approvedWorld(archivedChange());
     world.pull.labels = [ARCHIVED];
     world.failing = "/files";
