@@ -138,8 +138,9 @@ a repository change, the proofs its `design.md` names. Tick each task as
 change unarchived (`spec-workflow.md ## Archive executor and the
 freeze`); until it is, `checks / archived` stays unreported and nothing
 is red. `just spec-check` reproduces `checks / spec` locally;
-`just spec-changes status` shows the related changes' progress. Record
-what ran and the outcome for the PR's Validation section.
+`just spec-changes status --base origin/main --head HEAD` shows the
+related changes' progress. Record what ran and the outcome for the PR's
+Validation section.
 
 ## 6. Publish gate, then the draft PR and every later push
 

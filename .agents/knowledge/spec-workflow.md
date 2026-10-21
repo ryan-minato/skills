@@ -226,7 +226,7 @@ touches (an archived directory counts under its change name), resolved by
   while it holds, `spec/archived` when the pull request archives its
   change, and none otherwise (`## Approval gates`). Only the maintainer
   adds `spec/approved` or `spec/pending` by hand; task progress is
-  `just spec-changes status`.
+  `just spec-changes status --base origin/main --head HEAD`.
 
 Locally, `just spec-check` reproduces the check and
 `just spec-changes <command>` the rest.
