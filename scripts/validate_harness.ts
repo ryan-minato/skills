@@ -892,7 +892,7 @@ export function writeGrants(permissions: unknown): string[] {
 }
 
 const EVENT_EXPRESSION = /\$\{\{([\s\S]*?)\}\}/g;
-const UNTRUSTED_CONTEXT = /\bgithub\s*\.\s*(?:event(?=\s*[.[])|head_ref\b)/;
+const UNTRUSTED_CONTEXT = /\bgithub\s*\.\s*(?:event|head_ref)\b/;
 
 /** The `${{ ... }}` expressions in a string that read the event payload or the head ref. */
 export function eventExpressions(text: string): string[] {

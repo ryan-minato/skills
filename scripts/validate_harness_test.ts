@@ -206,6 +206,15 @@ Deno.test("workflows: an event expression in run:", () => {
     assertOne(workflowFindings({ "pr.yml": text }), PR, 23, "reaches a `run:` line");
 });
 
+Deno.test("workflows: the whole event in run: (bare or through toJSON); event_name passes", () => {
+    for (const expr of ["${{ github.event }}", "${{ toJSON(github.event) }}"]) {
+        const text = GOOD_PR.replace('run: echo "$N"', `run: echo "${expr}"`);
+        assertOne(workflowFindings({ "pr.yml": text }), PR, 23, "reaches a `run:` line");
+    }
+    const ok = GOOD_PR.replace('run: echo "$N"', 'run: echo "${{ github.event_name }}"');
+    assertEquals(workflowFindings({ "pr.yml": ok }), []);
+});
+
 Deno.test("workflows: github.head_ref in a multi-line run: block names its own line", () => {
     const text = GOOD_PR.replace('run: echo "$N"', 'run: |\n          set -e\n          echo "${{ github.head_ref }}"');
     assertOne(workflowFindings({ "pr.yml": text }), PR, 25, "`${{ github.head_ref }}` reaches a `run:` line");

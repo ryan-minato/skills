@@ -60,8 +60,8 @@ export const DISPOSABLE_CATALOGS = ["meta", "scaffold"];
 // The one public skill allowed to name an install command: it owns installing.
 export const INSTALLER_SKILL = "skills/core/ryan-minato-skills-installing";
 export const INSTALL_COMMAND = "npx skills add";
-/** Any package runner invoking `skills add` (npx, pnpm dlx, bunx, yarn dlx, npm exec), with flags between. */
-export const INSTALL_COMMAND_RE = /\b(?:npx|pnpm\s+dlx|bunx|yarn\s+dlx|npm\s+exec)(?:\s+-\S+)*\s+skills\s+add\b/;
+/** Any package runner invoking `skills add` (npx, pnpm dlx, bunx, yarn dlx, npm exec), with flags or a version between. */
+export const INSTALL_COMMAND_RE = /\b(?:npx|pnpm\s+dlx|bunx|yarn\s+dlx|npm\s+exec)\b.*?\bskills(?:@\S+)?\s+add\b/;
 
 const ESCAPING_LINK = /\]\((?:\.\.\/|\/)[^)]*\)/g;
 
