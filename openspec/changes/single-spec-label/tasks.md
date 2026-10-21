@@ -5,9 +5,9 @@
 
 ## 2. The labels workflow and the taxonomy
 
-- [ ] 2.1 `.github/workflows/spec-labels.yml`: the snapshot and plan steps removed, header rewritten; its assertions in `spec_approval_test.ts` follow
-- [ ] 2.2 `.github/labels.json`: `spec/pending`, `spec/approved`, `spec/archived` only
-- [ ] 2.3 `scripts/validate_harness.ts` `spec` check against `STATE_LABELS`, without the `case`-list check; `validate_harness_test.ts`
+- [x] 2.1 `.github/workflows/spec-labels.yml`: the snapshot and plan steps removed, header rewritten; its assertions in `spec_approval_test.ts` follow
+- [x] 2.2 `.github/labels.json`: `spec/pending`, `spec/approved`, `spec/archived` only
+- [x] 2.3 `scripts/validate_harness.ts` `spec` check against `STATE_LABELS`, without the `case`-list check; `validate_harness_test.ts`
 
 ## 3. `spec_changes.ts`
 
