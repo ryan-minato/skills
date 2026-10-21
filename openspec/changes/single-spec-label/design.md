@@ -74,6 +74,7 @@ The ruleset requires `checks / archived`. While a change is unarchived, GitHub s
 ## Risks / Trade-offs
 
 - [Between the merge and the ruleset update, an unarchived pull request can merge] → the maintainer updates the ruleset right after the merge; the order (name live on `main`, then the ruleset) is the one `github-checks.md` prescribes.
+- [Retargeting a pull request's base fires only `edited`, which starts no `checks.yml` run, so a pull request retargeted onto `main` keeps the verdict of its last push — `checks / archived` from its stacked days — with its change unarchived] → accepted by the maintainer during implementation: the gate stays in `checks.yml`, `github-checks.md ## No standing failure` says to rerun `checks` after retargeting onto `main`, and #127 tracks the fix. Rejected: `edited` on `checks.yml` (every body edit reruns the quality gate, and skipped required jobs report success).
 - [A pull request edits `checks.yml` to report `checks / archived` regardless] → review of workflow edits, as for every `pull_request` workflow; the verdict's script is the base's.
 - [An archive commit is reverted after the freeze] → `spec/approved` is no longer on the pull request, so the state is `spec/pending` and the record is withdrawn; the maintainer approves again. Fail closed, rare.
 - [The pull request lists more than 3000 files] → `spec/archived` is left as it is; the reason says so. The archive gate reads git, not the API, and is unaffected.

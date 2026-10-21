@@ -102,7 +102,7 @@ mark, so red always means something to fix now.
   required name, so the merge still waits.
 - Known gap: retargeting a pull request's base starts no `checks.yml` run,
   so the verdict stays as the last push left it until the next push or a
-  rerun; rerun `checks` after retargeting a pull request onto `main`.
+  rerun; rerun `checks` after retargeting a pull request onto `main` (#127).
 
 ## Privileged workflows
 
