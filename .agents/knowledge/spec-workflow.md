@@ -207,10 +207,6 @@ touches (an archived directory counts under its change name), resolved by
 - `checks / spec` runs the strict validator and fails a ready pull
   request holding an unarchived related change (a warning on a draft); on
   a push to `main` any change outside `archive/` fails.
-- `/spec show [<slug>] [proposal|design|tasks|specs|all]` and
-  `/spec status [<slug>]`, posted as a pull request comment by a
-  collaborator (owner, member, or collaborator association), get a reply
-  from `spec / command`.
 - `spec / labels` keeps `spec/archived` | `spec/unarchived` and
   `spec/not-started` | `spec/in-progress` | `spec/done` from the related
   changes' task lists, and the approval label as `## Approval gates`

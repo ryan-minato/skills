@@ -194,8 +194,8 @@ The OpenSpec CLI runs through Deno at the version the `justfile` pins:
 unarchived-change rule for the changes a branch touches, and
 `just spec-sync` regenerates the `openspec-*` skills.
 `scripts/spec_changes.ts` is the related-change tool behind
-`just spec-changes` (`snapshot`, `status`, `show`, `check`, `archive`,
-`labels`); `checks / spec`, `spec / command`, and `spec / labels` run it.
+`just spec-changes` (`snapshot`, `status`, `check`, `archive`, `labels`);
+`checks / spec` and `spec / labels` run it.
 
 The package approval is the label `spec/approved`. The maintainer adds it;
 `spec / labels` then runs `scripts/spec_approval.ts`, which decides from
@@ -226,8 +226,8 @@ Where each workflow finds its code:
 - `pr / policy` takes its workflow file from the pull request's merge ref
   but checks out the base and runs the base's script, so a change to its
   script takes effect from the next pull request.
-- `spec / labels` (`pull_request_target`), `spec / command`
-  (`issue_comment`), and `issues / triage` (`issues`) run `main`'s
+- `spec / labels` (`pull_request_target`) and `issues / triage`
+  (`issues`) run `main`'s
   workflow and scripts; `labels / sync` runs on `main` only. A change to
   their scripts takes effect after merge.
 

@@ -35,7 +35,7 @@ are the pairs no script checks, or checks only in part.
 | a catalog added or removed | catalog scaffold, `ARCHITECTURE.md` catalogs, `just gen-marketplace`, root README pair | author | same pull request; validators check part |
 | a catalog added or removed | `catalog/*` in `labels.json`, issue-form Catalog options, prefixes in `validate_skills.ts` | author, maintainer | validators; removed label deleted by hand |
 
-`scripts/spec_changes.ts` and `.github/workflows/spec-{command,labels}.yml`
+`scripts/spec_changes.ts` and `.github/workflows/spec-labels.yml`
 began from the `openspec-workflow` skill's assets; they are this
 repository's own port and bind nothing. A change to the assets needs no
 change here, and the reverse.

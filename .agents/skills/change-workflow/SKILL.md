@@ -137,8 +137,8 @@ a repository change, the proofs its `design.md` names. Tick each task as
 `spec-workflow.md ## Lifecycle` says, then run `just check`. Leave the
 change unarchived (`spec-workflow.md ## Archive executor and the
 freeze`). `just spec-check` reproduces `checks / spec` locally;
-`/spec status` on the PR shows the related changes' progress. Record what
-ran and the outcome for the PR's Validation section.
+`just spec-changes status` shows the related changes' progress. Record
+what ran and the outcome for the PR's Validation section.
 
 ## 6. Publish gate, then the draft PR and every later push
 
