@@ -28,8 +28,8 @@ review; prepare the acceptance-evidence report.
   the pull request carries a justified `Spec: none — <reason>`. The
   change is not archived yet (`spec-workflow.md ## Lifecycle`);
 - `just check` passes locally and every required check is green, except
-  that `checks / spec`, and through it `checks / gate`, is red until the
-  freeze (`github-checks.md`);
+  that `checks / archived` is not reported until the freeze
+  (`github-checks.md ## No standing failure`);
 - every scenario of the change passed, with the evidence in the pull
   request's Validation section;
 - the publish gate returned `SAFE TO PUBLISH: YES` for the exact pull
@@ -38,18 +38,18 @@ review; prepare the acceptance-evidence report.
 ## What agents may not do
 
 - Approve a pull request, merge, or arm auto-merge.
-- Add or remove the `spec/approved` label, or edit or delete its record
-  comment: the label stands for the maintainer's closing, and agents act
+- Add or remove the `spec/approved` label, add `spec/pending`, or edit or
+  delete the record comment: `spec/approved` stands for the maintainer's
+  closing and an added `spec/pending` for a withdrawal, and agents act
   through the maintainer's `gh` login, so only this rule tells the two
-  apart. Read it with `just spec-approval <n>`.
+  apart. Read the state with `just spec-approval <n>`.
 - Create milestones or tracking issues without a human confirming them.
 - Change a ruleset, a required check, a repository setting, this file,
   `AGENTS.md`, or `.claude/settings.json` in a way that widens agent
   authority.
 - Mark a pull request ready while a required check is failing,
   unavailable, or unreliable for any reason other than the unarchived
-  change `checks / spec` (and through it `checks / gate`) reports before
-  the freeze.
+  change that withholds `checks / archived` before the freeze.
 - Execute a task whose change is missing or unapproved.
 
 ## Publishing

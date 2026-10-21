@@ -22,7 +22,7 @@
 ## 5. Documents
 
 - [x] 5.1 `github-checks.md` (table, healthy runs, the no-standing-failure rule, diagnosing), `github-settings.md` required checks
-- [ ] 5.2 `spec-workflow.md`, `github-workflow.md`, `agent-authority.md`, `ARCHITECTURE.md`, `.github/CONTRIBUTING.md`, `change-workflow` skill
+- [x] 5.2 `spec-workflow.md`, `github-workflow.md`, `agent-authority.md`, `ARCHITECTURE.md`, `.github/CONTRIBUTING.md`, `change-workflow` skill
 
 ## 6. Verification
 

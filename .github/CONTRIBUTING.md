@@ -51,8 +51,8 @@ pre-commit hooks. `just check` is exactly what CI runs (see
    must conform, and you need not rewrite your branch history.
 5. Mark the pull request ready once every task is done, `just check`
    passes, and the Validation section records what you ran. Ready opens
-   the second discussion, on the finished implementation; `checks / spec`
-   stays red meanwhile.
+   the second discussion, on the finished implementation; meanwhile the
+   required `checks / archived` waits unreported and nothing is red.
 6. When the maintainer closes that discussion, archive the change with
    `just spec-changes archive --base origin/main --head HEAD` and commit
    it; then the maintainer merges. Green checks are evidence, not
