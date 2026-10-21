@@ -745,7 +745,10 @@ export function checkTools(h: Harness): void {
         );
     }
     for (const hit of h.deps.grepTracked(h.root, OPENTOFU_PIN_PATTERN)) {
-        if (hit.file.startsWith("skills/") || hit.file.startsWith("openspec/changes/archive/")) continue;
+        // Only where a pin takes effect; prose elsewhere may name the action (a rejected alternative, say).
+        const takesEffect = /^(\.github\/|\.devcontainer\/)/.test(hit.file) ||
+            ["justfile", ".pre-commit-config.yaml", "deno.json"].includes(hit.file);
+        if (!takesEffect) continue;
         h.error(
             `${hit.file}:${hit.line}: pins or sets up a fixed OpenTofu; the tools follow the latest release. ` +
                 "Use `just install-opentofu` (or the setup action's `opentofu` input).",

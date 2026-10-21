@@ -457,11 +457,12 @@ Deno.test("tools: an OpenSpec version outside the justfile, with file and line; 
     }
 });
 
-Deno.test("tools: an OpenTofu pin outside skills/ and archived changes, with file and line", () => {
+Deno.test("tools: an OpenTofu pin where it takes effect, with file and line; prose elsewhere passes", () => {
     const root = gitFixture({
         ".github/workflows/a.yml": `steps:\n  - uses: opentofu/${SETUP_TOFU}@x\n    with:\n      ${TOFU_PIN}\n`,
         "skills/x/y/assets/ci.yml": `${TOFU_PIN}\n`,
         "openspec/changes/archive/old/design.md": `${SETUP_TOFU}\n`,
+        "openspec/changes/x/design.md": `Rejected: opentofu/${SETUP_TOFU} in CI\n`,
     });
     try {
         const h = new Harness(root, realDeps);

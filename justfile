@@ -84,7 +84,7 @@ lint:
 test:
     deno test --allow-read --allow-write --allow-run --allow-env --allow-net --no-prompt
 
-# Format-check and validate every .tf skill asset with the pinned OpenTofu, in temp copies
+# Format-check and validate every .tf skill asset with the latest OpenTofu (just install-opentofu), in temp copies
 tf-validate:
     #!/usr/bin/env bash
     set -euo pipefail
