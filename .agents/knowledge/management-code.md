@@ -148,9 +148,11 @@ Held by review, not by the check:
 - Deno, just, pre-commit, ruff, and OpenTofu are never pinned: the dev
   container features and `./.github/actions/setup-tools` install the
   latest release, OpenTofu through `just install-opentofu`, checked
-  against that release's SHA256SUMS. A release that turns a check red is
-  the early signal; the fix is its own change, and one that touches
-  public skills is a change of those skills.
+  against that release's SHA256SUMS; the `tools` check fails an OpenTofu
+  setup action or version pin in `.github/`, `.devcontainer/`, the
+  `justfile`, `.pre-commit-config.yaml`, or `deno.json`. A release that
+  turns a check red is the early signal; the fix is its own change, and
+  one that touches public skills is a change of those skills.
 - OpenSpec is the one pin, `openspec_version` in the `justfile`, because
   the generated `openspec-*` skills must equal that CLI's output byte for
   byte. `just install-tools` installs it through Deno into `.tools/bin`. A

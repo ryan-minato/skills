@@ -14,7 +14,7 @@
 // Output: one JSON object on stdout:
 //   {"run_id": ..., "status": ..., "conclusion": ...,
 //    "failed_jobs": [{"name": ..., "job_id": ..., "failed_steps": [...], "log_tail": [...]}]}
-// A job or step is unsuccessful when its conclusion is failure, timed_out, or startup_failure (a cancelled job was superseded, not failed).
+// A job or step is unsuccessful when its conclusion is failure, timed_out, or startup_failure, or cancelled inside a run that was not itself cancelled.
 // Diagnostics go to stderr.
 //
 // Exit codes: 0 digest produced (a green run digests to an empty failed_jobs list), 1 gh missing, gh
@@ -140,7 +140,11 @@ export function validateRun(value: unknown): Run {
 
 /** The jobs to digest, and a note when the run failed but no job did (then every completed job). */
 export function selectJobs(run: Run): { jobs: Job[]; note?: string } {
-    const failed = run.jobs.filter((j) => UNSUCCESSFUL.has(j.conclusion ?? ""));
+    // A cancelled job counts unless the whole run was cancelled (superseded): a job past its
+    // timeout-minutes can conclude cancelled inside a failed run.
+    const failed = run.jobs.filter((j) =>
+        UNSUCCESSFUL.has(j.conclusion ?? "") || (j.conclusion === "cancelled" && run.conclusion !== "cancelled")
+    );
     if (failed.length || !UNSUCCESSFUL.has(run.conclusion ?? "")) return { jobs: failed };
     const completed = run.jobs.filter((j) => j.status === "completed");
     return {
