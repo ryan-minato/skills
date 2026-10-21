@@ -350,7 +350,14 @@ Deno.test("main: OK line on stdout, findings on stderr, argument errors exit 2",
 
 Deno.test("install command: any package runner invoking skills add is found", () => {
     for (
-        const line of ["npx skills add a/b", "pnpm dlx skills add a/b", "npx -y skills add a/b", "bunx skills add x"]
+        const line of [
+            "npx skills add a/b",
+            "pnpm dlx skills add a/b",
+            "npx -y skills add a/b",
+            "bunx skills add x",
+            "npx skills@latest add a/b",
+            "npx --package skills skills add a/b",
+        ]
     ) {
         assert(INSTALL_COMMAND_RE.test(line), line);
     }

@@ -5,27 +5,32 @@
 //
 // Usage: scripts/review_threads.ts <number>    (called by `just review-threads <number>`)
 //
-// Prints a JSON list, one object per thread (the first 100): isResolved, isOutdated, path, line, and the
-// first comment's author login, createdAt, and the first 200 characters of its body. Exit 0 on success,
-// 2 on a usage error or when gh or its response is not what this script relies on.
+// Pages through every thread (100 per request, at most MAX_PAGES requests) and prints a JSON list, one
+// object per thread: isResolved, isOutdated, path, line; the first comment's author login, createdAt, and
+// the first 200 characters of its body; and `comments`, every comment of the thread as {author, createdAt,
+// body} with the same 200-character limit. Exit 0 on success, 2 on a usage error, when gh or its response
+// is not what this script relies on, or when a thread has more than 100 comments or the pull request more
+// than MAX_PAGES pages of threads (it fails rather than truncate).
 import { CommandError, eprint, type Output, REPO, runAsync, UsageError } from "./lib/repo.ts";
 
 export const USAGE = `usage: review_threads.ts <number>
 
-Lists the review threads of pull request <number> of ${REPO} as JSON (the first 100 threads).`;
+Lists the review threads of pull request <number> of ${REPO} as JSON: every thread
+with every comment (bodies cut to the first 200 characters).`;
 
 /** The one query this script sends; callers supply only the pull request number. */
-export const QUERY = `query($owner: String!, $name: String!, $number: Int!) {
+export const QUERY = `query($owner: String!, $name: String!, $number: Int!, $after: String) {
   repository(owner: $owner, name: $name) {
     pullRequest(number: $number) {
-      reviewThreads(first: 100) {
-        totalCount
+      reviewThreads(first: 100, after: $after) {
+        pageInfo { hasNextPage endCursor }
         nodes {
           isResolved
           isOutdated
           path
           line
-          comments(first: 1) {
+          comments(first: 100) {
+            totalCount
             nodes { author { login } createdAt body }
           }
         }
@@ -35,12 +40,22 @@ export const QUERY = `query($owner: String!, $name: String!, $number: Int!) {
 }`;
 
 export const BODY_LIMIT = 200;
+/** Comments requested per thread; a thread with more fails instead of being truncated. */
+export const COMMENT_LIMIT = 100;
+/** Pages of 100 threads fetched at most; a pull request with more fails instead of being truncated. */
+export const MAX_PAGES = 50;
 const MAX_INT = 2 ** 31 - 1; // GraphQL Int
 
 /** Runs gh with the given arguments; tests replace it. */
 export type GhRunner = (args: string[]) => Promise<Output>;
 
 export const runGh: GhRunner = (args) => runAsync("gh", args);
+
+export interface Comment {
+    author: string | null;
+    createdAt: string;
+    body: string;
+}
 
 export interface Thread {
     isResolved: boolean;
@@ -50,6 +65,14 @@ export interface Thread {
     author: string | null;
     createdAt: string;
     body: string;
+    comments: Comment[];
+}
+
+/** One page of threads and where the next page starts. */
+export interface Page {
+    threads: Thread[];
+    hasNextPage: boolean;
+    endCursor: string | null;
 }
 
 /** Parses the pull request number; anything but a positive integer is a UsageError. */
@@ -62,8 +85,8 @@ export function parseNumber(argv: string[]): number {
     return Number(arg);
 }
 
-/** The gh arguments for the fixed query. */
-export function ghArgs(number: number): string[] {
+/** The gh arguments for the fixed query; `after` is the cursor of the previous page, absent on the first. */
+export function ghArgs(number: number, after?: string): string[] {
     const [owner, name] = REPO.split("/");
     return [
         "api",
@@ -74,6 +97,7 @@ export function ghArgs(number: number): string[] {
         `owner=${owner}`,
         "-f",
         `name=${name}`,
+        ...(after === undefined ? [] : ["-f", `after=${after}`]),
         "-f",
         `query=${QUERY}`,
     ];
@@ -96,8 +120,18 @@ export function truncate(body: string): string {
     return chars.length <= BODY_LIMIT ? body : chars.slice(0, BODY_LIMIT).join("");
 }
 
-/** Checks the response shape and extracts the threads; returns them with the total thread count. */
-export function parseResponse(stdout: string): { threads: Thread[]; totalCount: number } {
+function parseComment(value: unknown, where: string): Comment {
+    // author is null when the account was deleted (GitHub's schema documents it as nullable).
+    if (
+        !isObject(value) || typeof value.createdAt !== "string" || typeof value.body !== "string" ||
+        !(value.author === null || (isObject(value.author) && typeof value.author.login === "string"))
+    ) throw shapeError(where, value);
+    const author = value.author as { login: string } | null;
+    return { author: author === null ? null : author.login, createdAt: value.createdAt, body: truncate(value.body) };
+}
+
+/** Checks the response shape of one page and extracts its threads and page info. */
+export function parseResponse(stdout: string): Page {
     let data: unknown;
     try {
         data = JSON.parse(stdout);
@@ -113,52 +147,62 @@ export function parseResponse(stdout: string): { threads: Thread[]; totalCount: 
     const pr = repository.pullRequest;
     if (!isObject(pr)) throw shapeError("data.repository.pullRequest", pr);
     const rt = pr.reviewThreads;
-    if (!isObject(rt) || !Array.isArray(rt.nodes) || typeof rt.totalCount !== "number") {
-        throw shapeError("pullRequest.reviewThreads", rt);
-    }
+    if (!isObject(rt) || !Array.isArray(rt.nodes)) throw shapeError("pullRequest.reviewThreads", rt);
+    const pageInfo = rt.pageInfo;
+    if (
+        !isObject(pageInfo) || typeof pageInfo.hasNextPage !== "boolean" ||
+        !(typeof pageInfo.endCursor === "string" || (pageInfo.endCursor === null && !pageInfo.hasNextPage))
+    ) throw shapeError("reviewThreads.pageInfo", pageInfo);
     const threads = rt.nodes.map((node: unknown, i: number): Thread => {
         const where = `reviewThreads.nodes[${i}]`;
         if (
             !isObject(node) || typeof node.isResolved !== "boolean" || typeof node.isOutdated !== "boolean" ||
             typeof node.path !== "string" || !(node.line === null || typeof node.line === "number")
         ) throw shapeError(where, node);
-        const comments = node.comments;
-        if (!isObject(comments) || !Array.isArray(comments.nodes) || comments.nodes.length !== 1) {
-            throw shapeError(`${where}.comments`, comments);
-        }
-        const first: unknown = comments.nodes[0];
-        // author is null when the account was deleted (GitHub's schema documents it as nullable).
+        const c = node.comments;
         if (
-            !isObject(first) || typeof first.createdAt !== "string" || typeof first.body !== "string" ||
-            !(first.author === null || (isObject(first.author) && typeof first.author.login === "string"))
-        ) throw shapeError(`${where}.comments.nodes[0]`, first);
-        const author = first.author as { login: string } | null;
+            !isObject(c) || !Array.isArray(c.nodes) || c.nodes.length === 0 || typeof c.totalCount !== "number"
+        ) throw shapeError(`${where}.comments`, c);
+        if (c.totalCount > c.nodes.length) {
+            throw new CommandError(
+                `the review thread on ${node.path}:${node.line} has ${c.totalCount} comments; ` +
+                    `this script reads at most ${COMMENT_LIMIT} per thread and refuses to truncate`,
+            );
+        }
+        const comments = c.nodes.map((comment: unknown, j: number) =>
+            parseComment(comment, `${where}.comments.nodes[${j}]`)
+        );
         return {
             isResolved: node.isResolved,
             isOutdated: node.isOutdated,
             path: node.path,
             line: node.line as number | null,
-            author: author === null ? null : author.login,
-            createdAt: first.createdAt,
-            body: truncate(first.body),
+            ...comments[0],
+            comments,
         };
     });
-    return { threads, totalCount: rt.totalCount };
+    return { threads, hasNextPage: pageInfo.hasNextPage, endCursor: pageInfo.endCursor as string | null };
 }
 
-/** Fetches the threads of one pull request through the fixed query. */
+/** Fetches every thread of one pull request through the fixed query, one page of 100 at a time. */
 export async function fetchThreads(number: number, gh: GhRunner = runGh): Promise<Thread[]> {
-    const out = await gh(ghArgs(number));
-    if (out.code !== 0) {
-        throw new CommandError(
-            `\`gh api graphql\` (review threads of #${number}) exited ${out.code}: ${out.stderr.trim()}`,
-        );
+    const threads: Thread[] = [];
+    let after: string | undefined;
+    for (let page = 1; page <= MAX_PAGES; page++) {
+        const out = await gh(ghArgs(number, after));
+        if (out.code !== 0) {
+            throw new CommandError(
+                `\`gh api graphql\` (review threads of #${number}, page ${page}) exited ${out.code}: ${out.stderr.trim()}`,
+            );
+        }
+        const result = parseResponse(out.stdout);
+        threads.push(...result.threads);
+        if (!result.hasNextPage) return threads;
+        after = result.endCursor as string;
     }
-    const { threads, totalCount } = parseResponse(out.stdout);
-    if (totalCount > threads.length) {
-        eprint(`review_threads: #${number} has ${totalCount} review threads; listing the first ${threads.length}`);
-    }
-    return threads;
+    throw new CommandError(
+        `#${number} has more than ${MAX_PAGES} pages of review threads (MAX_PAGES); refusing to truncate`,
+    );
 }
 
 export async function main(argv: string[], gh: GhRunner = runGh): Promise<number> {
