@@ -21,10 +21,8 @@ import {
     pyQuote,
     pyStrip,
     select,
-    showMarkdown,
     type Snapshot,
     snapshotProblem,
-    type Source,
     statusMarkdown,
     taskCounts,
 } from "./spec_changes.ts";
@@ -98,27 +96,6 @@ function change(name: string, state: Change["state"], progress: Change["tasks"][
         skip_specs: false,
         tasks: { done: progress === "not-started" ? 0 : 1, open, open_tasks: [], progress },
     };
-}
-
-class FakeSource implements Source {
-    baseLabel = "b";
-    headLabel = "h";
-    constructor(private readonly files: Record<string, string>) {}
-    changedPaths() {
-        return Object.keys(this.files);
-    }
-    existsDir(_side: "base" | "head", path: string) {
-        return Object.keys(this.files).some((p) => p.startsWith(`${path}/`));
-    }
-    entries() {
-        return [];
-    }
-    headFiles(path: string) {
-        return Object.keys(this.files).filter((p) => p.startsWith(`${path}/`));
-    }
-    headText(path: string) {
-        return this.files[path] ?? null;
-    }
 }
 
 // --- Python string semantics -------------------------------------------------------------------------------
@@ -225,34 +202,6 @@ Deno.test("statusMarkdown cuts long tasks by code point", () => {
     const lines = statusMarkdown([c]).split("\n");
     assertEquals(lines[2], "| `x` | active | 1 done, 1 open | in-progress |");
     assertEquals(lines[5], "- `" + "😀".repeat(117) + "...`");
-});
-
-Deno.test("showMarkdown lists, links, truncates, and counts what it omits", () => {
-    const source = new FakeSource({
-        "openspec/changes/a/proposal.md": "# A\n```\ncode\n```\n",
-        "openspec/changes/a/tasks.md": "x\n".repeat(400),
-        "openspec/changes/a/specs/s/spec.md": "spec\n",
-        "openspec/changes/b/proposal.md": "# B\n",
-    });
-    const changes = [
-        change("a", "active", "done"),
-        change("b", "active", "done"),
-        change("gone", "removed", "not-started"),
-    ];
-    const full = showMarkdown(source, changes, "all", "https://x/blob/h/", 60000);
-    assertStringIncludes(
-        full,
-        "**`openspec/changes/a/proposal.md`** ([view](https://x/blob/h/openspec/changes/a/proposal.md))",
-    );
-    assertStringIncludes(full, "````markdown\n# A\n```\ncode\n```\n````");
-    assertStringIncludes(full, "**`openspec/changes/a/design.md`** — _no design.md yet_");
-    assertStringIncludes(full, "**`openspec/changes/b/specs/`** — _no delta spec yet_");
-    assertStringIncludes(full, "### `gone` — removed at the head; nothing to show.");
-    const cut = showMarkdown(source, changes, "all", "", 300);
-    assert(cpLen(cut) <= 300, `${cpLen(cut)} > 300`);
-    assertStringIncludes(cut, "… truncated — full file\n\n");
-    assertStringIncludes(cut, "_2 more documents omitted for size._\n");
-    assertEquals(showMarkdown(source, [], "all", "", 100), statusMarkdown([]));
 });
 
 // --- the snapshot document ---------------------------------------------------------------------------------
@@ -521,16 +470,16 @@ Deno.test("parseCommandLine keeps the original's options, defaults, and refusals
     assert(typeof status !== "string");
     assertEquals(status.change, ["a", "b"]);
     assertStringIncludes(parseCommandLine(["--help"], env) as string, "usage: spec_changes.ts");
-    assertStringIncludes(parseCommandLine(["show", "-h"], env) as string, "--max-chars N");
+    assertStringIncludes(parseCommandLine(["snapshot", "-h"], env) as string, "--max-calls N");
     const refused: [string[], string][] = [
         [[], "a command is required"],
         [["nope"], "invalid choice: 'nope'"],
         [["status", "--root", "x"], "unknown option --root"],
         [["status", "extra"], "unrecognized arguments: extra"],
-        [["show", "--doc", "readme"], "invalid choice: 'readme'"],
+        [["show"], "invalid choice: 'show'"],
         [["check", "--shape", "round"], "invalid choice: 'round'"],
-        [["show", "--max-chars", "0"], "0 is not a positive number"],
-        [["show", "--max-chars", "ten"], "invalid positive value: 'ten'"],
+        [["snapshot", "--repo", "o/r", "--pr", "0"], "0 is not a positive number"],
+        [["snapshot", "--repo", "o/r", "--pr", "1", "--max-files", "ten"], "invalid positive value: 'ten'"],
         [["snapshot", "--pr", "1"], "required: --repo"],
         [["snapshot", "--repo", "o/r/x", "--pr", "1"], "is not an OWNER/NAME pair"],
         [["snapshot", "--repo", "o/r\n", "--pr", "1"], "is not an OWNER/NAME pair"],
@@ -544,6 +493,10 @@ Deno.test("main exits 2 on bad arguments and 0 with help", async () => {
     assertStringIncludes(io.stderr, "unknown option --bogus");
     assertEquals(io.stdout, "");
     io = capture();
+    assertEquals(await main(["show"], io), 2);
+    assertStringIncludes(io.stderr, "invalid choice: 'show'");
+    assertEquals(io.stdout, "");
+    io = capture();
     assertEquals(await main(["-h"], io), 0);
     assertStringIncludes(io.stdout, "commands:");
     io = capture();
@@ -553,7 +506,7 @@ Deno.test("main exits 2 on bad arguments and 0 with help", async () => {
 
 // --- the commands over a fixture repository ----------------------------------------------------------------
 
-Deno.test("status, labels, show, and check read the git source", async () => {
+Deno.test("status, labels, and check read the git source", async () => {
     const { root, base, head } = fixtureRepo();
     try {
         const src = ["--base", base, "--head", head];
@@ -579,14 +532,7 @@ Deno.test("status, labels, show, and check read the git source", async () => {
         );
 
         io = capture();
-        assertEquals(await main(["--root", root, "show", ...src, "--change", "open", "--doc", "specs"], io), 0);
-        assertEquals(
-            io.stdout,
-            "**`openspec/changes/open/specs/cap/spec.md`**\n\n```markdown\n## ADDED Requirements\n```\n\n",
-        );
-
-        io = capture();
-        assertEquals(await main(["--root", root, "show", ...src, "--change", "nope"], io), 2);
+        assertEquals(await main(["--root", root, "status", ...src, "--change", "nope"], io), 2);
         assertStringIncludes(io.stderr, "not a change this request touches: `nope`");
 
         io = capture();
