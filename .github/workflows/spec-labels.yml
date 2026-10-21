@@ -1,18 +1,15 @@
-# .github/workflows/spec-labels.yml — keeps the labels of every pull request
-# that follow from its OpenSpec changes:
-#
-# - `spec/approved`, the maintainer's approval of the approval package
-#   (.agents/knowledge/spec-workflow.md, `## Approval gates`):
-#   `scripts/spec_approval.ts` records it in one comment when the maintainer
-#   adds the label, and withdraws it when the package changes after the
-#   recorded commit, when a person removes it, or when no valid record answers
-#   it; `just spec-approval <n>` prints the same decision without writing;
-# - `spec/archived` | `spec/unarchived` and `spec/not-started` |
-#   `spec/in-progress` | `spec/done` from the related changes. A pull request
-#   with no related change carries none of them.
-#
-# `scripts/spec_changes.ts` is this repository's own management script, not a
-# copy that must match the openspec-workflow skill's script.
+# .github/workflows/spec-labels.yml — keeps the one specification-state
+# label of every pull request (.agents/knowledge/spec-workflow.md,
+# `## Approval gates`): `scripts/spec_approval.ts` decides `spec/pending`,
+# `spec/approved`, `spec/archived`, or none from the pull request's present
+# state, adds the wanted one, and removes the others. It records the
+# maintainer's approval in one comment when the maintainer adds
+# `spec/approved`, and withdraws it, back to `spec/pending`, when the package
+# changes after the recorded commit, when a person removes `spec/approved` or
+# adds `spec/pending`, or when no valid record answers it. A pull request
+# with no unarchived change carries `spec/archived` when it archives one and
+# no state label otherwise. `just spec-approval <n>` prints the same decision
+# without writing.
 #
 # This is a privileged workflow (.agents/knowledge/github-checks.md): it runs
 # main's copy of this file and of the scripts with a token that can label a
@@ -64,11 +61,10 @@ jobs:
           persist-credentials: false
       # Deno only: every tool input of the setup action defaults to off.
       - uses: ./.github/actions/setup-tools
-      # First, so that no later step can delay or skip the approval decision.
-      # The step's own limit turns a hung script into a failed step, so that
-      # the last step runs; the job's limit alone would cancel the job, which
-      # runs no step conditioned on failure().
-      - name: Decide the approval label
+      # The one step that decides and writes. The step's own limit turns a hung
+      # script into a failed step, so that the last step runs; the job's limit
+      # alone would cancel the job, which runs no step conditioned on failure().
+      - name: Decide and write the state label
         timeout-minutes: 3
         env:
           GH_TOKEN: ${{ github.token }}
@@ -79,63 +75,11 @@ jobs:
           # A value, compared with the head the API returns; never checked out.
           EVENT_HEAD: ${{ github.event.pull_request.head.sha }}
         run: ./scripts/spec_approval.ts --apply
-      - name: Snapshot the head through the API
-        env:
-          # The token reaches only the steps that call the API, so a step
-          # added later starts without it and has to ask for it on purpose.
-          GH_TOKEN: ${{ github.token }}
-          N: ${{ github.event.pull_request.number }}
-          REPO: ${{ github.repository }}
-        run: ./scripts/spec_changes.ts snapshot --repo "$REPO" --pr "$N" --out "$RUNNER_TEMP/snapshot.json"
-      - name: Compute the label plan and apply it
-        env:
-          GH_TOKEN: ${{ github.token }}
-          N: ${{ github.event.pull_request.number }}
-          REPO: ${{ github.repository }}
-          CURRENT: ${{ join(github.event.pull_request.labels.*.name, ',') }}
-        run: |
-          set -euo pipefail
-          ./scripts/spec_changes.ts labels --snapshot "$RUNNER_TEMP/snapshot.json" \
-            --current "$CURRENT" --json > "$RUNNER_TEMP/plan.json"
-          cat "$RUNNER_TEMP/plan.json"
-          # The plan may only ever name a label of the fixed taxonomy; anything
-          # else means the script was tampered with, so the job stops.
-          check() {
-            case "$1" in
-              spec/archived|spec/unarchived|spec/not-started|spec/in-progress|spec/done) ;;
-              *) echo "refusing unexpected label: $1" >&2; exit 1 ;;
-            esac
-          }
-          # jq writes both lists before the loops run: fed through a process
-          # substitution, a jq failure would read as an empty plan.
-          jq -r '.add[]' "$RUNNER_TEMP/plan.json" > "$RUNNER_TEMP/add.txt"
-          jq -r '.remove[]' "$RUNNER_TEMP/plan.json" > "$RUNNER_TEMP/remove.txt"
-          while IFS= read -r label; do
-            [ -n "$label" ] || continue
-            check "$label"
-            gh api -X POST "repos/$REPO/issues/$N/labels" -f "labels[]=$label" > /dev/null
-          done < "$RUNNER_TEMP/add.txt"
-          while IFS= read -r label; do
-            [ -n "$label" ] || continue
-            check "$label"
-            # Encoded outside the `if` below, so a failure stops the step
-            # rather than sending a DELETE for an empty label name.
-            encoded=$(jq -rn --arg l "$label" '$l | @uri')
-            # A label already absent answers 404, which is not a failure here.
-            # Anything else — a permission regression, a rate limit — must fail
-            # the job: a silently skipped delete leaves a stale label saying the
-            # opposite of the truth, and nothing would prompt a retry.
-            if ! err=$(gh api -X DELETE "repos/$REPO/issues/$N/labels/$encoded" 2>&1 >/dev/null); then
-              case "$err" in
-                *"HTTP 404"*) ;;
-                *) printf '%s\n' "$err" >&2; exit 1 ;;
-              esac
-            fi
-          done < "$RUNNER_TEMP/remove.txt"
       # A run that failed or whose deciding step timed out may leave
       # spec/approved where it is wrong; this takes it off, on a closed pull
-      # request as well. The maintainer approves again by adding it again. A
-      # label that is not there is no failure.
+      # request as well. The next run that succeeds sets spec/pending; the
+      # maintainer approves again by adding spec/approved again. A label that
+      # is not there is no failure.
       - name: Remove spec/approved after a failure
         if: failure()
         env:

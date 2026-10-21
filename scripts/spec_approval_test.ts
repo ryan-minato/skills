@@ -1051,6 +1051,8 @@ Deno.test("spec-labels.yml runs the approval within its bounds", () => {
     assert(Number.isInteger(job["timeout-minutes"]) && job["timeout-minutes"] > 0, "the job has a time limit");
     for (const key of ["env", "container", "services", "defaults"]) assertEquals(job[key], undefined, key);
     const steps: Yaml[] = job.steps;
+    // The checkout, the tools, the one deciding step, and the failure step: nothing else.
+    assertEquals(steps.length, 4);
     const [checkout, tools] = steps;
     // The base, without credentials and without a ref.
     assertMatch(checkout.uses, /^actions\/checkout@[0-9a-f]{40}$/);
@@ -1089,10 +1091,10 @@ Deno.test("spec-labels.yml runs the approval within its bounds", () => {
         for (const key of Object.keys(step.with ?? {})) {
             assert(!["ref", "repository", "path", "token", "submodules", "fetch-depth"].includes(key), key);
         }
-        // The token only where gh is called: the script, the spec_changes steps (gh api), and the cleanup.
+        // The token only where gh is called: the script and the cleanup.
         if (step.env?.GH_TOKEN !== undefined) {
             assertEquals(step.env.GH_TOKEN, "${{ github.token }}");
-            assert(step === decide || /\bgh api\b|scripts\/spec_changes\.ts/.test(step.run), `a token in ${step.name}`);
+            assert(step === decide || step === cleanup, `a token in ${step.name}`);
         }
         assert(step.if === undefined || step === cleanup, `a condition on ${step.name ?? step.uses}`);
     }
@@ -1111,7 +1113,6 @@ Deno.test("spec-labels.yml runs the approval within its bounds", () => {
         "github.event.sender.login",
         "github.event.pull_request.head.sha",
         "github.repository",
-        "join(github.event.pull_request.labels.*.name, ',')",
     ]);
     for (const [, expression] of text.matchAll(/\$\{\{([^}]*)\}\}/g)) {
         assert(allowed.has(expression.trim()), expression);
