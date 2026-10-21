@@ -116,8 +116,8 @@ implementing agent writes the specification; the maintainer approves.
    still unarchived (`## Archive executor and the freeze`).
 4. **Archived** — the maintainer closes the second deliberation in
    conversation, the agent reconciles it, and the record is frozen by
-   the executor in `## Archive executor and the freeze`. `checks / spec`
-   turns green; the maintainer merges.
+   the executor in `## Archive executor and the freeze`.
+   `checks / archived` reports; the maintainer merges.
 
 Task ticking: tick a task only when its verification ran; a fully ticked
 task list is what the archive consumes.
@@ -131,10 +131,14 @@ pull request as in step 2, then continue.
 - **Package closing** — the maintainer adds the `spec/approved` label.
   `spec / labels` then writes one record comment as `github-actions[bot]`
   naming the approved head, the account, and the label event, and it
-  withdraws the label when the package changes after the recorded head,
-  when a run fails, or when its deciding step times out. The package is
-  every file of each unarchived change except `tasks.md`, plus the main
-  spec under each delta; an archive commit is not a package change.
+  withdraws the approval, putting `spec/pending` in place of
+  `spec/approved`, when the package changes after the recorded head, when
+  a person removes `spec/approved` or adds `spec/pending`, when a run
+  fails, or when its deciding step times out; the maintainer approves
+  the new package by adding `spec/approved` again. The package is every
+  file of each unarchived change except `tasks.md`, plus the main spec
+  under each delta; an archive commit is not a package change, and after
+  it `spec/archived` replaces `spec/approved` with the record left live.
   Only the run the label event starts writes the record; if that run is
   replaced while pending, the next run finds the label without a record
   and withdraws it, and the maintainer adds the label again.
@@ -168,12 +172,15 @@ pull request as in step 2, then continue.
 Every change is archived inside its own pull request, after the
 maintainer closes the second deliberation and the agent reconciled it, so
 `main` never holds an unarchived change. The pull request is ready before
-the archive, so `checks / spec` is red for the whole second deliberation;
-an unarchived ready pull request is the expected state then, not a defect
-to chase or to report. Freezing early hands the maintainer an archived
-record to deliberate on. The `spec-check` recipe pins `--shape combined`:
-no pull request merges with an unarchived change, not even one that
-implemented nothing.
+the archive, so through the whole second deliberation it shows
+`checks / awaiting-archive` and an expected, unreported
+`checks / archived`, which the ruleset requires: the merge waits and
+nothing is red (`github-checks.md ## No standing failure`). That is the
+expected state, not a defect to chase or to report. Freezing early hands
+the maintainer an archived record to deliberate on. No pull request into
+`main` merges with an unarchived change, not even one that implemented
+nothing; a pull request into another pull request's branch may keep its
+change open.
 
 The executor is one command, run by the implementing agent on the branch
 (on a fork, by whoever holds the branch):
@@ -204,17 +211,21 @@ A pull request's *related changes* are the change directories its diff
 touches (an archived directory counts under its change name), resolved by
 `scripts/spec_changes.ts`.
 
-- `checks / spec` runs the strict validator and fails a ready pull
-  request holding an unarchived related change (a warning on a draft); on
-  a push to `main` any change outside `archive/` fails.
+- `checks / spec` runs the strict validator and warns on each unarchived
+  related change; on a push to `main` any change outside `archive/` fails.
+- `checks / archive-verdict` and its carrier hold a pull request into
+  `main` with an unarchived related change on the required
+  `checks / archived` (`github-checks.md ## No standing failure`).
 - `/spec show [<slug>] [proposal|design|tasks|specs|all]` and
   `/spec status [<slug>]`, posted as a pull request comment by a
   collaborator (owner, member, or collaborator association), get a reply
   from `spec / command`.
-- `spec / labels` keeps `spec/archived` | `spec/unarchived` and
-  `spec/not-started` | `spec/in-progress` | `spec/done` from the related
-  changes' task lists, and the approval label as `## Approval gates`
-  says. Never set them by hand.
+- `spec / labels` keeps one state label: `spec/pending` while the head
+  holds an unarchived change whose approval does not hold, `spec/approved`
+  while it holds, `spec/archived` when the pull request archives its
+  change, and none otherwise (`## Approval gates`). Only the maintainer
+  adds `spec/approved` or `spec/pending` by hand; task progress is
+  `just spec-changes status`.
 
 Locally, `just spec-check` reproduces the check and
 `just spec-changes <command>` the rest.

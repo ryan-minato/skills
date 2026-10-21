@@ -61,9 +61,7 @@ The declared state of every enforced rule is in
 | `catalog/<name>`, `catalog/repository` | The area axis: every catalog a change touches, or the repository harness itself. |
 | `status/needs-triage` | Applied by every form; removed by automation once a type label and exactly one priority label exist. |
 | `status/blocked` | Applied by a person when an issue cannot proceed; the body says on what. |
-| `spec/archived` / `spec/unarchived` | Derived by `spec / labels` from the related OpenSpec changes; never set by hand. |
-| `spec/not-started` / `spec/in-progress` / `spec/done` | Task progress of the related changes, derived the same way; absent with no related change. |
-| `spec/approved` | The package approval label (`.agents/knowledge/spec-workflow.md` `## Approval gates`). |
+| `spec/pending` / `spec/approved` / `spec/archived` | The one spec state of a pull request, kept by `spec / labels` (`spec-workflow.md` `## Approval gates`). |
 | Milestone + `goal` tracking issue | A theme spanning several pull requests; see below. |
 | Sub-issues | One level only, under a tracking issue. |
 | Actions checks | Deterministic enforcement of structure, safety, and pull-request policy. |
