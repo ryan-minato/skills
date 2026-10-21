@@ -1,10 +1,12 @@
 #!/usr/bin/env -S deno run --no-prompt --allow-run=gh --allow-env=PR_NUMBER,EVENT_ACTION,EVENT_LABEL,EVENT_SENDER,EVENT_HEAD
 // Keeps the one specification-state label of a pull request (.agents/knowledge/spec-workflow.md,
-// ## Approval gates): `spec/approved` while the head holds an unarchived change and the maintainer's
-// approval of its package holds, `spec/pending` while it holds one and the approval does not,
-// `spec/archived` when it holds none and the pull request adds a path under openspec/changes/archive/,
-// and none otherwise. When the file list is cut short and the head holds no unarchived change,
-// `spec/archived` is left as it is. The wanted label is added, then every other state label removed.
+// ## Approval gates): `spec/approved` while the pull request holds an unarchived change of its own and the
+// maintainer's approval of its package holds, `spec/pending` while it holds one and the approval does not,
+// `spec/archived` when it holds none and adds a path under openspec/changes/archive/, and none otherwise.
+// Its own changes are the unarchived changes at the head that the base does not hold identically, so a
+// pull request into another pull request's branch answers only for what it brings. When the file list is
+// cut short and the pull request holds no change of its own, `spec/archived` is left as it is. The wanted
+// label is added, then every other state label removed.
 //
 //   scripts/spec_approval.ts <n>        print the state the rules give now and the writes they call for;
 //                                       writes nothing (`just spec-approval <n>`)
@@ -12,7 +14,7 @@
 //                                       the pull request and its event come from PR_NUMBER, EVENT_ACTION,
 //                                       EVENT_LABEL, EVENT_SENDER, and EVENT_HEAD; makes the writes
 //
-// The approval rules, which apply while the head holds an unarchived change. The run started by a
+// The approval rules, which apply while the pull request holds a change of its own. The run started by a
 // person adding `spec/approved` records the approval in one comment from github-actions[bot] (the
 // approved commit, the account, the id of the label event) when the pull request is open, its head is
 // still the commit the event named, that adding is the latest adding of the label by a person and no
@@ -24,10 +26,11 @@
 // github-actions[bot] answers the latest adding by a person, is not withdrawn, no person withdrew it
 // after that adding, and the approval package at the head equals the package at the recorded commit.
 // Otherwise the state is `spec/pending` and every live record is marked withdrawn (fail closed). With
-// no unarchived change at the head no record is written or withdrawn. A closed pull request is never
-// written to by a run that succeeds.
+// no change of its own, no record is written; a person's withdrawal after the latest adding still holds
+// when the pull request archives its change: the state is `spec/pending` and every live record is marked
+// withdrawn. A closed pull request is never written to by a run that succeeds.
 //
-// The approval package of a commit: every path under each unarchived change in openspec/changes/
+// The approval package of a commit: every path under each of the pull request's own changes in openspec/changes/
 // except its own tasks.md, by mode and blob, and openspec/specs/<capability>/spec.md (or its absence)
 // for each delta openspec/changes/<change>/specs/<capability>/spec.md. A change the head holds only as
 // openspec/changes/archive/<date>-<change>/ is compared through that copy, without its main specs,
@@ -99,6 +102,8 @@ export interface Pull {
     state: "open" | "closed";
     /** The head commit id. */
     head: string;
+    /** The base commit id: the commit of the base branch the pull request is compared with. */
+    base: string;
     labels: string[];
     /** The number of files the pull request changes. */
     changedFiles: number;
@@ -243,6 +248,26 @@ export function changesOf(tree: Tree): Change[] {
     return changes.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
 }
 
+/** Every entry at or under openspec/changes/<name>, as "path mode sha" lines: the change as a tree holds it. */
+function entriesOf(tree: Tree, name: string): string {
+    const dir = `${CHANGES}${name}`;
+    return tree.entries
+        .filter((entry) => entry.path === dir || entry.path.startsWith(`${dir}/`))
+        .map((entry) => `${entry.path} ${entry.mode} ${entry.sha}`)
+        .sort()
+        .join("\n");
+}
+
+/**
+ * The pull request's own unarchived changes: those of `tree` that `base` does not hold identically. A change
+ * a stacked base already carries belongs to the pull request that brought it, so it is not this one's.
+ */
+export function ownChanges(tree: Tree, base: Tree): Set<string> {
+    return new Set(
+        changesOf(tree).map((change) => change.name).filter((name) => entriesOf(tree, name) !== entriesOf(base, name)),
+    );
+}
+
 interface Files {
     /** Path under the change directory to "mode sha"; directories and the change's own tasks.md left out. */
     files: Map<string, string>;
@@ -294,12 +319,13 @@ function mainSpecOf(pathInChange: string): string | undefined {
     return delta ? `${SPECS}${delta[1]}/spec.md` : undefined;
 }
 
-/** The approval package of a tree. */
-export function packageOf(tree: Tree): Package {
+/** The approval package of a tree: of the changes named in `only` when given, else of every unarchived change. */
+export function packageOf(tree: Tree, only?: Set<string>): Package {
     const changes = new Map<string, Map<string, string>>();
     const specs = new Map<string, string>();
     const refused: string[] = [];
     for (const change of changesOf(tree)) {
+        if (only !== undefined && !only.has(change.name)) continue;
         if (change.kind !== "directory") {
             refused.push(`${CHANGES}${change.name}`);
             continue;
@@ -334,10 +360,13 @@ function differing(a: Map<string, string>, b: Map<string, string>): string[] {
     return [...new Set([...a.keys(), ...b.keys()])].filter((path) => a.get(path) !== b.get(path)).sort();
 }
 
-/** How the approval package at `head` differs from the one at `recorded`; empty when it is the same. */
-export function packageProblems(recorded: Tree, head: Tree): string[] {
-    const before = packageOf(recorded);
-    const now = packageOf(head);
+/**
+ * How the approval package at `head` differs from the one at `recorded`, both of the changes named in `only`
+ * when given; empty when it is the same.
+ */
+export function packageProblems(recorded: Tree, head: Tree, only?: Set<string>): string[] {
+    const before = packageOf(recorded, only);
+    const now = packageOf(head, only);
     const problems: string[] = [];
     if (before.changes.size === 0) problems.push("the recorded commit holds no unarchived change");
     if (before.refused.length > 0) problems.push(`the recorded package holds ${list(before.refused)}`);
@@ -442,13 +471,13 @@ type Outcome =
 
 /**
  * Why the run its event started may not record the approval, or, after reading both again, the pull
- * request and the label event it records. `head` is the tree of `pull.head`, which holds an unarchived change.
+ * request and the label event it records. `found` is the package of the pull request's own changes at `pull.head`.
  */
 async function recordingRefusal(
     api: Api,
     number: number,
     pull: Pull,
-    head: Tree,
+    found: Package,
     event: Event,
     events: LabelEvent[],
     records: ApprovalRecord[],
@@ -466,7 +495,6 @@ async function recordingRefusal(
     if (records.length > 1) {
         return { refusal: "more than one record comment exists; the maintainer deletes all but one" };
     }
-    const found = packageOf(head);
     if (found.refused.length > 0) {
         return { refusal: `a link or submodule in the package at the head: ${list(found.refused)}` };
     }
@@ -489,37 +517,54 @@ async function recordingRefusal(
     return { pull: again, eventId: latest.id, events: now };
 }
 
-/** The state of a pull request whose head holds no unarchived change: archived, none, or undecided. */
+/**
+ * The state of a pull request that holds no unarchived change of its own: archived, none, or undecided. A
+ * withdrawal by a person after the latest adding of spec/approved still holds after the archive: the state is
+ * spec/pending and every live record is marked withdrawn, until the maintainer adds spec/approved again.
+ */
 async function archiveState(api: Api, number: number, pull: Pull): Promise<Decision> {
     const base = { open: pull.state === "open", labels: pull.labels, withdraw: [] };
     const files = await api.files(number);
     const complete = pull.changedFiles <= MAX_FILES && files.length >= pull.changedFiles;
     // A file that arrives under the archive, added there or moved there from a change.
     if (files.some((file) => (file.status === "added" || file.status === "renamed") && file.path.startsWith(ARCHIVE))) {
-        return { ...base, state: ARCHIVED, reason: "no unarchived change at the head; the pull request archives one" };
+        const events = await api.labelEvents(number);
+        const latest = latestApproval(events);
+        if (latest !== undefined && withdrawnAfter(events, latest.id)) {
+            const live = recordsOf(await api.comments(number)).filter((record) => !record.withdrawn);
+            return {
+                ...base,
+                state: PENDING,
+                reason: `the pull request archives its change, but a person withdrew ${LABEL} after its latest adding`,
+                withdraw: live,
+            };
+        }
+        return { ...base, state: ARCHIVED, reason: "no unarchived change of its own; the pull request archives one" };
     }
     if (!complete) {
         return {
             ...base,
             state: undefined,
-            reason: "no unarchived change at the head; the file list is cut short, so whether the pull request " +
+            reason: "no unarchived change of its own; the file list is cut short, so whether the pull request " +
                 `archives one is not decided and ${ARCHIVED} is left as it is`,
         };
     }
-    return { ...base, state: null, reason: "no unarchived change at the head, and the pull request archives none" };
+    return { ...base, state: null, reason: "no unarchived change of its own, and the pull request archives none" };
 }
 
 /** Decides the state label of pull request `number`, whose present state `pull` was just read. */
 export async function decide(api: Api, number: number, pull: Pull, event: Event | undefined): Promise<Decision> {
     const head = await api.tree(pull.head);
-    if (changesOf(head).length === 0) return await archiveState(api, number, pull);
+    const baseTree = await api.tree(pull.base);
+    const own = ownChanges(head, baseTree);
+    if (own.size === 0) return await archiveState(api, number, pull);
     let events = await api.labelEvents(number);
     const records = recordsOf(await api.comments(number));
     const live = records.filter((record) => !record.withdrawn);
     let current = pull;
     let refused = "";
     if (event !== undefined && event.action === "labeled" && event.label === LABEL) {
-        const outcome = await recordingRefusal(api, number, pull, head, event, events, records);
+        const outcome = await recordingRefusal(api, number, pull, packageOf(head, own), event, events, records);
         if ("refusal" in outcome) {
             refused = `; not recorded: ${outcome.refusal}`;
             // The pull request as the refusal last read it, so that a closing meanwhile stops the writes.
@@ -557,7 +602,14 @@ export async function decide(api: Api, number: number, pull: Pull, event: Event 
         }
         const now = current.head === pull.head ? head : await api.tree(current.head);
         const recorded = record.commit === current.head ? now : await api.tree(record.commit);
-        problems.push(...packageProblems(recorded, now));
+        // The pull request's own changes: those at the head, and those at the recorded commit that the present
+        // base does not hold unarchived (archived or dropped since); a base change that moved on is not its own.
+        const inBase = new Set(changesOf(baseTree).map((change) => change.name));
+        const only = new Set([
+            ...ownChanges(now, baseTree),
+            ...[...ownChanges(recorded, baseTree)].filter((name) => !inBase.has(name)),
+        ]);
+        problems.push(...packageProblems(recorded, now, only));
     }
     if (problems.length === 0) {
         const [record] = records;
@@ -637,8 +689,8 @@ export interface Output {
 }
 
 /**
- * After an error: spec/pending added when the pull request was read as open, then spec/approved removed,
- * open or closed. The error itself is still reported.
+ * After an error: on a pull request read as open, spec/pending added and a spec/archived it carried removed, so
+ * that one state label remains; then spec/approved removed, open or closed. The error itself is still reported.
  */
 async function failClosed(api: Api, number: number, pull: Pull | undefined, out: Output): Promise<void> {
     if (pull?.state === "open") {
@@ -647,6 +699,14 @@ async function failClosed(api: Api, number: number, pull: Pull | undefined, out:
             out.note(`after the error: added ${PENDING}`);
         } catch (error) {
             out.note(`after the error: could not add ${PENDING}: ${oneLine(errorText(error))}`);
+        }
+        if (pull.labels.includes(ARCHIVED)) {
+            try {
+                const removed = await api.removeLabel(number, ARCHIVED);
+                out.note(`after the error: ${removed ? `removed ${ARCHIVED}` : `${ARCHIVED} was already gone`}`);
+            } catch (error) {
+                out.note(`after the error: could not remove ${ARCHIVED}: ${oneLine(errorText(error))}`);
+            }
         }
     }
     try {
@@ -788,13 +848,15 @@ export function ghApi(gh: Gh = runGh, repo: string = REPO): Api {
             const pull = await get(path);
             if (
                 !isObject(pull) || (pull.state !== "open" && pull.state !== "closed") || !isObject(pull.head) ||
-                typeof pull.head.sha !== "string" || !COMMIT.test(pull.head.sha) || !Array.isArray(pull.labels) ||
+                typeof pull.head.sha !== "string" || !COMMIT.test(pull.head.sha) || !isObject(pull.base) ||
+                typeof pull.base.sha !== "string" || !COMMIT.test(pull.base.sha) || !Array.isArray(pull.labels) ||
                 !pull.labels.every((item) => isObject(item) && typeof item.name === "string") ||
                 !Number.isSafeInteger(pull.changed_files) || (pull.changed_files as number) < 0
             ) throw shapeError(`gh api ${path}`, pull);
             return {
                 state: pull.state,
                 head: pull.head.sha,
+                base: pull.base.sha,
                 labels: (pull.labels as Json[]).map((item) => item.name as string),
                 changedFiles: pull.changed_files as number,
             };
