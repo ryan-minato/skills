@@ -27,7 +27,7 @@ escape for `|`). "Current" is the readback of the date in
 | Projects, Wiki | off | off | `R` | `{has_projects,has_wiki}` |
 | Ruleset `Default` | id 19602018, active, targets the default branch | same | `R/rulesets/19602018` | `{enforcement,conditions}` |
 | Ruleset rules | deletion and non-fast-forward blocked; pull request required | same | `R/rulesets/19602018` | `[.rules[].type]` |
-| Required checks | `checks / gate`, `pr / policy`, `scan-secrets`; strict | same | `R/rulesets/19602018` | `.rules[]\|select(.type=="required_status_checks").parameters` |
+| Required checks | `checks / gate`, `pr / policy`, `scan-secrets`; strict | the same and `checks / archived` | `R/rulesets/19602018` | `.rules[]\|select(.type=="required_status_checks").parameters` |
 | Pull request rule | 0 approvals; threads resolved; merge methods squash, rebase | same | `R/rulesets/19602018` | `.rules[]\|select(.type=="pull_request").parameters` |
 | Ruleset bypass | none | none | `R/rulesets/19602018` | `.bypass_actors` |
 | Legacy branch protection | none (HTTP 404) | none | `R/branches/main/protection` | HTTP 404 means none |

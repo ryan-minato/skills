@@ -16,12 +16,12 @@
 
 ## 4. The archive gate
 
-- [ ] 4.1 `.github/workflows/checks.yml`: `checks / archive-verdict` and the carrier job, the default-branch condition, `checks / spec` without `--draft`
-- [ ] 4.2 `scripts/validate_harness.ts` `checks` check reads a conditional job name as its two names; `validate_harness_test.ts`
+- [x] 4.1 `.github/workflows/checks.yml`: `checks / archive-verdict` and the carrier job, the default-branch condition, `checks / spec` without `--draft`
+- [x] 4.2 `scripts/validate_harness.ts` `checks` check reads a conditional job name as its two names; `validate_harness_test.ts`
 
 ## 5. Documents
 
-- [ ] 5.1 `github-checks.md` (table, healthy runs, the no-standing-failure rule, diagnosing), `github-settings.md` required checks
+- [x] 5.1 `github-checks.md` (table, healthy runs, the no-standing-failure rule, diagnosing), `github-settings.md` required checks
 - [ ] 5.2 `spec-workflow.md`, `github-workflow.md`, `agent-authority.md`, `ARCHITECTURE.md`, `.github/CONTRIBUTING.md`, `change-workflow` skill
 
 ## 6. Verification

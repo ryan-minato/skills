@@ -555,12 +555,29 @@ function workflowFiles(h: Harness): string[] {
     return h.list(WORKFLOWS).filter((n) => /\.ya?ml$/.test(n)).map((n) => `${WORKFLOWS}/${n}`);
 }
 
-/** `jobs.<id>.name` when present, else `<id>`, per job. */
+/** A job name `${{ <condition> && '<a>' || '<b>' }}`, as a carrier job of a withheld check writes it. */
+const CONDITIONAL_NAME = /^\$\{\{\s*[^}]*?\s&&\s*'([^'{}]+)'\s*\|\|\s*'([^'{}]+)'\s*\}\}$/;
+
+/** The names a job reports under: a conditional name gives both of its names; any other expression is refused. */
+export function jobNames(workflow: string, name: string): string[] {
+    const conditional = CONDITIONAL_NAME.exec(name);
+    if (conditional) return [conditional[1], conditional[2]];
+    if (name.includes("${{")) {
+        throw new ShapeError(
+            `${workflow}: job name ${
+                quote(name)
+            } is an expression other than \`\${{ <condition> && '<a>' || '<b>' }}\``,
+        );
+    }
+    return [name];
+}
+
+/** `jobs.<id>.name` when present, else `<id>`, per job; a conditional name counts as its two names. */
 export function workflowJobNames(h: Harness, workflow: string): string[] {
     const doc = h.yaml(workflow);
     if (!isRecord(doc) || !isRecord(doc.jobs)) throw new ShapeError(`${workflow} has no top-level jobs: block`);
-    const names = Object.entries(doc.jobs).map(([id, job]) =>
-        isRecord(job) && job.name !== undefined && job.name !== null ? String(job.name) : id
+    const names = Object.entries(doc.jobs).flatMap(([id, job]) =>
+        jobNames(workflow, isRecord(job) && job.name !== undefined && job.name !== null ? String(job.name) : id)
     );
     if (names.length === 0) throw new ShapeError(`${workflow}: could not parse any job under jobs:`);
     return names;
