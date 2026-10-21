@@ -18,6 +18,7 @@ import {
     frontmatter,
     Harness,
     importSpecifiers,
+    jobNames,
     justRecipes,
     main,
     markdownSection,
@@ -836,6 +837,21 @@ Deno.test("checks doc: job names and the table agree both ways", () => {
         assertThrows(() => checkChecksDoc(new Harness(root, noDeps)), ShapeError, "no top-level jobs");
     } finally {
         cleanup(root);
+    }
+});
+
+Deno.test("checks doc: a conditional job name counts as both of its names; any other expression stops the run", () => {
+    const carrier = "jobs:\n  carry:\n    name: ${{ needs.v.outputs.ok == 'true' && 'a / done' || 'a / waiting' }}\n";
+    const both = "| `a / done` | x |\n| `a / waiting` | y |\n";
+    const files = { ".github/workflows/a.yml": carrier, ".agents/knowledge/github-checks.md": both };
+    assertEquals(findings(files, checkChecksDoc).errors, []);
+    assertEquals(
+        findings({ ...files, ".agents/knowledge/github-checks.md": "| `a / done` | x |\n" }, checkChecksDoc).errors,
+        ["workflow job 'a / waiting' is not in the table of .agents/knowledge/github-checks.md."],
+    );
+    assertEquals(jobNames("w", "plain / name"), ["plain / name"]);
+    for (const name of ["${{ matrix.os }}", "build ${{ matrix.os }}", "${{ a && 'x' }}"]) {
+        assertThrows(() => jobNames("w", name), ShapeError, "is an expression other than");
     }
 });
 
