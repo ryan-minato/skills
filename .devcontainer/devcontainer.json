@@ -9,9 +9,10 @@
     },
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/git-lfs:1": {},
-    "ghcr.io/devcontainers/features/node:2": {},
-    "ghcr.io/devcontainers/features/python:1": {
-      "toolsToInstall": "pre-commit,rust-just,ruff==0.16.4"
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/hoshiori-dev/devcontainer-features/deno:1": {},
+    "ghcr.io/hoshiori-dev/devcontainer-features/uv:1": {
+      "toolsToInstall": "pre-commit,rust-just,ruff"
     }
   },
   "customizations": {
@@ -34,8 +35,12 @@
     }
   },
   "remoteEnv": {
+    "PATH": "${containerWorkspaceFolder}/.tools/bin:${containerEnv:PATH}",
     "OPENSPEC_NO_UPDATE_CHECK": "1",
-    "DO_NOT_TRACK": "1"
+    "DO_NOT_TRACK": "1",
+    "PAGER": "cat",
+    "GIT_PAGER": "cat",
+    "GH_PAGER": "cat"
   },
   "postCreateCommand": "just setup"
 }

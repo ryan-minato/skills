@@ -1,5 +1,5 @@
 # Labels must exist in .github/labels.json or GitHub drops them silently;
-# scripts/validate_harness.py checks that. The Catalog and Priority answers
+# scripts/validate_harness.ts checks that. The Catalog and Priority answers
 # are turned into labels by the `issues / triage` check.
 name: Bug report
 description: A skill behaves differently from its spec, or a repository tool from its documented intent.

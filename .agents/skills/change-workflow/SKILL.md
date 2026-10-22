@@ -7,18 +7,19 @@ metadata:
 
 # Change Workflow
 
-Follow this for every tracked-file change. The rules it executes live in
-three knowledge files; this skill orders them and adds the mechanics:
+Follow this for every tracked-file change. It orders the steps and holds
+their mechanics; each rule it follows has one owner, named where the step
+needs it:
 
-- `.agents/knowledge/github-workflow.md` — branches, merge method, labels,
-  issues, milestones, triage.
-- `.agents/knowledge/spec-workflow.md` — when a change needs an OpenSpec
-  change, its lifecycle, and who approves it.
-- `.agents/knowledge/agent-authority.md` — what you may do on your own
-  (H1) and when to stop.
+- `.agents/knowledge/spec-workflow.md` — the lifecycle, the approval
+  gates, the archive executor and the freeze.
+- `.agents/knowledge/agent-authority.md` — publishing, review admission,
+  pending decisions, what is never yours.
+- `.agents/knowledge/github-workflow.md` — branches, merging, issues,
+  labels, triage.
 
-Never edit those files, a workflow, the ruleset, or a required check to
-unblock your own change.
+When a check, policy, or permission blocks you, follow
+`agent-authority.md ## No self-escalation`.
 
 ## 1. Gate tooling and authorization
 
@@ -32,11 +33,8 @@ if authentication fails, ask the user to run `gh auth login` — never start
 it yourself. If `openspec` is missing, run `just setup`.
 
 List the remote writes the task may need — issue, push, PR, ready, review
-request, labels — and continue only with the user's explicit authorization
-for them in the current conversation. One clear authorization covers the
-listed operations; an explicit local-only instruction permits branch and
-commit work and nothing remote. Absent or ambiguous authorization: do local
-work only and say what is waiting.
+request, labels — and obtain the authorization
+`agent-authority.md ## Publishing` requires for them.
 
 Done when: `gh auth status` succeeds and the allowed remote operations are
 recorded, or the workflow has stopped with exact setup or authorization
@@ -50,60 +48,55 @@ Derive `OWNER/REPO` from `git remote get-url origin`. An issue is optional
 - **Taking one**: read it, confirm it is open and nobody else is assigned,
   and confirm its acceptance — the scenarios of the change its
   Specification field names, or executable criteria. An issue with no
-  change yet is taken by proposing the change on the draft pull request
-  (step 3); an issue whose change exists but whose discussion is still
-  open waits for the maintainer to close it. Assign yourself, re-read,
-  confirm you are the sole assignee.
-- **Creating one**: only when the user authorized it. Build the body by
-  mirroring the form's `### <label>` headings in
-  `.github/ISSUE_TEMPLATE/` (non-interactive creation ignores forms) and
-  apply the form's labels explicitly; the `issues / triage` check derives
-  `priority/*` and `catalog/*`. Issues for planned work derive from the
-  change's `tasks.md`, each naming the scenarios it closes; never copy
-  acceptance criteria into an issue. Milestones and `goal` tracking issues
-  are created only after the maintainer confirms them.
+  change yet is taken by proposing the change (step 3); an issue whose
+  change is still under discussion waits for the maintainer's closing.
+  Assign yourself, re-read, confirm you are the sole assignee.
+- **Creating one**: only when authorized. Build the body by mirroring the
+  form's `### <label>` headings in `.github/ISSUE_TEMPLATE/`
+  (non-interactive creation ignores forms) and apply the form's labels
+  explicitly; `issues / triage` derives `priority/*` and `catalog/*`.
+  Issues for planned work derive from the change's `tasks.md`, each
+  naming the scenarios it closes (`spec-workflow.md ## Specifications
+  and tracked work`).
 
 Record the issue number or a one-line reason there is none.
 
-## 3. Establish the branch and the change
+## 3. Establish the branch, the change, and its approval
 
 1. Confirm the worktree is clean enough to isolate the requested change;
    fetch `origin` when remote reads are allowed.
-2. Choose the slug. Create the branch `<type>/<slug>` (or
-   `<type>/<issue>-<slug>`) from `origin/main`; never work on `main`.
-3. If the change alters what a skill does, run the OpenSpec loop on that
-   branch with the `openspec-*` skills: propose (the change is
-   `openspec/changes/<slug>/`), clarify with the `plan-clarification`
-   skill until no assumption is silent, write `design.md` whenever the
-   schema requires one (the approach's bounds and the verification plan —
-   never a step list, never a secret or private datum), validate, commit
-   the approval package (proposal, delta specs, design), then publish —
-   run the publish gate (step 6) and open the draft pull request with the
-   complete package as its first content and `Phase: specification` in
-   the body. Never open it before the design is written or after the task
-   list is. Then stop. The maintainer discusses the package on the pull
-   request — the proposal, the delta specs, and the design's bounds, never
-   `tasks.md` — and directs record changes in conversation; push each
-   through the publish gate. When the maintainer says in conversation
-   that the discussion is closed, read the pull request's comments
-   (`gh api repos/ryan-minato/skills/issues/<n>/comments`) and its review
-   threads with their resolution state (GraphQL `reviewThreads`, field
-   `isResolved`); list every unresolved thread, every requested adjustment
-   the package does not carry, and every contradiction; ask the maintainer
-   to confirm the open items; proceed only when nothing is open or the
-   open items are confirmed, and note the closing on the body's
-   `Approval:` line. Write `tasks.md` after that, then implement.
-   `spec-driven-development` supplies the loop's rules; `openspec-workflow`
-   the tool's records, the archive executor, and the `/spec` commands;
-   `spec-workflow.md` says which domains exist and that specs are never
-   backfilled.
-4. A change to the repository itself (environment, harness, tooling,
-   checks, workflows, documents) runs the same loop as a repository change:
-   `openspec new change` then `skip_specs: true` in its `.openspec.yaml`,
-   so it carries a proposal, a design, and tasks and no delta spec; the
-   draft opens once the proposal and the design are written. Only a
-   change too small to plan (a pin bump, a typo) skips the loop, and its PR
-   says `Spec: none — <reason>`.
+2. Create the branch from `origin/main` as
+   `github-workflow.md ## Branches and merging` names it.
+3. Write the approval package on that branch with the `openspec-*`
+   skills. A skill change: propose (`openspec/changes/<slug>/`), clarify
+   with `plan-clarification`, write the design the schema asks for. A
+   repository change: `openspec new change <slug>`, then
+   `skip_specs: true` in its `.openspec.yaml`, then the proposal and the
+   design. Run `just spec-validate` and commit the package. The
+   `spec-driven-development` skill supplies the loop's general rules;
+   `spec-workflow.md` overrides it here.
+4. Run the publish gate (step 6) and open the draft pull request with the
+   package as its first content, at the point
+   `spec-workflow.md ## Lifecycle` sets. Then stop.
+5. Push each record change the maintainer directs in conversation through
+   the publish gate. When asking for the package approval, ask the
+   maintainer to add `spec/approved`, then push nothing to the package and
+   poll `just spec-approval <n>` until the record appears
+   (`spec-workflow.md ## Approval gates`, including the bootstrap).
+6. Reconcile each closing — this one and the implementation closing in
+   step 7:
+   - read the comments with `gh pr view <n> --json comments` and the
+     review threads with `just review-threads <n>` (field `isResolved`);
+   - list every unresolved thread, every requested adjustment the record
+     does not carry, and every contradiction;
+   - ask the maintainer to confirm the open items; proceed only when
+     nothing is open or the open items are confirmed;
+   - update the `Approval:` line, and after the package closing set
+     `Phase: implementation`, through the publish gate.
+7. Write `tasks.md`, run `just spec-validate`, commit, then implement.
+
+A change too small to plan skips the loop with `Spec: none — <reason>`
+(`spec-workflow.md ## Specifications and tracked work`).
 
 ## 4. Implement in atomic commits
 
@@ -114,135 +107,111 @@ independently valid logical change:
    stand alone.
 2. Stage one group; run the applicable checks (`just check-skill <dir>` for
    a skill, `just spec-validate` after touching `openspec/`).
-3. Commit. The `commit-safety` pre-commit hook checks the author email,
-   staged credentials, and the harness layers touched; the `git-commit`
-   skill's gates and `AGENTS.md` Commits govern the message. When a
-   deviation from the spec appears, stop, revise the change with the update
-   skill, and have the maintainer discuss and close the revision before
-   continuing.
+3. Commit. The `commit-safety` pre-commit hook checks the author email
+   and staged credentials; the `git-commit` skill's gates and `AGENTS.md`
+   Commits govern the message.
 
-Never bypass hooks, force a failing commit, or add tool-attribution
-trailers. Use a GitHub noreply author email unless the user explicitly
-approves a private one.
+A deviation from the spec stops the work (`spec-workflow.md
+## Lifecycle`).
+
+Checkpoints inside a task are commits, never stashes: commit drafts as
+you go, and before ticking the task squash them into its one atomic
+commit non-interactively — `git reset --soft <task start commit>`, then
+one commit under the rules above (interactive rebase is unavailable).
+Draft commits never leave the machine: push only after the task commit,
+as `agent-authority.md ## Publishing` says. The per-commit hooks — secret
+scans, validators, lint — run on every draft, so every draft commit must
+pass them; keep them fast. A task is done only when no draft commit
+remains on the branch.
+
+Never bypass hooks (`--no-verify`), force a failing commit, or add
+tool-attribution trailers; author with a GitHub noreply email.
+`pr / policy` re-checks all three over the pull request's commits.
 
 ## 5. Verify the scenarios
 
 Before marking the PR ready, execute every scenario of the change against
 the result, not the diff: for a skill, the behavioral tests in the
-`skill-authoring` project skill, planned in the change's `design.md` and
-derived from the scenarios; for a repository change, the proofs its
-`design.md` names. Tick each task only when its verification ran. Then
-run `just check`. Do **not** archive yet: the record stays open through
-the deliberation that marking the PR ready opens (step 7), and
-`checks / spec` is red until then by design. `just spec-check` reproduces
-its verdict locally; `/spec status` on the PR shows the related changes'
-progress. Record what ran and the outcome for
-the PR's Validation section, linking the plan in `design.md` rather than
-restating it; that section and Changes stay reserved until ready (step 7).
+`skill-authoring` project skill, planned in the change's `design.md`; for
+a repository change, the proofs its `design.md` names. Tick each task as
+`spec-workflow.md ## Lifecycle` says, then run `just check`. Leave the
+change unarchived (`spec-workflow.md ## Archive executor and the
+freeze`); until it is, `checks / archived` stays unreported and nothing
+is red. `just spec-check` reproduces `checks / spec` locally;
+`just spec-changes status --base origin/main --head HEAD` shows the
+related changes' progress. Record what ran and the outcome for the PR's
+Validation section.
 
 ## 6. Publish gate, then the draft PR and every later push
 
 GitHub publication cannot be undone: bodies, comments, commit messages,
 and their notification copies survive deletion, and public content is
-indexed within minutes. Every remote or publishable write passes this
-gate, and any edit after the verdict needs a fresh one.
+indexed within minutes. Every remote write passes this gate
+(`agent-authority.md ## Publishing`).
 
 1. Assemble the exact payload as files in a scratch directory outside the
-   repository. For a pull request: `title.txt`, `body.md` built from
-   `.github/PULL_REQUEST_TEMPLATE.md` — an unheaded opening paragraph
-   stating the goal (not the work), `## Why` (the value), `## Specification`
-   with the `Spec:` line as a link to the change directory on this branch
-   (`[openspec/changes/<slug>](https://github.com/ryan-minato/skills/tree/<branch>/openspec/changes/<slug>)`),
-   the `Phase:` line, one link per record, and the approval line with the
-   copyable comment; `## Related work` with `Closes #N` or `N/A — <reason>`;
-   `## Changes` and `## Validation` left on the template's reserved line
-   until ready; the checklist. Add or update sections beyond the template's
-   when the change needs them; they pass this gate like every other.
-   `commits.txt` from `git log origin/main..HEAD --format=full`, and
-   `diff.patch` from `git diff origin/main...HEAD`. For an issue or comment:
-   `title.txt` and `body.md`. For a later push, the new commits and diff.
+   repository. For a pull request: `title.txt`; `body.md` built from
+   `.github/PULL_REQUEST_TEMPLATE.md`, whose comments say what each field
+   holds and when; `commits.txt` from
+   `git log origin/main..HEAD --format=full`; `diff.patch` from
+   `git diff origin/main...HEAD`. For an issue or comment: `title.txt` and
+   `body.md`. For a later push: the new commits and diff.
 2. Review it independently: dispatch a clean-context subagent whose whole
    prompt is the review prompt in
    [references/publish-review.md](references/publish-review.md) with the
    directory path filled in; without subagent support, re-read every file
    from disk and write `Review mode: file-only (not clean-context)` above
-   the verdict. Judge only what the files contain.
+   the verdict.
 3. Continue only with a verbatim `SAFE TO PUBLISH: YES`. On NO, fix every
    finding, rebuild the directory, review again; a secret that reached
    GitHub is compromised even after deletion — rotate it.
-4. Confirm the user's authorization covers this write, push without force,
-   open the draft PR non-interactively, then read it back and compare with
-   the reviewed payload.
+4. Confirm the authorization covers this write, push one named ref
+   without force, open the draft PR non-interactively, then read it back
+   and compare with the reviewed payload.
 
-The draft is the public ownership signal and the review surface for the
-specification; keep its body current as evidence changes, and switch
-`Phase:` to `implementation` once the discussion is closed and reconciled. Do not
-publish secrets, private data, or internal context on any surface.
+Keep the draft's body current as evidence changes; each edit passes this
+gate.
 
-## 7. Review admission (H1), the second deliberation, and the freeze
+## 7. Review admission, the second deliberation, and the freeze
 
-Mark the PR ready and request the maintainer's review yourself only when
-every condition in `agent-authority.md` holds: the package deliberation
-closed on the draft by the maintainer and reconciled with nothing open,
-every task done, `just check` green locally and every required check
-green except `checks / spec`, which is red until the freeze
-(`.agents/knowledge/github-checks.md`; digest a red run with
-`python3 .agents/skills/change-workflow/scripts/run_log_digest.py --repo ryan-minato/skills --run-id <id>`
-rather than reading full logs), scenarios verified and recorded, publish
-gate passed for the final body, remote writes authorized. Then:
+Check every condition of `agent-authority.md ## What agents may do`,
+reading the approval with `just spec-approval <n>`. For a red check,
+follow `github-checks.md ## Diagnosing a red check`; digest a failed run
+instead of reading full logs:
 
-1. Complete the final description: replace the reserved Changes line with
-   a permalink per touched file or directory to the commit that changed it
-   (`blob/<sha>/<path>#L10-L20` for a local change, the whole file or
-   directory for a broad one), fill Validation with each scenario's result
-   linking the plan in `design.md`, set `Phase: implementation`, replace
-   the approval line to say the implementation deliberation is open, and
-   tick the checklist — every item is about something true at ready, and
-   the freeze is enforced by `checks / spec`, never by a box.
+```bash
+./.agents/skills/change-workflow/scripts/run_log_digest.ts --repo ryan-minato/skills --run-id <id>
+```
+
+Then:
+
+1. Complete the final description as the template's comments direct:
+   Changes and Validation filled, `Phase: implementation`, the approval
+   line naming the implementation deliberation, the checklist ticked.
 2. `gh pr ready <number>`. When the pull request was opened from another
    account, also `gh pr edit <number> --add-reviewer ryan-minato`; GitHub
    silently drops a review request for the author, so on a pull request
    from the maintainer's own account the ready state is the request.
-3. Hand over the acceptance-evidence report from `agent-authority.md`:
-   goal, tests and check state, actual scope, risks, and the maintainer's
-   decisions — request fixes, reject, or merge (rebase; squash for forks).
-4. Wait. Marking the PR ready opens the deliberation on the finished
-   implementation; the red `checks / spec` is what blocks the merge while
-   it runs. When the maintainer closes it in conversation, reconcile it
-   exactly as step 3 reconciles the first one, then freeze: the archive
-   skill (a skill change's delta lands in `openspec/specs/`; a repository
-   change's record only moves under `openspec/changes/archive/`), then
-   `just spec-validate` and a commit `docs: archive the <slug> change`,
-   through the publish gate. Update the approval line with the closing's
-   date and the freeze commit. `checks / spec` turns green; the
-   maintainer merges.
+3. Hand over the report in `agent-authority.md ## Escalation`.
+4. Wait. When the maintainer closes the implementation deliberation in
+   conversation, reconcile it (step 3.6), then freeze with the executor
+   in `spec-workflow.md ## Archive executor and the freeze`:
+
+   ```bash
+   just spec-changes archive --base origin/main --head HEAD
+   git add openspec && git commit -m "docs: archive the <slug> change"
+   ```
+
+   Push it through the publish gate and update the approval line with the
+   closing's date and the archive commit. The maintainer merges.
 
 If any condition fails, stop at the draft with the same report and name
-the failing condition. Never approve, merge, or arm auto-merge; merge
-closes the issue through the closing keyword.
+the failing condition.
 
 ## Gotchas
 
-- Authorization is task-scoped; a successful `gh auth status` is not
-  permission to publish.
-- Never tick a task that is not done: a fully ticked task list is what
-  the archive consumes, and `spec_changes.py archive` refuses every
-  change of the PR while any has an open task.
-- A red `checks / spec` on a ready PR is the expected state, not a
-  failure to chase: it says the record is not frozen yet. Freezing early
-  to clear it hands the maintainer an archived record to deliberate on.
-- Nothing revokes the maintainer's closing. A commit after the archive
-  commit spends it — compare the tip with that commit before pushing or
-  handing over, and say so.
-- The draft opens with the complete approval package — proposal, delta
-  specs, and design — never at the proposal alone.
-- The draft exists to review the approval package: opening it after
-  implementation turns the approval gate into a formality.
 - A branch, issue, or PR does not authorize unrelated cleanup; report
-  discovered work separately.
-- When ending with work unfinished, leave a self-contained handoff in the
-  PR or conversation: branch, change, completed work, remaining work,
-  current checks.
-- Fork pull requests are squash-merged and their title is what the
-  `pr / policy` check validates; in-repo branches are validated commit by
-  commit.
+  discovered work separately (`AGENTS.md` Mismatches).
+- Any command naming `spec/approved` is denied, reads included
+  (`agent-authority.md ## Permission entries`); read the approval with
+  `just spec-approval <n>`.

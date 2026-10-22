@@ -99,9 +99,8 @@ is an instruction failure, not a reason to escalate.
 ## 4. Clean up and report
 
 Record the results — scores, evidence, every isolation degradation, and
-any skipped test with its reason — in the pull request's Validation section,
-linking the change's `design.md` verification plan for the cases, rubric,
-solver tier, and observation method instead of restating them. Remove every detached candidate test
+any skipped test with its reason — for the pull request's Validation
+section, shaped as the pull request template directs. Remove every detached candidate test
 worktree, snapshot, harness, fixture, and evaluation output. Keep the current
 change worktree for the remaining commit and PR workflow, and confirm its
 `git status` shows only the intended repository changes.

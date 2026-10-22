@@ -4,6 +4,9 @@ devcontainer-lock.json
 ### Skills ###
 skills-lock.json
 
+### Deno (no lockfile: dependencies follow their major-version range) ###
+deno.lock
+
 ### Python ###
 .venv/
 __pycache__/

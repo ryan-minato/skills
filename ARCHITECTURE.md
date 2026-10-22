@@ -15,17 +15,21 @@ skills/<catalog>/<skill-name>/   Public, distributable skills
   knowledge/                     Rules and registers, each with a pointer in AGENTS.md
 openspec/                        Specifications: specs/ (source of truth), changes/, changes/archive/
 .claude/skills -> ../.agents/skills
-.claude/settings.json            Claude Code read-only command allowlist
+.claude/settings.json            Claude Code permission entries (allow, deny)
 .claude-plugin/marketplace.json  Plugin marketplace (one plugin per catalog)
 .codex/config.toml               agentskills MCP server (Codex)
+.codex/rules/default.rules       Codex command rules (forbidden, allow)
 .mcp.json                        agentskills MCP server (Claude Code)
-.devcontainer/                   Dev container: tools, MCP server, `just setup` on create
+.devcontainer/                   Dev container: latest tools, MCP server, `just setup` on create
 .github/                         Issue forms, PR template, workflows, labels, health files
+  actions/setup-tools/           Composite action: latest Deno, other tools on request
   skills -> ../.agents/skills    Copilot-facing path to the same skills
-scripts/                         Repository tooling
-justfile                         Canonical check recipes and tool version pins
-ruff.toml                        Lint and format configuration (repo scripts, skill scripts, script assets)
-.pre-commit-config.yaml          Hooks: commit safety, secrets, ruff, validators
+scripts/                         Management scripts (TypeScript run by Deno) and their tests
+  lib/                           Modules the scripts share; no remote import
+deno.json                        Deno import map, no lockfile, fmt/lint/test scope
+justfile                         Canonical recipes and the one tool pin (OpenSpec)
+ruff.toml                        Lint and format configuration for the public skills' Python
+.pre-commit-config.yaml          Hooks: commit safety, secrets, ruff, validators, no commit on main
 .gitmessage                      Commit message template
 ```
 
@@ -74,17 +78,18 @@ Public skills are grouped into catalogs under `skills/`:
   blog/opinion, promotional copy) and medium skills (LaTeX, Typst,
   Markdown source); the general baseline `human-writing` lives in `core`.
 
-Adding a catalog requires: the catalog scaffold (`README.md`, `README.zh.md`,
-`CONTEXT.md`), an entry in this list, and — once it has a skill — a plugin
-entry in `.claude-plugin/marketplace.json`. `scripts/validate_skills.py`
-cross-checks this list against the directories in `skills/`.
+A catalog is its scaffold (`README.md`, `README.zh.md`, `CONTEXT.md`), an
+entry in this list, and — once it has a skill — a plugin entry in
+`.claude-plugin/marketplace.json`. `scripts/validate_skills.ts`
+cross-checks this list against the directories in `skills/`; the steps
+for adding or removing one are in the `skill-authoring` project skill.
 
 Skill names follow a recommended `[<prefix>-]<body>[-<suffix>]` shape,
 described in `.agents/knowledge/skill-quality.md` and refined per catalog in
 its `CONTEXT.md` `## Naming` section; the shape is advisory. What is enforced
 is the prefix the two disposable catalogs reserve for their members: every
 skill in `meta` is named `meta-*` and every skill in `scaffold` is named
-`scaffold-*`, via `CATALOG_NAME_PREFIXES` in `scripts/validate_skills.py`.
+`scaffold-*`, through the catalog prefix list in `scripts/validate_skills.ts`.
 The prefix groups a catalog's builders, which matters because installed skills
 are read far from this repository.
 
@@ -93,7 +98,7 @@ the check runs in one direction only: `core/meta-harness` is durable, globally
 installed, and `meta-`-prefixed. What identifies a disposable builder is the
 marker its description opens with — the same sentence in both catalogs,
 `Disposable builder skill (delete after the harness is built):`, enforced by
-`check_disposable_markers()` in `scripts/validate_skills.py`. That marker is
+the disposable-marker check of `scripts/validate_skills.ts`. That marker is
 what `meta-disposal` matches on, and the only key it may use, so one disposal
 skill removes both catalogs' builders together.
 
@@ -101,15 +106,15 @@ skill removes both catalogs' builders together.
 
 `.agents/skills/` is the canonical directory agents scan for this repo's
 usable skills (the cross-client convention from the Agent Skills spec). It
-contains two kinds of entries:
+contains three kinds of entries:
 
 - **Project-only workflow skills** (`change-workflow`, `skill-authoring`,
   `code-review`): real directories, created directly here. They serve this
   repo's own workflows, are never distributed, and may reference repo paths.
 - **OpenSpec-generated skills** (`openspec-*`, plus the
-  `.agents/skills/.openspec-target` marker): real directories written by the OpenSpec CLI for the shared
-  `.agents/skills` target and regenerated only by `just spec-sync`. Tracked,
-  never hand-edited, never distributed.
+  `.agents/skills/.openspec-target` marker): real directories written by
+  the OpenSpec CLI for the shared `.agents/skills` target and regenerated
+  only by `just spec-sync`. Tracked, never distributed.
 - **Symlinks to public skills**: every `skills/<catalog>/<name>/` gets a
   relative symlink `.agents/skills/<name> -> ../../skills/<catalog>/<name>`,
   so the repo can dogfood the skills it publishes.
@@ -121,8 +126,9 @@ code review expects its review skill at `.github/skills/code-review/`, so
 clients (Codex, and anything following the spec) scan `.agents/skills/`
 directly.
 
-`scripts/validate_skills.py` (via `just validate` and pre-commit) enforces
-that symlinks exist, don't dangle, and point to the right targets.
+`scripts/validate_skills.ts` (through `just validate` and pre-commit)
+checks that the symlinks exist, do not dangle, and point to the right
+targets.
 
 ## Plugin Marketplace
 
@@ -138,9 +144,10 @@ No skill files move. The real directories in `.agents/skills/` (project-only
 and OpenSpec-generated skills) are excluded because the generator reads
 `skills/` only.
 
-`scripts/gen_marketplace.py` (via `just gen-marketplace`) regenerates the
-`skills` arrays from the catalogs on disk, and the validator fails if any
-plugin's list drifts from its catalog — so the lists are never hand-edited.
+`scripts/gen_marketplace.ts` (through `just gen-marketplace`) regenerates
+the `skills` arrays from the catalogs on disk, and `scripts/validate_skills.ts`
+fails when a plugin's list drifts from its catalog, so the lists are never
+hand-edited.
 
 Users add the marketplace once, then install catalogs individually:
 
@@ -149,86 +156,105 @@ Users add the marketplace once, then install catalogs individually:
 /plugin install <catalog>@ryan-minato-skills
 ```
 
-Because installed skills are copied out of this repo, public skills must be
-fully self-contained, and what they may depend on is governed by the
-dependency policy in `.agents/knowledge/skill-quality.md`: `core` always,
-other catalogs only by a grant in that catalog's `CONTEXT.md`, never another
-repository — with every handoff routed through `ryan-minato-skills-installing`.
+Installed skills are copied out of this repository, which is why public
+skills are self-contained (`.agents/knowledge/skill-quality.md`).
 
 ## Knowledge Base
 
-`.agents/knowledge/*.md` is the project knowledge base: three rule files
-(`github-workflow.md`, `spec-workflow.md`, `agent-authority.md`), two
-GitHub registers (`github-checks.md`, `github-settings.md`), the
-synchronization and entropy register (`harness-maintenance.md`), the skill
-quality bar (`skill-quality.md`), and external URLs (`references.md`).
-`AGENTS.md` names every file with the condition that loads it;
-`scripts/validate_harness.py` fails when a knowledge file has no pointer.
+`.agents/knowledge/*.md` is the project knowledge base: rule files
+(`github-workflow.md`, `spec-workflow.md`, `agent-authority.md`,
+`management-code.md`), the checks register (`github-checks.md`), the
+settings declaration (`github-settings.md`), the synchronization and
+entropy register (`harness-maintenance.md`), the skill quality bar
+(`skill-quality.md`), and external URLs (`references.md`). Each rule has
+one owner file; other files point to it. `AGENTS.md` names every file with
+the condition that loads it.
 
-Source of truth: **the knowledge files on origin's latest default branch**.
-Working-tree edits become authoritative only after merge. GitHub is the only
-remote and task platform, so the rules are written in GitHub terms.
+`scripts/validate_harness.ts` fails when a knowledge file has no pointer
+in `AGENTS.md`, when a path or `just` recipe `AGENTS.md` names does not
+exist, and — its `budget` check — when `AGENTS.md` passes 110 lines or a
+table row in `AGENTS.md`, this file, or a knowledge file passes 200
+columns.
+
+The knowledge files on origin's latest default branch are authoritative;
+working-tree edits become authoritative only after merge.
 
 ## Specifications
 
-`openspec/specs/<catalog>/<skill-name>/spec.md` is the source of truth for
-what each public skill does. The repository itself has no spec domain: a
-change to its harness, tooling, or documents is a `skip_specs` change with
-a proposal, design, and tasks only. A
-behavior change goes through `openspec/changes/<slug>/` on the branch of
-the same slug; its draft pull request opens once the approval package
-(proposal, delta specs, design) is written, its scenarios become the
-behavioral tests, and the change is archived inside the pull request by
-the implementer, once the maintainer closes the deliberation on the
-finished implementation, so `main` never holds an unarchived change;
-`checks / spec` fails a ready pull request that still carries one, which
-is the expected state until that freeze. Specs exist only for domains a change has touched. The change
-artifacts follow the project schema in `openspec/schemas/skill-change/`
-(requirements named by kind — trigger, behavior, handoff, script — and a
-design that bounds the approach and carries the verification plan). The
-OpenSpec CLI version is pinned in the `justfile`; `just spec-validate`
-runs its strict validator, `just spec-check` adds the unarchived-change
-rule, and `just spec-sync` regenerates the `openspec-*` skills. The
-request automation — the check, the slash-spec comment commands, the
-spec status labels, all of them read-only — was installed from the
-`openspec-workflow` skill's assets into `.github/workflows/`, and runs
-`scripts/spec_changes.py`, this repository's own management script.
+`openspec/specs/<catalog>/<skill-name>/spec.md` holds what each public
+skill does; `openspec/changes/<slug>/` holds a change in flight and
+`openspec/changes/archive/` the archived ones. Change artifacts follow
+the project schema in `openspec/schemas/skill-change/` (requirements named
+by kind — trigger, behavior, handoff, script — and a design that bounds
+the approach and carries the verification plan). The lifecycle around
+them is `.agents/knowledge/spec-workflow.md`.
+
+The OpenSpec CLI runs through Deno at the version the `justfile` pins:
+`just install-tools` installs it into the ignored .tools/bin,
+`just spec-validate` runs its strict validator, `just spec-check` adds a
+warning for each unarchived change a branch touches, and
+`just spec-sync` regenerates the `openspec-*` skills.
+`scripts/spec_changes.ts` is the related-change tool behind
+`just spec-changes` (`snapshot`, `status`, `check`, `archive`);
+`checks / spec` and `checks / archive-verdict`, which runs the base's
+copy, use it. The archive gate holds a pull request into
+`main` with an unarchived change on the required `checks / archived`,
+which its carrier job reports only once nothing is unarchived; waiting
+is never a failing check (`.agents/knowledge/github-checks.md`
+`## No standing failure`).
+
+A pull request carries one specification-state label: `spec/pending`,
+`spec/approved`, `spec/archived`, or none. The package approval is
+`spec/approved`. The maintainer adds it; `spec / labels` then runs
+`scripts/spec_approval.ts`, which decides from the pull request's head
+and base trees, file list, labels, and timeline, writes one record comment as
+`github-actions[bot]` naming the approved head, the account, and the
+label event, and puts `spec/pending` back when the package changes after
+the recorded head, when a run fails, or when its deciding step times out.
+`just spec-approval <n>` recomputes the state without writing. The rules
+around the label are in `.agents/knowledge/spec-workflow.md`
+`## Approval gates`.
 
 ## GitHub Workflow
 
-Every change is a branch and a pull request; issues are optional and link
-their OpenSpec change instead of restating its acceptance. The issue forms
-apply type and `status/needs-triage` labels; the `issues / triage`
-workflow derives `priority/*` and `catalog/*` from the form answers with
-`scripts/sync_issue_metadata.py`, whose mapping comes from
-`.github/labels.json` by prefix. The `labels / sync` workflow applies
-`.github/labels.json` to the repository with `scripts/sync_labels.py`
-whenever it changes on `main` and weekly, reporting labels it would
-prune instead of deleting them. `scripts/check_pr_policy.py` validates
-each pull request against the template's own headings and the commit
-convention (commit range for in-repo branches, title for forks). Agents
-may ready a pull request under the H1 policy; the maintainer merges.
+The issue forms apply type and `status/needs-triage` labels; the
+`issues / triage` workflow derives `priority/*` and `catalog/*` from the
+form answers with `scripts/sync_issue_metadata.ts`, whose mapping comes
+from `.github/labels.json` by prefix. The `labels / sync` workflow applies
+`.github/labels.json` to the repository with `scripts/sync_labels.ts`
+whenever it changes on `main` and weekly, reporting labels it would prune
+instead of deleting them. `scripts/check_pr_policy.ts` checks each pull
+request against the base's template and the commit convention, and
+`scripts/check_commit_safety.ts --range` scans each of its commits. `scripts/review_threads.ts` (`just review-threads <n>`)
+reads a pull request's review threads through one fixed GraphQL query.
 
-## Quality Gates
+Where each workflow finds its code:
 
-- `just check` = `validate` (`scripts/validate_skills.py` +
-  `scripts/validate_harness.py`) + `lint` (ruff over `scripts/`, every
-  `skills/*/*/scripts/`, and the script assets under `skills/meta/*/assets/`
-  and `skills/sdd/*/assets/`; in all but the skills' own `scripts/`, a
-  blind `except` and a `try`/`except`/`pass` fail it, and SIM105 is off so
-  ruff never suggests `contextlib.suppress`, which neither rule sees) +
-  `spec-validate` + `tf-validate` (`tofu fmt -check`, then `init
-  -backend=false` and `validate` on a temp copy of every `.tf` skill asset,
-  with the OpenTofu pinned as `opentofu_version` and installed into the
-  ignored `.tools/bin` by `just install-tools`) + `pre-commit run --all-files` (whitespace, secrets,
-  ruff, both validators; the `commit-safety` hook runs only on
-  `git commit`).
-- pre-commit hooks are installed by `just setup` (run automatically by the
-  devcontainer's `postCreateCommand`), which also installs the pinned
-  OpenSpec CLI and sets the `.gitmessage` commit template.
-- CI (`.github/workflows/checks.yml`) runs `just check` and the OpenSpec
-  validation with the same pins; `checks / gate`, `pr / policy`, and
-  `scan-secrets` are the required checks (`.agents/knowledge/github-checks.md`).
+- `checks / *` and `scan-secrets` run the pull request's own copy, except
+  that `checks / archive-verdict` checks out the base and runs the base's
+  `scripts/spec_changes.ts` over the fetched head.
+- `pr / policy` takes its workflow file from the pull request's merge ref
+  but checks out the base and runs the base's script, so a change to its
+  script takes effect from the next pull request.
+- `spec / labels` (`pull_request_target`) and `issues / triage`
+  (`issues`) run `main`'s
+  workflow and scripts; `labels / sync` runs on `main` only. A change to
+  their scripts takes effect after merge.
 
-Longer custom logic belongs in `scripts/`, not inline in justfile recipes or
-hooks.
+## Checks
+
+- `just check` runs `validate` (`scripts/validate_skills.ts`,
+  `scripts/validate_harness.ts`), `lint` (Deno lint, format, and type
+  check on the management code; ruff on the public skills' Python),
+  `test` (`deno test`), `spec-validate`, `tf-validate` (the OpenTofu skill
+  assets with the latest OpenTofu), and the remaining pre-commit hooks.
+- `just setup`, run by the dev container's `postCreateCommand`, installs
+  the tools (`just install-tools`), the pre-commit hooks, and the
+  `.gitmessage` commit template.
+- CI installs its tools with `.github/actions/setup-tools/action.yml`. The
+  `checks / gate` job runs `scripts/ci_gate.ts` over the results of the
+  jobs it needs; `checks / devcontainer` builds the dev container and runs
+  `just check` inside it. Every job, its command, and the required checks
+  are in `.agents/knowledge/github-checks.md`.
+- `.agents/skills/change-workflow/scripts/run_log_digest.ts` digests a
+  failed run's logs for diagnosis.

@@ -43,6 +43,6 @@ files contain.
 ```
 
 Treat any last line other than exactly `SAFE TO PUBLISH: YES` as NO.
-Published content must be byte-identical to the reviewed content. Record
-the verdict line verbatim in the handoff and delete the scratch directory
-once the write completes.
+Publish the reviewed bytes unchanged (`agent-authority.md ## Publishing`).
+Record the verdict line verbatim in the handoff and delete the scratch
+directory once the write completes.

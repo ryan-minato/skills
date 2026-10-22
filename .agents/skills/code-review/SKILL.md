@@ -39,10 +39,9 @@ git path; every rule below applies to any reviewer, human or machine.
    severe first, empty if nothing survived, never duplicated as prose —
    otherwise as a ranked list.
 4. **Arguments.** `--fix`: after reporting, apply the surviving findings to
-   the working tree. `--comment`: post findings as inline PR comments —
-   that is a remote write, so it needs the explicit user authorization the
-   `change-workflow` skill requires, and the exact comment payloads are
-   drafted and reviewed before publishing.
+   the working tree. `--comment`: post findings as inline PR comments — a
+   remote write, so `agent-authority.md ## Publishing` applies to the
+   exact comment payloads.
 5. A deep multi-agent cloud review ("ultra") is a host feature, not part of
    this skill; when it is unavailable, run at maximum effort locally and
    say that is what happened.
@@ -57,10 +56,8 @@ git path; every rule below applies to any reviewer, human or machine.
    no-self-escalation rule); a builder-defined model noun inside a
    deposited platform file, or a platform object decided during the
    platform-neutral design stage; a contradiction between pieces that load
-   together; a
-   path reference escaping a public skill's directory; a hard dependency
-   outside the catalog's granted range, or a recommendation of another
-   repository's skill.
+   together; a breach of
+   `skill-quality.md ## Self-containment and dependencies`.
 3. **Recommended**: a latent ambiguity with a plausible failure path; a
    harness desync (see the quality gradient).
 4. **Note**: grammar, terminology, phrasing. Never marked blocking, and
@@ -106,15 +103,15 @@ follow-up commit deletes nothing.
   entropy that misleads every later agent; report it, capped at
   recommended severity.
 - `openspec/` is the specification layer. A pull request that changes a
-  public skill's behavior without a delta spec, or whose delta spec is not
-  archived into `openspec/specs/`, or whose Validation section names no
-  scenario, is blocking: `main` must never disagree with its specs
-  (`.agents/knowledge/spec-workflow.md`). A change to the repository itself
-  (harness, tooling, checks, documents) has no spec domain: it carries a
-  `skip_specs` change record with a proposal, design, and tasks, and its
-  Validation section names the proofs of that design; a missing record is
-  the finding, a missing delta spec is not. The `openspec-*` skills are
-  generated; a hand edit there is a finding.
+  public skill's behavior without a delta spec, or that is ready with a
+  Validation section naming no scenario, is blocking. A repository change
+  needs its `skip_specs` record instead of a delta spec
+  (`spec-workflow.md ## Domains`). A hand edit to a generated `openspec-*`
+  skill is a finding (`spec-workflow.md ## Artifacts`).
+- Never block a ready pull request for being unarchived: during its second
+  deliberation that is the expected state, and `checks / spec` blocks the
+  merge until the freeze (`spec-workflow.md ## Archive executor and the
+  freeze`).
 
 ## Scripts: the threat model
 
@@ -129,36 +126,33 @@ issues. What does matter:
   paths default to dry-run and require an explicit `--apply`, `--delete`,
   or `--confirm`.
 - Secrets are never printed or logged.
-- The repository script contract holds: non-interactive, `--help`, data to
-  stdout and diagnostics to stderr, exit codes 0/1/2, idempotent. Exit 2
-  is guaranteed only for bad arguments; an unexpected crash exits 1.
+- The script contract in `skill-quality.md ## Scripts` holds.
 
-Management code — this repository's `scripts/` and workflow shell, the
-project skills' scripts, and the script assets skills deposit into their
-targets — is reviewed against `## Management code` in
-`.agents/knowledge/skill-quality.md`. A fallback that hides an unexpected
-failure is a finding: a default in place of data, a swallowed exception, a
-catch-all handler, a blanket `|| true`, a command whose failure a
-condition reads as false. A checked interface and a deferral written
-explicitly by design are not. Management code that runs in a privileged
-job (`pull_request_target`, `issue_comment`, `workflow_run`) handles
-content the request's author wrote — file paths, change names, document
-text, comment words — so there it is untrusted input: parsed and never
-executed or fetched, and rendered into a comment or a label only through
-escaping or a literal allow-list.
+The rules each kind of script is reviewed against have one owner:
+
+- This repository's code — `scripts/`, workflow shell, the project
+  skills' scripts — `.agents/knowledge/management-code.md`; a privileged
+  job handles content the request's author wrote, so read its
+  `## Workflow security` before reviewing one.
+- The Python scripts and script assets public skills ship —
+  `skill-quality.md ## Script assets`.
 
 ## Do not report what machines catch
 
 `just check` already enforces frontmatter limits, name/directory match,
-symlinks, marketplace sync, path self-containment, catalog files, the
+symlinks, marketplace sync, catalog files, the
 `## Harness Methodology` copy between `core/meta-harness` and
 `meta-harness-architecture`, label and form consistency, knowledge-file
-pointers, and strict OpenSpec validation
-(`scripts/validate_skills.py`, `scripts/validate_harness.py`, `just
-spec-validate`). Run it (or trust its CI result) and spend review attention
-only on what it cannot see. A name that departs from the
-recommended `[<prefix>-]<body>[-<suffix>]` shape is not a defect either: the
-shape is advisory and the chosen name stands.
+pointers, the parsed workflow rules (permissions, pins, timeouts,
+privileged triggers), line and table budgets, and strict OpenSpec
+validation (`scripts/validate_skills.ts`, `scripts/validate_harness.ts`,
+`just spec-validate`). Run it (or trust its CI result) and spend review
+attention only on what it cannot see. Its self-containment check catches
+only Markdown links that escape a skill's root and install commands;
+review every other reference yourself — paths in prose or code, skill
+names outside the dependency range, skills of other repositories. A name
+that departs from the recommended `[<prefix>-]<body>[-<suffix>]` shape is
+not a defect either: the shape is advisory and the chosen name stands.
 
 ## Repository-specific checks
 
@@ -180,25 +174,21 @@ shape is advisory and the chosen name stands.
   platform base's registered extension slots in a second phase, so their
   slot names and locations must match the bases' slot registers. This
   repository's own harness is GitHub-specific by decision
-  (`.agents/knowledge/harness-maintenance.md`), so GitHub vocabulary in
+  (`.agents/knowledge/github-workflow.md`), so GitHub vocabulary in
   `.agents/knowledge/` is not a finding.
 - **Cross-skill references by name that hand off through
-  `ryan-minato-skills-installing` are the required pattern**, not a defect.
-  The defects are a hardcoded install command in a public skill; a
-  dependency the skill cannot work without on anything outside its allowed
-  range (`core` always; other catalogs only by the catalog `CONTEXT.md`
-  grant); a recommendation of a skill from another repository; and a path
-  reference across skill roots.
+  `ryan-minato-skills-installing` are the required pattern**, not a defect;
+  the defects are those `skill-quality.md ## Self-containment and
+  dependencies` names.
 
 ## Before suggesting an edit
 
-Check the constraint surface first: descriptions warn above 900 characters
-(error at 1024); bodies warn above 500 lines; all content is English;
-`meta-`/`scaffold-` descriptions open with the shared disposable marker
-(`Disposable builder skill (delete after the harness is built):`), which
-must not change; every `README.md` change needs its content-identical
-`README.zh.md` twin; trigger phrases in descriptions are load-bearing —
-never trade one away for style.
+Check the constraint surface first: the limits in
+`skill-quality.md ## Spec limits (mechanically enforced)`; English only;
+the disposable marker of `meta-`/`scaffold-` descriptions
+(`ARCHITECTURE.md`), which must not change; the `README.zh.md` twin of
+every `README.md` (`AGENTS.md`). Trigger phrases in descriptions are
+load-bearing — never trade one away for style.
 
 ## Verifying findings
 
