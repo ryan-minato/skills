@@ -60,9 +60,19 @@ claims it.
 
 Read before asking. Record the target and exposed interfaces; layout and
 dependency skeleton; technology stack; development, test, deployment, and
-CI environments; validation commands; error cost; lifecycle and maintenance
-horizon; version-control workflow; maintained sources of truth; and every
-existing agent-facing file, skill, registered tool, hook, and check.
+CI environments; validation commands; version-control workflow; maintained
+sources of truth; every existing agent-facing file, skill, registered
+tool, hook, permission file, and check; and what the repository shows of
+the five variables that set each layer's thickness — a deploy target or
+published package (error cost), the age and author count of the history
+(maintenance horizon, team size), a container or sandbox definition and
+the credentials it exposes (environment isolation), unattended workflows
+or scheduled agent runs (agent autonomy) — so these are confirmed as
+facts, not asked as questions: a committed container with a scoped token
+is presented as "isolation: container, read-only token — confirm" rather
+than asked about; the sandbox audit of the architecture manual still runs
+before any autonomy is granted, because a container can mount what it
+should not.
 
 For each existing harness artifact, record how a future agent finds it,
 when it loads, its source of truth, and what keeps it current; classify
@@ -77,11 +87,20 @@ question only the team can answer.
 
 Load the `plan-clarification` skill and interrogate the goal in rounds
 until nothing is silently assumed: what the harness must achieve, what is
-out of scope, the team facts the repository cannot show (review structure,
-confidentiality boundary, how much agents do on their own, who approves
-what, which external actions are delegated), what must be preserved, and
-the user's preferences. Bring the open questions from step 1 into these
-rounds. Do not produce a plan before this converges.
+out of scope, the team facts the repository cannot show — the five
+variables step 1 did not settle (error cost, maintenance horizon,
+environment isolation, agent autonomy, team size), the externally
+writable input sources agents will read (issues, comments, search, pages)
+and whether a human reviews results before they leave, which irreversible
+or outward actions are pre-authorized (which branch is pushed, whether
+comments or requests may be opened), which document holds that line and
+where the pending-decisions list lives so a person sees it, which
+control-plane files are hard read-only, the review structure, the
+confidentiality boundary, who approves what — what must be preserved, and
+the user's preferences. Bring
+the open questions from step 1 into these rounds and present the inferred
+variables as facts to confirm rather than questions. Do not produce a plan
+before this converges.
 
 Done when: the user and you state the same goal, scope, and constraints,
 and every open question has an answer or a recorded owner.
@@ -89,9 +108,19 @@ and every open question has an answer or a recorded owner.
 ### 3. Design, exploring the skills at hand
 
 Rate each harness layer with the design axes in
-`meta-harness-architecture`: the thickness of every capability and
-constraint layer, the evolution mode, agent topology, sync family, model
-class, and entropy controls. Record one value and one reason per decision.
+`meta-harness-architecture`: the six layers — environment and sandbox,
+knowledge and routing, hard gates, authorization boundary, specification
+and completion criteria, entropy management — each omitted, light, medium,
+or thick, starting from the exploratory or engineering preset and
+recording every per-layer deviation with the variable that causes it; for
+an omitted layer, the trigger that would build it later; then the
+evolution mode, agent topology, sync family, model class, and entropy
+controls. Record one value and one reason per decision, and refuse to
+assign one maturity level to the whole project even when asked to. When
+the user names a preset or asks to skip the table, keep the six rows,
+take the named preset as the starting column, and record each layer the
+facts push away from it — the table is never dropped and the preset is
+never refused, only deviated from with reasons.
 
 Then assign every layer to whatever can build it best. List every skill
 available in this session — the installed builders and the durable skills

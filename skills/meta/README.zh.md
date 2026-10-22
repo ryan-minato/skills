@@ -7,8 +7,8 @@ catalog，将所有长期规则写入目标项目并完成验证，然后使用 
 
 | Skill | 用途 |
 |---|---|
-| [meta-harness-building](meta-harness-building/) | 所有 harness 搭建、改进与修复的统一入口：先了解仓库，与用户敲定需求，计划获批后借助手头的 skill 逐层构建，在干净上下文中回读产物，审查只有构建技能才懂的词汇，让构建技能不进入任何提交，并在送审前询问是否移除它们。 |
-| [meta-harness-architecture](meta-harness-architecture/) | 入口按层加载的架构实践手册：设计轴、entrypoint、knowledge、project skill、同步、熵治理、多 agent 拓扑与高级自治，并附起始形状资产。 |
+| [meta-harness-building](meta-harness-building/) | 所有 harness 搭建、改进与修复的统一入口：先了解仓库，与用户敲定五个变量与威胁模型事实，提出六层计划并获批后借助手头的 skill 逐层构建，在干净上下文中回读产物，审查只有构建技能才懂的词汇，让构建技能不进入任何提交，并在送审前询问是否移除它们。 |
+| [meta-harness-architecture](meta-harness-architecture/) | 入口按层加载的架构实践手册：六层定档、entrypoint、knowledge、project skill、沙箱与威胁模型、授权边界、运行时约定、同步、harness 自检、熵治理、多 agent 拓扑与高级自治，并附起始形状资产。 |
 | [meta-workflow-design](meta-workflow-design/) | 与人类开发者在平台无关的模型中共同设计项目的管理模型——项目真正配得上的工作跟踪语义、贴合实际交付方式的 workflow profile、overlay 与变更传播风险——并以项目自身平台的词汇落地为 workflow 文件，供平台构建技能实现而非重新决定。 |
 | [meta-spec-workflow](meta-spec-workflow/) | 以框架无关的方式分两个阶段为项目配置规格驱动开发规则：与用户敲定规格级别与方法家族、变更请求形态、两道审批门各自的方式与审批包（规格加上有必要时的受约束 design；默认两道门都在对话中收口，只有当对话之外的人必须自行核验时才采用记录式批准）、存档执行者（由人在 request 内、在实现评议收口后执行）与规格范围，为每个事实保留唯一来源，以项目自身平台的词汇落地规格契约，并把工具接入与自动化交给 `sdd` catalog 的框架 skill；待平台底座交付后，再填充其扩展槽——请求模板的规格块与检查项、intake 字段、项目技能的领取、草稿、收口核对与收尾步骤，以及知识节。 |
 | [meta-agent-authority](meta-agent-authority/) | 设计人类-Agent 治理政策——H0–H3 权限级别、review admission 与 integration 两道关口、升级上报条件，以及 agent 永不自行扩权的规则——并将其作为项目 agent 运行时遵循的持久政策落地。 |

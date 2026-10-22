@@ -73,6 +73,21 @@ project may port its copy later, as its own change.
   script in the target's harness knowledge (the entrypoint's validation
   table or a knowledge file), so the next agent runs it the same way.
 
+## Quiet output
+
+A check's output is injected into the agent's context the moment it fails,
+so it is a routing message, not a log. Enable the tool's own quiet or
+compact mode first (a silent test runner, short tracebacks, plain
+diagnostics): zero maintenance, and it removes the pass logs and
+third-party stack frames that crowd the context. When a tool has no such
+mode, accept its native noise; a custom parser that filters another
+tool's output is a fragile maintenance burden that is never worth the
+tokens it saves. A script the project writes returns the state and the
+next action — "all passed", or "two failed, these files and assertions" —
+not three hundred lines of passes. A rejection from a custom rule says
+what to use instead or which document or example to read, so the hard
+stop becomes the agent's route to the fix.
+
 ## Failing fast
 
 Fail-fast is a design philosophy aimed at one thing: a fallback that

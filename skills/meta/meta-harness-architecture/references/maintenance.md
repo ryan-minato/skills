@@ -30,6 +30,28 @@ Never install two mechanisms for the same concern. If a sync skill owns a
 concern, the entrypoint's sync table must not also list it; duplicated rules
 drift apart and contradict each other.
 
+Where the framework offers lifecycle hooks, a reminder injected after the
+triggering operation ("you edited the task runner — update the command
+table") is the most reliable forward trigger, because it does not depend
+on the agent remembering to consult the rule. It is a soft boundary, not a
+check; the check belongs to `harness-checks.md`.
+
+## Where a found mismatch lands
+
+An agent that finds a document, script, or command disagreeing with the
+repository must handle it, and never only in the conversation, which ends
+and leaves the next agent to hit the same wall. The harness names three
+landing places, chosen by the size of the deviation and the agent's
+authority:
+
+- corrected in place, in the same change, with the commit message saying
+  so — when the deviation is small and the agent is certain;
+- queued as a pending decision in the shape the authorization boundary
+  fixes — when the intent is unclear or the fix exceeds the task's
+  authorization;
+- filed as a tracked item with a fixed label — when the deviation is wide
+  and not handled now, so the periodic reclamation starts from a list.
+
 Copy the matching shape from `assets/maintenance-skeletons.md` (path
 relative to this skill's root) when creating a workflow entry or a sync
 skill.
@@ -51,7 +73,16 @@ For a long-lived project, install a cleanup mechanism — a workflow entry for
 a linear periodic review, or a project skill when the review is recurring
 and branchy (shapes in the same skeletons file). It scans for the list
 above, checks documentation against the implementation, and reports
-keep/update/remove recommendations.
+keep/update/remove recommendations. Deterministic checks on the harness
+itself, where the lifecycle earns them, are in `harness-checks.md`.
+
+Two sources of evidence feed the review without new machinery. The
+framework's own session logs, hooks, or telemetry show which tool calls
+fail most and where retries loop; read them on the machine that produced
+them or after redaction, never from a shared copy, since they carry
+everything the agent read. And a project with heavy harness investment may
+keep a few representative past tasks to rerun by hand after a major
+harness change — never in CI — to catch a rewrite that made agents worse.
 
 ## Safety
 

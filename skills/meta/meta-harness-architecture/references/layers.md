@@ -1,113 +1,153 @@
 # Layer Calibration
 
-Per-layer guidance for a full harness design or a recalibration. The
-thickness scale is the one in SKILL.md: omitted, light, medium, thick.
+Per-layer guidance for a full harness design or a recalibration. The scale
+is the one in SKILL.md: omitted (nothing built), light (a sentence or an
+entry), medium (a dedicated file or configuration, enforced by convention),
+thick (a check, hook, CI job, or isolation that machines enforce).
 
-## Environment
+## The five variables
 
-The development and CI environments decide how much autonomy agents can
-safely be given, so choose the isolation level first:
+Each layer's rating comes from the variables that push it, not from the
+project's type:
 
-- Fully isolated (container or virtual machine holding everything the agent
-  touches): agents can run with minimal or no approval. Secrets stay outside
-  the agent's reach, a broken environment is rebuilt rather than repaired,
-  and the user reviews only the produced changes.
-- Sandboxed host (agents read beyond the workspace but cannot write outside
-  it): agents can decide for themselves when to escalate for approval.
-- Unisolated host: require per-command approval, because agents can damage
-  the host or reach confidential data.
+| Variable | Pushes | Direction |
+|---|---|---|
+| Error cost | hard gates, environment and sandbox | the more a wrong change breaks, the thicker the machine checks and the isolation |
+| Maintenance horizon | entropy management, knowledge and routing | the longer the code lives, the more copies drift; a short-lived project never reaches the point where cleanup pays |
+| Environment isolation | authorization boundary (inverse) | the stronger the sandbox, the wider the allow list can be, because a wrong call is absorbed by the environment; the gates that keep defects out of the trunk do not loosen, since a sandbox absorbs no bad merge |
+| Agent autonomy | authorization boundary, specification and completion criteria, hard gates | the longer agents run unattended, the more they need pre-authorization, checkable done criteria, and machine feedback |
+| Team size | hard gates, knowledge and routing | the more people, the less a convention holds; oral agreements become files and checks |
 
-Prefer an isolated, reproducible development environment when the stack
-allows one; fall back to the host only when the project genuinely depends on
-host-specific resources. Record in the harness only the boundaries agents
-must respect: how to enter and verify the environment, what is out of
-bounds, and what needs approval.
+Task type is one typical combination of these, not an input. Two presets
+follow; start from the closer one and deviate per layer.
 
-## Target constraints
+## The two presets
+
+| Layer | Exploratory (demo, PoC, research run, early prototype) | Engineering (production evolution, shared trunk, maintenance) |
+|---|---|---|
+| Environment and sandbox | light to medium: secret isolation and a basic sandbox, no network allow list | thick: container or VM, security rules hard read-only, session-log destination decided |
+| Knowledge and routing | light, expanding: external API and SDK pointers, domain background, a quick-start script; few style rules | medium to thick, routing and constraining: layout, layer boundaries, procedures, sync rules |
+| Hard gates | light: secret scan and a smoke run; strict format, coverage, and architecture lint off | thick: type check, lint, tests, hooks, CI gates all on |
+| Authorization boundary | light: wide allow list, humans only at acceptance; one branch per parallel attempt | medium to thick: written policy, pre-authorized irreversible actions, a fixed pending-decisions shape |
+| Specification and completion criteria | light: intent and final effect aligned, implementation left open; branches or worktrees for parallel attempts | thick: data structures, reused modules, interface contracts, change scope, a judgeable scenario per requirement |
+| Entropy management | omitted to light: one sync sentence in the entrypoint | thick: self-checks in CI, one source of truth with two-way sync rules, periodic cleanup |
+
+Deviate per layer by asking, for each one, whether its error cost,
+horizon, and autonomy match the project's overall profile. A research
+project's data pipeline (high error cost, long horizon) takes the
+engineering column for hard gates and entropy management and the
+exploratory column elsewhere; a production repository's `experiments/`
+directory takes the reverse; a solo, fully paired production project
+(small team, low autonomy) takes knowledge and authorization one step
+thinner than the engineering column and keeps the gates.
+
+## Environment and sandbox
+
+Light: the host with scoped tokens and nothing mounted. Thick: a container
+or VM with a network allow list, security rules hard read-only, and a
+recorded session-log decision.
+
+Decide isolation first; it sets how much autonomy the other layers can
+grant. Fully isolated (container or VM holding everything the agent
+touches): minimal approval, secrets outside reach, a broken environment
+rebuilt rather than repaired. Sandboxed host (reads beyond the workspace,
+writes only inside it): agents escalate on their own judgment. Unisolated
+host: the host offers no boundary, so the allow list is narrow, the deny
+list is fool-proofing only, outward actions stay pre-authorized or queued
+as `authorization.md` describes, and isolation is recommended to the
+owner; step-by-step approval is only the pairing-mode exception that file
+names (a bootstrap phase, or the project kinds it lists), never the
+standing mode for other work. Prefer a reproducible isolated environment when the
+stack allows one. Capability tools — driving the running software, reading
+logs and metrics, querying telemetry — belong here; add the ones current
+work needs, since each unused tool is description noise in every session.
+Whether an agent role needs the strict tier, and the sandbox audit, are in
+`security-boundary.md` (path relative to this skill's `references/`).
+
+## Knowledge and routing
+
+Light: one root entrypoint under about 100 lines pointing at documents the
+project already has. Thick: the entrypoint plus a layered knowledge base,
+an architecture document, project skills, and directory-level entries.
+
+The entrypoint, its routing table, knowledge files, architecture
+documents, project skills, and information tools: everything that expands
+what agents know, each behind a pointer with a precise condition rather
+than preloaded. Implementation constraints live here too — language,
+paradigm, module architecture, dependency direction — and they shrink the
+agent's freedom to explore, so calibrate by how settled the requirements
+are, how complex the structure is, and how long the code must live: nearly
+none for one-off work, documented boundaries and enforced dependency
+direction for long-lived or complex structure. When the user has made
+design decisions, record them as fixed. The practice is in `entrypoint.md`,
+`knowledge.md`, and `project-skill.md`.
+
+## Hard gates
+
+Light: a formatter and a secret scan. Thick: type check, lint, tests, and
+architecture-boundary checks in both pre-commit and CI.
+
+Formatters, linters, type checks, tests, secret scans, and custom checks,
+in hooks and CI. They narrow output variance without shrinking exploration,
+but every future change pays to satisfy them: lean on the language's static
+checking first; decide test granularity deliberately rather than defaulting
+to maximal coverage; and make every custom check fail with what failed, why
+it matters, and the likely fix, naming the file and printing no traceback.
+Repository safety — keeping secrets and private data out of the tree with
+scanning hooks and commit rules — is this layer, calibrated by leak risk
+and the collaboration boundary; security of the code itself belongs to
+tests. Output noise is in `management-code.md`.
+
+## Authorization boundary
+
+Light: a few allows and denies, the rest left to the framework's default.
+Thick: a written policy, a pre-authorized-actions list, and a fixed
+pending-decisions shape.
+
+What an agent may do inside what it can do: allow and deny lists,
+pre-authorized irreversible actions, the pending-decisions rule, and the
+workflow tools (ticket system, review flow, messaging) the team has
+delegated, each with a constraint that says how the team expects it used.
+Add a workflow tool only when the delegation and the access are real;
+otherwise document the human handoff. The practice is in
+`authorization.md`.
+
+## Specification and completion criteria
+
+Light: plan mode in the conversation with non-goals agreed orally. Thick: a
+specification framework with a judgeable scenario per requirement and
+strict validation in CI.
 
 Target constraints give agents a durable understanding of what the project
-is for, which keeps effort pointed in one direction across many sessions and
-shapes implementation style. Every project needs at least a written goal
-statement. Beyond that, match the constraint form to what the project
-exposes: code consumed by other code needs its public interface defined;
-a service needs its API behavior defined; user-facing software needs user
-stories, expected behavior, or visual references. Do not add contract forms
-for surfaces the project does not have. When the project works from
-written specifications, those specifications are this layer's contract
-form: the harness points to them and never restates a requirement.
+is for. Every project needs at least a written goal; beyond that, match the
+form to what the project exposes — a public interface for code consumed by
+code, API behavior for a service, user stories or visual references for
+user-facing software — and add no contract form for a surface the project
+lacks. When the project works from written specifications, those are this
+layer's form: the harness points to them and never restates a requirement.
+A specification answers four things: how completion is judged by a check
+the agent itself can run, what is not done, what is delivered, and which
+irreversible actions are pre-authorized.
 
-## Implementation constraints
+## Entropy management
 
-Language, paradigm, module architecture, and dependency direction. Thicker
-constraints make output more controllable and maintainable but shrink the
-agent's freedom to explore, so calibrate by how settled the requirements
-are, how complex the structure is, and how long the code must live:
+Light: a few sync reminders in the entrypoint. Thick: reference-integrity
+and structural checks in CI, periodic cleanup, and a drift label.
 
-- One-off or exploratory work: nearly none. Users care about the result, not
-  the design; prescribing architecture there is over-engineering.
-- Clear requirements, complex structure, or a long maintenance horizon:
-  document architecture and module boundaries, and enforce dependency
-  direction where tooling allows.
+Sync rules, drift reporting, harness self-checks, and periodic cleanup. The
+mechanisms are in `maintenance.md`, `periodic-reclamation.md`, and
+`harness-checks.md`.
 
-When the user has already made design decisions, record them here and treat
-them as fixed.
+## Hardening and thinning
 
-## Quality constraints
+Thickness moves in both directions.
 
-Linters, formatters, style documents, tests, and review gates narrow output
-variance without shrinking the agent's exploration freedom — but they are
-not free: creating them costs tokens, and every future change pays tokens to
-satisfy them. Calibrate by error cost, maintenance horizon, and how much the
-language already guarantees:
-
-- Strong static or compile-time checking reduces the need for a thick
-  custom quality layer; lean on the language first.
-- Long-lived or error-intolerant projects justify thick tests to prevent
-  regressions; decide the test granularity deliberately — per-component unit
-  tests, tests for key components only, scenario tests, or a smoke test —
-  rather than defaulting to maximal coverage.
-- Custom checks must fail with messages that explain what failed, why it
-  matters, and the likely fix. A finding names the file to fix and prints
-  no traceback; a traceback is for an unexpected failure of the check
-  itself. A check agents cannot self-correct against just burns tokens.
-
-## Workflow constraints
-
-How commits are made, how branches merge, how review is requested, and how
-tickets are created, planned, and closed. These pair with workflow tools to
-automate code evolution, and they are team decisions: record what the team
-has decided, and leave everything undecided out. An agent must not invent a
-workflow the team never agreed to.
-
-## Information tools
-
-Reference documents, external links, documentation endpoints, and similar
-sources expand what agents can know, but every read costs tokens. Design for
-progressive loading: a short pointer with a precise condition (in the
-entrypoint, a knowledge file, or a skill) that tells agents when the source
-is worth reading, instead of inlining or preloading the content.
-
-## Workflow tools
-
-Documents, skills, or registered tools that let agents operate the team's
-ticket system, review flow, or messaging. Add one only when the team has
-delegated that action to agents and access is authorized; otherwise document
-the human handoff instead. Every workflow tool needs a matching workflow
-constraint that says how the team expects it to be used.
-
-## Capability tools
-
-Tools that let agents exercise and observe the system while developing:
-driving the running software end to end, capturing its state, reading logs
-and metrics, or querying telemetry. Add the ones the current development and
-validation work actually needs; each unused tool is description noise in
-every session.
-
-## Repository safety
-
-This layer keeps secrets and private data out of the repository: scanning
-hooks, commit rules, and guidance on what may never be committed. Calibrate
-by leak risk and collaboration boundary — what counts as confidential in a
-trusted internal team differs from an open-source project. Security of the
-code itself (input validation, dependency vulnerabilities) is not this
-layer; it belongs to quality constraints, especially tests.
+Hardening: when a prototype graduates to maintained work, run one explicit
+pass — extract the stable layout into the entrypoint and architecture
+document; add static types, linters, and tests, and lock the security
+control plane; delete the exploration-era scripts and context and install
+the sync mechanism. Thinning: an over-thick harness never fails; it makes
+agents slower and more conservative. The signal is a constraint that no
+longer catches anything — a lint rule for a bug fixed long ago, a skill for
+a migration that finished, a routing row for a module that was removed.
+Periodic reclamation lists these beside stale content.

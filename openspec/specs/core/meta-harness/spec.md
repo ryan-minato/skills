@@ -1,7 +1,7 @@
 # core/meta-harness Specification
 
 ## Purpose
-Governs what an agent that loaded the `meta-harness` methodology observably does with a project's management code — the checks, scripts, hooks, and CI shell that never ship in the product — when it designs, audits, or changes a harness.
+Governs what an agent that loaded the `meta-harness` methodology observably does when it designs, audits, or changes a harness: how it rates the six layers, places soft and hard boundaries, decides isolation, designs the authorization boundary and the runtime conventions, lands drift and checks the harness itself, and treats the project's management code.
 
 ## Requirements
 

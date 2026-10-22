@@ -35,6 +35,16 @@ rewrite — change what the findings justify.
 - Speculative components serving no current need, and constraints thicker
   than the work justifies.
 - Workflow automation the team never actually delegated.
+- A framework allow or deny list standing in as the security boundary,
+  with no sandbox or token scope behind it (`security-boundary.md`,
+  `authorization.md`).
+- A rule that must hold on every task living only in a subdirectory entry
+  file or a framework carrier (`entrypoint.md`).
+- A hidden rule whose rejection says only "not allowed", with no
+  alternative or owner (`security-boundary.md`).
+- Checkpoints by stash, draft commits pushed, scratch notes in the tree
+  (`runtime.md`); a long-lived harness with no checks of its own
+  (`harness-checks.md`).
 - A project script bound to a skill's bundled script by a sync rule, a
   check, or an instruction to keep it identical. The binding is the
   finding, not matching content; the fix removes the binding so the script
@@ -55,7 +65,14 @@ rewrite — change what the findings justify.
   needed — keep that part and push the rest behind a conditional pointer.
   Prefer merging over splitting.
 - Thin: valid but overweight — replace machinery with a pointer, a note, or
-  a single command.
+  a single command. The signal is a constraint that no longer catches
+  anything: a lint rule for a bug fixed long ago, a skill for a migration
+  that finished, a routing row for a removed module. Over-thickness never
+  fails a check; it only makes agents slower and more conservative, so it
+  is found by asking, not by waiting.
+- Harden: the project graduated from exploration to maintained work while
+  its harness did not — run the one-time hardening pass (`layers.md`,
+  Hardening and thinning) instead of patching layer by layer.
 - Remove: clearly obsolete, duplicated, or unsupported. Ask before removing
   anything that looks maintained.
 - Leave unchanged: accurate, reachable, proportionate.

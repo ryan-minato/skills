@@ -7,6 +7,32 @@ this file is the complete harness for a lightweight project. -->
 
 [One-sentence project purpose.]
 
+## Always
+
+<!-- The rules whose breach costs the same whatever the task: safety,
+publishing, commits, language, the validation entry command, what to do
+when blocked. They come first because attention decays with position. -->
+
+- [Rule that applies to every task.]
+- [Rule that applies to every task.]
+- **Blocked work**: finish everything that does not depend on the decision;
+  record each pending decision with where it is stuck, the options, the
+  recommended option and why, and the completed work each option affects.
+- **Mismatches**: a document, script, or command found to disagree with the
+  repository is corrected in the same change, queued as a pending decision,
+  or filed as [tracked item and label] — never left in the conversation.
+- **Authorization**: proceed without asking on [reversible internal
+  actions]; push only to the branch named in [the plan or specification
+  that records pre-authorized actions]; never [force push, hard reset,
+  delete the main branch] — the deny list is fool-proofing, [the sandbox]
+  is the boundary, and an agent never relaxes this policy.
+- **Checkpoints**: commits, never stashes; a task's drafts squashed into its
+  one commit before the task is ticked; drafts never pushed; secret scan on
+  every commit.
+- **Pending decisions** live in [the description of the change request,
+  a tracked file, or an issue] — a place a person sees, never only a
+  scratch note.
+
 ## Project Map
 
 <!-- Delete if a discoverable architecture document already provides this.
@@ -17,16 +43,13 @@ too detailed. -->
 [path]/    <- [purpose]
 ```
 
-## Core Conventions
-
-- [Convention that applies to most tasks.]
-- [Convention that applies to most tasks.]
-
 ## When To Read What
 
-<!-- Knowledge and reference files are invisible without these pointers.
-Skills and registered tools announce themselves; scripts only need their
-usage documented elsewhere in this file. -->
+<!-- Knowledge and reference files are invisible without these pointers,
+and a process-critical skill (publish gate, compliance review) is routed
+here by situation, named; only auxiliary skills and registered tools may
+rely on self-announcement. Scripts only need their usage documented
+elsewhere in this file. -->
 
 | Situation | Read |
 |---|---|
@@ -36,12 +59,14 @@ usage documented elsewhere in this file. -->
 
 - [How to enter and verify the environment.]
 - [Isolation, approval, or sensitive-data boundary agents must respect.]
+- [Non-interactive settings in force: pagers off, prompts disabled.]
 
 ## Validation
 
 | Check | Command |
 |---|---|
-| [What this validates] | `[command]` |
+| [What this validates, full] | `[command]` |
+| [Scoped, seconds-scale check for one file or module] | `[command]` |
 
 ## Workflow
 
