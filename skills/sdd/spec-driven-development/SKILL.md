@@ -59,12 +59,17 @@ rules below until none of them is unanswered.
 
 1. **Specify.** Create the change record with the tool's command, then
    write the requirements and their scenarios for this change only, plus
-   non-goals. Done when: every requirement has at least one scenario a
-   reader who has never seen the code could judge, and the validator
-   passes.
+   the four answers every specification carries (see Specification
+   quality): how completion is judged, what is not done, what is
+   delivered, and which irreversible actions are pre-authorized. Place
+   each fact by the artifact roles below. Done when: every requirement
+   has at least one scenario a reader who has never seen the code could
+   judge, the four answers are written, and the validator passes.
 2. **Clarify.** Interrogate every ambiguity, unstated assumption, and
-   missing edge case with the user; record answers in the spec, not in the
-   chat. Done when: no `[NEEDS CLARIFICATION]`-class marker remains.
+   missing edge case with the user, including any of the four answers
+   still missing; record answers in the spec, not in the chat. Done when:
+   no `[NEEDS CLARIFICATION]`-class marker remains and the four answers
+   are written.
 3. **Bound the approach, then publish.** When a design is warranted (see
    [The approval package](#the-approval-package)), write it: the approach,
    its technical constraints, the preferences, the rejected alternatives —
@@ -73,8 +78,10 @@ rules below until none of them is unanswered.
    shape) with the complete approval package as its first content. Then
    stop: no task list and no code until the contract's approval mode is
    satisfied (the gate owner closes the discussion in conversation, or
-   posts the fixed comment). Done when: the package is complete and
-   published, and the agent is waiting and says what it waits for.
+   posts the fixed comment). A package whose specification lacks a done
+   criterion the agent can run is not published. Done when: the package is
+   complete and published, and the agent is waiting and says what it waits
+   for.
 4. **Reconcile, then tasks.** When the gate owner closes the discussion,
    read the request's comments and review threads with their resolution
    state; list every unresolved thread, every adjustment requested in the
@@ -88,7 +95,9 @@ rules below until none of them is unanswered.
    confirmed, no task lacks a scenario, and no scenario lacks a task.
 5. **Implement.** Work task by task; when the code must deviate from the
    spec or the design, stop and change the record first, with the user's
-   approval. Done when: every task is closed or its deviation is recorded
+   approval. When a task needs an irreversible or outward action the record
+   does not name, queue it as a pending decision and continue the tasks
+   that do not depend on it. Done when: every task is closed or its deviation is recorded
    as an approved change.
 6. **Verify.** Execute the scenarios — tests, commands, observed states —
    against the running result, not against the diff. When the change
@@ -142,13 +151,74 @@ review.
   requirements.
 - Every requirement carries at least one scenario in a given / when / then
   shape, and one of them covers an edge or failure path.
-- Non-goals are written down; an unstated exclusion is a future dispute.
 - Scope requirements as *now*, *later*, and *out of scope*; only *now* enters
   the design.
 - Requirements and design live in separate files; a requirement that names
   a class or a table is a design decision in disguise.
 - A spec describes observable behavior, never the diff: "the API returns
   409 on a duplicate email" is a requirement; "add a unique index" is not.
+- Every specification answers four things, and one missing any of them is
+  not complete — propose a concrete answer (a command, an observable
+  check, a branch) for the user to confirm in the clarify step rather
+  than assume it or stop at naming the gap:
+  1. **How completion is judged**: acceptance scenarios or a final
+     verification command the implementing agent can execute itself,
+     including the task-level closing conditions the project sets (for
+     example, no draft commits left on the branch). A criterion only the
+     user can judge leaves the agent either stopping early or never
+     stopping.
+  2. **What it does not do**: the non-goals, written down — an unstated
+     exclusion is a future dispute, and non-goals curb scope creep better
+     than goals do.
+  3. **What is delivered**: a change request, a report, a deployment,
+     and the pending decisions handed over with it.
+  4. **Which irreversible or outward actions are pre-authorized**: the
+     branch that is pushed, whether comments or a change request may be
+     opened. An action the record does not name is queued as a pending
+     decision when the implementation reaches it, and the work that does
+     not depend on it continues. The line names actions only within what
+     the project's authority policy allows; where no policy exists,
+     nothing outward beyond the named branch is pre-authorized.
+  Where the tool's record has no field for the last two, they go in its
+  proposal-like artifact or, absent one, at the head of the specification
+  (the framework skill names the spot where it does; otherwise the
+  proposal-like artifact, or the head of the specification where the
+  record has none). Every action the project's contract
+  (or, when none exists, the defaults below) prescribes for the loop
+  itself — pushing the branch, opening the draft, replying to review
+  threads, marking the request ready, the freeze — is covered by that
+  prescription; the line extends beyond them, and a record
+  written before the project adopted it pre-authorizes nothing further.
+
+## Artifact roles
+
+Each artifact of a change record owns one role, and no fact is restated
+in another:
+
+| Role | Owns | Never holds |
+|---|---|---|
+| Outcome and acceptance | why, the goal, what changes, the four answers above, the acceptance lists | the behavior contract, the approach, steps |
+| Behavior contract | requirements and scenarios | implementation choices |
+| Approach bounds | the chosen approach, its constraints and preferences, rejected alternatives, information needed only for this change | the goal or acceptance, steps |
+| Steps | ordered tasks, each with its verification, written after the package gate | acceptance; anything the gate must see |
+
+Two tests place a fact:
+
+- **Invariant test**: a rule that would still have to hold under any
+  other approach belongs with the acceptance, as a stays-true entry that
+  names it and points to the requirement or scenario carrying it (add
+  one when none does; a non-behavioral invariant such as a size or a
+  dependency rule is stated outright); one that holds only because of the
+  chosen approach belongs in the approach bounds.
+- **Information test**: information needed again the next time the
+  behavior changes (an upstream source, a protocol page, a data owner)
+  belongs in the specification; information needed only for this change
+  belongs in the approach bounds.
+
+Acceptance is two checkable lists — **becomes true** (the end state) and
+**stays true** (what must not change) — that point to the scenarios for
+behavior and never restate them. The framework skill names which of the
+tool's files carries each role.
 
 ## The approval package
 
@@ -159,7 +229,9 @@ design; a spec-first kit with a constitution: the specification and the
 plan; an IDE's native spec files: the requirements and the design;
 committed specification documents: the specification with its approach
 section — and the framework skill for the tool carries the details. The
-task list always follows approval.
+task list always follows approval. The gate reads the acceptance lists
+first: what becomes true and what stays true tell the reviewer what the
+scenarios are for.
 
 A design is warranted when more than one reasonable approach exists, when
 the change touches structure, interfaces, dependencies, or files outside
@@ -190,10 +262,11 @@ by default, or the file the agent entrypoint points to — records the
 level, the tool and its framework skill, the change request shape
 (combined or split), the approval owner and mode, when a design is
 warranted, the archive executor, the specification scope, and what tracked
-work links. Apply those facts without asking them again; the specification
-owns *what*, *why*, and the acceptance criteria, tracked work owns *who*,
-*when*, and *status* and links the record, and acceptance criteria exist in
-exactly one place.
+work links. Apply those facts without asking them again; the change record owns
+*what*, *why*, and the acceptance criteria — its outcome artifact the why
+and the acceptance lists, its specification the scenarios they point to —
+tracked work owns *who*, *when*, and *status* and links the record, and
+every scenario exists in exactly one place.
 
 When no contract exists, apply these defaults and say so in the reply,
 naming the spec workflow builder of the `meta` catalog (offered through

@@ -44,6 +44,49 @@ The task list always follows approval, even when the tool generated it
 with the specification. The framework skill says which files make up the
 package for its tool.
 
+## Artifact roles
+
+The contract says which fact goes in which artifact of a change record,
+so proposals stop restating specifications and designs stop carrying
+acceptance. Each artifact owns one role and never holds another's:
+
+| Role | Owns | Never holds |
+|---|---|---|
+| Outcome and acceptance | why, the goal, what changes, the four answers every specification carries — how completion is judged by a check the agent can run; what is not done; what is delivered; which irreversible or outward actions are pre-authorized — and the acceptance lists | the contract itself, the approach, steps |
+| Behavior contract | requirements and scenarios | implementation choices |
+| Approach bounds | the chosen approach, constraints and preferences, rejected alternatives, information needed only for this change | the goal or acceptance, steps |
+| Steps | tasks with their verification, written after the package gate | acceptance; anything the gate must see |
+
+Two tests decide placement, and the contract carries both: the
+**invariant test** (holds under any approach → a stays-true entry that
+names it and points to the requirement or scenario carrying it, stated
+outright only for a non-behavioral invariant; holds only under the chosen
+approach → the design) and
+the **information test** (needed again the next time the behavior changes
+→ the specification; needed only for this change → the design).
+Acceptance is two checkable lists — becomes true, stays true — that point
+to the scenarios for behavior and never restate them. The framework skill
+maps the roles onto its tool's files; the deposited contract names the
+project's files.
+
+The pre-authorized-actions line is part of the outcome artifact: the
+branch the change pushes and the outward writes it allows, within what the
+authority policy permits. An action the record does not name is queued
+when the implementation reaches it; the actions the contract itself
+prescribes for the loop (pushing the branch, opening the draft, replying
+to threads, marking ready, the freeze) need no line.
+
+## A specification-ruled surface
+
+When the specification is the source of truth for something a machine
+reads — an artifact's option metadata, a schema, a command surface, a
+configuration shape — the contract's source-of-truth table names that
+surface and the check that compares it to the specification: part of the
+project's local check command and its CI, failing with the surface and the
+requirement that differ, written as the project's own management code.
+Where the specification describes behavior only, no such check exists,
+and the contract says so.
+
 ## The two gates
 
 A change passes two deliberations, and each one has its own mode:
@@ -84,7 +127,18 @@ the mark to one version. Where a platform offers no such pair, a
 fixed-wording comment covering the record as of the last push before it
 does the same job less cleanly. Name the property the mechanism must
 provide (durable, attributable, bound to one version), check the target
-platform offers it, then choose the mechanism.
+platform offers it, then offer the implementations with their costs and
+choose with the user:
+
+| Implementation | Provides | Costs |
+|---|---|---|
+| The platform's review approval, dismissed on new commits | durable, attributable, bound to one version by the platform | nothing the project owns; taken again after every push |
+| A label the automation keeps: recomputed from the package by rule, withdrawn when the package's digest changes or a run crashes, readable locally by one command | durable and bound to one version by the withdrawal; attributable only to the automation (the approver is the account that added the label, recorded in the request's events), plus a local readback and a state the list view shows | a workflow and a script the project owns; forgeable by any account with write access, which the contract records as an accepted risk |
+| An approval artifact bound to the package digest, the approving actor, and the head commit | the strongest evidence of who accepted what | more code than the others; an expiry that forces re-approval on a slow request; no local readback without the artifact |
+
+Keep the conversational closing as the default wherever everyone who
+needs the decision is in the conversation; a mechanism nobody outside it
+reads is pure cost.
 
 Recommend from who reads the record, never from team size or pipeline
 maturity. A conversational closing is legible only to the people in the

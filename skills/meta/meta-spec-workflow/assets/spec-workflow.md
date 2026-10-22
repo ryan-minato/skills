@@ -46,6 +46,30 @@ ready, and after archiving; a red check is a red check.
 | `<archive location>` | completed change records | the archive step only |
 | `<codebase map location>` | as-built description of untouched code, with the commit it was mapped at | re-mapped when the drift gate fires |
 
+## Artifact roles
+
+Each artifact of a change record owns one role; nothing is restated in
+another.
+
+| Artifact | Owns | Never holds |
+|---|---|---|
+| `<proposal-like artifact>` | why, the goal, what changes, how completion is judged, what is not done, what is delivered, which irreversible actions are pre-authorized (the branch pushed, outward writes allowed — within `.agents/knowledge/agent-authority.md`; any other outward action outside the loop's own steps on this request, a comment or <an issue | a work item> included, is queued as a pending decision for <the approval owner>), and `## Acceptance` | the contract, the approach, steps |
+| `<specification artifact>` | requirements and scenarios | implementation choices |
+| `<design artifact>` | the approach, its constraints and preferences, rejected alternatives, information needed only for this change | the goal or acceptance, steps |
+| `<task list>` | steps with their verification, written after the package gate closes | acceptance; anything the gate must see |
+
+- `## Acceptance` holds two checkable lists: **Becomes true** (the end
+  state) and **Stays true** (what must not change); for behavior it points
+  to the scenarios and never restates them.
+- Invariant test: a rule that would still hold under any other approach
+  belongs in Stays true as an entry pointing to the requirement or scenario
+  that carries it (a non-behavioral invariant — a size or a dependency
+  rule — is stated outright); one that holds only because of the chosen
+  approach belongs in the design.
+- Information test: information needed again the next time the behavior
+  changes goes to the specification; information needed only for this
+  change goes to the design.
+
 ## Source of truth
 
 | Fact | Rules | Points to it |
@@ -53,8 +77,9 @@ ready, and after archiving; a red check is a red check.
 | Project goals | `<goal document>` | principles file, this contract |
 | Engineering principles | `<principles file>` | agent entrypoint |
 | Behavior of a domain | `<source-of-truth spec>` | knowledge base, <issues | work items> |
-| Acceptance of a change | the scenarios in `<change record>/…` | <pull requests | merge requests>, <issues | work items> |
+| Acceptance of a change | the `## Acceptance` lists of `<change record>/<proposal-like artifact>`, pointing to the scenarios in `<change record>/…` | <pull requests | merge requests>, <issues | work items> |
 | Conventions and mechanics | the knowledge base | specifications never restate them |
+| <A machine-readable surface the specification rules, e.g. option metadata, a schema; when none, replace this row with one stating that no machine-readable surface is derived from the specifications> | `<source-of-truth spec>` | `<the surface's file>`, kept equal by `<comparison check>` in `<local check command>` and CI |
 
 A file listed under "Points to it" may summarize in one line and must link;
 it never restates the fact.
@@ -197,7 +222,9 @@ and the token variables>; <nothing else | "pipelines must succeed">.
 
 ## Specifications and <issues | work items>
 
-- A specification owns what is built, why, and its acceptance scenarios.
+- A change record owns what is built, why, and its acceptance: the
+  proposal-like artifact the why and the acceptance lists, the
+  specification the scenarios they point to.
 - An <issue | work item> is opened when the requirement appears, carrying
   the raw requirement, owner, and priority and no acceptance criteria; it
   links the change record once that record exists. It owns who does it,
@@ -210,7 +237,10 @@ and the token variables>; <nothing else | "pipelines must succeed">.
   the goal, a section stating the value, the specification block (`Spec:`
   linking the record on the branch, `Phase:` specification or
   implementation, one link per file of the approval package with the task
-  list marked as after-approval, `Approval:` in the mode above), related work with the closing reference (<a split-shape
+  list marked as after-approval, `Approval:` in the mode above, and the
+  pre-authorized actions line of the proposal-like artifact — the branch
+  pushed and nothing else outward unless named; the loop's own steps on
+  this <pull request | merge request> need no line), related work with the closing reference (<a split-shape
   specification <pull request | merge request> references the <issue |
   work item> with <`Refs #N` | a bare `#N`> and never closes it; the last
   implementation request does | delete under the combined shape>), and
@@ -255,3 +285,6 @@ commit with the current one and re-map when they differ.
 - A gate's mode changes, or a recorded approval is added to or dropped
   from one.
 - The rule for when a design is warranted changes.
+- <The condition a bootstrap-time exception waited for — the protection
+  rule, the first merged check — is confirmed active or found missing:
+  drop the exception recorded in <the issue | the work item>; delete when none.>

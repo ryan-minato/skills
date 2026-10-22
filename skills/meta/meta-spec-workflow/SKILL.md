@@ -40,7 +40,7 @@ Both must survive this builder and this conversation.
 - The contract records specification discipline only: level, tool, artifact
   map, source of truth per fact, lifecycle, approval gate, and the division
   of labor with tracked work. It adds no management semantic — a
-  specification is the content of a change request's acceptance, never a
+  specification is what a change request's acceptance lists point to, never a
   new work-item kind, objective, or timebox — and it never reopens a
   decision the workflow contract already settled.
 - The design is tool-neutral and platform-neutral; the deposit is not.
@@ -119,6 +119,10 @@ starts at step 7 after this inspection. Sort everything into known facts
 with evidence, unknown facts still discoverable, and decisions only a
 human can make.
 
+Record also any machine-readable surface the specifications rule
+(option metadata, a schema, a command surface) and whatever check keeps it
+equal to them today.
+
 Done when: the script's summary is recorded; every existing spec artifact,
 every requirement-bearing document, every entrypoint pointer, and every
 behavior statement in the entrypoint or knowledge base is listed with its
@@ -133,7 +137,11 @@ recommendation:
 1. **Level** — spec-first (spec used to build, then archived),
    spec-anchored (spec kept as the living description; default for anything
    maintained past one release), or spec-as-source (only when the user names
-   it and the toolchain regenerates code).
+   it and the toolchain regenerates code). Separately from the level: where
+   the specification rules a machine-readable surface (option metadata, a
+   schema, a command surface, a configuration shape), record that surface
+   and the comparison check that keeps it equal to the specification; offer
+   no such check where the specification describes behavior only.
 2. **Approach** — one default by situation, the rest as deviations: no code
    yet and an application delivered feature by feature → the spec-first kit
    (GitHub Spec-Kit); no code yet and a library, framework, or
@@ -169,11 +177,21 @@ recommendation:
    named version, never from team size or pipeline maturity. Both modes
    are defined in
    [contract-design.md](references/contract-design.md), read before this
-   round. Record the owner, the mode of each gate, and the design rule;
-   the authority builder attaches its levels to these gates later.
-4. **Division of labor** — confirm the default: specifications own what,
-   why, and acceptance; tracked work owns who, when, and status and links
-   the specification. Any deviation is recorded with its reason.
+   round; when the answer is a recorded approval, offer the
+   implementations it lists with their costs rather than one mechanism.
+   Record the owner, the mode of each gate, and the design rule; the
+   authority builder attaches its levels to these gates later. Settle
+   here too where the record names the irreversible or outward actions a
+   change pre-authorizes (the branch it pushes, whether comments or
+   requests may be opened), pointing to the authority policy for the
+   actions it governs.
+4. **Division of labor** — confirm the default: the change record owns
+   what, why, and acceptance (its outcome artifact the why and the
+   acceptance lists, its specification the scenarios); tracked work owns
+   who, when, and status and links the record. Then settle the artifact
+   roles inside the record with the two placement tests and the two-list
+   acceptance shape as [contract-design.md](references/contract-design.md)
+   states them. Any deviation is recorded with its reason.
 5. **Change request shape** — combined (one change request carries the
    change record from the moment it is committed, opened as a draft, and
    the approval gate is exercised on that draft before implementation) or
