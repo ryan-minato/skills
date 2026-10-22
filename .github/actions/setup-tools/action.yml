@@ -1,0 +1,55 @@
+# Installs the repository's development tools at their latest releases, as
+# the dev container does: Deno always; just, the Python tools (pre-commit,
+# ruff), and OpenTofu only when the calling job asks. A job holding a write
+# permission asks for nothing beyond Deno; scripts/validate_harness.ts (the
+# `workflows` check) fails a privileged job that passes any input here.
+# Use it after actions/checkout: `opentofu` runs `just install-opentofu`
+# from the checked-out justfile and therefore needs `just: "true"` too.
+name: setup-tools
+description: Install the latest Deno, and on request the latest just, pre-commit and ruff, and OpenTofu.
+
+inputs:
+  just:
+    description: Install just (`pipx install rust-just`).
+    required: false
+    default: "false"
+  python-tools:
+    description: Install pre-commit and ruff (`pipx install`).
+    required: false
+    default: "false"
+  opentofu:
+    description: Install OpenTofu with `just install-opentofu` (needs `just` set to "true" and a checkout).
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+      with:
+        deno-version: vx.x.x
+    - name: Install just
+      if: inputs.just == 'true'
+      shell: bash
+      run: pipx install rust-just
+    - name: Install pre-commit and ruff
+      if: inputs.python-tools == 'true'
+      shell: bash
+      run: |
+        set -euo pipefail
+        pipx install pre-commit
+        pipx install ruff
+    - name: Install OpenTofu
+      if: inputs.opentofu == 'true'
+      shell: bash
+      env:
+        JUST: ${{ inputs.just }}
+        # Raises the GitHub API rate limit for the latest-release lookup.
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        if [ "$JUST" != "true" ]; then
+          echo "setup-tools: opentofu installs through 'just install-opentofu'; set just: \"true\" as well." >&2
+          exit 1
+        fi
+        just install-opentofu

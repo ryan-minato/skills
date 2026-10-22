@@ -19,23 +19,24 @@ artifacts:
       - **Skills touched**: one line per public skill, as
         `<catalog>/<skill-name>`, marked *new* (no main spec exists yet) or
         *modified* (a main spec exists under `openspec/specs/<path>/`). Each
-        line becomes a delta spec at `specs/<path>/spec.md`. Never list a
-        skill the change does not touch: specs are never backfilled. A change
-        to the repository itself - its environment, harness, tooling, checks,
-        workflows, or documentation - is a repository change: it sets
-        `skip_specs: true` in its `.openspec.yaml`, lists nothing here, and
+        line becomes a delta spec at `specs/<path>/spec.md`. List only the
+        skills the change touches. A repository change
+        (`.agents/knowledge/spec-workflow.md`, Domains) lists nothing here and
         states "repository change" instead.
       - **Installed behavior**: how an agent that loads the skill from a user's
-        project behaves differently after the change - this decides the
-        commit type: `fix` corrects wrong, misleading, or wrongly restrictive
-        or permissive behavior; `feat` adds a capability; `refactor` changes
-        no behavior. Correction beats improvement. For a repository change,
-        state what agents working in this repository do differently.
+        project behaves differently after the change; it decides the commit
+        type (`AGENTS.md`, Commits). For a repository change, state what
+        agents working in this repository do differently.
       - **Impact**: which of the synchronized surfaces move with the change -
         the catalog `README.md` and `README.zh.md` rows, the `.agents/skills/`
         symlink, `marketplace.json`, the catalog `CONTEXT.md`, mirrored files
-        listed in `scripts/validate_harness.py`, and any project harness file.
+        listed in `scripts/validate_harness.ts`, and any project harness file.
       - **Non-goals**: what stays as it is, so review does not argue about it.
+      - **Deliverable and pre-authorized actions**: what the change delivers
+        (the pull request, a report, the pending decisions handed over) and
+        the branch it pushes plus any other outward write it needs. An
+        action not named here is queued as a pending decision
+        (`.agents/knowledge/agent-authority.md`, Pending decisions).
       - **Tracked work**: the GitHub issue it serves, or "no issue".
     requires: []
 
@@ -107,16 +108,17 @@ artifacts:
       Create the design: the bounds the implementation works inside — where
       the requirements land in the skill (or a repository change in the
       harness), the decisions with their rejected alternatives, the risks,
-      and how the result will be verified. It is part of the approval
-      package: the maintainer reviews it on the draft together with the
-      proposal and the delta specs, so it is written before the draft opens
-      and never lists implementation steps or tasks (those are tasks.md,
-      written after the closing). It is committed and published: no secret,
-      credential, internal hostname, or private datum. Required for every
-      change that touches a skill's description, adds or moves a reference,
-      asset, or script, changes a dependency or handoff, touches a mirrored
-      file, or is a repository change; optional only for a wording change
-      inside one existing section.
+      and how the result will be verified. It belongs to the approval
+      package the maintainer reviews on the draft
+      (`.agents/knowledge/spec-workflow.md`, Lifecycle), so it states bounds
+      and never implementation steps or tasks; those are tasks.md. It is
+      committed and published: no secret, credential, internal hostname, or
+      private datum.
+
+      Required WHEN the change touches a skill's description, adds or moves
+      a reference, asset, or script, changes a dependency or handoff,
+      touches a mirrored file, or is a repository change. Optional only
+      WHEN the change is a wording change inside one existing section.
 
       Sections:
       - **Context**: the current shape of the skill or harness and the
@@ -211,7 +213,6 @@ apply:
   tracks: tasks.md
   instruction: |
     Work task by task from tasks.md on the change's branch, committing each
-    independently valid group under the repository's commit rules. Mark a
-    task done only when its verification ran. When the implementation must
-    deviate from a spec, stop, revise the change, and get it re-approved
-    before continuing.
+    independently valid group under the repository's commit rules. Tick
+    tasks and handle a deviation from a spec as
+    .agents/knowledge/spec-workflow.md (Lifecycle) says.

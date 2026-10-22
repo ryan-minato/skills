@@ -21,8 +21,7 @@ compatibility, and rollback is `git revert` on `main`.
 
 - Model: GitHub Flow. `main` is the only long-lived branch; it must stay
   installable at every commit. No release branches, environment branches,
-  version tags, or releases exist (`backup-*` tags are historical and
-  unused).
+  version tags, or releases exist.
 - Short-lived branch name: `<type>/<slug>`, or `<type>/<issue>-<slug>`
   when an issue exists. `<type>` is the dominant Conventional Commit type
   of the change. The slug is also the OpenSpec change name: branch
@@ -41,30 +40,37 @@ compatibility, and rollback is `git revert` on `main`.
 |---|---|---|
 | Changes reach `main` only through a pull request | enforced | ruleset `Default` |
 | Force pushes and deletion of `main` are blocked | enforced | ruleset `Default` |
-| Required checks pass before merge | enforced | ruleset `Default`, see `.agents/knowledge/github-checks.md` |
+| Required checks pass before merge | enforced | ruleset `Default`; `.agents/knowledge/github-checks.md` |
 | Review threads resolved before merge | enforced | ruleset `Default` |
+| No local commit on `main` | enforced locally | the `no-commit-to-branch` pre-commit hook |
 | Rebase for in-repo branches, squash for forks | convention | maintainer at merge time; both methods enabled |
-| Branch naming | convention | the `change-workflow` project skill |
+| Branch naming | convention | review; the `change-workflow` project skill applies it |
 
-The live state of every enforced rule is recorded in
+The declared state of every enforced rule is in
 `.agents/knowledge/github-settings.md`.
 
 ## Objects in use
 
-| Object | Meaning here | What is lost without it |
-|---|---|---|
-| Issue | Work that needs its own priority, owner, discussion, or acceptance lifecycle. A small self-contained change needs no issue; its pull request explains it. | Work loses its context and priority before implementation. |
-| Pull request | Every change to `main`; one per branch. A draft is work in progress, never a placeholder for planned work. | No durable boundary around review evidence and the exact change set. |
-| Acceptance | The scenarios of the linked OpenSpec change pass, `just check` and the required checks are green, and the maintainer decides to merge. | Green automation gets mistaken for product acceptance. |
-| `bug` / `enhancement` / `task` labels | The type axis, applied by the issue forms. A bug's acceptance baseline is the current spec; a task's is the linked change's scenarios. | Intake cannot route to the right form or baseline. |
-| `priority/critical` … `priority/low` | Exactly one per issue; orders the open list. | Urgent work is indistinguishable from the queue. |
-| `catalog/<name>` and `catalog/repository` | The area axis: which catalog a change touches, or the repository harness itself. Every applicable one. | Changes spanning the library cannot be filtered or routed. |
-| `status/needs-triage` | Applied by every form; removed by automation once a type label and exactly one priority label exist. | New issues sit indistinguishable from triaged ones. |
-| `status/blocked` | Applied by a human when an issue cannot proceed; the body says on what. | Blocked work looks abandoned. |
-| `spec/archived` / `spec/unarchived`, `spec/not-started` / `spec/in-progress` / `spec/done` | Two axes the `spec / labels` workflow derives from the pull request's related OpenSpec changes; never set by hand; absent on a pull request with no related change. | A reviewer cannot see from the list whether a pull request is archived or how far its tasks are. |
-| Milestone + `goal` tracking issue | A theme spanning several pull requests (for example the spec-driven-development series). The maintainer creates or confirms both. The tracking issue carries vision, non-goals, the specs whose scenarios define completion (linked, not restated), and its sub-issues; the milestone is only the date bucket. Close milestones, never delete them. | Multi-PR themes have no completion criterion and no progress view. |
-| Sub-issues | One level only, under a tracking issue. | Theme progress cannot be counted. |
-| Actions checks | Deterministic enforcement of structure, safety, and pull-request policy. | Mechanical review drifts between contributors and agents. |
+| Object | Meaning here |
+|---|---|
+| Issue | Work that needs its own priority, owner, discussion, or acceptance lifecycle; a small change needs none. |
+| Pull request | Every change to `main`; one per branch. A draft is work in progress, never a placeholder for planned work. |
+| Acceptance | The linked change's scenarios pass, `just check` and the required checks are green, the maintainer merges. |
+| `bug` / `enhancement` / `task` | The type axis, applied by the issue forms. A bug's baseline is the current spec; a task's is its change. |
+| `priority/critical` … `priority/low` | Exactly one per issue; orders the open list. |
+| `catalog/<name>`, `catalog/repository` | The area axis: every catalog a change touches, or the repository harness itself. |
+| `status/needs-triage` | Applied by every form; removed by automation once a type label and exactly one priority label exist. |
+| `status/blocked` | Applied by a person when an issue cannot proceed; the body says on what. |
+| `spec/pending` / `spec/approved` / `spec/archived` | The one spec state of a pull request, kept by `spec / labels` (`spec-workflow.md` `## Approval gates`). |
+| Milestone + `goal` tracking issue | A theme spanning several pull requests; see below. |
+| Sub-issues | One level only, under a tracking issue. |
+| Actions checks | Deterministic enforcement of structure, safety, and pull-request policy. |
+
+A milestone and its `goal` tracking issue are created or confirmed by the
+maintainer. The tracking issue carries the vision, the non-goals, the
+specs whose scenarios define completion (linked, not restated), and its
+sub-issues; the milestone is only the date bucket. Milestones are closed,
+never deleted.
 
 Deliberately not used, with the trigger that would reopen the decision:
 
@@ -75,7 +81,7 @@ Deliberately not used, with the trigger that would reopen the decision:
 | Releases, version tags, `release.yml` | Consumers start depending on named versions instead of `main`. |
 | Severity labels | An operational incident stream appears. |
 | Decision records, CODEOWNERS | A second maintainer joins. |
-| A "retired labels" mechanism | Never: a label that no longer applies is deleted once, with authorization, after listing the issues that carry it. |
+| A "retired labels" mechanism | Never: a label that no longer applies is deleted once, with authorization, after listing its issues. |
 
 ## Decomposition
 

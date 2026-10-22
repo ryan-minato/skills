@@ -23,6 +23,10 @@
 
 <!-- What stays as it is. -->
 
+## Deliverable and pre-authorized actions
+
+<!-- What the change delivers and the branch it pushes; other outward writes it needs. Anything not named here is queued as a pending decision. -->
+
 ## Tracked work
 
 <!-- The GitHub issue this serves, or "no issue". -->

@@ -1,9 +1,10 @@
-# Ruff configuration for repository scripts, skill-bundled scripts, and the
-# script assets the meta and sdd skills deposit into targets.
+# Ruff configuration for the Python the public skills ship: each skill's
+# scripts/ and the script assets the meta and sdd skills deposit into targets.
+# The repository's own management code is TypeScript, checked by Deno.
 # The explicit `select` keeps local and pre-commit runs on one rule set; the
-# line length matches .editorconfig. BLE001 and S110 hold management code to
+# line length matches .editorconfig. BLE001 and S110 hold the script assets to
 # the rule that no handler hides a failure (.agents/knowledge/skill-quality.md,
-# Management code); a justified exception carries `# noqa: <rule>` and its
+# Script assets); a justified exception carries `# noqa: <rule>` and its
 # reason. SIM105 is off there because it rewrites a flagged handler into
 # `contextlib.suppress`, which neither rule sees. Skills' own scripts/
 # follow the Scripts rules instead.

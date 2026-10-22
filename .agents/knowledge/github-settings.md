@@ -1,65 +1,82 @@
-# GitHub Settings Register
+# GitHub Settings
 
-Read this before changing any repository setting, ruleset, security
-feature, Actions policy, Discussions, or label on `ryan-minato/skills`.
-Every row is account-side state no checkout can prove; changing one is a
-human-approved remote write, executed then read back and recorded here.
+Read this before changing or reading back any repository setting, ruleset,
+security feature, Actions policy, Discussions, or label on
+`ryan-minato/skills`. Every row is account-side state no checkout can
+prove; this file declares the intended value of each.
 
-Repository: `ryan-minato/skills` · owner type: personal account (no issue
-types, no issue fields) · visibility: public · plan: free features suffice
-(rulesets, scanners, Discussions are free on public repositories).
+Repository: `ryan-minato/skills` · personal account (no issue types, no
+issue fields) · public · free plan (rulesets, scanners, and Discussions
+are free on public repositories).
 
-| Concern | Intended state | Tier | Verify | Update trigger |
+## Declared settings
+
+`R` stands for `repos/ryan-minato/skills`. Each row is read with
+`gh api <path> --jq '<field>'`, read-only (`\|` in a field is the table's
+escape for `|`). "Current" is the readback of the date in
+`## Applying and reading back`.
+
+| Setting | Current | Intended | Path | Field |
 |---|---|---|---|---|
-| Default branch | `main` | enforced | `gh api repos/ryan-minato/skills --jq .default_branch` | never expected |
-| Merge methods | rebase and squash allowed; merge commits disabled | enforced | `gh api repos/ryan-minato/skills --jq '{allow_rebase_merge,allow_squash_merge,allow_merge_commit}'` | merge policy in `github-workflow.md` changes |
-| Delete branch on merge | enabled | enforced | `gh api repos/ryan-minato/skills --jq .delete_branch_on_merge` | branch policy changes |
-| Description | "Agent Skills library: install with npx skills add ryan-minato/skills" | convention | `gh repo view --json description` | purpose changes |
-| Ruleset `Default` (id 19602018) | targets `main`; pull request required; deletion and force push blocked; required checks `checks / gate`, `pr / policy`, `scan-secrets` (strict); review threads must be resolved; 0 required approvals; extra approval for unattributed changes off; allowed merge methods squash and rebase | enforced | `gh api repos/ryan-minato/skills/rulesets/19602018` | a check is renamed; approval policy changes |
-| Ruleset bypass actors | none: nothing pushes to `main` outside a pull request, and no workflow pushes anywhere — every installed job runs with `contents: read`, so no identity needs a bypass. Live state: none (the 2026-09-10 attempt to add the Actions app was refused by the REST API on this user-owned repository and is no longer wanted) | enforced | same readback (`bypass_actors`) | anything is ever granted a bypass; a workflow is ever given `contents: write`; a second maintainer joins |
-| Required approvals | 0 — a solo maintainer cannot approve their own pull request; the integration gate in `agent-authority.md` is the human decision | convention | same readback | a second maintainer joins |
-| Legacy branch protection | none | enforced | `gh api repos/ryan-minato/skills/branches/main/protection` (404 = none) | ruleset edits |
-| Actions | enabled; all actions allowed by policy, but every workflow pins by commit SHA and the only third-party action is TruffleHog | enforced where GitHub can | `gh api repos/ryan-minato/skills/actions/permissions` | a new action is added |
-| Secret scanning | enabled | enforced | `gh api repos/ryan-minato/skills --jq .security_and_analysis.secret_scanning` | visibility change |
-| Push protection | enabled | enforced | `gh api repos/ryan-minato/skills --jq .security_and_analysis.secret_scanning_push_protection` | visibility change |
-| Code scanning | CodeQL default setup, Python and Actions; advisory (not a required check); alerts triaged by the maintainer | advisory | `gh api repos/ryan-minato/skills/code-scanning/default-setup` | a language is added |
-| Dependabot | version updates for `github-actions` and `devcontainers`, weekly (`.github/dependabot.yml`); alerts enabled | enforced | repository security settings | a manifest is added |
-| Discussions | enabled, with Q&A and Ideas categories; the target of `ISSUE_TEMPLATE/config.yml` | enforced | `gh repo view --json hasDiscussionsEnabled` | intake routing changes |
-| Projects, Wiki | disabled (unused) | convention | `gh repo view --json hasProjectsEnabled,hasWikiEnabled` | a "not used" trigger in `github-workflow.md` fires |
-| Labels | exactly `.github/labels.json`; applied by the `labels / sync` workflow when the file changes on `main` and weekly (`.agents/knowledge/github-checks.md`), which creates and corrects but never deletes; the manual fallback is `python3 scripts/sync_labels.py --file .github/labels.json --repo ryan-minato/skills` (dry run, then `--apply`); `--prune` only after listing the issues that carry the label and with explicit authorization | enforced | `gh label list`; the latest `labels / sync` run summary lists prune candidates | a `labels / sync` run warns about a prune candidate or fails |
-| Milestones | created or confirmed by the maintainer only; closed, never deleted | convention | `gh api repos/ryan-minato/skills/milestones` | — |
-| Private vulnerability reporting | enabled; `SECURITY.md` points at it | enforced | repository security settings | — |
-| Secrets and variables | none; every workflow uses `GITHUB_TOKEN` with job-level permissions | enforced | `gh secret list` | a workflow needs a credential (a maintainer decision) |
+| Default branch | `main` | `main` | `R` | `.default_branch` |
+| Merge methods | rebase and squash on; merge commits off | same | `R` | `{allow_rebase_merge,allow_squash_merge,allow_merge_commit}` |
+| Auto-merge | off | off | `R` | `.allow_auto_merge` |
+| Delete branch on merge | on | on | `R` | `.delete_branch_on_merge` |
+| Description | "Agent Skills library: install with npx skills add ryan-minato/skills" | same | `R` | `.description` |
+| Discussions | on, with Q&A and Ideas (the target of `ISSUE_TEMPLATE/config.yml`) | on | `R` | `.has_discussions` |
+| Projects, Wiki | off | off | `R` | `{has_projects,has_wiki}` |
+| Ruleset `Default` | id 19602018, active, targets the default branch | same | `R/rulesets/19602018` | `{enforcement,conditions}` |
+| Ruleset rules | deletion and non-fast-forward blocked; pull request required | same | `R/rulesets/19602018` | `[.rules[].type]` |
+| Required checks | `checks / gate`, `pr / policy`, `scan-secrets`; strict | the same and `checks / archived` | `R/rulesets/19602018` | `.rules[]\|select(.type=="required_status_checks").parameters` |
+| Pull request rule | 0 approvals; threads resolved; merge methods squash, rebase | same | `R/rulesets/19602018` | `.rules[]\|select(.type=="pull_request").parameters` |
+| Ruleset bypass | none | none | `R/rulesets/19602018` | `.bypass_actors` |
+| Legacy branch protection | none (HTTP 404) | none | `R/branches/main/protection` | HTTP 404 means none |
+| Actions allowed | all | GitHub-owned plus the allowlist below | `R/actions/permissions` | `.allowed_actions` |
+| Actions allowlist | none (all allowed) | `denoland/setup-deno@*`, `trufflesecurity/trufflehog@*`, `devcontainers/ci@*` | `R/actions/permissions/selected-actions` | `.patterns_allowed` |
+| Full-length SHA pinning | not required | required | `R/actions/permissions` | `.sha_pinning_required` |
+| Default workflow permissions | read; Actions cannot approve reviews | same | `R/actions/permissions/workflow` | `.` |
+| Secret scanning | on | on | `R` | `.security_and_analysis.secret_scanning.status` |
+| Push protection | on | on | `R` | `.security_and_analysis.secret_scanning_push_protection.status` |
+| Dependabot alerts | on | on | `R/vulnerability-alerts` | HTTP 204 means on, 404 off |
+| Dependabot security updates | on | on | `R` | `.security_and_analysis.dependabot_security_updates.status` |
+| Private vulnerability reporting | off | on (`.github/SECURITY.md` points at it) | `R/private-vulnerability-reporting` | `.enabled` |
+| Code scanning | CodeQL default setup, `actions` and `python`; advisory | same | `R/code-scanning/default-setup` | `{state,languages}` |
+| Labels | exactly `.github/labels.json` | exactly `.github/labels.json`, applied by `labels / sync` | `R/labels?per_page=100` | `[.[].name]` |
+| Actions secrets | none; workflows use `GITHUB_TOKEN` | none | `R/actions/secrets` | `.total_count` |
 
-## Ownership and security
+- The allowlist is every third-party action a workflow or
+  `.github/actions/*/action.yml` uses; `actions/*` and `github/*` are
+  GitHub-owned. A new third-party action adds its row value here in the
+  change that adds the `uses:` line.
+- 0 required approvals: a solo maintainer cannot approve their own pull
+  request; the integration gate in `.agents/knowledge/agent-authority.md`
+  is the human decision.
+- No bypass actor: no workflow pushes anywhere, so no identity needs one.
+- Scanner alerts (secret scanning, CodeQL, Dependabot) and private
+  vulnerability reports are triaged by the maintainer; a false positive is
+  dismissed with a reason on the alert.
 
-- Vulnerability intake: private vulnerability reporting; triage owner the
-  maintainer; acknowledgement within seven days (`.github/SECURITY.md`).
-- Scanner alerts (secret scanning, CodeQL, Dependabot): the maintainer
-  reviews them when they arrive; a false positive is dismissed with a
-  reason on the alert.
-- No CODEOWNERS and no required reviewer: solo maintainer. Trigger: a
-  second maintainer joins.
-- No releases: consumers install from `main`. Trigger: consumers depend on
-  named versions.
+## Applying and reading back
 
-## Last verification
+- An agent never writes a setting (`.agents/knowledge/agent-authority.md`).
+  The maintainer applies every row whose Current differs from Intended,
+  after the change that declared it is archived.
+- The agent then reads back every row with its command and records one
+  dated result — which rows match, which differ — in that change's pull
+  request description, since a commit after the archive would spend the
+  approval. The next change copies the result into the Current column
+  and the line below.
+- The periodic review reads back every row too
+  (`.agents/knowledge/harness-maintenance.md` `## Periodic entropy review`).
 
-2026-09-10, after the authorized ruleset write, read back with
-`gh api repos/ryan-minato/skills/rulesets/19602018`: required status
-checks exactly `checks / gate`, `pr / policy`, `scan-secrets`
-(`strict_required_status_checks_policy: true`);
-`required_review_thread_resolution: true`;
-`allowed_merge_methods: ["squash", "rebase"]`;
-`require_extra_approval_for_unattributed_changes: false`;
-`required_approving_review_count: 0`; deletion and non-fast-forward rules
-present; `bypass_actors: []` (see the bypass row for the refused write);
-`gh api repos/ryan-minato/skills/branches/main/protection` → 404, no
-legacy protection. Blocking observed on pull request #80:
-`mergeStateStatus` `BLOCKED` right after opening, `CLEAN` once the three
-required checks passed. The other rows were last read back on 2026-09-03,
-after the authorized writes of the harness rebuild: description set;
-Discussions on (default categories including Q&A and Ideas); Projects and
-Wiki off; merge commits off, rebase and squash on; delete branch on merge
-on; labels exactly `.github/labels.json`; secret scanning, push
-protection, and CodeQL default setup on.
+Last readback: 2026-10-20, before ready of `repo-harness-alignment`.
+Differ: Actions allowed, Actions allowlist, full-length SHA pinning,
+private vulnerability reporting. Every other row matches.
+
+## Update this file when
+
+- A setting, the ruleset, or a security feature is intended to change: the
+  row changes in the same pull request as the reason for it.
+- A required check is renamed (`.agents/knowledge/github-checks.md`).
+- A workflow adds or drops a third-party action.
+- A readback differs from the declaration.

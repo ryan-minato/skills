@@ -6,15 +6,15 @@ repos:
       # Runs first, on `git commit` only: needs staged content and the
       # author email. `just check` and CI skip it with SKIP=commit-safety.
       - id: commit-safety
-        name: staged-change safety gate (author email, credentials, layers)
-        entry: python3 scripts/check_commit_safety.py
+        name: staged-change safety gate (author email, credentials, personal emails)
+        entry: scripts/check_commit_safety.ts
         language: system
         pass_filenames: false
         always_run: true
         stages: [pre-commit]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -25,6 +25,8 @@ repos:
         args: ['--maxkb=2000']
       - id: mixed-line-ending
         args: [ "--fix=auto" ]
+      - id: no-commit-to-branch
+        args: ['--branch', 'main']
 
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
@@ -34,31 +36,39 @@ repos:
         args: ['--baseline', '.secrets.baseline']
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.24.2
+    rev: v8.30.1
     hooks:
       - id: gitleaks
         name: secret and PII scanning with gitleaks (.gitleaks.toml)
         args: ['--config', '.gitleaks.toml']
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.4
+  # The installed ruff (latest, as in `just lint` and CI), not a pinned copy.
+  - repo: local
     hooks:
       - id: ruff-check
-        files: ^(scripts|skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
+        name: ruff check
+        entry: ruff check --force-exclude
+        language: system
+        types_or: [python, pyi]
+        files: ^(skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
       - id: ruff-format
-        files: ^(scripts|skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
+        name: ruff format
+        entry: ruff format --force-exclude
+        language: system
+        types_or: [python, pyi]
+        files: ^(skills/[^/]+/[^/]+/scripts|skills/(meta|sdd)/[^/]+/assets)/.*\.py$
 
   - repo: local
     hooks:
       - id: validate-skills
         name: validate skill layout and harness consistency
-        entry: python3 scripts/validate_skills.py
+        entry: scripts/validate_skills.ts
         language: system
         pass_filenames: false
         always_run: true
       - id: validate-harness
         name: validate harness synchronization
-        entry: python3 scripts/validate_harness.py
+        entry: scripts/validate_harness.ts
         language: system
         pass_filenames: false
         always_run: true

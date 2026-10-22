@@ -2,7 +2,7 @@
 # executed by an agent. Acceptance is either executable criteria or a link
 # to the change's scenarios, never both (.agents/knowledge/spec-workflow.md).
 # Labels must exist in .github/labels.json (checked by
-# scripts/validate_harness.py).
+# scripts/validate_harness.ts).
 name: Task
 description: Planned work with an agreed outcome, usually one task of an OpenSpec change.
 title: "[Task]: "

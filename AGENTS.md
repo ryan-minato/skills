@@ -12,33 +12,24 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
 
 ## Repository Map
 
-- `skills/<catalog>/<skill-name>/` — public, distributable skills; each
-  catalog has `README.md`, `README.zh.md`, and `CONTEXT.md` (catalog rules).
-- `.agents/skills/` — project-only skills (`change-workflow`,
-  `skill-authoring`, `code-review`), the OpenSpec-generated `openspec-*`
-  skills, and symlinks to every public skill. `.claude/skills` and
-  `.github/skills` are symlinks to it.
+- `skills/<catalog>/<skill-name>/` — public skills; each catalog has
+  `README.md`, `README.zh.md`, and `CONTEXT.md` (catalog rules).
+- `.agents/skills/` — project skills (`change-workflow`, `skill-authoring`,
+  `code-review`), the generated `openspec-*` skills, and symlinks to every
+  public skill; `.claude/skills` and `.github/skills` link to it.
 - `.agents/knowledge/` — the knowledge base; every file is listed below.
-- `openspec/` — specifications: `openspec/specs/<catalog>/<skill>/` is the
-  source of truth for what public skills do, `openspec/changes/` holds
-  changes in flight, `openspec/schemas/skill-change/` is the project schema
-  that shapes their artifacts.
-- `.github/` — issue forms, PR template, workflows, labels, health files.
-- `scripts/` — repository tooling; `justfile` — the canonical commands.
-- `ARCHITECTURE.md` — how the mechanisms fit together (symlinks,
-  marketplace, validators) and the as-built map of everything no spec covers.
+- `openspec/` — `openspec/specs/` (what public skills do), `openspec/changes/`, the project schema.
+- `.github/` — issue forms, PR template, workflows, actions, labels;
+  `scripts/` — management scripts in Deno; `justfile` — the commands.
+- `ARCHITECTURE.md` — the mechanisms and the as-built map.
 
 ## Always
 
-- **Language**: harness files, skills, code, and comments are English. Every
-  `README.md` has a content-identical `README.zh.md` beside it.
-- **Skill self-containment**: a public skill references nothing outside its
-  directory and depends only on `core` skills unless its catalog's
-  `CONTEXT.md` grants more; every handoff routes through the
-  `ryan-minato-skills-installing` skill, never an install command. The full
-  bar: `.agents/knowledge/skill-quality.md`.
-- **Checks**: run them through `just` recipes only. `just check` is what CI
-  runs; never weaken a check to make it pass.
+A rule that names a file in `.agents/knowledge/` is owned there, in full;
+a rule that names none is owned here.
+
+- **Language**: harness files, skills, code, and comments are English.
+  Every `README.md` has a content-identical `README.zh.md` beside it.
 - **Commits**: Conventional Commits in English, `type(scope): subject`;
   scope is the skill name(s), `", "`-separated, omitted for repo-wide
   changes. For distributable skills, `fix` corrects wrong, misleading, or
@@ -46,73 +37,67 @@ person (`ryan-minato`) with agents, and hosted only on GitHub.
   capability; `refactor` restructures without changing behavior; `docs`
   only for supporting documentation that changes no installed skill.
   Correction beats improvement; file format never decides the type.
-  Branch commits land by rebase, so every subject must conform.
-- **Specs before behavior**: only public skills have spec domains. A
-  change to what a skill does goes through an OpenSpec change with a delta
-  spec, whose scenarios (given/when/then) are the acceptance criteria; a
-  change to the repository itself (harness, tooling, checks, documents) is
-  a `skip_specs` change with a proposal, design, and tasks and no spec.
-  The draft pull request opens once the approval package — proposal,
-  delta specs, and design — is written; the task list follows the
-  maintainer's closing. Marking the pull request ready opens the second
-  deliberation, on the finished implementation; the agent archives the
-  change inside the pull request only once the maintainer closes that
-  one, and `checks / spec` is red until it does — that red is the merge
-  block.
-- **Publishing**: nothing reaches GitHub (issue, PR, comment, setting)
-  without explicit user authorization in the current conversation and a
-  `SAFE TO PUBLISH: YES` review of the exact payload.
-- **Authority**: agents may open and ready pull requests; approving,
-  merging, and changing settings or this file to widen agent authority are
-  the maintainer's. Never edit a check, ruleset, or policy to unblock
-  yourself.
+- **Self-containment**: a public skill references nothing outside its
+  directory; handoffs go through `ryan-minato-skills-installing` (skill-quality.md).
+- **Specs before behavior**: a public skill's behavior changes through an
+  OpenSpec change whose delta scenarios (WHEN/THEN) are its acceptance
+  criteria; a repository change is `skip_specs`. Draft timing, approval,
+  and the freeze: spec-workflow.md.
+- **Checks**: run through `just` recipes; `just check` is what CI runs (github-checks.md).
+- **Publishing**: nothing reaches GitHub without the user's authorization in
+  this conversation and a `SAFE TO PUBLISH: YES` review (agent-authority.md `## Publishing`).
+- **Authority**: agents open and ready pull requests; approving, merging,
+  the approval label, settings, and widening agent authority are the
+  maintainer's; never weaken a check (agent-authority.md).
+- **Blocked work**: finish what does not depend on the decision, then record
+  each pending decision in the handoff (agent-authority.md `## Pending decisions`).
+- **Mismatches**: a document, script, or command that disagrees with the
+  repository is fixed in the same change when small and certain, else
+  queued as a pending decision (out of scope: an issue labelled
+  `catalog/repository`, filed once authorized); never left in conversation.
 - **Builders stay**: the `meta` and `scaffold` skills are this repository's
-  product. Their "never commit, delete after the build" rules do not apply
+  product; their "never commit, delete after the build" rules do not apply
   here (`## Use inside this repository` in each catalog's `CONTEXT.md`).
 
 ## When To Read What
 
-- Any tracked change: branch, issue, commits, PR, ready → the
-  `change-workflow` project skill. It runs the OpenSpec loop and the
-  publish gate.
-- Branch names, merge method, labels, milestones, triage, what objects
-  exist on GitHub → `.agents/knowledge/github-workflow.md`.
-- A change to a skill's behavior or to the repository itself, anything under `openspec/`,
-  creating issues from a change → `.agents/knowledge/spec-workflow.md`.
-- Marking ready, requesting review, merging, releasing, any authority
-  question → `.agents/knowledge/agent-authority.md`.
+- Any tracked change (branch, issue, commits, PR, ready) → the
+  `change-workflow` project skill; it runs the OpenSpec loop and the publish gate.
+- Branch names, merge method, labels, milestones, triage → `.agents/knowledge/github-workflow.md`.
+- A change to a skill's behavior or to the repository, anything under
+  `openspec/` → `.agents/knowledge/spec-workflow.md`.
+- Ready, merge, permissions, any authority question → `.agents/knowledge/agent-authority.md`.
 - Creating, modifying, moving, or removing a skill → the `skill-authoring`
-  project skill (quality bar, catalog `CONTEXT.md`, behavioral tests).
-- Reviewing a diff, PR, or branch → the `code-review` project skill.
-- A red or changed CI check, a workflow edit → `.agents/knowledge/github-checks.md`.
-- Any repository setting, ruleset, security feature, label sync →
-  `.agents/knowledge/github-settings.md`.
-- A file another file mirrors, a tool pin, the first PR of a quarter →
-  `.agents/knowledge/harness-maintenance.md`.
+  project skill (bar: `.agents/knowledge/skill-quality.md`); a review → `code-review`.
+- A script, recipe, hook, workflow step, or tool version → `.agents/knowledge/management-code.md`.
+- A red or changed CI check → `.agents/knowledge/github-checks.md`.
+- A repository setting, ruleset, security feature, or Actions policy →
+  `.agents/knowledge/github-settings.md`, the declaration.
+- A mirrored file, the first PR of a quarter → `.agents/knowledge/harness-maintenance.md`.
 - External documentation URLs → `.agents/knowledge/references.md`.
-- Repo mechanics and the as-built map → `ARCHITECTURE.md`.
-- The `openspec-*` skills are generated by the OpenSpec CLI; edit them only
-  through `just spec-sync` after bumping `openspec_version` in the `justfile`.
 
 ## Validation
 
 | Check | Command |
 |---|---|
 | Everything CI runs | `just check` |
-| Skill layout, harness sync, catalogs | `just validate` |
+| Skill layout, harness sync, catalogs, budgets | `just validate` |
 | One skill while drafting | `just check-skill <dir>...` |
+| Management code tests | `just test` |
+| Deno lint, format, type check; ruff on skills' Python | `just lint` |
 | Specs and changes (strict) | `just spec-validate` |
-| Python style (repo scripts, skill scripts, script assets) | `just lint` |
-| Format and validate the tf skill assets (pinned OpenTofu) | `just tf-validate` |
+| Package approval state of a pull request (read-only) | `just spec-approval <n>` |
+| Review threads of a pull request (read-only) | `just review-threads <n>` |
+| Format and validate the tf skill assets | `just tf-validate` |
 | Regenerate `marketplace.json` | `just gen-marketplace` |
-| Regenerate the OpenSpec skills | `just spec-sync` |
-| Staged-change safety gate (also the first pre-commit hook) | `just commit-gate` |
+| Regenerate the `openspec-*` skills after a bump of `openspec_version` | `just spec-sync` |
+| Staged-change safety gate (also a pre-commit hook) | `just commit-gate` |
 
 ## Keep In Sync
 
-Mechanically checked pairs are listed in `scripts/validate_harness.py`
-and fail `just check`. The rest, with owners and triggers, live in
-`.agents/knowledge/harness-maintenance.md`; the three that bite most often:
+Mechanically checked pairs live in `scripts/validate_skills.ts` and
+`scripts/validate_harness.ts`; the rest, with owners and triggers, in
+`.agents/knowledge/harness-maintenance.md`. The three that bite most often:
 
 | When this changes | Update |
 |---|---|

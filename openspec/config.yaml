@@ -1,28 +1,22 @@
 schema: skill-change
 
-# Conventions live in the repository harness; this block points, it does
-# not restate. AGENTS.md is the entrypoint, .agents/knowledge/spec-workflow.md
-# the specification rules, .agents/knowledge/skill-quality.md the skill bar.
+# Conventions live in the repository harness; this file points, it never
+# restates. Artifact rules live in the project schema
+# (openspec/schemas/skill-change/schema.yaml); this file carries only the
+# context and the apply and archive guidance the CLI injects.
 context: |
   This repository is a library of Agent Skills (skills/<catalog>/<skill>/)
   that other projects install by copying a skill directory. Read AGENTS.md
-  first. Specification rules: .agents/knowledge/spec-workflow.md. Skill
-  quality bar: .agents/knowledge/skill-quality.md. Domains: one per public
-  skill at specs/<catalog>/<skill-name>. Changes to the repository itself
-  (environment, harness, tooling, documents) are skip_specs changes with
-  no domain. Never backfill specs for skills the change does not touch.
-
-# Artifact rules live in openspec/schemas/skill-change/schema.yaml (the
-# project schema); this file carries only the guidance the CLI injects into
-# the apply and archive operations.
+  first. Domains, repository changes, and the lifecycle:
+  .agents/knowledge/spec-workflow.md. Skill quality bar:
+  .agents/knowledge/skill-quality.md.
 
 operations:
   apply:
     guidance:
-      - Work on the change's branch (<type>/<slug>, slug = change name); see .agents/knowledge/github-workflow.md.
-      - When the implementation must deviate from the spec, stop and revise the change first.
+      - Work on the change's branch (.agents/knowledge/github-workflow.md, Branches and merging).
+      - Tick tasks and handle a deviation from the spec as .agents/knowledge/spec-workflow.md, Lifecycle, says.
   archive:
     guidance:
-      - Archive inside the pull request once the maintainer closes the deliberation on the finished implementation, with `just spec-changes archive --base origin/main --head HEAD` (see .agents/knowledge/spec-workflow.md, Archive executor and the freeze); no workflow archives. The pull request is marked ready before this, so checks / spec is red until the archive commit lands; main never holds an unarchived change.
-      - Never tick a task that is not done; a fully ticked tasks.md is what the archive consumes, and the archive command refuses every change of the pull request while any has an open task.
-      - Run `just spec-validate` after archiving; `just spec-check` reproduces the checks / spec verdict.
+      - Archive only with `just spec-changes archive --base origin/main --head HEAD`, never the generated archive skill.
+      - When to archive and what follows: .agents/knowledge/spec-workflow.md, Archive executor and the freeze.

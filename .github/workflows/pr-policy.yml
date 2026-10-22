@@ -1,7 +1,14 @@
 # Validates a pull request against .github/PULL_REQUEST_TEMPLATE.md and the
-# commit convention (scripts/check_pr_policy.py). The template and the script
-# are read from the BASE commit, so a pull request cannot ship a weakened
-# template or script to pass its own check. Read-only and fork-safe.
+# commit convention (scripts/check_pr_policy.ts), and scans each commit of the
+# range for credentials, author emails, and attribution trailers
+# (scripts/check_commit_safety.ts --range). The template and the scripts are
+# read from the BASE commit, so a pull request cannot ship a weakened template
+# or script to pass its own check. Read-only and fork-safe; event values reach
+# `run:` only through `env:`.
+#
+# Transition: a base that holds the Deno port runs it; an older base runs its
+# Python original, and the range scan waits until the base holds that script.
+# A follow-up change removes the Python branch once `main` holds the port.
 name: pr-policy
 
 on:
@@ -18,6 +25,7 @@ jobs:
   policy:
     name: pr / policy
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
     steps:
@@ -25,8 +33,34 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           fetch-depth: 0
-      - name: Fetch the pull request head for the commit-range check
-        if: ${{ !github.event.pull_request.head.repo.fork }}
-        run: git fetch --no-tags origin "refs/pull/${{ github.event.pull_request.number }}/head"
+          persist-credentials: false
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: vx.x.x
+      - name: Fetch the pull request head for the commit-range checks
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: git fetch --no-tags origin "refs/pull/${PR_NUMBER}/head"
       - name: Check the pull request against the template and commit convention
-        run: python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"
+        run: |
+          if [ -f scripts/check_pr_policy.ts ]; then
+            ./scripts/check_pr_policy.ts --event "$GITHUB_EVENT_PATH"
+          else
+            python3 scripts/check_pr_policy.py --event "$GITHUB_EVENT_PATH"
+          fi
+      - name: Scan each commit of the range
+        # Runs after a policy failure too, so one push reports both.
+        if: ${{ !cancelled() }}
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          BASE_REPO: ${{ github.event.pull_request.base.repo.full_name }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          if [ ! -f scripts/check_commit_safety.ts ]; then
+            echo "The base has no scripts/check_commit_safety.ts; the range scan starts once it does."
+          elif [ "$HEAD_REPO" = "$BASE_REPO" ]; then
+            ./scripts/check_commit_safety.ts --range "$BASE..$HEAD"
+          else
+            ./scripts/check_commit_safety.ts --range "$BASE..$HEAD" --fork
+          fi

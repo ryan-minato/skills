@@ -31,6 +31,14 @@ skill belong in that catalog's `CONTEXT.md`, not here.
 - just (command runner): https://just.systems/man/en/
 - pre-commit: https://pre-commit.com/
 
+## Deno (management code)
+
+- Runtime manual: https://docs.deno.com/runtime/
+- Security and permissions (the `--allow-*` flags a shebang grants): https://docs.deno.com/runtime/fundamentals/security/
+- `deno.json` configuration (imports, `lock`, fmt/lint/test includes): https://docs.deno.com/runtime/fundamentals/configuration/
+- Testing (`deno test`): https://docs.deno.com/runtime/test/
+- Standard library packages (`jsr:@std/*`): https://jsr.io/@std
+
 ## Services
 
 - Agent Skills docs MCP endpoint: https://agentskills.io/mcp

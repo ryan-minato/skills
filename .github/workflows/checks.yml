@@ -1,7 +1,7 @@
 # The quality gate. Every job mirrors a `just` recipe that exists and
 # passes locally; .agents/knowledge/github-checks.md maps jobs to commands.
-# Job names are what the ruleset requires (only `checks / gate`), so keep
-# them unique across all workflows and update that file when one changes.
+# The ruleset requires `checks / gate` from this workflow; keep job names
+# unique across all workflows and update that file when one changes.
 name: checks
 
 on:
@@ -24,19 +24,21 @@ jobs:
   quality:
     name: checks / quality
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: "3.12"
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+          persist-credentials: false
+      - name: Install Deno, just, pre-commit, and ruff (latest, as in the dev container)
+        uses: ./.github/actions/setup-tools
         with:
-          node-version: "24"
-      - name: Install check tools (pins match the dev container and pre-commit)
-        run: python3 -m pip install --quiet pre-commit==4.6.2 rust-just==1.58.0 ruff==0.16.4
-      - name: Install pinned repository tools
+          just: "true"
+          python-tools: "true"
+      - name: Install the repository tools `just install-tools` names
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: just install-tools
       - name: Run every repository check
         run: just check
@@ -46,12 +48,14 @@ jobs:
     # every pull request; an `on.paths` filter would skip the gate too.
     name: checks / spec
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - id: changed
         name: Decide whether spec files changed
         env:
@@ -66,37 +70,35 @@ jobs:
           # Outside the condition, so a failed diff fails the step instead of
           # reading as "no spec paths changed".
           git diff --name-only "$BASE" "$HEAD" > "$RUNNER_TEMP/changed.txt"
-          if grep -Eq '^(openspec/|\.agents/skills/openspec-|\.agents/skills/\.openspec-target|scripts/spec_changes\.py$|justfile$)' "$RUNNER_TEMP/changed.txt"; then
+          if grep -Eq '^(openspec/|\.agents/skills/openspec-|\.agents/skills/\.openspec-target|scripts/spec_changes\.ts$|scripts/lib/|deno\.json$|justfile$)' "$RUNNER_TEMP/changed.txt"; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "No spec-related paths changed; nothing to validate."
           fi
       - if: steps.changed.outputs.run == 'true'
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        name: Install Deno and just
+        uses: ./.github/actions/setup-tools
         with:
-          node-version: "24"
+          just: "true"
       - if: steps.changed.outputs.run == 'true'
-        name: Install just and the pinned OpenSpec CLI
-        run: |
-          python3 -m pip install --quiet rust-just==1.58.0
-          just install-tools
+        name: Install the pinned OpenSpec CLI
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: just install-tools
       - if: steps.changed.outputs.run == 'true'
-        name: Validate strictly and refuse an unarchived related change
-        # A pull request: strict validation, then every related change that
-        # is still unarchived warns on a draft and fails when ready — the
-        # request stays red through the deliberation, and the freeze is what
-        # turns it green. A push to main: strict validation, then any change
-        # outside archive/ fails.
+        name: Validate strictly and report an unarchived related change
+        # A pull request: strict validation, then a warning for every related
+        # change that is still unarchived — waiting for the freeze is a state,
+        # not a failure, and `checks / archived` holds the merge until then. A
+        # push to main: strict validation, then any change outside archive/
+        # fails.
         env:
           EVENT: ${{ github.event_name }}
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
-          DRAFT: ${{ github.event.pull_request.draft }}
         run: |
           if [ "$EVENT" = "pull_request" ]; then
-            flag=""
-            [ "$DRAFT" = "true" ] && flag="--draft"
-            just spec-check "$BASE" "$HEAD" $flag
+            just spec-check "$BASE" "$HEAD"
           else
             just spec-changes check --all
           fi
@@ -110,20 +112,157 @@ jobs:
             exit 1
           fi
 
+  archive-verdict:
+    # The archive gate (.agents/knowledge/github-checks.md, `## No standing
+    # failure`): decides whether a pull request into the default branch still
+    # holds an unarchived related change. Waiting for the freeze is a state,
+    # not a failure, so the job succeeds either way and only the carrier
+    # below says which; it fails only when the verdict cannot be reached. It
+    # runs the BASE's copy of scripts/spec_changes.ts over git objects, so a
+    # pull request cannot relax its own verdict by editing the script; the
+    # head is fetched, never checked out. Outside the gate: it runs on pull
+    # requests only, and ci_gate.ts fails a skipped dependency.
+    name: checks / archive-verdict
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      archived: ${{ steps.verdict.outputs.archived }}
+    steps:
+      - id: branch
+        name: Hold only a pull request into the default branch
+        # A pull request into another pull request's branch may keep its
+        # change open; the request that reaches main archives it.
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ "$BASE_REF" = "$DEFAULT_BRANCH" ]; then
+            echo "held=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "The base is not the default branch: the archive gate holds only pull requests into it."
+          fi
+      - if: steps.branch.outputs.held == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - if: steps.branch.outputs.held == 'true'
+        uses: ./.github/actions/setup-tools
+      - if: steps.branch.outputs.held == 'true'
+        name: Fetch the pull request head without checking it out
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: git fetch --no-tags origin "refs/pull/${PR_NUMBER}/head"
+      - if: steps.branch.outputs.held == 'true'
+        name: List the related changes with the base's script
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          ./scripts/spec_changes.ts status --base "$BASE" --head "$HEAD"
+          ./scripts/spec_changes.ts status --base "$BASE" --head "$HEAD" --json > "$RUNNER_TEMP/status.json"
+      - id: verdict
+        name: Write the verdict
+        # Only the literal true or false reaches the job's output; no change
+        # name the pull request chose does.
+        env:
+          HELD: ${{ steps.branch.outputs.held }}
+        run: |
+          if [ "$HELD" != "true" ]; then
+            echo "archived=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          archived="$(jq -r '[.changes[] | select(.state == "active")] | length == 0' "$RUNNER_TEMP/status.json")"
+          case "$archived" in
+            true | false) echo "archived=${archived}" >> "$GITHUB_OUTPUT" ;;
+            *) echo "The status JSON gave no verdict." >&2; exit 1 ;;
+          esac
+
+  archived:
+    # Carries the required check: it succeeds either way, but under the
+    # required name `checks / archived` only when no related change is
+    # unarchived. While one is, it reports `checks / awaiting-archive`, which
+    # no ruleset requires, so the merge waits on an expected check and the
+    # run stays green. A failed verdict skips it: neither name succeeds.
+    name: ${{ needs.archive-verdict.outputs.archived == 'true' && 'checks / archived' || 'checks / awaiting-archive' }}
+    needs: archive-verdict
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - env:
+          ARCHIVED: ${{ needs.archive-verdict.outputs.archived }}
+        run: |
+          if [ "$ARCHIVED" = "true" ]; then
+            echo "No related change is unarchived, or the base is not the default branch."
+          else
+            echo "Waiting for the archive; checks / archive-verdict names the unarchived changes."
+          fi
+
+  devcontainer:
+    # Builds the dev container and runs `just check` inside it when the
+    # container, the setup action, the justfile, or deno.json change. Path
+    # filtering happens inside the job, as in `spec`, so the gate never sees
+    # it skipped.
+    name: checks / devcontainer
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: changed
+        name: Decide whether the toolchain changed
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" != "pull_request" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only "$BASE" "$HEAD" > "$RUNNER_TEMP/changed.txt"
+          if grep -Eq '^(\.devcontainer/|\.github/actions/setup-tools/|justfile$|deno\.json$)' "$RUNNER_TEMP/changed.txt"; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "The dev container, setup action, justfile, and deno.json are unchanged; nothing to build."
+          fi
+      - if: steps.changed.outputs.run == 'true'
+        name: Build the dev container and run every check inside it
+        uses: devcontainers/ci@513af61f4de4f75d37e4438f184ba4358f0fc1ca # v0.3.1900000450
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          imageName: skills-devcontainer
+          push: never
+          env: GITHUB_TOKEN
+          runCmd: just check
+
   gate:
-    # The aggregator: the ONLY job name the ruleset requires. A skipped job
-    # reports success, so this job inspects its dependencies' results.
+    # The aggregator: the ONLY job name the ruleset requires from this
+    # workflow. A skipped job reports success, so scripts/ci_gate.ts fails
+    # on a failed, cancelled, or skipped dependency and names it.
     name: checks / gate
     if: always()
-    needs: [quality, spec]
+    needs: [quality, spec, devcontainer]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup-tools
       - name: All required jobs succeeded
         env:
-          RESULTS: ${{ toJSON(needs) }}
-        run: |
-          echo "$RESULTS"
-          if printf '%s' "$RESULTS" | grep -Eq '"result": *"(failure|cancelled)"'; then
-            echo "ERROR: a required job failed or was cancelled. Fix that job; never weaken this gate." >&2
-            exit 1
-          fi
+          NEEDS: ${{ toJSON(needs) }}
+        run: ./scripts/ci_gate.ts
